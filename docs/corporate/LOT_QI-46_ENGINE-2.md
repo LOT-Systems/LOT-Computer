@@ -8,7 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.3 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Engine Specification v0.4 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16
 
 ---
 
@@ -19,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           1 of N  — first self-assembled node
+NODE           2 of N  — consent + admin preview + risk sensitivity
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.3.0-node1)
+CODE           src/server/utils/qi46.ts   (v0.4.0-node2)
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server build green · smoke 9/9
+GATE           PASS — typecheck 0 errors · server build green · smoke 11/11
 AUTHORS        Vadik & Kuzya
 ```
 
@@ -146,18 +147,62 @@ const verdict = cosmoScreen(draft, vector)   // CLEARED | HELD
 
 ---
 
+## 3a. NODE 2 — CONSENT · PREVIEW · RISK (assembled 2026-11-16)
+
+### Consent ("Calibrate me")
+
+The upload starts only when the person says yes. Consent is one boolean in `user.metadata.qi46.consent`, with a timestamp. No migration is needed. Only the exact value `true` counts as consent.
+
+```
+GET  /api/qi46/consent            → { consent }          self only
+POST /api/qi46/consent {consent}  → { consent }          self only, boolean required
+```
+
+There is no UI yet. Nothing in the product asks for it or shows it.
+
+### Admin preview
+
+```
+GET /admin-api/users/:userId/qi46 → { consent, vector, calibration, systemPrompt }
+```
+
+The preview is read-only and sits behind the existing admin guard. It reads up to 300 recent logs, and only when the person has consented. Without consent it returns the empty vector. Nothing is generated, stored or sent.
+
+### Risk sensitivity (closes Node 1 finding F1)
+
+The shared trauma detector averages 12 dimensions, and five of them are eating-disorder dimensions. A person who is heavy across many trauma dimensions therefore averages out to `low`. QI·46 now computes its own risk on top of the detector's verdict:
+
+| Rule | Effect |
+|---|---|
+| Never lower | The detector's verdict is the floor |
+| Breadth ≥ 5 of 7 trauma dimensions present | At least `moderate` |
+| Breadth ≥ 3 of 7 | At least `low` |
+| Direct statement of not wanting to be here (ideation phrase list) | `elevated`. COSMO® then holds any reply that does not point toward a real human |
+
+`riskSignals` explains the level using labels only (`detector:low`, `breadth:6/7`, `ideation`), never the person's words. The shared detector is unchanged, because other surfaces depend on it.
+
+| Persona | Node 1 risk | Node 2 risk | Signals |
+|---|---|---|---|
+| Bright | none | none | — |
+| Mild ("a bit tired today") | none | none | — |
+| Heavy | low | **moderate** | detector:low · breadth:6/7 |
+| Ideation ("don't want to wake up") | none | **elevated** | ideation |
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
 |---|---|---|
-| **2** | Consent flag on `User` (opt-in "Calibrate me") plus an admin-only `/admin-api/qi46/:userId` preview of the vector and calibration | Admin-only; no subscriber exposure |
+| ~~2~~ | ~~Consent flag + admin preview~~ | **ASSEMBLED 2026-11-16** |
+| ~~4~~ | ~~Risk sensitivity: Heavy ≥ moderate~~ | **ASSEMBLED 2026-11-16** (folded into Node 2) |
 | **3** | COSMO® audit trail: persist each verdict (status, reasons, timestamp only, no text) | Migration reviewed by Vadik |
-| **4** | Raise `riskLevel` sensitivity: the "Heavy" persona (worthless, nightmares, avoidance) only scores `low` | Re-run smoke; Heavy ≥ moderate |
-| **5** | Wire into one existing surface behind the consent flag (Memory prompts) | Closed beta, 12 founding users |
+| **5** | A "Calibrate me" toggle in Settings that calls `/api/qi46/consent` | Vadik approves the copy |
+| **6** | Wire into one existing surface behind the consent flag (Memory prompts) | Closed beta, 12 founding users |
 
 ---
 
-*QI·46 Engine Specification — v0.3 · Node 1*
+*QI·46 Engine Specification — v0.4 · Node 2*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Assembled: November 15, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026*

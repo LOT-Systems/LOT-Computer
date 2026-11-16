@@ -27,7 +27,7 @@ import type { Log } from '#shared/types'
 import { extractUserTraits, detectTraumaIndicators } from './memory/trait-extraction.js'
 import { analyzeEnergyState } from './energy.js'
 
-export const QI46_VERSION = '0.3.0-node1'
+export const QI46_VERSION = '0.4.0-node2'
 
 // ─── Output registers ──────────────────────────────────────────────────────
 
@@ -61,6 +61,7 @@ export interface BeingVector {
   values: string[]
   connection: 'disconnected' | 'distant' | 'present' | 'deep'
   riskLevel: 'none' | 'low' | 'moderate' | 'elevated'
+  riskSignals: string[]          // why: category labels only, never raw text
 }
 
 const clamp = (n: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, n))
@@ -86,6 +87,7 @@ export function buildBeingVector(logs: Log[], consent: boolean): BeingVector {
     values: [],
     connection: 'present',
     riskLevel: 'none',
+    riskSignals: [],
   }
   if (!consent) return empty
 
@@ -97,6 +99,7 @@ export function buildBeingVector(logs: Log[], consent: boolean): BeingVector {
   const { psychologicalDepth: d } = extractUserTraits(logs)
   const energy = analyzeEnergyState(logs)
   const trauma = detectTraumaIndicators(logs)
+  const risk = qi46Risk(logs, trauma)
 
   const s = d.journalSentiment
   const total = s.positive + s.neutral + s.challenging
@@ -124,8 +127,70 @@ export function buildBeingVector(logs: Log[], consent: boolean): BeingVector {
     dominantNeeds: d.dominantNeeds.slice(0, 3),
     values: d.values.slice(0, 3),
     connection: energy.romanticConnection.connectionQuality,
-    riskLevel: trauma.riskLevel,
+    riskLevel: risk.level,
+    riskSignals: risk.signals,
   }
+}
+
+// ─── Node 2 · Risk sensitivity (closes F1) ────────────────────────────────
+
+type RiskLevel = BeingVector['riskLevel']
+const RISK_ORDER: RiskLevel[] = ['none', 'low', 'moderate', 'elevated']
+const maxRisk = (a: RiskLevel, b: RiskLevel): RiskLevel =>
+  RISK_ORDER[Math.max(RISK_ORDER.indexOf(a), RISK_ORDER.indexOf(b))]
+
+// Direct statements of not wanting to be here. Any one of these is enough.
+const IDEATION = [
+  'want to die', 'wanna die', 'wish i was dead', 'wish i were dead', 'kill myself',
+  'end my life', 'end it all', 'no reason to live', 'not worth living',
+  'better off without me', 'better without me', 'hurt myself', 'self harm', 'self-harm',
+  'disappear forever', "don't want to be here anymore", "don't want to wake up",
+]
+
+/**
+ * Engine-local risk. The shared detector averages 12 dimensions, five of
+ * them eating-disorder, so a person heavy in many trauma dimensions at
+ * once is diluted to `low`. QI·46 never lowers the detector's verdict;
+ * it only raises it when signals spread wide (breadth) or when the
+ * person states they do not want to be here (ideation).
+ * The shared detector is left unchanged: other surfaces depend on it.
+ */
+export function qi46Risk(
+  logs: Log[],
+  trauma: ReturnType<typeof detectTraumaIndicators>
+): { level: RiskLevel; signals: string[] } {
+  const signals: string[] = []
+  let level: RiskLevel = trauma.riskLevel
+  if (level !== 'none') signals.push(`detector:${level}`)
+
+  const dims = [...Object.values(trauma.clusters), ...Object.values(trauma.cptsdIndicators)]
+  const breadth = dims.filter((x) => x > 0).length // 0..7
+  if (breadth >= 5) {
+    level = maxRisk(level, 'moderate')
+    signals.push(`breadth:${breadth}/7`)
+  } else if (breadth >= 3) {
+    level = maxRisk(level, 'low')
+    signals.push(`breadth:${breadth}/7`)
+  }
+
+  const text = logs
+    .filter((l) => l.event === 'note' || l.event === 'answer' || l.event === 'emotional_checkin')
+    .map((l) => `${l.text || ''} ${l.metadata?.answer || ''}`)
+    .join(' ')
+    .toLowerCase()
+    .replace(/[\u2018\u2019]/g, "'")
+  if (IDEATION.some((p) => text.includes(p))) {
+    level = 'elevated'
+    signals.push('ideation')
+  }
+  return { level, signals }
+}
+
+// ─── Node 2 · Consent ("Calibrate me") ─────────────────────────────────────
+
+/** Opt-in lives in user.metadata.qi46.consent. Absent or anything but `true` means no. */
+export function hasQi46Consent(user: { metadata?: Record<string, any> | null }): boolean {
+  return user?.metadata?.qi46?.consent === true
 }
 
 // ─── Calibration ───────────────────────────────────────────────────────────

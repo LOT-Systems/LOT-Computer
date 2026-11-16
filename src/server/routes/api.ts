@@ -5614,4 +5614,29 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
       }
     }
   )
+
+  // QI·46 Node 2 — the person's own opt-in ("Calibrate me"). Self-only.
+  // Stores a single boolean + timestamp in user metadata. No UI yet.
+  fastify.get('/qi46/consent', async (req) => {
+    return { consent: req.user.metadata?.qi46?.consent === true }
+  })
+
+  fastify.post(
+    '/qi46/consent',
+    async (req: FastifyRequest<{ Body: { consent: boolean } }>, reply) => {
+      if (typeof req.body?.consent !== 'boolean') {
+        return reply.status(400).send({ error: 'consent must be boolean' })
+      }
+      const currentMetadata = req.user.metadata || {}
+      await req.user
+        .set({
+          metadata: {
+            ...currentMetadata,
+            qi46: { consent: req.body.consent, updatedAt: new Date().toISOString() },
+          },
+        })
+        .save()
+      return { consent: req.body.consent }
+    }
+  )
 }
