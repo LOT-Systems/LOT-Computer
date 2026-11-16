@@ -18,6 +18,7 @@ type Routes = {
   adminUser: 'userId'
   logs: void
   dm: 'userId'
+  basics: void
 }
 
 export const router = createRouter<Routes>({
@@ -30,6 +31,7 @@ export const router = createRouter<Routes>({
   adminUser: '/us/:userId',
   logs: '/log',
   dm: '/dm/:userId',
+  basics: '/basics',
 })
 
 export const goTo = <P extends keyof Routes>(

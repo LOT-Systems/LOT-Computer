@@ -361,6 +361,16 @@ fastify.register(async (fastify: FastifyInstance) => {
           })
         })
       })
+
+      // LOT-FM-001 — Basics. Members get the in-app tab; visitors with no
+      // session get the public OPEN TAB (read-only ledger) — not the login wall.
+      fastify.get('/basics', async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: req.user ? 'app' : 'basics',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
     })
 
     // Admin app (accessible by Usership members only)

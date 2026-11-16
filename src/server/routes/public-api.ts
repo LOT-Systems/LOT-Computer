@@ -20,6 +20,15 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import {
+  BASIC_DOCTRINE,
+  BASIC_FM,
+  BASIC_PHASE,
+  BASIC_PRICE_LINE,
+  BASIC_PRICE_USD,
+  CADENCE_LABEL,
+  RATION_MANIFEST,
+} from '#shared/constants/basic'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -504,6 +513,29 @@ export default async (fastify: FastifyInstance) => {
 
   // Public status endpoint - no authentication required
   // Cached for 2 minutes to be cost-effective with Digital Ocean
+  // LOT-FM-001 — public BASIC manifest. Nomenclature + cadence. COGS withheld.
+  fastify.get('/basic/manifest', async (req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=3600')
+    return {
+      fm: BASIC_FM,
+      priceUsd: BASIC_PRICE_USD,
+      priceLine: BASIC_PRICE_LINE,
+      phase: BASIC_PHASE,
+      doctrine: BASIC_DOCTRINE,
+      lines: RATION_MANIFEST.map((i) => ({
+        seq: i.seq,
+        nomenclature: i.nomenclature,
+        qty: i.qty,
+        unit: i.unit,
+        class: i.cls,
+        cadence: CADENCE_LABEL[i.every],
+        every: i.every,
+        offset: i.offset,
+        sized: !!i.sized,
+      })),
+    }
+  })
+
   fastify.get('/status', async (req, reply) => {
     const now = Date.now()
 
