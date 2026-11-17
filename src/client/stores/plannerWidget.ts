@@ -9,6 +9,7 @@
 import { atom } from 'nanostores'
 import { shouldShowWidget } from './intentionEngine'
 import { shouldShowRewardWidget } from './rewardWidgets'
+import { getSharedAudioContext } from '#client/utils/audioContext'
 
 type PlanCategory = 'intent' | 'today' | 'how' | 'feeling'
 
@@ -246,9 +247,7 @@ let _audioCtx: AudioContext | null = null
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
   try {
-    if (!_audioCtx || _audioCtx.state === 'closed') {
-      _audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    }
+    _audioCtx = getSharedAudioContext()
     return _audioCtx
   } catch {
     return null

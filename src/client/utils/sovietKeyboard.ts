@@ -5,6 +5,7 @@
  * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
  * Made in the USA | brand.lot-systems.com
  */
+import { getSharedAudioContext } from '#client/utils/audioContext'
 
 /**
  * Soviet synth keyboard click
@@ -29,12 +30,7 @@ const MIN_GAP_MS = 18 // cap to roughly 55 clicks/sec, still feels live
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
   try {
-    if (!ctx || ctx.state === 'closed') {
-      ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    }
-    if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {})
-    }
+    ctx = getSharedAudioContext()
     return ctx
   } catch {
     return null

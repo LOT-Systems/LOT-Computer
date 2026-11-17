@@ -5,6 +5,7 @@
  * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
  * Made in the USA | brand.lot-systems.com
  */
+import { getSharedAudioContext } from '#client/utils/audioContext'
 
 // Soviet-era inspired digital coo-coo chime
 // Inspired by 1960s-70s Soviet electronic music - simple, pure tones with minimal ornamentation
@@ -31,10 +32,10 @@ const hourProfiles = [
 let sharedAudioContext: AudioContext | null = null
 
 function getAudioContext(): AudioContext {
-  if (!sharedAudioContext || sharedAudioContext.state === 'closed') {
-    sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-  }
-  return sharedAudioContext
+  const c = getSharedAudioContext()
+  if (!c) throw new Error('AudioContext unavailable')
+  sharedAudioContext = c
+  return c
 }
 
 export function warmAudioContext() {

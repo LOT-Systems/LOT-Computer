@@ -28,7 +28,13 @@ const MONTH_MESSAGES: Record<number, string> = {
   10: 'Ten months. Almost there.',
   11: 'Eleven months. One more.',
   12: 'One year with LOT. The portrait is complete — and still evolving.',
+  13: 'Thirteen months. The practice keeps itself now.',
+  14: 'Fourteen months. Fewer words, clearer signal.',
+  15: 'Fifteen months. The full interface is yours. Keep it quiet.',
 }
+
+// Month-to-month UI reveal arc runs 15 months (Digital UX routine).
+const REVEAL_MONTHS = 15
 
 const DISMISS_PHRASES = [
   'Onward.',
@@ -103,10 +109,10 @@ export const MonthlyPulseWidget: React.FC = () => {
 
   if (!visible) return null
 
-  const message = MONTH_MESSAGES[Math.min(monthNumber, 12)] ??
+  const message = MONTH_MESSAGES[monthNumber] ??
     `Month ${monthNumber}. The journey continues.`
-  const capped = Math.min(monthNumber, 12)
-  const label = `Month ${capped}:`
+  const capped = Math.min(monthNumber, REVEAL_MONTHS)
+  const label = `Month ${monthNumber}:`
 
   return (
     <div
@@ -131,7 +137,7 @@ export const MonthlyPulseWidget: React.FC = () => {
             >
               <div>{message}</div>
               <div className="opacity-30 mt-4 text-sm">
-                {capped} / 12 months
+                {capped} / {REVEAL_MONTHS} months
               </div>
             </div>
           )}

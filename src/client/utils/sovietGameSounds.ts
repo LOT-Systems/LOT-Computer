@@ -5,6 +5,7 @@
  * LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024
  * Made in the USA | brand.lot-systems.com
  */
+import { getSharedAudioContext } from '#client/utils/audioContext'
 
 // Soviet-era micro game sound effects
 // Synthesized via Web Audio API — lo-fi, 8-bit character inspired by
@@ -13,11 +14,10 @@
 let ctx: AudioContext | null = null
 
 function getCtx(): AudioContext {
-  if (!ctx || ctx.state === 'closed') {
-    ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-  }
-  if (ctx.state === 'suspended') ctx.resume().catch(() => {})
-  return ctx
+  const c = getSharedAudioContext()
+  if (!c) throw new Error('AudioContext unavailable')
+  ctx = c
+  return c
 }
 
 // Clamp gain to safe range

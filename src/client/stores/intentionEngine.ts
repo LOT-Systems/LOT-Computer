@@ -26,7 +26,7 @@ import { atom } from 'nanostores'
 // Intention signals collected from all widgets and background monitors
 export type IntentionSignal = {
   timestamp: number
-  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal' | 'calculator' | 'log' | 'energy' | 'cohort' | 'recipe' | 'goals' | 'qos' | 'medical' | 'resilience' | 'badges' | 'astrology'
+  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal' | 'calculator' | 'log' | 'energy' | 'cohort' | 'recipe' | 'goals' | 'qos' | 'medical' | 'resilience' | 'badges' | 'astrology' | 'micro_game'
   signal: string
   metadata?: Record<string, any>
 }
@@ -3329,7 +3329,8 @@ export function analyzeIntentions(): IntentionPattern[] {
   // active OS dimension contributing signal at the same time. The field is not building — it is saturated.
   const hasPresenceP142 = patterns.some(p => p.pattern === 'adaptive-signal-web')
   const hasPresenceP137 = patterns.some(p => p.pattern === 'quantum-coherence-peak')
-  const daySignals147 = signals.filter(s => now - s.timestamp < dayMs)
+  const dayMs147 = 24 * 60 * 60 * 1000
+  const daySignals147 = signals.filter(s => now - s.timestamp < dayMs147)
   const uniqueSources147 = new Set(daySignals147.map(s => s.source)).size
   if (hasPresenceP142 && hasPresenceP137 && uniqueSources147 >= 7) {
     const presenceBonus = Math.min((uniqueSources147 - 7) * 0.02, 0.14)
