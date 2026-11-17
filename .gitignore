@@ -47,7 +47,7 @@ postcss.config.*.backup
 *.working-backup
 
 # Compiled output (should not be in repo)
-server/
+/server/
 *.js.map
 
 # Archive files
@@ -74,7 +74,7 @@ yarn 2.lock
 *.mp3
 touch
 middleware.ts
-server.ts
+/server.ts
 
 # Security: Certificate files
 *.crt

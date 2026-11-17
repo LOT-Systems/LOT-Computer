@@ -27,7 +27,7 @@ import type { Log } from '#shared/types'
 import { extractUserTraits, detectTraumaIndicators } from './memory/trait-extraction.js'
 import { analyzeEnergyState } from './energy.js'
 
-export const QI46_VERSION = '0.4.0-node2'
+export const QI46_VERSION = '0.5.0-node3'
 
 // ─── Output registers ──────────────────────────────────────────────────────
 
@@ -248,6 +248,17 @@ export interface CosmoVerdict {
   timestamp: string
 }
 
+/** Every reason code COSMO® can emit. The audit trail accepts only these. */
+export const COSMO_REASONS = [
+  'no-consent',
+  'empty',
+  'clinical-claim',
+  'humanoid-claims-to-be-human',
+  'hedging-voice',
+  'elevated-risk-without-human-bridge',
+] as const
+export type CosmoReason = (typeof COSMO_REASONS)[number]
+
 const HEDGES = /\b(i think|perhaps|it might be|maybe you should)\b/i
 const CLINICAL = /\b(you (have|suffer from)|diagnos|disorder|ptsd)\b/i
 const IDENTITY_CLAIM = /\b(i am (human|a person|alive)|i (feel|love) you (too|back))\b/i
@@ -267,6 +278,40 @@ export function cosmoScreen(response: string, v: BeingVector, now = new Date()):
     reasons.push('elevated-risk-without-human-bridge')
   }
   return { status: reasons.length ? 'HELD' : 'CLEARED', reasons, timestamp: now.toISOString() }
+}
+
+// ─── COSMO® audit row (Node 3) ─────────────────────────────────────────────
+
+export interface CosmoAuditRow {
+  status: CosmoVerdict['status']
+  reasons: CosmoReason[]
+  riskLevel: BeingVector['riskLevel']
+  lead: Qi46Register
+  engineVersion: string
+  source: 'admin-preview' | 'surface'
+}
+
+/**
+ * Reduce a verdict to what may be persisted. No text survives this function:
+ * reason codes are filtered against the closed COSMO_REASONS list, and the
+ * other fields are enum labels.
+ */
+export function toCosmoAuditRow(
+  verdict: CosmoVerdict,
+  v: BeingVector,
+  c: CalibrationProfile,
+  source: CosmoAuditRow['source'] = 'admin-preview'
+): CosmoAuditRow {
+  const allowed = new Set<string>(COSMO_REASONS)
+  const reasons = verdict.reasons.filter((r): r is CosmoReason => allowed.has(r))
+  return {
+    status: reasons.length ? 'HELD' : verdict.status === 'HELD' ? 'HELD' : 'CLEARED',
+    reasons,
+    riskLevel: v.riskLevel,
+    lead: c.lead,
+    engineVersion: QI46_VERSION,
+    source,
+  }
 }
 
 // ─── Voice seed ────────────────────────────────────────────────────────────

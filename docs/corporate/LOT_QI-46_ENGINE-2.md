@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.4 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16
+### Engine Specification v0.5 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17
 
 ---
 
@@ -20,13 +20,14 @@
 ## 0. NODE STATUS
 
 ```
-NODE           2 of N  — consent + admin preview + risk sensitivity
+NODE           3 of N  — COSMO® audit trail (append-only, no text)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.4.0-node2)
+CODE           src/server/utils/qi46.ts   (v0.5.0-node3) · qi46-audit.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server build green · smoke 11/11
+GATE           PASS — typecheck 0 errors · server build green · smoke 18/18 · migration up/down verified on Postgres 16
+REVIEW         Migration 20261117120000 awaits Vadik's review before it runs in production
 AUTHORS        Vadik & Kuzya
 ```
 
@@ -190,19 +191,52 @@ The shared trauma detector averages 12 dimensions, and five of them are eating-d
 
 ---
 
+## 3b. NODE 3 — COSMO® AUDIT TRAIL (assembled 2026-11-17)
+
+> *COSMO® does not edit. It records and holds.* Node 3 is where it records.
+
+### Table `qi46_cosmo_verdicts` (append-only)
+
+| Column | Type | Holds |
+|---|---|---|
+| `id` | bigint | row id |
+| `userId` | uuid → users (CASCADE) | whose verdict it is. If the person is deleted, the trail is deleted |
+| `status` | varchar(8) | `CLEARED` · `HELD` |
+| `reasons` | jsonb | reason codes from the closed list of 6, never free text |
+| `risk_level` | varchar(16) | `none` · `low` · `moderate` · `elevated` |
+| `lead` | varchar(16) | the register the voice opened in |
+| `engine_version` | varchar(32) | e.g. `0.5.0-node3` |
+| `source` | varchar(32) | `admin-preview` now, `surface` from Node 6 |
+| `created_at` | timestamptz | |
+
+**There is no text column.** The person's words and the generated response are never stored. `toCosmoAuditRow()` is the only way into the table: it drops any reason that is not in `COSMO_REASONS`, and if a forged verdict says CLEARED but carries a real reason, the row is forced to HELD.
+
+### Routes (admin only, behind the existing guard)
+
+```
+POST /admin-api/users/:userId/qi46/screen   {draft}  → { verdict, audit:{recorded, id, row} }
+GET  /admin-api/users/:userId/qi46/verdicts          → { available, total, held, cleared, rows }
+```
+
+`screen` is a dry run. The admin pastes a draft and COSMO® screens it against the person's live Being Vector. The verdict is recorded and the draft is discarded. Nothing is sent to the person.
+
+**Fail soft:** if the migration has not run yet, `recorded:false` is returned along with the verdict, and `verdicts` returns `available:false`. Nothing throws.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
 |---|---|---|
 | ~~2~~ | ~~Consent flag + admin preview~~ | **ASSEMBLED 2026-11-16** |
 | ~~4~~ | ~~Risk sensitivity: Heavy ≥ moderate~~ | **ASSEMBLED 2026-11-16** (folded into Node 2) |
-| **3** | COSMO® audit trail: persist each verdict (status, reasons, timestamp only, no text) | Migration reviewed by Vadik |
+| ~~3~~ | ~~COSMO® audit trail~~ | **ASSEMBLED 2026-11-17**. Migration `20261117120000` awaits Vadik's review |
 | **5** | A "Calibrate me" toggle in Settings that calls `/api/qi46/consent` | Vadik approves the copy |
 | **6** | Wire into one existing surface behind the consent flag (Memory prompts) | Closed beta, 12 founding users |
 
 ---
 
-*QI·46 Engine Specification — v0.4 · Node 2*
+*QI·46 Engine Specification — v0.5 · Node 3*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026*

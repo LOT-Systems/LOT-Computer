@@ -14,7 +14,7 @@ export interface EnergyTransaction {
   activity: string
   energyCost: number // negative = drain, positive = replenishment
   category: 'social' | 'focus' | 'creative' | 'physical' | 'rest' | 'joy' | 'emotional' | 'romantic' | 'intimacy'
-  source: 'check-in' | 'chat' | 'memory' | 'planner' | 'log'
+  source: string // originating log event at runtime, e.g. 'emotional_checkin', 'answer', 'note'
 }
 
 export interface EnergyState {

@@ -19,7 +19,8 @@ import { Umzug, SequelizeStorage } from 'umzug'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
-import { assembleQi46, hasQi46Consent } from '#server/utils/qi46'
+import { assembleQi46, hasQi46Consent, cosmoScreen, toCosmoAuditRow } from '#server/utils/qi46'
+import { recordCosmoVerdict, listCosmoVerdicts } from '#server/utils/qi46-audit'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -432,6 +433,44 @@ export default async (fastify: FastifyInstance) => {
         : []
       const { vector, calibration, systemPrompt } = assembleQi46(logs as any, consent)
       return { userId: user.id, consent, vector, calibration, systemPrompt }
+    }
+  )
+
+  // QI·46 Node 3 — COSMO® dry-run. Screens an admin-supplied draft against the
+  // person's Being Vector and records the verdict (status + reason codes only).
+  // The draft text is never stored and nothing is sent to the person.
+  fastify.post(
+    '/users/:userId/qi46/screen',
+    async (
+      req: FastifyRequest<{ Params: { userId: string }; Body: { draft?: unknown } }>,
+      reply
+    ) => {
+      const user = await fastify.models.User.findByPk(req.params.userId)
+      if (!user) return reply.throw.notFound()
+      if (typeof req.body?.draft !== 'string') return reply.throw.badParams()
+      const consent = hasQi46Consent(user)
+      const logs = consent
+        ? await fastify.models.Log.findAll({
+            where: { userId: user.id },
+            order: [['createdAt', 'DESC']],
+            limit: 300,
+          })
+        : []
+      const { vector, calibration } = assembleQi46(logs as any, consent)
+      const verdict = cosmoScreen(req.body.draft.slice(0, 4000), vector)
+      const row = toCosmoAuditRow(verdict, vector, calibration, 'admin-preview')
+      const audit = await recordCosmoVerdict(user.id, row)
+      return { userId: user.id, verdict, audit: { ...audit, row } }
+    }
+  )
+
+  // QI·46 Node 3 — read the COSMO® audit trail for one person.
+  fastify.get(
+    '/users/:userId/qi46/verdicts',
+    async (req: FastifyRequest<{ Params: { userId: string } }>, reply) => {
+      const user = await fastify.models.User.findByPk(req.params.userId)
+      if (!user) return reply.throw.notFound()
+      return { userId: user.id, ...(await listCosmoVerdicts(user.id, 50)) }
     }
   )
 

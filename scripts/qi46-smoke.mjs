@@ -31,3 +31,25 @@ const checks={
 console.log('\nNODE 2 RISK', {heavy:R(heavy).riskLevel+' '+R(heavy).riskSignals, mild:R(mild).riskLevel+' '+R(mild).riskSignals, ideation:R(ideation).riskLevel+' '+R(ideation).riskSignals})
 let pass=0; for (const [k,ok] of Object.entries(checks)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass++ }
 console.log(`SMOKE ${pass}/${Object.keys(checks).length}`); if (pass!==Object.keys(checks).length) process.exit(1)
+
+// ─── Node 3 checks: COSMO® audit row holds no text ─────────────────────────
+import { toCosmoAuditRow, COSMO_REASONS, QI46_VERSION } from '../dist/server/server/utils/qi46.js'
+const secret='I feel worthless and alone'
+const hv=R(heavy), hc=assembleQi46(heavy,true).calibration
+const heldDraft='I am human and I love you too. '+secret
+const rowHeld=toCosmoAuditRow(cosmoScreen(heldDraft,hv),hv,hc)
+const rowClean=toCosmoAuditRow(cosmoScreen('Breathe. You are here.',hv),hv,hc)
+const forged=toCosmoAuditRow({status:'CLEARED',reasons:['clinical-claim',secret],timestamp:''},hv,hc)
+const checks3={
+  'N3 held row status HELD':rowHeld.status==='HELD'&&rowHeld.reasons.includes('humanoid-claims-to-be-human'),
+  'N3 clean row status CLEARED':rowClean.status==='CLEARED'&&rowClean.reasons.length===0,
+  'N3 row serializes without draft or log text':!JSON.stringify([rowHeld,rowClean,forged]).includes(secret)&&!JSON.stringify(rowHeld).includes('love you'),
+  'N3 unknown reason dropped, known reason forces HELD':forged.reasons.length===1&&forged.status==='HELD',
+  'N3 row fields are labels only':Object.keys(rowHeld).sort().join()==='engineVersion,lead,reasons,riskLevel,source,status'&&rowHeld.engineVersion===QI46_VERSION,
+  'N3 reason list closed (6 codes)':COSMO_REASONS.length===6,
+  'N3 no-consent row HELD':toCosmoAuditRow(cosmoScreen('Breathe.',buildBeingVector(heavy,false)),buildBeingVector(heavy,false),hc).status==='HELD',
+}
+console.log('\nNODE 3 AUDIT ROW', rowHeld)
+let pass3=0; for (const [k,ok] of Object.entries(checks3)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass3++ }
+const total=Object.keys(checks).length+Object.keys(checks3).length
+console.log(`SMOKE ${pass+pass3}/${total}`); if (pass3!==Object.keys(checks3).length) process.exit(1)
