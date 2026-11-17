@@ -4178,9 +4178,12 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           ? { email: q.email }
           : { firstName: { [Op.iLike]: q.firstName } }
         if (q.lastInitial) where.lastName = { [Op.iLike]: `${q.lastInitial}%` }
-        where.id = { [Op.ne]: req.user.id }
-        const candidates = (await fastify.models.User.findAll({ where, limit: 10 }))
+        const found = (await fastify.models.User.findAll({ where, limit: 10 }))
           .filter((u) => !isSuspendedUser(u as any))
+        const candidates = found.filter((u) => u.id !== req.user.id)
+        if (!candidates.length && found.length) {
+          return reply.status(400).send({ error: 'CANNOT EMAIL YOURSELF — write a log instead.' })
+        }
         if (candidates.length > 1) {
           return reply.status(409).send({
             error: 'MULTIPLE MATCHES — add a last initial.',

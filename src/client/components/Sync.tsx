@@ -24,7 +24,9 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useSendLotEmail,
 } from '#client/queries'
+import { parseEmailCommand } from '#shared/utils/lotEmail'
 import { sync } from '../sync'
 import { LotEmailInbox } from './LotEmailInbox'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -126,12 +128,37 @@ export const Sync = React.memo(function SyncInner() {
 
   const onChangeMessage = React.useCallback((value: string) => setMessage(value), [])
 
+  // LOT® Email inside LOT Chat: "/email to Hitomi. …" typed in the chat
+  // line is delivered privately as a letter — never posted to public chat.
+  const [mailStatus, setMailStatus] = React.useState<string | null>(null)
+  const { mutate: sendLotEmail, isLoading: mailSending } = useSendLotEmail({
+    onSuccess: (letter) => {
+      setMessage('')
+      setMailStatus(`MAIL: DELIVERED → ${letter.receiverName.toUpperCase()}`)
+    },
+    onError: (err: any) => {
+      const data = err?.response?.data
+      const cands = Array.isArray(data?.candidates) ? ` · ${data.candidates.join(' · ')}` : ''
+      setMailStatus(`MAIL: ${data?.error || 'MAIL OFFLINE — try again.'}${cands}`)
+    },
+  })
+
   const onSubmitMessage = React.useCallback(
     (ev?: React.FormEvent) => {
       ev?.preventDefault()
+      if (/^\s*\/email\b/i.test(message)) {
+        const draft = parseEmailCommand(message)
+        if (!draft || !draft.body) {
+          setMailStatus('MAIL: /email to Name. Your letter')
+          return
+        }
+        if (!mailSending) sendLotEmail({ to: draft.to, message: draft.body })
+        return
+      }
+      setMailStatus(null)
       createChatMessage({ message })
     },
-    [message]
+    [message, mailSending]
   )
 
   const onToggleLike = React.useCallback(
@@ -217,6 +244,10 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {mailStatus && (
+        <div className="text-acc/40 -mt-72 mb-40 select-none">{mailStatus}</div>
+      )}
 
       <LotEmailInbox />
 
