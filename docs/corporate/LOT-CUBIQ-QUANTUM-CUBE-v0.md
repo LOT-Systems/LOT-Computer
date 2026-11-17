@@ -321,6 +321,15 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE NAP-TIME TABLE                          2026-11-17
+  ─────────────────────────────────────────────────────────────────
+  Parent working at the kitchen table during a baby's nap; phone on
+  silent. LOT® Station CO₂ signal → THE DRIFT (new, silent stick-slip
+  glide toward the window side of the pad); missed LOT® Brush event →
+  THE SETTLE. Zero airborne gestures, zero sounds. Establishes
+  horizontal surface motion as a v.0 requirement and per-operator
+  directional meaning. Full text: LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md §11.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
