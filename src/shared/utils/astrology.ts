@@ -81,14 +81,21 @@ export function getHourlyZodiac(date: Date): string {
  */
 export function getRokuyo(date: Date): string {
   // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
   const knownRokuyoIndex = 0
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
+  // Count whole *calendar* days from the reading's own local date fields.
+  // (2026-11-17 fix) The previous version diffed against
+  // new Date('2000-01-01') — UTC midnight — so for any viewer west of UTC
+  // the rokuyo flipped mid-afternoon/evening local time instead of at local
+  // midnight (e.g. 16:00 in Los Angeles). Anchoring both sides with
+  // Date.UTC(y, m, d) makes the day boundary the viewer's own midnight and
+  // is identical to the old result on UTC hosts (server Logs history).
+  const dayNumber = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const knownDayNumber = Date.UTC(2000, 0, 1)
+  const daysDiff = Math.round((dayNumber - knownDayNumber) / (1000 * 60 * 60 * 24))
 
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Calculate Rokuyo index (6-day cycle); keep it positive for pre-2000 dates
+  const rokuyoIndex = (((knownRokuyoIndex + daysDiff) % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +183,116 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ambient reading v2 (2026-11-17) — single source of truth shared by the
+// System dashboard (client) and getLogContext (server / Logs entries), so a
+// log's ASTRO snapshot and the dashboard block can never disagree.
+// Ambient conditions only — never a personal natal chart.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** One-line plain guidance per rokuyo day (traditional reading, simplified). */
+export const ROKUYO_GUIDANCE: Record<string, string> = {
+  Sensho: 'Act early — mornings favoured',
+  Tomobiki: 'Shared plans go well',
+  Senpu: 'Go slow — afternoons favoured',
+  Butsumetsu: 'Rest, close loops, start nothing big',
+  Taian: 'Auspicious — good day to begin',
+  Shakku: 'Midday only — take care',
+}
+
+export interface AstrologyReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  rokuyoGuidance: string
+  moonPhase: string
+  moonIllumination: number
+  /** Taian day */
+  auspicious: boolean
+  /** Local calendar date of the reading, YYYY-MM-DD (in the reading's timeZone) */
+  readingDate: string
+  /** The timeZone actually applied, or null when device/server-local time was used */
+  timeZone: string | null
+}
+
+/**
+ * Return a Date whose *local* getters (getHours/getDate/...) read the wall
+ * clock of `timeZone` at `now`. Invalid/missing timeZone → `now` unchanged.
+ * Uses Intl only, so it is isomorphic (no dayjs dependency in shared code).
+ */
+export function getWallClockDate(now: Date, timeZone?: string | null): { date: Date; timeZone: string | null } {
+  if (!timeZone) return { date: now, timeZone: null }
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(now)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+    const date = new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+    if (isNaN(date.getTime())) return { date: now, timeZone: null }
+    return { date, timeZone }
+  } catch {
+    return { date: now, timeZone: null }
+  }
+}
+
+/**
+ * Full ambient reading for `now`, personalised to the user's saved timeZone.
+ * Calendar/clock-based values (zodiac hour, sign, rokuyo) use the wall clock;
+ * the moon phase is an absolute astronomical quantity and uses real `now`.
+ */
+export function getAstrologyReading(now: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = getWallClockDate(now, timeZone)
+  const moon = getMoonPhase(now)
+  const rokuyo = getRokuyo(wall.date)
+  const d = wall.date
+  const readingDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return {
+    hourlyZodiac: getHourlyZodiac(wall.date),
+    westernZodiac: getWesternZodiac(wall.date),
+    rokuyo,
+    rokuyoGuidance: ROKUYO_GUIDANCE[rokuyo] ?? '',
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    auspicious: rokuyo === 'Taian',
+    readingDate,
+    timeZone: wall.timeZone,
+  }
+}
+
+/** Minimal log shape so this stays free of server/client type imports. */
+export interface AstroLogLike {
+  context?: { astroMoonPhase?: string | null; astroRokuyo?: string | null } | null
+}
+
+export interface LogsUnderSky {
+  /** Logs written under the same moon phase as now */
+  samePhase: number
+  /** Logs written on the same rokuyo day-type as today */
+  sameRokuyo: number
+  /** Logs that carry any astro snapshot at all (written since 2026-07-27) */
+  withReading: number
+}
+
+/**
+ * Logs ↔ Astrology read-back: how many of the user's own log entries were
+ * written under the current sky. Turns the per-log ASTRO snapshot into a
+ * personal, history-based signal without any natal data.
+ */
+export function summarizeLogsUnderSky(logs: AstroLogLike[], reading: Pick<AstrologyReading, 'moonPhase' | 'rokuyo'>): LogsUnderSky {
+  let samePhase = 0
+  let sameRokuyo = 0
+  let withReading = 0
+  for (const log of logs) {
+    const ctx = log?.context
+    if (!ctx || !ctx.astroRokuyo) continue
+    withReading++
+    if (ctx.astroMoonPhase === reading.moonPhase) samePhase++
+    if (ctx.astroRokuyo === reading.rokuyo) sameRokuyo++
+  }
+  return { samePhase, sameRokuyo, withReading }
 }

@@ -56,6 +56,9 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      // (2026-11-17) own saved timeZone — personalises the Astrology block
+      // so the dashboard reading matches the ASTRO snapshot on Logs entries
+      'timeZone',
     ])(this.toJSON())
 
     // Add memory engine status based on tags

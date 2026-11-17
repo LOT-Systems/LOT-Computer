@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading, summarizeLogsUnderSky, type AstrologyReading, type LogsUnderSky } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -101,6 +101,25 @@ function LoadingDots() {
   return <span className="opacity-40">{'·'.repeat(dots)}</span>
 }
 
+// Second line of the Astrology block: today's rokuyo guidance + the Logs
+// read-back ("N logs under this moon"). Ambient + personal history only.
+const AstrologyDetail = React.memo(function AstrologyDetail({
+  reading,
+  underSky,
+}: {
+  reading: AstrologyReading
+  underSky: LogsUnderSky
+}) {
+  return (
+    <div className="opacity-60">
+      {reading.rokuyoGuidance}
+      {underSky.withReading > 0 && (
+        <> • {underSky.samePhase} {underSky.samePhase === 1 ? 'log' : 'logs'} under this moon</>
+      )}
+    </div>
+  )
+})
+
 export const System = React.memo(function SystemInner() {
   const me = useStore(stores.me)
   const weather = useStore(stores.weather)
@@ -113,7 +132,7 @@ export const System = React.memo(function SystemInner() {
   const myProfileVisits: number = (me as any)?.metadata?.profileVisits ?? 0
 
   const { data: profile } = useProfile()
-  const { data: logs = [] } = useLogs()
+  const { data: logs = [], isFetched: logsFetched } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
 
 
@@ -203,40 +222,55 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // rokuyo), not a personal natal chart. v2 (2026-11-17): personalised to
+  // the user's saved profile timeZone (falls back to device time), via the
+  // same shared getAstrologyReading() that stamps every Logs entry — so the
+  // dashboard and the journal's ASTRO line always agree.
+  const userTimeZone = me?.timeZone ?? null
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), userTimeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, userTimeZone]
+  )
+
+  // Logs <-> Astrology read-back: how many of the user's own entries were
+  // written under this moon phase / this rokuyo day-type.
+  const logsUnderSky = React.useMemo(
+    () => summarizeLogsUnderSky(logs as any[], astrology),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logs, astrology.moonPhase, astrology.rokuyo]
+  )
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
-  // per calendar day, so other widgets (cosmic, system) can react to it.
+  // per local calendar day (in the reading's timeZone), so other widgets
+  // (cosmic, system) can react to it. Waits for logs so the read-back
+  // counts carried in the signal are real, not a pre-fetch zero.
+  // (Gated on the query having fetched, not on logs.length > 0, so a brand
+  // new user with zero logs still gets the daily ambient signal.)
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    try {
+      if (localStorage.getItem(lastRecordedKey) === astrology.readingDate) return
+    } catch { /* storage blocked — fall through */ }
+    if (!logsFetched) return
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      {
+        readingDate: astrology.readingDate,
+        timeZone: astrology.timeZone,
+        logsSamePhase: logsUnderSky.samePhase,
+        logsSameRokuyo: logsUnderSky.sameRokuyo,
+        logsWithReading: logsUnderSky.withReading,
+      }
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, astrology.readingDate) } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrology.readingDate, logsFetched])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +501,7 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            <AstrologyDetail reading={astrology} underSky={logsUnderSky} />
           </Block>
         </div>
 
@@ -671,7 +706,10 @@ export const System = React.memo(function SystemInner() {
         >
           {astrologyView === 'astrology' ? (
             <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              <AstrologyDetail reading={astrology} underSky={logsUnderSky} />
             </div>
           ) : astrologyView === 'psychology' ? (
             <div>

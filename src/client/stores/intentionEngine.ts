@@ -4880,7 +4880,15 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // v2 (2026-11-17): personalization + Logs read-back context
+  extra: {
+    readingDate?: string
+    timeZone?: string | null
+    logsSamePhase?: number
+    logsSameRokuyo?: number
+    logsWithReading?: number
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4897,7 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    ...extra,
   })
 }
 
