@@ -1079,12 +1079,27 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Calendar stream — dedicated read so entries never fall out of the
+  // 500-row /logs window. Returns the append-only calendar event stream
+  // (entries, status changes, fired alerts); the client folds it into state.
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    return fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_status', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+  })
+
   fastify.get('/logs', async (req: FastifyRequest, reply) => {
     // Only return user-facing log events (exclude raw QIE signal events)
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1597,7 +1612,7 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       const log = await fastify.models.Log.findByPk(req.params.id)
-      if (!log) return reply.throw.notFound()
+      if (!log || log.userId !== req.user.id) return reply.throw.notFound()
       if (log.event !== 'note') return log
 
       // If user backspaced all content, delete the log instead of saving empty text
