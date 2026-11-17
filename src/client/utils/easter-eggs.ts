@@ -1483,6 +1483,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCANE TERMINAL ────────────────────────────────────────────────
+  { patterns: /\barcane[\s-]?(arts?|knowledge|practice|wisdom|study)?\b/i,              badge: 'arcane_signal' },
+  { patterns: /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b/i,        badge: 'grimoire_open' },
+  { patterns: /\bincantation\b|\bsacred[\s-]?words?\b|\bspoken[\s-]?into[\s-]?being\b/i, badge: 'incantation_cast' },
+  { patterns: /\bward(ing|ed|s)?\b|\bprotective[\s-]?ward\b/i,                          badge: 'ward_placed' },
+  { patterns: /\btransmut(e|ed|ing|ation)\b|\bbase[\s-]?(metal[\s-]?)?into[\s-]?gold\b|\balchemical[\s-]?change\b/i, badge: 'transmute_active' },
+  { patterns: /\bsigil(s)?\b|\bsacred[\s-]?symbol\b|\bsymbolic[\s-]?mark\b/i,          badge: 'sigil_carved' },
+  { patterns: /\bfamiliar\b|\bspirit[\s-]?animal\b|\bcompanion[\s-]?spirit\b|\bpower[\s-]?animal\b/i, badge: 'familiar_bound' },
+  { patterns: /\bsanctum\b|\binner[\s-]?sanctum\b|\bsanctuary\b|\bsacred[\s-]?space\b/i, badge: 'sanctum_found' },
+  { patterns: /\balchemy\b|\balchemical\b|\bgreat[\s-]?work\b/i,                        badge: 'alchemy_process' },
+  { patterns: /\bcipher\b|\bdecipher(ed|ing)?\b|\bencoded\b|\bthe[\s-]?code[\s-]?beneath\b/i, badge: 'cipher_broken' },
+  { patterns: /\brune(s|ic)?\b|\bancient[\s-]?marks?\b|\bcarved[\s-]?in[\s-]?stone\b/i, badge: 'rune_inscribed' },
+  { patterns: /\bnexus\b|\bpower[\s-]?nexus\b|\bconvergence[\s-]?point\b/i,             badge: 'nexus_activated' },
+  // ── v20 Secret Boss — THE HIDDEN CODEX word triggers ─────────────────────────
+  { patterns: /\bparacelsus\b|\bquinta[\s-]?essentia\b|\bsulphur[\s-]?mercury[\s-]?salt\b|\bsulfur[\s-]?mercury\b/i, badge: 'paracelsus_key' },
+  { patterns: /\bjohn[\s-]?dee\b|\benochian\b|\bangelic[\s-]?language\b|\bscrying[\s-]?mirror\b/i, badge: 'dee_cipher' },
+  { patterns: /\bemerald[\s-]?tablet\b|\bhermes[\s-]?trismegistus\b|\bas[\s-]?above[\s-]?so[\s-]?below\b/i, badge: 'emerald_tablet' },
 ]
 
 /**
@@ -2711,6 +2728,65 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Arcane Terminal v23 behavioral checks ─────────────────────────────────────
+
+const ARCANE_WORDS_V23 = [
+  /\barcane[\s-]?(arts?|knowledge|practice|wisdom|study)?\b/i,
+  /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b/i,
+  /\bincantation\b|\bsacred[\s-]?words?\b|\bspoken[\s-]?into[\s-]?being\b/i,
+  /\bward(ing|ed|s)?\b|\bprotective[\s-]?ward\b/i,
+  /\btransmut(e|ed|ing|ation)\b|\bbase[\s-]?(metal[\s-]?)?into[\s-]?gold\b/i,
+  /\bsigil(s)?\b|\bsacred[\s-]?symbol\b/i,
+  /\bfamiliar\b|\bspirit[\s-]?animal\b|\bcompanion[\s-]?spirit\b/i,
+  /\bsanctum\b|\binner[\s-]?sanctum\b|\bsanctuary\b|\bsacred[\s-]?space\b/i,
+  /\balchemy\b|\balchemical\b|\bgreat[\s-]?work\b/i,
+  /\bcipher\b|\bdecipher(ed|ing)?\b|\bencoded\b/i,
+  /\brune(s|ic)?\b|\bancient[\s-]?marks?\b/i,
+  /\bnexus\b|\bpower[\s-]?nexus\b|\bconvergence[\s-]?point\b/i,
+]
+
+/**
+ * Award arcane_session badge if 3+ Arcane Terminal (v23) words appear in one journal entry.
+ */
+export function checkArcaneSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcane_session')) return null
+  const matchCount = ARCANE_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('arcane_session')
+    return 'arcane_session'
+  }
+  return null
+}
+
+/**
+ * Award midnight_ritual badge if user checks in between 00:01 and 00:59 local time.
+ */
+export function checkMidnightRitual(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_ritual')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  if (hour === 0 && minute >= 1) {
+    awardBadge('midnight_ritual')
+    return 'midnight_ritual'
+  }
+  return null
+}
+
+/**
+ * Award long_spell badge if journal entry is 666+ characters — the number of transformation.
+ */
+export function checkLongSpell(journalText: string): BadgeType | null {
+  if (hasBadge('long_spell')) return null
+  if (journalText.length >= 666) {
+    awardBadge('long_spell')
+    return 'long_spell'
   }
   return null
 }
