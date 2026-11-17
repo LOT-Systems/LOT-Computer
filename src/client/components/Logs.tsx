@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, detectTriggers, formatSystemHelp, extractCommandArgument, ARGUMENT_TRIGGERS, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryScope } from '#shared/utils/storyCompression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3741,7 +3742,7 @@ const NoteEditor = ({
   })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
-      setStoryResponse(data.story)
+      setStoryResponse(data.header ? `${data.header}\n\n${data.story}` : data.story)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4033,24 +4034,9 @@ const NoteEditor = ({
         } catch {
           setScanResult('SCAN FAILED — Unable to read system state.')
         }
-      } else if (trigger === 'qi-rfi') {
-        const qiMatch = value.match(/\/qi\s+(.+)/i)
-        if (qiMatch && qiMatch[1].trim().length >= 2 && !qiLoading) {
-          const query = qiMatch[1].trim()
-          setQiLoading(true)
-          setQiResponse(null)
-          try {
-            const state = getUserState()
-            const index = getUserIndex()
-            submitQi({
-              query,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitQi({ query })
-          }
-        }
+      } else if (ARGUMENT_TRIGGERS.has(trigger)) {
+        // Argument commands settle first — see the pending-command effect below.
+        pendingArgCommandsRef.current.add(trigger)
       } else if (trigger === 'breathe') {
         setBreatheEnabled(prev => !prev)
       } else if (trigger === 'silent-mode') {
@@ -4121,52 +4107,87 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(formatSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
-      } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
       }
     }
   }, [value])
+
+  // --------------------------------------------------------------------
+  // Argument commands (/story [scope], /qi [query]) — settle-then-fire.
+  // The detector sees "/story" the instant the word is complete, before
+  // the operator can type "month". So instead of firing on detection we
+  // mark the command pending and fire when either:
+  //   (a) the command's line is finished (Enter), or
+  //   (b) the operator pauses typing for ARG_SETTLE_MS.
+  // If the command is deleted before it settles, nothing fires.
+  // --------------------------------------------------------------------
+  const ARG_SETTLE_MS = 1400
+  const pendingArgCommandsRef = React.useRef<Set<LogTrigger>>(new Set())
+  const argTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const runArgumentCommand = (trigger: LogTrigger, text: string) => {
+    if (trigger === 'story-mode') {
+      if (storyLoading) return
+      const scope = parseStoryScope(text)
+      setStoryLoading(true)
+      setStoryResponse(null)
+      try {
+        const logText = text
+          .split('\n')
+          .filter(l => !/^\s*(📖|🕯️|🕯)/u.test(l))
+          .join('\n')
+          .replace(/\/story(\s+(day|today|week|month|year|d|w|m|y)\b)?/i, '')
+          .replace(/📖/g, '')
+          .trim()
+        submitStory({ logText, scope, quantumState: getUserState(), userIndex: getUserIndex() })
+      } catch {
+        submitStory({ logText: '', scope })
+      }
+    } else if (trigger === 'qi-rfi') {
+      const query = extractCommandArgument(text, 'qi-rfi')
+      if (query.length < 2 || qiLoading) return
+      setQiLoading(true)
+      setQiResponse(null)
+      try {
+        submitQi({ query, quantumState: getUserState(), userIndex: getUserIndex() })
+      } catch {
+        submitQi({ query })
+      }
+    }
+  }
+  const runArgumentCommandRef = React.useRef(runArgumentCommand)
+  runArgumentCommandRef.current = runArgumentCommand
+
+  React.useEffect(() => {
+    const pending = pendingArgCommandsRef.current
+    if (pending.size === 0) return
+    if (argTimerRef.current) clearTimeout(argTimerRef.current)
+
+    const fire = () => {
+      argTimerRef.current = null
+      const text = valueRef.current
+      const present = new Set(detectTriggers(text))
+      const toRun = Array.from(pendingArgCommandsRef.current)
+      pendingArgCommandsRef.current.clear()
+      for (const t of toRun) {
+        if (present.has(t)) runArgumentCommandRef.current(t, text)
+      }
+    }
+
+    // Enter after the command line → fire now.
+    const lineDone = Array.from(pending).some(t => {
+      const kw = t === 'story-mode' ? 'story' : t === 'qi-rfi' ? 'qi' : null
+      return kw ? new RegExp(`(^|\\s)\\/${kw}\\b[^\\n]*\\n`, 'i').test(value) : false
+    })
+    if (lineDone) fire()
+    else argTimerRef.current = setTimeout(fire, ARG_SETTLE_MS)
+  }, [value])
+
+  React.useEffect(() => () => {
+    if (argTimerRef.current) clearTimeout(argTimerRef.current)
+  }, [])
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''

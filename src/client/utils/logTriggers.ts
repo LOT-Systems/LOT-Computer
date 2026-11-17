@@ -115,3 +115,98 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ---------------------------------------------------------------------------
+// Command registry — single source of truth for `/system`.
+//
+// Every slash command the Log understands is listed here exactly once,
+// with its usage line, a one-line description and a category. The
+// `/system` help screen is rendered from this table, so a command can
+// never exist without being documented (and vice-versa). The pure
+// verifier in scripts/verify-log-commands.ts asserts that every entry
+// maps to a detector rule above.
+// ---------------------------------------------------------------------------
+
+export type CommandCategory = 'NARRATIVE' | 'INTELLIGENCE' | 'SELF-CARE' | 'ENVIRONMENT'
+
+export interface LogCommand {
+  trigger: LogTrigger
+  usage: string
+  description: string
+  category: CommandCategory
+  /**
+   * Argument commands wait for the operator to finish typing (Enter or a
+   * short pause) before firing, so `/story month` is read as "month" and
+   * not as a bare `/story` the instant the word is complete.
+   */
+  takesArgument?: boolean
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { trigger: 'story-mode',     usage: '/story [day|week|month|year]', description: 'Compressed story of your day / week / month / year', category: 'NARRATIVE', takesArgument: true },
+  { trigger: 'prayer-mode',    usage: '/prayer',      description: 'Contextual scripture for this entry',      category: 'NARRATIVE' },
+  { trigger: 'how-checkin',    usage: '/how',         description: 'Open the LOT AI check-in (System tab)',    category: 'NARRATIVE' },
+  { trigger: 'qi-rfi',         usage: '/qi [query]',  description: 'Ask the Quantum Intelligence engine',      category: 'INTELLIGENCE', takesArgument: true },
+  { trigger: 'ai-scan',        usage: '/scan',        description: 'System status overview',                   category: 'INTELLIGENCE' },
+  { trigger: 'qos-report',     usage: '/qos',         description: 'Quantum OS state analysis',                category: 'INTELLIGENCE' },
+  { trigger: 'assembly-check', usage: '/assembly',    description: 'Self-assembly module status',              category: 'INTELLIGENCE' },
+  { trigger: 'phys-report',    usage: '/phys',        description: 'Physiological cohort report',              category: 'INTELLIGENCE' },
+  { trigger: 'breathe',        usage: '/breathe',     description: '4-2-6 breathing exercise',                 category: 'SELF-CARE' },
+  { trigger: 'freeze-widgets', usage: '/freeze',      description: 'Pause and reflect protocol',               category: 'SELF-CARE' },
+  { trigger: 'silent-mode',    usage: '/silent',      description: 'Signal silence check',                     category: 'SELF-CARE' },
+  { trigger: 'force-fast',     usage: '/fast',        description: 'Orthodox fasting calendar',                category: 'SELF-CARE' },
+  { trigger: 'toggle-synth',   usage: '/synth',       description: 'Toggle keyboard sound',                    category: 'ENVIRONMENT' },
+  { trigger: 'radio-toggle',   usage: '/radio',       description: 'Toggle radio',                             category: 'ENVIRONMENT' },
+  { trigger: 'night-mode',     usage: '/night',       description: 'Dark mode',                                category: 'ENVIRONMENT' },
+  { trigger: 'system-help',    usage: '/system',      description: 'This command index',                       category: 'ENVIRONMENT' },
+]
+
+export const ARGUMENT_TRIGGERS: ReadonlySet<LogTrigger> = new Set(
+  LOG_COMMANDS.filter(c => c.takesArgument).map(c => c.trigger)
+)
+
+/** Detector keywords for a trigger (used by the registry verifier). */
+export function keywordsFor(trigger: LogTrigger): string[] {
+  return RULES.find(r => r.trigger === trigger)?.keywords ?? []
+}
+
+/**
+ * Render the `/system` screen. Category headers are plain upper-case
+ * lines; command lines start with "/" and separate usage from
+ * description with two or more spaces (the Log renderer splits on that).
+ * An optional Arcade line (from the operator's local state) is appended.
+ */
+export function formatSystemHelp(opts: { arcadeLine?: string } = {}): string {
+  const order: CommandCategory[] = ['NARRATIVE', 'INTELLIGENCE', 'SELF-CARE', 'ENVIRONMENT']
+  const width = Math.max(...LOG_COMMANDS.map(c => c.usage.length)) + 3
+  const lines: string[] = ['LOT® AI — LOG COMMANDS', '']
+  for (const cat of order) {
+    lines.push(cat)
+    for (const c of LOG_COMMANDS.filter(x => x.category === cat)) {
+      lines.push(c.usage.padEnd(width) + c.description)
+    }
+    lines.push('')
+  }
+  lines.push('SHORTCUTS')
+  lines.push('Ctrl+Enter  Save log immediately')
+  lines.push('Enter       Run an argument command (/story month, /qi …)')
+  if (opts.arcadeLine) {
+    lines.push('')
+    lines.push('ARCADE')
+    lines.push(opts.arcadeLine)
+  }
+  return lines.join('\n')
+}
+
+/**
+ * Extract the argument of an argument command from the log text.
+ * Returns the remainder of the command's line, trimmed ('' if none).
+ */
+export function extractCommandArgument(text: string, trigger: LogTrigger): string {
+  const kws = keywordsFor(trigger)
+  for (const k of kws) {
+    const m = text.match(new RegExp(`(?:^|\\s)\\/${k}[ \\t]+([^\\n]+)`, 'i'))
+    if (m) return m[1].trim()
+  }
+  return ''
+}

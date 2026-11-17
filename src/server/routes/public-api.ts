@@ -638,7 +638,7 @@ export default async (fastify: FastifyInstance) => {
 
   // Test all AI engines to see which are available
   fastify.get('/test-ai-engines', async (req, reply) => {
-    const { aiEngineManager } = await import('#server/utils/ai-engines.js')
+    const { aiEngineManager } = await import('#server/utils/ai-engines')
 
     const status = aiEngineManager.getStatus()
     const hasAnyEngine = aiEngineManager.hasAvailableEngine()
