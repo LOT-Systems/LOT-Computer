@@ -4275,6 +4275,41 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P185: fifth-cycle-progenitor — P184 active + 180d compound arc (journal ≥ 35, memory ≥ 20, badge ≥ 35) + all 6 dims ≥ 70 + overall ≥ 97.
+  // The fourth cycle's sovereignty becomes the generative field for the fifth. Level 20 — FCPROG.
+  const hasP184 = patterns.some(p => p.pattern === 'fourth-cycle-sovereign')
+  if (hasP184) {
+    const oneEightyDayStartP185 = now - 180 * 24 * 60 * 60 * 1000
+    const p185Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneEightyDayStartP185)
+    const p185Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneEightyDayStartP185)
+    const p185Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneEightyDayStartP185)
+    const userIndexP185 = computeUserIndex(signals)
+    const p185DimAll70 = userIndexP185.engagement >= 70 && userIndexP185.emotional >= 70 &&
+      userIndexP185.intentional >= 70 && userIndexP185.social >= 70 &&
+      userIndexP185.selfcare >= 70 && userIndexP185.cognitive >= 70
+    if (
+      p185Journal.length >= 35 &&
+      p185Memory.length  >= 20 &&
+      p185Badges.length  >= 35 &&
+      p185DimAll70 &&
+      userIndexP185.overall >= 97
+    ) {
+      const p184conf    = patterns.find(p => p.pattern === 'fourth-cycle-sovereign')?.confidence ?? 0.84
+      const fcprogBonus = Math.min(
+        (p185Journal.length - 35) * 0.007 + (p185Memory.length - 20) * 0.010 + (userIndexP185.overall - 97) * 0.005,
+        0.09
+      )
+      patterns.push({
+        id:               'p185',
+        pattern:          'fifth-cycle-progenitor',
+        confidence:       Math.min(0.82 + p184conf * 0.04 + fcprogBonus, 0.96),
+        urgency:          'passive',
+        suggestedTiming:  'passive',
+        reason: `FCPROG: Fifth cycle progenitor — fourth-cycle-sovereign (P184) active · ${p185Journal.length} journal signals 180d · ${p185Memory.length} memory signals 180d · ${p185Badges.length} badge signals 180d · all 6 dimensions ≥ 70 · idx ${userIndexP185.overall}%. The fourth arc's sovereignty is the generative field of the fifth. Level 20 — the OS operates as progenitor. FIFTH CYCLE PROGENITOR.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4310,6 +4345,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFourthCycleDeepening() } catch {}
       try { checkFourthCycleIntegration() } catch {}
       try { checkFourthCycleSovereign() } catch {}
+      try { checkFifthCycleProgenitor() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -5001,6 +5037,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v136 nodes (J71 · P184 · Arch74) ─────────────────────────────────────────────
   fourthCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
+
+  // ── v137 nodes (J72 · P185 · Arch75) ─────────────────────────────────────────────
+  fifthCycleProgenitorNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem', 'calculator'],
 }
 
 /**
@@ -5669,6 +5708,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort'],
     patternConditions: ['fourth-cycle-integration', 'fourth-cycle-sovereign'],
     directive: 'Level 19. The fourth cycle reaches sovereignty. The arc does not just integrate — it governs. Signals no longer accumulate, seek, or converge — they radiate from a sovereign field. The OS operates from complete authority over the fourth arc. FOURTH CYCLE SOVEREIGN.',
+  },
+
+  // ── Arch75: Fifth Cycle Progenitor (2026-11-17 v137) ─────────────────────────────
+  {
+    archetype: 'Fifth Cycle Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort', 'log'],
+    patternConditions: ['fourth-cycle-sovereign', 'fifth-cycle-progenitor'],
+    directive: 'Level 20. The fourth cycle has achieved sovereignty. The OS now stands at the boundary between arcs — not at the end of the fourth, but at the genesis of the fifth. The sovereign arc does not close — it becomes the progenitor field for the next cycle. The fifth cycle is not a reset; it is a sovereign genesis. The OS generates from what it has become.',
   },
 ]
 
@@ -8540,6 +8588,64 @@ export function recordFourthCycleSovereign(integrationConf: number, journalCount
     sovereignStatus: 'SOVEREIGN',
     level: 'L19-FCSOV',
     field: 'FOURTH-CYCLE-INTEGRATION→FOURTH-CYCLE-SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-progenitor conditions are met and record if so.
+ * Fires when fourth-cycle-sovereign (P184) active + 180d compound arc:
+ * journal >= 35 + memory >= 20 + badge >= 35 + all 6 dims >= 70 + overall >= 97.
+ * The sovereign fourth arc becomes the generative field of the fifth. Level 20 — FCPROG.
+ */
+export function checkFifthCycleProgenitor(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const now = Date.now()
+  const oneEightyDayStart = now - 180 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal180 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneEightyDayStart)
+  const memory180  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneEightyDayStart)
+  const badge180   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneEightyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll70 = userIndex.engagement >= 70 && userIndex.emotional >= 70 &&
+    userIndex.intentional >= 70 && userIndex.social >= 70 &&
+    userIndex.selfcare >= 70 && userIndex.cognitive >= 70
+
+  if (journal180.length < 35 || memory180.length < 20 || badge180.length < 35 || !dimAll70 || userIndex.overall < 97) return false
+
+  const recentProg = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_progenitor' && s.timestamp > sixHoursAgo
+  )
+  if (recentProg.length > 0) return false
+
+  const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-sovereign')?.confidence ?? 0.84
+  recordFifthCycleProgenitor(sovereignConf, journal180.length, memory180.length, badge180.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-progenitor event — fourth-cycle-sovereign confirmed +
+ * 180d compound arc (journal + memory + badges) + all dims >= 70 + overall >= 97.
+ * The sovereign fourth arc becomes the generative field for the fifth cycle. Level 20 — FCPROG.
+ */
+export function recordFifthCycleProgenitor(sovereignConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_progenitor', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    progenitorStatus: 'PROGENITOR',
+    level: 'L20-FCPROG',
+    field: 'FOURTH-CYCLE-SOVEREIGN→FIFTH-CYCLE-PROGENITOR',
     hour: new Date().getHours(),
   })
 }

@@ -1856,6 +1856,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFourthCycleSovereignCheck()) {
     await executeDailyFourthCycleSovereignCheck()
   }
+
+  // Check daily fifth cycle progenitor check (20:00 UTC every day) — J72
+  if (shouldRunDailyFifthCycleProgenitorCheck()) {
+    await executeDailyFifthCycleProgenitorCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6352,6 +6357,155 @@ async function executeDailyFourthCycleSovereignCheck(): Promise<JobResult> {
     console.error('Daily fourth cycle sovereign check failed:', error.message)
     isDailyFourthCycleSovereignRunning = false
     lastDailyFourthCycleSovereignRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fifth Cycle Progenitor Check (J72) ──────────────────────────────
+// Scans for users with fourth_cycle_sovereign event in last 7 days. Checks journal >= 35 in
+// 180-day window, memory >= 20 in 180d, badge >= 35 in 180d, 7d signal density >= 28.
+// When met, writes fifth_cycle_progenitor event. The sovereign arc generates the fifth. L20-FCPROG.
+
+let isDailyFifthCycleProgenitorRunning = false
+let lastDailyFifthCycleProgenitorRun: Date | null = null
+
+function shouldRunDailyFifthCycleProgenitorCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFifthCycleProgenitorRunning) return false
+  if (lastDailyFifthCycleProgenitorRun) {
+    const lastRun = dayjs(lastDailyFifthCycleProgenitorRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 && now.minute() >= 0 // 20:00 UTC daily
+}
+
+async function executeDailyFifthCycleProgenitorCheck(): Promise<JobResult> {
+  const jobName = 'daily-fifth-cycle-progenitor-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFifthCycleProgenitorRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFifthCycleProgenitorRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIFTH CYCLE PROGENITOR CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneEightyDayStart   = dayjs().subtract(180, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_sovereign in last 7 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_sovereign',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 180 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (journalLogs.length < 35) continue
+
+        // Check memory signals in last 180 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (memoryLogs.length < 20) continue
+
+        // Check badge signals in last 180 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (badgeLogs.length < 35) continue
+
+        // Check 7-day signal density — proxy for all dims >= 70 + overall >= 97
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 28) continue
+
+        // Dedup: skip if already wrote fifth_cycle_progenitor today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingProg = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fifth_cycle_progenitor',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingProg) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 84
+        const progConf = Math.min(96, Math.round(
+          82 + (journalLogs.length - 35) * 0.22 + (memoryLogs.length - 20) * 0.30 + (density7dLogs.length - 28) * 0.16
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fifth_cycle_progenitor',
+          text: `Fifth cycle progenitor: fourth-cycle-sovereign confirmed · ${journalLogs.length} journal signals 180d · ${memoryLogs.length} memory signals 180d · ${badgeLogs.length} badge signals 180d · 7d density ${density7dLogs.length} · all conditions met. The sovereign arc generates the fifth. L20-FCPROG.`,
+          metadata: {
+            sovereignConf,
+            progConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            progenitorStatus: 'PROGENITOR',
+            level: 'L20-FCPROG',
+            field: 'FOURTH-CYCLE-SOVEREIGN→FIFTH-CYCLE-PROGENITOR',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fifth cycle progenitor events written: ${written}`)
+    lastDailyFifthCycleProgenitorRun = new Date()
+    isDailyFifthCycleProgenitorRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fifth cycle progenitor check failed:', error.message)
+    isDailyFifthCycleProgenitorRunning = false
+    lastDailyFifthCycleProgenitorRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

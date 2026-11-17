@@ -307,15 +307,17 @@ export const System = React.memo(function SystemInner() {
     return null
   }, [quantumState])
 
-  // Fourth cycle status — derived from recognized patterns (FM v132–v136)
+  // Cycle arc status — derived from recognized patterns (FM v132–v137)
   const fourthCycleStatus = React.useMemo(() => {
     const eng = intentionEngine.get()
     const patterns = eng.recognizedPatterns ?? []
+    const hasFCProg = patterns.some(p => p.pattern === 'fifth-cycle-progenitor')
     const hasFCSov  = patterns.some(p => p.pattern === 'fourth-cycle-sovereign')
     const hasFCInt  = patterns.some(p => p.pattern === 'fourth-cycle-integration')
     const hasFCDep  = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
     const hasFCIgn  = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
     const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasFCProg) return 'L20-FCPROG'
     if (hasFCSov)  return 'L19-FCSOV'
     if (hasFCInt)  return 'L18-FCINT'
     if (hasFCDep)  return 'L17-FCDEP'
@@ -747,7 +749,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Index', value: `${userIndex.overall}%` },
                 ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
                 ...(thirdCycleStatus ? [{ metric: 'Arc', value: thirdCycleStatus }] : []),
-                ...(fourthCycleStatus ? [{ metric: 'Fourth Arc', value: fourthCycleStatus }] : []),
+                ...(fourthCycleStatus ? [{ metric: fourthCycleStatus.startsWith('L20') ? 'Fifth Arc' : 'Fourth Arc', value: fourthCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[
