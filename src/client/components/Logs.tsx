@@ -1695,6 +1695,20 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'device_copy') {
+          // LOT Pager hardware — COPY button signal (HW-01)
+          const deviceName = log.metadata?.deviceName as string | undefined
+          const source = log.metadata?.source as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PAGER:" blockView>
+                <div>{log.text || '—'}</div>
+                <div className="opacity-40 uppercase tracking-widest mt-4">
+                  COPY{deviceName ? ` · ${deviceName}` : ''}{source ? ` · ${source}` : ''}
+                </div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'badge_unlock') {
           const badgeName = log.metadata?.badgeName as string | undefined
           const tier = log.metadata?.tier as string | undefined

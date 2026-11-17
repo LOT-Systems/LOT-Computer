@@ -28,6 +28,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import { deviceRoutes } from './routes/device-api.js'
 
 const CWD = process.cwd()
 
@@ -230,6 +231,8 @@ fastify.register(async (fastify: FastifyInstance) => {
     // Public API (no authentication required)
     fastify.register(authRoutes, { prefix: '/auth' })
     fastify.register(publicApiRoutes, { prefix: '/api/public' })
+    // LOT Pager hardware (Bearer device token, no cookie) — HW-01
+    fastify.register(deviceRoutes, { prefix: '/api/device/v1' })
 
     // User API
     fastify.register(async (fastify) => {

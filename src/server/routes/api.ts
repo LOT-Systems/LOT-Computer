@@ -44,6 +44,7 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { registerDeviceUserRoutes } from './device-api.js'
 
 // ============================================================================
 // Helper Functions
@@ -136,6 +137,7 @@ function generateCompassionateResponse(
 export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
+  registerDeviceUserRoutes(fastify)
 
   // Admin diagnostic ping endpoint
   fastify.get('/ping', async (req, reply) => {
@@ -1083,6 +1085,8 @@ export default async (fastify: FastifyInstance) => {
     // Only return user-facing log events (exclude raw QIE signal events)
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
+      // LOT Pager hardware: COPY button signal (HW-01)
+      'device_copy',
       'emotional_checkin', 'settings_change', 'system_snapshot',
       'weekly_summary_response', 'calendar_entry', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
