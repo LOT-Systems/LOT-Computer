@@ -19,6 +19,7 @@ import { Umzug, SequelizeStorage } from 'umzug'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
+import { assembleQi46, hasQi46Consent } from '#server/utils/qi46'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -410,6 +411,27 @@ export default async (fastify: FastifyInstance) => {
       const user = await fastify.models.User.findByPk(req.params.userId)
       if (!user) return reply.throw.notFound()
       return await completeAndExtractQuestion(req.body.prompt, user)
+    }
+  )
+
+  // QI·46 Node 2 — admin-only preview of a person's Being Vector + calibration.
+  // Read-only. Nothing is generated, stored or sent. Without the person's own
+  // opt-in (metadata.qi46.consent) the vector is empty by design.
+  fastify.get(
+    '/users/:userId/qi46',
+    async (req: FastifyRequest<{ Params: { userId: string } }>, reply) => {
+      const user = await fastify.models.User.findByPk(req.params.userId)
+      if (!user) return reply.throw.notFound()
+      const consent = hasQi46Consent(user)
+      const logs = consent
+        ? await fastify.models.Log.findAll({
+            where: { userId: user.id },
+            order: [['createdAt', 'DESC']],
+            limit: 300,
+          })
+        : []
+      const { vector, calibration, systemPrompt } = assembleQi46(logs as any, consent)
+      return { userId: user.id, consent, vector, calibration, systemPrompt }
     }
   )
 
