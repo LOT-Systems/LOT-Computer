@@ -45,7 +45,11 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
+// SystemProgressWidget carries ~177 KB of deployment history — code-split so it
+// stays off the critical path; it renders inside the below-fold Dashboard stack.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -55,7 +59,7 @@ import { MicroCalculatorWidget } from './MicroCalculatorWidget'
 import { MicroImageWidget } from './MicroImageWidget'
 import { checkRecipeWidget } from '#client/stores/recipeWidget'
 import { checkPlannerWidget } from '#client/stores/plannerWidget'
-import { getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions, classifyPhysiologicalCohort, intentionEngine, recordAstrologySignal, getCircadianPhase } from '#client/stores/intentionEngine'
+import { startBackgroundQOSMonitor, getOptimalWidget, shouldShowWidget, getUserState, getUserIndex, analyzeIntentions, classifyPhysiologicalCohort, intentionEngine, recordAstrologySignal, getCircadianPhase } from '#client/stores/intentionEngine'
 import { QuantumStateWidget } from './QuantumStateWidget'
 import { SignalStreamWidget } from './SignalStreamWidget'
 import { PatternRecognitionWidget } from './PatternRecognitionWidget'
@@ -90,6 +94,18 @@ function LazyMount({ children }: { children: React.ReactNode }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const inViewport = useInViewport(ref)
   return <div ref={ref}>{inViewport ? children : null}</div>
+}
+
+// Storage reads during render must never throw (private mode / blocked site
+// data) — a throw here takes the whole WidgetErrorBoundary section down.
+function readStorage(key: string): string | null {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+function writeStorage(key: string, value: string | null) {
+  try {
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
+  } catch {}
 }
 
 function LoadingDots() {
@@ -375,6 +391,24 @@ export const System = React.memo(function SystemInner() {
   }, [weather])
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
+
+  // Per-mount visibility gates. These were previously evaluated inside render
+  // with Math.random(), so every SSE tick (users online, weather, live
+  // message) re-rolled them: Subscribe flickered in/out, and Intentions
+  // vanished on the next re-render because the render itself wrote
+  // 'intentions-last-shown' = now. Roll once per mount instead.
+  // Background QOS monitor used to start only when SystemProgressWidget
+  // mounted; that widget is now code-split + viewport-deferred, so start the
+  // (idempotent) monitor here to keep 30-min snapshots on their old schedule.
+  React.useEffect(() => startBackgroundQOSMonitor(), [])
+
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
+  const [intentionsCooldownPassed] = React.useState(() => {
+    const lastShown = readStorage('intentions-last-shown')
+    const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+    const cooldownPeriod = twoDaysMs + Math.random() * (24 * 60 * 60 * 1000)
+    return !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+  })
 
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
@@ -836,7 +870,7 @@ export const System = React.memo(function SystemInner() {
           const isEvening = hour >= 19 && hour < 22 // Evening wind-down
 
           // Check cooldown (3 hours since last interaction)
-          const lastInteraction = localStorage.getItem('self-care-last-interaction')
+          const lastInteraction = readStorage('self-care-last-interaction')
           const threeHoursMs = 3 * 60 * 60 * 1000
           const cooldownPassed = !lastInteraction ||
             (Date.now() - parseInt(lastInteraction)) >= threeHoursMs
@@ -846,7 +880,7 @@ export const System = React.memo(function SystemInner() {
 
           // Check if completed self-care today
           const today = new Date().toDateString()
-          const stored = localStorage.getItem('self-care-completed')
+          const stored = readStorage('self-care-completed')
           let completedToday = 0
           if (stored) {
             try {
@@ -868,9 +902,9 @@ export const System = React.memo(function SystemInner() {
 
           // Store quantum reasoning for widget to display
           if (intentionSuggestsSelfCare && optimalWidget?.reason) {
-            localStorage.setItem('selfcare-quantum-reason', optimalWidget.reason)
+            writeStorage('selfcare-quantum-reason', optimalWidget.reason)
           } else {
-            localStorage.removeItem('selfcare-quantum-reason')
+            writeStorage('selfcare-quantum-reason', null)
           }
 
           return <div><SelfCareMoments /></div>
@@ -880,34 +914,26 @@ export const System = React.memo(function SystemInner() {
       {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
       <WidgetErrorBoundary name="Intentions">
         {(() => {
-          const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
-
+          const hasIntention = !!readStorage('current-intention')
+          const cooldownPassed = intentionsCooldownPassed
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
           // Show if:
           // 1. User has an existing intention to display, OR
           // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
+          // 3. Cooldown passed (fallback for periodic prompting — rolled once per mount)
           if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
-              localStorage.setItem('intentions-last-shown', Date.now().toString())
+            // Update last shown time (gate is frozen per mount, so this write
+            // no longer hides the widget on the next re-render)
+            if (cooldownPassed || intentionSuggestsIntentions || !readStorage('intentions-last-shown')) {
+              writeStorage('intentions-last-shown', Date.now().toString())
             }
 
             // Store quantum reasoning for widget to display
             if (intentionSuggestsIntentions && optimalWidget?.reason) {
-              localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
+              writeStorage('intentions-quantum-reason', optimalWidget.reason)
             } else {
-              localStorage.removeItem('intentions-quantum-reason')
+              writeStorage('intentions-quantum-reason', null)
             }
 
             return <div><IntentionsWidget /></div>
@@ -930,15 +956,14 @@ export const System = React.memo(function SystemInner() {
           if (answerLogs.length < 10) return null
 
           // Check if clicked recently (10 days cooldown)
-          const lastClicked = localStorage.getItem('subscribe-clicked')
+          const lastClicked = readStorage('subscribe-clicked')
           const tenDaysMs = 10 * 24 * 60 * 60 * 1000
           if (lastClicked && (Date.now() - parseInt(lastClicked)) < tenDaysMs) {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // 20% chance to show when all conditions met — rolled once per mount
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1027,8 +1052,12 @@ export const System = React.memo(function SystemInner() {
           {/* Correlated Indexes - Four-dimensional weekly tracking */}
           <CorrelatedIndexesWidget />
 
-          {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          {/* System Progress - Deployment info with feedback (code-split + deferred) */}
+          <LazyMount>
+            <React.Suspense fallback={null}>
+              <SystemProgressWidget />
+            </React.Suspense>
+          </LazyMount>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1042,6 +1071,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,6 +1080,7 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

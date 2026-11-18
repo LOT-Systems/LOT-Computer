@@ -21,7 +21,7 @@ import {
   getCircadianPhase,
 } from '#client/stores/intentionEngine'
 import { getEcosystemNarrative } from '#client/utils/narrative'
-import { useEnergy } from '#client/queries'
+import { useEnergy, useProfile } from '#client/queries'
 import { selfAssembly, phaseSymbol, phaseLabel, recomputeAssembly } from '#client/stores/selfAssembly'
 
 function usePersistedState(key: string): [boolean, React.Dispatch<React.SetStateAction<boolean>>] {
@@ -165,7 +165,15 @@ export const QuantumEngineWidgets: React.FC = () => {
   const engineState = useStore(intentionEngine)
   const assemblyState = useStore(selfAssembly)
   const { data: energyData } = useEnergy()
-  const [cohortData, setCohortData] = React.useState<{ archetype?: string; behavioralCohort?: string } | null>(null)
+  // Shared react-query cache (/api/user-profile, 2-min staleTime) — replaces a
+  // raw per-mount fetch that duplicated the same request on every System load.
+  const { data: profileData } = useProfile()
+  const cohortData = React.useMemo<{ archetype?: string; behavioralCohort?: string } | null>(
+    () => (profileData?.archetype || profileData?.behavioralCohort)
+      ? { archetype: profileData.archetype, behavioralCohort: profileData.behavioralCohort }
+      : null,
+    [profileData?.archetype, profileData?.behavioralCohort]
+  )
   const [readiness, setReadiness] = React.useState<number | null>(null)
 
   const connectedCount = [carConnected, homeConnected, computerConnected, phoneConnected, watchConnected, robotConnected].filter(Boolean).length
@@ -174,17 +182,6 @@ export const QuantumEngineWidgets: React.FC = () => {
     [connectedCount]
   )
 
-  // Load cohort/archetype from user-profile (server-derived)
-  React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   // Compute readiness from physiological report
   React.useEffect(() => {
@@ -469,7 +466,7 @@ export const QuantumEngineWidgets: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">CARE</span>
-                    <span className="tabular-nums">{userIndex.dimensions.selfcare}</span>
+                    <span className="tabular-nums">{userIndex.dimensions.selfCare}</span>
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="opacity-30 uppercase">COG</span>

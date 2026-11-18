@@ -12,7 +12,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { ProgressBars } from '#client/utils/progressBars'
 import { selfAssembly, phaseSymbol, phaseLabel, recomputeAssembly, type AssembledModule } from '#client/stores/selfAssembly'
-import { useEnergy, useLogs } from '#client/queries'
+import { useEnergy, useProfile, useLogs } from '#client/queries'
 import {
   getPhysiologicalReport,
   getEnrichedPhysiologicalReport,
@@ -1491,23 +1491,10 @@ const ASSEMBLY_TRANSMISSIONS: {
   },
 ]
 
-// ─── Usership Transmission — appended after each assembly run ───────────────
-// This is the system talking to the person. Terse, technical, alive.
-export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
-  message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
-    'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
-  ],
-}
+// Usership Transmission lives in its own module so importers (ArchitectWidget)
+// don't pull this whole code-split widget into the main bundle.
+import { USERSHIP_TRANSMISSION } from './usershipTransmission'
+export { USERSHIP_TRANSMISSION }
 
 const FEEDBACK_OPTIONS = [
   { id: 'operational', label: 'Operational', symbol: '\u2191' },
@@ -1534,7 +1521,15 @@ export function SystemProgressWidget() {
   const assembly = useStore(selfAssembly)
   const { data: energyData } = useEnergy()
   const { data: logs = [] } = useLogs()
-  const [cohortData, setCohortData] = React.useState<{ archetype?: string; behavioralCohort?: string } | null>(null)
+  // Shared react-query cache (/api/user-profile, 2-min staleTime) — replaces a
+  // raw per-mount fetch that duplicated the same request on every System load.
+  const { data: profileData } = useProfile()
+  const cohortData = React.useMemo<{ archetype?: string; behavioralCohort?: string } | null>(
+    () => (profileData?.archetype || profileData?.behavioralCohort)
+      ? { archetype: profileData.archetype, behavioralCohort: profileData.behavioralCohort }
+      : null,
+    [profileData?.archetype, profileData?.behavioralCohort]
+  )
 
   // Last 3 non-empty user-written note entries for OS Journal field surface
   const recentEntries = React.useMemo(() => {
@@ -1572,17 +1567,6 @@ export function SystemProgressWidget() {
     return stop
   }, [])
 
-  // Load physiological cohort classification from user-profile (server-derived archetype)
-  React.useEffect(() => {
-    fetch('/api/user-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.archetype || data.behavioralCohort) {
-          setCohortData({ archetype: data.archetype, behavioralCohort: data.behavioralCohort })
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   // Load OS journal (vitals snapshots + signal reports) when view is active
   React.useEffect(() => {
