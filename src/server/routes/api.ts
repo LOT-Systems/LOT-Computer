@@ -44,6 +44,8 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { LOT_EMAIL_MARKER, formatLotEmail } from '#shared/utils/lot-email'
+import { buildEmailRecipientWhere, pickEmailRecipient } from '#server/utils/lot-email'
 
 // ============================================================================
 // Helper Functions
@@ -378,6 +380,14 @@ export default async (fastify: FastifyInstance) => {
             attributes: ['id'],
           })
           write({ event, data: { ...payload, isLiked: !!myLike } })
+          break
+        }
+        case 'direct_message':
+        case 'lot_email': {
+          // Private: only relay to the two parties of the message
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({ event, data })
+          }
           break
         }
         case 'settings_updated': {
@@ -4082,6 +4092,129 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — the simplest internal mail. Composed in Log with
+  // "/email to <Name>", stored as a DirectMessage carrying the ✉ marker,
+  // delivered in Sync. Recipients resolve through the LOT Community,
+  // cohort members first.
+  // ============================================================================
+
+  fastify.post('/email', async (req: FastifyRequest<{
+    Body: { to: string; subject?: string; body: string; receiverId?: string }
+  }>, reply) => {
+    try {
+      const { to, subject, body, receiverId } = req.body || ({} as any)
+      if ((!to || !String(to).trim()) && !receiverId) {
+        return reply.status(400).send({ error: 'Recipient is required' })
+      }
+      if (!body || !String(body).trim()) {
+        return reply.status(400).send({ error: 'Message is required' })
+      }
+
+      let receiver: any = null
+      if (receiverId) {
+        receiver = await fastify.models.User.findByPk(receiverId)
+      } else {
+        const candidates = await fastify.models.User.findAll({
+          where: { id: { [Op.ne]: req.user.id }, ...buildEmailRecipientWhere(String(to)) },
+          attributes: ['id', 'firstName', 'lastName', 'city', 'country', 'metadata', 'lastSeenAt'],
+          order: [['lastSeenAt', 'DESC']],
+          limit: 10,
+        })
+        receiver = pickEmailRecipient(candidates as any[], req.user as any)
+        if (!receiver && candidates.length > 1) {
+          return reply.status(409).send({
+            error: 'Several LOT members match this name',
+            candidates: candidates.slice(0, 5).map((u: any) => ({
+              id: u.id,
+              name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+              city: u.city || null,
+            })),
+          })
+        }
+      }
+      if (!receiver) {
+        return reply.status(404).send({ error: `No LOT member named "${to}"` })
+      }
+
+      const message = formatLotEmail(subject, String(body))
+      const dm = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message,
+      })
+
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      const payload = {
+        id: dm.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: dm.message,
+        senderName,
+        createdAt: dm.createdAt,
+      }
+      sync.emit('direct_message', payload)
+      sync.emit('lot_email', payload)
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'direct_message_sent',
+            text: '',
+            metadata: { directMessageId: dm.id, receiverId: receiver.id, message: dm.message, channel: 'email' },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging LOT email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: dm.id,
+        to: { id: receiver.id, name: `${receiver.firstName || ''} ${receiver.lastName || ''}`.trim() },
+        createdAt: dm.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending LOT email:', error)
+      return reply.status(500).send({ error: 'Failed to send email' })
+    }
+  })
+
+  fastify.get('/email/inbox', async (req, reply) => {
+    try {
+      const rows = await fastify.models.DirectMessage.findAll({
+        where: {
+          receiverId: req.user.id,
+          message: { [Op.like]: `${LOT_EMAIL_MARKER}%` },
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+      const senderIds = Array.from(new Set(rows.map((r: any) => r.senderId)))
+      const senders = senderIds.length
+        ? await fastify.models.User.findAll({
+            where: { id: { [Op.in]: senderIds } },
+            attributes: ['id', 'firstName', 'lastName'],
+          })
+        : []
+      const nameById = new Map(senders.map((u: any) => [u.id, `${u.firstName || ''} ${u.lastName || ''}`.trim()]))
+      return reply.send({
+        emails: rows.map((r: any) => ({
+          id: r.id,
+          senderId: r.senderId,
+          senderName: nameById.get(r.senderId) || 'LOT Member',
+          message: r.message,
+          createdAt: r.createdAt,
+        })),
+      })
+    } catch (error) {
+      console.error('Error fetching LOT email inbox:', error)
+      return reply.status(500).send({ error: 'Failed to fetch inbox' })
     }
   })
 

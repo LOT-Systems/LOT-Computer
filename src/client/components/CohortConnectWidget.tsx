@@ -14,6 +14,7 @@ import { useCohorts, useEnergy, useProfile } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
+import { composeEmailInLog } from '#client/stores/lotEmail'
 
 /**
  * Cohort Connect Widget - Find and connect with cohort members
@@ -268,6 +269,22 @@ export const CohortConnectWidget: React.FC = () => {
                         }}
                       >
                         Send message
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          recordSignal('mood', 'cohort_email_initiated', {
+                            userId: match.user.id,
+                            similarity: match.similarity,
+                            hour: new Date().getHours(),
+                          })
+                          const name = [match.user.firstName, match.user.lastName].filter(Boolean).join(' ')
+                          composeEmailInLog(name || 'LOT member', match.user.id)
+                          stores.goTo('logs')
+                        }}
+                      >
+                        Email
                       </Button>
                     </div>
                   </div>

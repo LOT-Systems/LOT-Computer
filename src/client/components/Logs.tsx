@@ -30,10 +30,12 @@ import {
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
-import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
+import { recordSignal, recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
+import { parseEmailCommand } from '#shared/utils/lot-email'
+import { $pendingEmailTo } from '#client/stores/lotEmail'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3764,6 +3766,61 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  // LOT® Email — "/email to Hitomi." composes a letter from this Log entry.
+  // Everything after the command line is the letter; text above it stays private.
+  const emailDraft = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (data) => {
+      const stamp = dayjs().format('HH:mm')
+      setEmailStatus(null)
+      // Mark the command as sent so the composer closes and the Log keeps a record
+      const current = valueRef.current
+      const updated = current.replace(
+        /(^|\n)[ \t]*\/email\b[^\n]*/i,
+        `$1✉ Sent to ${data.to.name || 'LOT member'} · ${stamp}`
+      )
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+      try { recordSignal('log', 'direct_message_sent', { channel: 'email', hour: new Date().getHours() }) } catch {}
+    },
+    onError: (err: any) => {
+      const data = err?.response?.data
+      if (data?.candidates?.length) {
+        const names = data.candidates.map((c: any) => c.name + (c.city ? ` (${c.city})` : '')).join(', ')
+        setEmailStatus(`SEVERAL MATCHES — ADD A LAST NAME: ${names}`)
+      } else {
+        setEmailStatus((data?.error || 'EMAIL OFFLINE — try again').toUpperCase())
+      }
+    },
+  })
+  // Draft handed over from Cohort / Community ("Email" button)
+  const pendingEmailTo = useStore($pendingEmailTo)
+  const emailReceiverRef = React.useRef<{ to: string; receiverId?: string } | null>(null)
+  React.useEffect(() => {
+    if (!primary || !pendingEmailTo) return
+    $pendingEmailTo.set(null)
+    emailReceiverRef.current = pendingEmailTo
+    const current = valueRef.current
+    const separator = current.trim() ? '\n\n' : ''
+    const updated = current + separator + `/email to ${pendingEmailTo.to}.\n`
+    setValue(updated)
+    valueRef.current = updated
+  }, [primary, pendingEmailTo])
+  const onSendEmail = React.useCallback(() => {
+    if (!emailDraft || !emailDraft.body || emailSending) return
+    setEmailStatus(null)
+    const handoff = emailReceiverRef.current
+    const receiverId =
+      handoff && handoff.to.toLowerCase() === emailDraft.to.toLowerCase() ? handoff.receiverId : undefined
+    sendEmail({ to: emailDraft.to, body: emailDraft.body, receiverId })
+  }, [emailDraft, emailSending, sendEmail])
+  React.useEffect(() => {
+    if (!emailDraft) setEmailStatus(null)
+  }, [!!emailDraft])
+
   const debounceTime = 7000  // 7s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
@@ -4139,6 +4196,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to     LOT® Email — write below, press Send',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4384,6 +4442,34 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {emailDraft && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                <div className="flex items-center gap-x-8">
+                  <span className="opacity-40">TO</span>
+                  <span>{emailDraft.to}</span>
+                </div>
+                <div className="opacity-60 mt-4" style={{ whiteSpace: 'pre-wrap' }}>
+                  {emailDraft.body || 'Write your letter below the command line.'}
+                </div>
+                <div className="flex items-center gap-x-8 mt-8">
+                  <Button
+                    kind="secondary"
+                    size="small"
+                    disabled={!emailDraft.body || emailSending}
+                    onClick={onSendEmail}
+                  >
+                    {emailSending ? 'Sending...' : 'Send'}
+                  </Button>
+                  <span className="opacity-40" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                    {emailStatus || 'DELIVERED TO SYNC'}
+                  </span>
+                </div>
+              </div>
             </Block>
           </div>
         )}
