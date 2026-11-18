@@ -321,6 +321,16 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE SILENT HOUSEHOLD                        2026-11-18
+  ─────────────────────────────────────────────────────────────────
+  Deaf operator, Usership ~14 months, shared kitchen table with a hearing
+  partner and a toddler. NUDGE through the tabletop replaces sound and
+  reaches only the operator. Hand-detect holds back a LEAP while a
+  child's hand is on the pad. A new gesture, THE BREATH, paces the
+  evening Self-Care "breathe" practice by touch. Full entry, with the
+  physics and safety layers behind it:
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0.2.md, Section 11.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
