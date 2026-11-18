@@ -21,6 +21,12 @@ Core technical documentation about system architecture, engines, and implementat
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
 
+### [Usership](./usership/)
+Paid-tier product design.
+
+**Key Documents:**
+- [The Twelve Strata](./usership/LOT-USERSHIP-12-MONTH-EVOLUTION.md) - 12-month evolution from bare UI to LOT® AI (Memory compression, monthly seals, widgets)
+
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.
 
