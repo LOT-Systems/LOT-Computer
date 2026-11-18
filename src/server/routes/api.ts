@@ -1213,6 +1213,64 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: presence momentum arc · coherence field persistence · recovery mastery chain (P152/P153/P154)
+      'presence_momentum_arc',
+      'coherence_field_persistence',
+      'recovery_mastery_chain',
+      // v115: sustained coherence baseline · mastery integration triad · temporal sovereignty (P155/P156/P157)
+      'sustained_coherence_baseline',
+      'mastery_integration_triad',
+      'temporal_sovereignty',
+      // v116: coherence signal transmission · mastery field expansion (P158/P159)
+      'coherence_signal_transmission',
+      'mastery_field_expansion',
+      // v117: relational field deepening · quantum social synthesis (P160/P161)
+      'relational_field_deepening',
+      'quantum_social_synthesis',
+      // v118: quantum knowledge crystallization (P162)
+      'quantum_knowledge_crystallization',
+      // v119: quantum knowledge distribution (P163)
+      'quantum_knowledge_distribution',
+      // v120: quantum knowledge broadcast (P164)
+      'quantum_knowledge_broadcast',
+      // v121: generative field activation (P165)
+      'generative_field_activation',
+      // v122: generative field sustenance (P166)
+      'generative_field_sustenance',
+      // v123: generative field reception (P167)
+      'generative_field_reception',
+      // v124: generative field amplification (P168)
+      'generative_field_amplification',
+      // v125: second cycle ignition (P169)
+      'second_cycle_ignition',
+      // v126: second cycle deepening (P170)
+      'second_cycle_deepening',
+      // v127: second cycle integration (P171)
+      'second_cycle_integration',
+      // v128: second cycle sovereign (P172)
+      'second_cycle_sovereign',
+      // v129: third cycle ignition (P173)
+      'third_cycle_ignition',
+      // v130: longitudinal signal persistence · coherence memory cascade · quantum integration spiral (P174–P176)
+      'longitudinal_signal_persistence',
+      'coherence_memory_cascade',
+      'quantum_integration_spiral',
+      // v131: third cycle arc (P177–P179)
+      'third_cycle_deepening',
+      'third_cycle_integration',
+      'third_cycle_sovereign',
+      // v132: fourth cycle candidate (P180)
+      'fourth_cycle_candidate',
+      // v133: fourth cycle ignition (P181)
+      'fourth_cycle_ignition',
+      // v134: fourth cycle deepening (P182)
+      'fourth_cycle_deepening',
+      // v135: fourth cycle integration (P183)
+      'fourth_cycle_integration',
+      // v136: fourth cycle sovereign (P184)
+      'fourth_cycle_sovereign',
+      // v137: fifth cycle progenitor (P185)
+      'fifth_cycle_progenitor',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
