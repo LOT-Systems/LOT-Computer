@@ -1905,6 +1905,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bjohn[\s-]?muir\b|\bthe[\s-]?mountains[\s-]?are[\s-]?calling\b|\byosemite\b|\bsierra[\s-]?nevada\b/i,                                              badge: 'muir_signal' },
   { patterns: /\bwalden\b|\bthoreau\b|\bcivil[\s-]?disobedience\b|\bbean[\s-]?field\b|\bwalden[\s-]?pond\b/i,                                                       badge: 'walden_signal' },
   { patterns: /\bgaia[\s-]?hypothesis\b|\bjames[\s-]?lovelock\b|\bliving[\s-]?earth\b|\bbiosphere\b|\bself[\s-]?regulating[\s-]?system\b/i,                         badge: 'gaia_hypothesis' },
+  // ── v38 — THE COSMOS ENGINE — word turns ──────────────────────────────────
+  { patterns: /\bcosmos\b|\bthe[\s-]?cosmos\b|\bcosmic[\s-]?reality\b|\bcosmic[\s-]?order\b|\bcosmic[\s-]?field\b/i,                                                badge: 'cosmos_signal' },
+  { patterns: /\bstellar\b|\bstar[\s-]?field\b|\bstarfield\b|\bstargazing\b|\bstars[\s-]?tonight\b|\bstar[\s-]?cluster\b|\bstellar[\s-]?field\b/i,                   badge: 'stellar_found' },
+  { patterns: /\borbit\b|\borbital\b|\bin[\s-]?orbit\b|\borbiting\b|\borbital[\s-]?mechanics\b|\borbital[\s-]?pattern\b|\borbital[\s-]?path\b/i,                     badge: 'orbital_signal' },
+  { patterns: /\bnebula\b|\bnebular\b|\bcosmic[\s-]?cloud\b|\bstar[\s-]?nursery\b|\bmolecular[\s-]?cloud\b|\bstellar[\s-]?nursery\b/i,                               badge: 'nebula_field' },
+  { patterns: /\bdark[\s-]?matter\b|\bdark[\s-]?energy\b|\binvisible[\s-]?forces\b|\bthe[\s-]?unseen[\s-]?field\b|\bdark[\s-]?mass\b|\bcosmological[\s-]?constant\b/i, badge: 'dark_matter' },
+  { patterns: /\bsingularity\b|\bthe[\s-]?singularity\b|\btechnological[\s-]?singularity\b|\bevent[\s-]?singularity\b|\bpoint[\s-]?of[\s-]?no[\s-]?return\b/i,       badge: 'singularity_found' },
+  { patterns: /\blight[\s-]?year\b|\blightyear\b|\blight[\s-]?years\b|\bastronomical[\s-]?unit\b|\bcosmic[\s-]?scale\b|\bparsec\b|\binterstellar[\s-]?distance\b/i,  badge: 'light_year_signal' },
+  { patterns: /\bevent[\s-]?horizon\b|\bno[\s-]?going[\s-]?back\b|\bhorizon[\s-]?crossed\b|\birreversible[\s-]?threshold\b|\bbeyond[\s-]?the[\s-]?horizon\b/i,       badge: 'event_horizon_badge' },
+  { patterns: /\bconstellation\b|\bstars[\s-]?aligned\b|\bstar[\s-]?map\b|\bconnect[\s-]?the[\s-]?dots\b|\bstar[\s-]?pattern\b|\bcelestial[\s-]?map\b/i,             badge: 'constellation_found' },
+  { patterns: /\bsupernova\b|\bstellar[\s-]?explosion\b|\bwent[\s-]?supernova\b|\bexplosive[\s-]?change\b|\bstar[\s-]?death\b|\bstellar[\s-]?collapse\b/i,           badge: 'supernova_signal' },
+  { patterns: /\bgravity[\s-]?well\b|\bgravitational[\s-]?pull\b|\bescape[\s-]?velocity\b|\bpull[\s-]?of[\s-]?gravity\b|\bgravitational[\s-]?field\b/i,              badge: 'gravity_well' },
+  { patterns: /\bcosmic[\s-]?archive\b|\bakashic[\s-]?record\b|\buniversal[\s-]?memory\b|\bthe[\s-]?archive[\s-]?of[\s-]?time\b|\bcosmic[\s-]?record\b/i,            badge: 'cosmic_archive' },
+  // ── v38 — THE COSMOS VAULT — secret boss word triggers ────────────────────
+  { patterns: /\bcarl[\s-]?sagan\b|\bwe[\s-]?are[\s-]?star[\s-]?stuff\b|\bpale[\s-]?blue[\s-]?dot\b|\bbillions[\s-]?and[\s-]?billions\b|\bcosmos[\s-]?by[\s-]?sagan\b/i, badge: 'sagan_signal' },
+  { patterns: /\bcopernicus\b|\bheliocentric\b|\bthe[\s-]?earth[\s-]?moves\b|\bde[\s-]?revolutionibus\b|\bcopernican\b|\bnicolas[\s-]?copernicus\b/i,                badge: 'copernicus_found' },
+  { patterns: /\bfermi[\s-]?paradox\b|\bwhere[\s-]?is[\s-]?everybody\b|\bgreat[\s-]?filter\b|\bdrake[\s-]?equation\b|\brare[\s-]?earth[\s-]?hypothesis\b/i,          badge: 'fermi_paradox' },
 ]
 
 /**
@@ -2323,6 +2340,10 @@ export function runCheckInEasterEggs(
   const dawnWalker = checkDawnWalker()
   if (dawnWalker) awarded.push(dawnWalker)
 
+  // v38 Cosmos Engine: dark_space (00:00–03:00)
+  const darkSpace = checkDarkSpace()
+  if (darkSpace) awarded.push(darkSpace)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2452,6 +2473,12 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   if (natureSession) awarded.push(natureSession)
   const longWalk = checkLongWalk(journalText)
   if (longWalk) awarded.push(longWalk)
+
+  // v38 Cosmos Engine behavioral
+  const cosmosSession = checkCosmosSession(journalText)
+  if (cosmosSession) awarded.push(cosmosSession)
+  const magnitudeScan = checkMagnitudeScan(journalText)
+  if (magnitudeScan) awarded.push(magnitudeScan)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -4603,6 +4630,58 @@ export function checkLongWalk(journalText: string): BadgeType | null {
   if (wordCount >= 400) {
     awardBadge('long_walk')
     return 'long_walk'
+  }
+  return null
+}
+
+// ── Cosmos Engine v38 — behavioral checks ─────────────────────────────────────
+
+const COSMOS_WORDS_V38 = [
+  /\bcosmos\b|\bthe[\s-]?cosmos\b|\bcosmic[\s-]?reality\b|\bcosmic[\s-]?order\b/i,
+  /\bstellar\b|\bstar[\s-]?field\b|\bstargazing\b|\bstars[\s-]?tonight\b/i,
+  /\borbit\b|\borbital\b|\bin[\s-]?orbit\b|\borbiting\b/i,
+  /\bnebula\b|\bnebular\b|\bcosmic[\s-]?cloud\b|\bstar[\s-]?nursery\b/i,
+  /\bdark[\s-]?matter\b|\bdark[\s-]?energy\b|\binvisible[\s-]?forces\b/i,
+  /\bsingularity\b|\bthe[\s-]?singularity\b|\btechnological[\s-]?singularity\b/i,
+  /\blight[\s-]?year\b|\blightyear\b|\bastronomical[\s-]?unit\b|\bcosmic[\s-]?scale\b/i,
+  /\bevent[\s-]?horizon\b|\bno[\s-]?going[\s-]?back\b|\bhorizon[\s-]?crossed\b/i,
+  /\bconstellation\b|\bstars[\s-]?aligned\b|\bstar[\s-]?map\b/i,
+  /\bsupernova\b|\bstellar[\s-]?explosion\b|\bwent[\s-]?supernova\b/i,
+  /\bgravity[\s-]?well\b|\bgravitational[\s-]?pull\b|\bescape[\s-]?velocity\b/i,
+  /\bcosmic[\s-]?archive\b|\bakashic[\s-]?record\b|\buniversal[\s-]?memory\b/i,
+]
+
+/** Award cosmos_session badge if 3+ Cosmos Engine (v38) words appear in one journal entry. */
+export function checkCosmosSession(journalText: string): BadgeType | null {
+  if (hasBadge('cosmos_session')) return null
+  const matchCount = COSMOS_WORDS_V38.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('cosmos_session')
+    return 'cosmos_session'
+  }
+  return null
+}
+
+/** Award dark_space badge if journal entry is written between 00:00 and 03:00 local time. */
+export function checkDarkSpace(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dark_space')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 0 && hour < 3) {
+    awardBadge('dark_space')
+    return 'dark_space'
+  }
+  return null
+}
+
+/** Award magnitude_scan badge if journal entry has 500+ words. */
+export function checkMagnitudeScan(journalText: string): BadgeType | null {
+  if (hasBadge('magnitude_scan')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 500) {
+    awardBadge('magnitude_scan')
+    return 'magnitude_scan'
   }
   return null
 }

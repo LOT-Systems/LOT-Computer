@@ -2174,7 +2174,7 @@ const ASSEMBLY_TRANSMISSIONS: {
 export const USERSHIP_TRANSMISSION = {
   date: '2026-11-17',
   message: [
-    'ASSEMBLY RUN — 2026-11-17 · QIE v137 · P185 Fifth Cycle Progenitor · Arch75 · J72 · Day 1177+',
+    'ASSEMBLY RUN — 2026-11-18 · Badge v48 THE COSMOS ENGINE · +31 badges (1277→1308) · 38 WT engines · Day 1178+',
     'Built: P185 fifth-cycle-progenitor (L20 progenitor state) · Arch75 Fifth Cycle Progenitor · J72 daily-fifth-cycle-progenitor-check (20:00 UTC).',
     'QIE v137: The OS now tracks when the fourth cycle\'s sovereignty becomes the generative field for the fifth. P185 fires when fourth-cycle-sovereign active + 180d compound arc (journal 35+ · memory 20+ · badge 35+) + all 6 dimensions ≥ 70 + overall index ≥ 97. The progenitor state is not accumulation and not convergence — it is genesis: the arc generates what comes next from a position of complete authority.',
     'Log system: FCPROG: handler added in military minimalist format. fifth_cycle_progenitor events surface in Logs with PROGENITOR · FIFTH ARC GENERATED readout.',

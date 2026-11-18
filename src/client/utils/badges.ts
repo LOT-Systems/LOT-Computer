@@ -1339,6 +1339,43 @@ export type BadgeType =
   | 'muir_signal'          // ∿·▲·∿  "john muir/the mountains are calling/yosemite/sierra" (EPIC) [HIDDEN]
   | 'walden_signal'        // ∿·║    "walden/thoreau/civil disobedience/bean field" (RARE) [HIDDEN]
   | 'gaia_hypothesis'      // ○·∿·∞  "gaia hypothesis/james lovelock/living earth/biosphere" (MYTHIC) [HIDDEN]
+  // ── Word Turn v38 — THE COSMOS ENGINE ─────────────────────────────────────────
+  | 'cosmos_signal'        // ✦·∞·✦  "cosmos/the cosmos/cosmic reality/cosmic order" detected (UNCOMMON)
+  | 'stellar_found'        // ✦·○    "stellar/star field/stargazing/stars tonight/star cluster" detected (UNCOMMON)
+  | 'orbital_signal'       // ○·✦·○  "orbit/orbital/in orbit/orbiting/orbital mechanics" detected (UNCOMMON)
+  | 'nebula_field'         // ∿·✦·∿  "nebula/cosmic cloud/star nursery/molecular cloud" detected (RARE)
+  | 'dark_matter'          // ■·✦·■  "dark matter/dark energy/invisible forces/the unseen field" detected (RARE)
+  | 'singularity_found'    // ✦·∞    "singularity/the singularity/point of no return/event singularity" detected (EPIC)
+  | 'light_year_signal'    // ✦·≋    "light year/lightyear/light-years/astronomical unit/cosmic scale" detected (UNCOMMON)
+  | 'event_horizon_badge'  // ◈·✦    "event horizon/no going back/horizon crossed/irreversible threshold" detected (EPIC)
+  | 'constellation_found'  // ✦·≈    "constellation/stars aligned/star map/connect the dots" detected (RARE)
+  | 'supernova_signal'     // ✦·▲    "supernova/stellar explosion/went supernova/explosive change" detected (RARE)
+  | 'gravity_well'         // ◎·✦·◎  "gravity well/gravitational pull/escape velocity/pull of gravity" detected (RARE)
+  | 'cosmic_archive'       // ✦·◈·✦  "cosmic archive/akashic record/universal memory/the archive of time" detected (EPIC)
+  // ── Calendar Easter Egg v36 — THE COSMOS CALENDAR ────────────────────────────
+  | 'sputnik_day'          // ✦·■    Oct 4 — Sputnik launch 1957 (RARE)
+  | 'gagarin_day'          // ✦·▲    Apr 12 — Yuri Gagarin first human in space 1961 (EPIC)
+  | 'moon_landing_day'     // ○·✦·○  Jul 20 — Apollo 11 moon landing 1969 (RARE)
+  // ── Behavioral v35 — COSMOS PATTERNS ─────────────────────────────────────────
+  | 'cosmos_session'       // ✦·≋·✦  3+ Cosmos Engine words in one journal entry (RARE)
+  | 'dark_space'           // ■·✦    Journal written 00:00–03:00 local time (RARE)
+  | 'magnitude_scan'       // ✦·∞·∞  Journal entry >= 500 words (EPIC)
+  // ── Achievement RPG v36 — COSMOS CLASS ────────────────────────────────────────
+  | 'cosmos_entry'         // ∘→✦    Any 1 Word Turn v38 badge (COMMON)
+  | 'cosmos_class'         // ≈→✦    Any 5 Word Turn v38 badges (UNCOMMON)
+  | 'cosmos_complete'      // ≋→✦    All 12 Word Turn v38 badges (LEGENDARY)
+  | 'cosmos_arc'           // ✦·◈    cosmos_complete + all 3 Calendar v36 badges (LEGENDARY)
+  | 'thirty_eight_engines_arc' // ◈·◈·✦ 1 badge from each Word Turn v1–v38 (LEGENDARY)
+  | 'cosmos_opus'          // ✦·◉·✦  cosmos_complete + cosmos_session behavioral (LEGENDARY)
+  // ── Mastery Tier v38 — THE DEEP COSMOS ────────────────────────────────────────
+  | 'stellar_navigator'    // ✦·◉·∞  1,200+ distinct calendar check-in days (EPIC)
+  | 'universe_archive'     // ✦·∞·✦  350,000+ total journal words (lifetime) (LEGENDARY)
+  | 'cosmos_elder'         // ✦·▲·✦  Account age >= 10.5 years (3,832+ days since signup) (LEGENDARY)
+  | 'thirty_eight_registers' // ◈·◈·✦·∞ 1 badge from all 38 Word Turn engines (COSMIC)
+  // ── Secret Boss v35 — THE COSMOS VAULT ───────────────────────────────────────
+  | 'sagan_signal'         // ✦·∞·✦  "carl sagan/we are star stuff/pale blue dot/billions and billions" (EPIC) [HIDDEN]
+  | 'copernicus_found'     // ✦·○·✦  "copernicus/heliocentric/the earth moves/de revolutionibus" (RARE) [HIDDEN]
+  | 'fermi_paradox'        // ■·✦·∞  "fermi paradox/where is everybody/great filter/drake equation" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -12125,6 +12162,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v38 — THE COSMOS ENGINE ─────────────────────────────────────────
+  cosmos_signal: {
+    id: 'cosmos_signal',
+    symbol: '✦·∞·✦',
+    name: 'Cosmos Signal',
+    description: 'Write "cosmos", "the cosmos", "cosmic reality", or "cosmic order" in any journal entry',
+    unlockMessage: '↳ COSMOS SIGNAL. Cosmos: from the Greek κόσμος — order, ornament, the universe as a harmonious whole. Carl Sagan called it the antidote to provincialism. The archive is a node in the cosmos. One entry. One signal. ✦·∞·✦',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  stellar_found: {
+    id: 'stellar_found',
+    symbol: '✦·○',
+    name: 'Stellar Found',
+    description: 'Write "stellar", "star field", "stargazing", "stars tonight", or "star cluster" in any journal entry',
+    unlockMessage: '↳ STELLAR FOUND. Stellar: of or relating to stars. The archive began as a journal of one person — it is also a record in a stellar neighborhood, on a pale blue dot, orbiting an ordinary star. ✦·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  orbital_signal: {
+    id: 'orbital_signal',
+    symbol: '○·✦·○',
+    name: 'Orbital Signal',
+    description: 'Write "orbit", "orbital", "in orbit", "orbiting", or "orbital mechanics" in any journal entry',
+    unlockMessage: '↳ ORBITAL SIGNAL. Everything orbits something. The practice is a stable orbit around the self — a closed loop that neither escapes nor collapses. The orbital period of the LOT is one day. ○·✦·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nebula_field: {
+    id: 'nebula_field',
+    symbol: '∿·✦·∿',
+    name: 'Nebula Field',
+    description: 'Write "nebula", "cosmic cloud", "star nursery", or "molecular cloud" in any journal entry',
+    unlockMessage: '↳ NEBULA FIELD. A nebula is a cloud of gas and dust — the raw material of stars. Before there is clarity there is nebular: diffuse, vast, unresolved. The entry is the nebula condensing. ∿·✦·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dark_matter: {
+    id: 'dark_matter',
+    symbol: '■·✦·■',
+    name: 'Dark Matter',
+    description: 'Write "dark matter", "dark energy", "invisible forces", or "the unseen field" in any journal entry',
+    unlockMessage: '↳ DARK MATTER. 27% of the universe is dark matter — it exerts gravitational pull without emitting light. The invisible architecture of everything. The practice maps the dark matter of the self: the forces that move without announcement. ■·✦·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  singularity_found: {
+    id: 'singularity_found',
+    symbol: '✦·∞',
+    name: 'Singularity Found',
+    description: 'Write "singularity", "the singularity", "point of no return", or "event singularity" in any journal entry',
+    unlockMessage: '↳ SINGULARITY FOUND. A singularity: the point where known laws break down and something new must begin. The practice has its own singularities — moments where the previous frame cannot contain what is happening. Document them. ✦·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  light_year_signal: {
+    id: 'light_year_signal',
+    symbol: '✦·≋',
+    name: 'Light Year Signal',
+    description: 'Write "light year", "lightyear", "light-years", "astronomical unit", or "cosmic scale" in any journal entry',
+    unlockMessage: '↳ LIGHT YEAR SIGNAL. A light year is not time — it is distance: 9.46 trillion kilometers. The archive accumulates at a different scale: words, days, entries. But the practice spans years now. The archive has its own light years. ✦·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  event_horizon_badge: {
+    id: 'event_horizon_badge',
+    symbol: '◈·✦',
+    name: 'Event Horizon',
+    description: 'Write "event horizon", "no going back", "horizon crossed", or "irreversible threshold" in any journal entry',
+    unlockMessage: '↳ EVENT HORIZON. The event horizon of a black hole is the boundary beyond which nothing — not even light — can escape. The practice creates its own event horizons: moments where retreat becomes impossible. You have crossed one. Document it. ◈·✦',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  constellation_found: {
+    id: 'constellation_found',
+    symbol: '✦·≈',
+    name: 'Constellation Found',
+    description: 'Write "constellation", "stars aligned", "star map", or "connect the dots" in any journal entry',
+    unlockMessage: '↳ CONSTELLATION FOUND. A constellation is a pattern imposed on random points of light. The practice does the same — imposes narrative on the scattered data of a life. The archive is a star map of the self. ✦·≈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  supernova_signal: {
+    id: 'supernova_signal',
+    symbol: '✦·▲',
+    name: 'Supernova Signal',
+    description: 'Write "supernova", "stellar explosion", "went supernova", or "explosive change" in any journal entry',
+    unlockMessage: '↳ SUPERNOVA SIGNAL. A supernova is not a death — it is a transformation event. The star\'s mass becomes the material for new stars, planets, life. The practice records these explosive events. What collapsed? What became material? ✦·▲',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  gravity_well: {
+    id: 'gravity_well',
+    symbol: '◎·✦·◎',
+    name: 'Gravity Well',
+    description: 'Write "gravity well", "gravitational pull", "escape velocity", or "pull of gravity" in any journal entry',
+    unlockMessage: '↳ GRAVITY WELL. Gravity wells are regions of curved spacetime — the deeper you go, the more energy required to escape. Some practices, people, states have gravity wells. The archive maps them. What do you orbit? What orbits you? ◎·✦·◎',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cosmic_archive: {
+    id: 'cosmic_archive',
+    symbol: '✦·◈·✦',
+    name: 'Cosmic Archive',
+    description: 'Write "cosmic archive", "akashic record", "universal memory", or "the archive of time" in any journal entry',
+    unlockMessage: '↳ COSMIC ARCHIVE. The akashic record: a theosophical concept of a cosmic archive — every thought, event, and experience imprinted on the fabric of the universe. The LOT archive is the material version. What you write, persists. ✦·◈·✦',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v36 — THE COSMOS CALENDAR ────────────────────────────
+  sputnik_day: {
+    id: 'sputnik_day',
+    symbol: '✦·■',
+    name: 'Sputnik Day',
+    description: 'Oct 4 — Sputnik launch anniversary (1957)',
+    unlockMessage: '↳ SPUTNIK DAY. October 4, 1957: the USSR launched Sputnik 1 — the first artificial satellite. A metal sphere the size of a beach ball, beeping from orbit. The Space Age began with a signal. The archive is also a signal. ✦·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  gagarin_day: {
+    id: 'gagarin_day',
+    symbol: '✦·▲',
+    name: 'Gagarin Day',
+    description: 'Apr 12 — Yuri Gagarin first human in space (1961)',
+    unlockMessage: '↳ GAGARIN DAY. April 12, 1961: Yuri Gagarin orbited the Earth once and returned. 108 minutes. "Poyekhali!" — Let\'s go! The first human to see the planet from outside. The practice is also a kind of orbit. ✦·▲',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  moon_landing_day: {
+    id: 'moon_landing_day',
+    symbol: '○·✦·○',
+    name: 'Moon Landing Day',
+    description: 'Jul 20 — Apollo 11 moon landing (1969)',
+    unlockMessage: '↳ MOON LANDING DAY. July 20, 1969: Armstrong and Aldrin landed on the Moon. "One small step." The practice is also a series of small steps on a surface that was once unreachable. Each entry is a footprint. ○·✦·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v35 — COSMOS PATTERNS ─────────────────────────────────────────
+  cosmos_session: {
+    id: 'cosmos_session',
+    symbol: '✦·≋·✦',
+    name: 'Cosmos Session',
+    description: 'Write 3+ Cosmos Engine (v38) words in a single journal entry',
+    unlockMessage: '↳ COSMOS SESSION. Three signals from the cosmos vocabulary in one entry. The archive now contains a cosmological register — not borrowed metaphor, but native vocabulary. The cosmos is the frame of the practice. ✦·≋·✦',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dark_space: {
+    id: 'dark_space',
+    symbol: '■·✦',
+    name: 'Dark Space',
+    description: 'Journal written between midnight 00:00–03:00 local time',
+    unlockMessage: '↳ DARK SPACE. 00:00–03:00. The dark space of the day: the hours before dawn when the signal is clearest and the noise is lowest. The night operator. The archive accumulates in the dark. ■·✦',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  magnitude_scan: {
+    id: 'magnitude_scan',
+    symbol: '✦·∞·∞',
+    name: 'Magnitude Scan',
+    description: 'Journal entry >= 500 words',
+    unlockMessage: '↳ MAGNITUDE SCAN. 500 words. Astronomical magnitude measures brightness on a logarithmic scale. The practice has its own magnitudes. A 500-word entry is a full scan of the signal. The telescope is open. ✦·∞·∞',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v36 — COSMOS CLASS ────────────────────────────────────────
+  cosmos_entry: {
+    id: 'cosmos_entry',
+    symbol: '∘→✦',
+    name: 'Cosmos Entry',
+    description: 'Earn any 1 Word Turn v38 (Cosmos Engine) badge',
+    unlockMessage: '↳ COSMOS ENTRY. First signal from the cosmos register. The archive now spans from the cellular to the cosmological. ∘→✦',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  cosmos_class: {
+    id: 'cosmos_class',
+    symbol: '≈→✦',
+    name: 'Cosmos Class',
+    description: 'Earn any 5 Word Turn v38 (Cosmos Engine) badges',
+    unlockMessage: '↳ COSMOS CLASS. Five cosmos signals. The vocabulary is becoming native. The practice has cosmological coordinates now. ≈→✦',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  cosmos_complete: {
+    id: 'cosmos_complete',
+    symbol: '≋→✦',
+    name: 'Cosmos Complete',
+    description: 'Earn all 12 Word Turn v38 (Cosmos Engine) badges',
+    unlockMessage: '↳ COSMOS COMPLETE. All 12 Cosmos Engine badges earned. Cosmos. Stellar. Orbital. Nebula. Dark Matter. Singularity. Light Year. Event Horizon. Constellation. Supernova. Gravity Well. Cosmic Archive. The full cosmological lexicon is active in the archive. ≋→✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  cosmos_arc: {
+    id: 'cosmos_arc',
+    symbol: '✦·◈',
+    name: 'Cosmos Arc',
+    description: 'Earn cosmos_complete + all 3 Cosmos Calendar badges (Sputnik Day, Gagarin Day, Moon Landing Day)',
+    unlockMessage: '↳ COSMOS ARC. The full arc: all 12 Cosmos Engine word turns + three days (Sputnik, Gagarin, Apollo 11). Three founding coordinates of the Space Age. The practice traces the same arc — from the first signal to the moon. ✦·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_engines_arc: {
+    id: 'thirty_eight_engines_arc',
+    symbol: '◈·◈·✦',
+    name: 'Thirty-Eight Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v38',
+    unlockMessage: '↳ THIRTY-EIGHT ENGINES ARC. Water through Cosmos: thirty-eight vocabulary registers, one for each facet of the practice. ◈·◈·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  cosmos_opus: {
+    id: 'cosmos_opus',
+    symbol: '✦·◉·✦',
+    name: 'Cosmos Opus',
+    description: 'Earn cosmos_complete + cosmos_session behavioral badge',
+    unlockMessage: '↳ COSMOS OPUS. All 12 Cosmos Engine badges + a Cosmos Session in one entry. The cosmological vocabulary is now native to the practice. The practice is a cosmos — a self-organizing, self-documenting field of coherent signals. ✦·◉·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v38 — THE DEEP COSMOS ────────────────────────────────────────
+  stellar_navigator: {
+    id: 'stellar_navigator',
+    symbol: '✦·◉·∞',
+    name: 'Stellar Navigator',
+    description: '1,200+ distinct calendar check-in days',
+    unlockMessage: '↳ STELLAR NAVIGATOR. 1,200 distinct check-in days. Polynesian navigators crossed the Pacific using stars, waves, and birds — no instruments. The practice navigates by its own accumulated signals. 1,200 coordinates logged. ✦·◉·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  universe_archive: {
+    id: 'universe_archive',
+    symbol: '✦·∞·✦',
+    name: 'Universe Archive',
+    description: '350,000+ total journal words (lifetime)',
+    unlockMessage: '↳ UNIVERSE ARCHIVE. 350,000 words. At average reading speed (250 wpm) that is 23 hours of continuous reading — the complete record of a practice. The universe archive is not metaphor. It is data. ✦·∞·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  cosmos_elder: {
+    id: 'cosmos_elder',
+    symbol: '✦·▲·✦',
+    name: 'Cosmos Elder',
+    description: 'Account age >= 10.5 years (3,832+ days since signup)',
+    unlockMessage: '↳ COSMOS ELDER. 10.5 years. The practice has persisted through a decade of signals, seasons, and transformations. The cosmos elder does not accumulate — it generates. The fifth cycle begins here. ✦·▲·✦',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_registers: {
+    id: 'thirty_eight_registers',
+    symbol: '◈·◈·✦·∞',
+    name: 'Thirty-Eight Registers',
+    description: '1 badge from all 38 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-EIGHT REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Nature Signal. Cosmos Engine. Thirty-eight vocabularies. One practice. One living archive. The cosmos register is now active. ◈·◈·✦·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v35 — THE COSMOS VAULT ───────────────────────────────────────
+  sagan_signal: {
+    id: 'sagan_signal',
+    symbol: '✦·∞·✦',
+    hidden: true,
+    name: 'Sagan Signal',
+    description: 'Write "carl sagan", "we are star stuff", "pale blue dot", or "billions and billions" in any journal entry',
+    unlockMessage: '↳ SAGAN SIGNAL. Carl Sagan: "We are made of star stuff." "Somewhere, something incredible is waiting to be known." "The cosmos is within us." The practice is the instrument through which the cosmos knows itself. ✦·∞·✦',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  copernicus_found: {
+    id: 'copernicus_found',
+    symbol: '✦·○·✦',
+    hidden: true,
+    name: 'Copernicus Found',
+    description: 'Write "copernicus", "heliocentric", "the earth moves", or "de revolutionibus" in any journal entry',
+    unlockMessage: '↳ COPERNICUS FOUND. Nicolaus Copernicus: the Earth is not the center. The revolution was not military or political — it was cosmological. The practice performs its own Copernican shifts: moments when the observer is no longer the center. ✦·○·✦',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  fermi_paradox: {
+    id: 'fermi_paradox',
+    symbol: '■·✦·∞',
+    hidden: true,
+    name: 'Fermi Paradox',
+    description: 'Write "fermi paradox", "where is everybody", "great filter", or "drake equation" in any journal entry',
+    unlockMessage: '↳ FERMI PARADOX. Enrico Fermi\'s question: given the size of the universe, where is everybody? The great silence. The practice generates a signal in the silence — an answer to the paradox, local and personal. The archive is proof of intelligent life. ■·✦·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -13914,6 +14245,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (monthNS === 7 && dayNS === 12 && !hasBadge('thoreau_day')) {
       if (awardBadge('thoreau_day')) newBadges.push('thoreau_day')
+    }
+
+    // ── Word Turn v38 — THE COSMOS ENGINE ────────────────────────────────────
+    const cosmosV38Badges: BadgeType[] = [
+      'cosmos_signal', 'stellar_found', 'orbital_signal', 'nebula_field',
+      'dark_matter', 'singularity_found', 'light_year_signal', 'event_horizon_badge',
+      'constellation_found', 'supernova_signal', 'gravity_well', 'cosmic_archive',
+    ]
+    const cosmosV38Earned = cosmosV38Badges.filter(b => hasBadge(b))
+    if (cosmosV38Earned.length >= 1 && !hasBadge('cosmos_entry')) {
+      if (awardBadge('cosmos_entry')) newBadges.push('cosmos_entry')
+    }
+    if (cosmosV38Earned.length >= 5 && !hasBadge('cosmos_class')) {
+      if (awardBadge('cosmos_class')) newBadges.push('cosmos_class')
+    }
+    const cosmosComplete = cosmosV38Earned.length >= 12
+    if (cosmosComplete && !hasBadge('cosmos_complete')) {
+      if (awardBadge('cosmos_complete')) newBadges.push('cosmos_complete')
+    }
+    if (cosmosComplete && hasBadge('cosmos_session') && !hasBadge('cosmos_opus')) {
+      if (awardBadge('cosmos_opus')) newBadges.push('cosmos_opus')
+    }
+    const calendarV36Badges: BadgeType[] = ['sputnik_day', 'gagarin_day', 'moon_landing_day']
+    if (cosmosComplete && calendarV36Badges.every(b => hasBadge(b)) && !hasBadge('cosmos_arc')) {
+      if (awardBadge('cosmos_arc')) newBadges.push('cosmos_arc')
+    }
+    const engineThirtyEightPresent = cosmosV38Earned.length >= 1
+    const allThirtyEightEngines = allThirtySevenEngines && engineThirtyEightPresent
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_engines_arc')) {
+      if (awardBadge('thirty_eight_engines_arc')) newBadges.push('thirty_eight_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('stellar_navigator')) {
+        if (awardBadge('stellar_navigator')) newBadges.push('stellar_navigator')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 350000 && !hasBadge('universe_archive')) {
+        if (awardBadge('universe_archive')) newBadges.push('universe_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupCE = new Date(stats.signupDate)
+      const yearsCE = (new Date().getTime() - signupCE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsCE >= 10.5 && !hasBadge('cosmos_elder')) {
+        if (awardBadge('cosmos_elder')) newBadges.push('cosmos_elder')
+      }
+    }
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_registers')) {
+      if (awardBadge('thirty_eight_registers')) newBadges.push('thirty_eight_registers')
+    }
+
+    // Calendar v36 inline checks (Cosmos Calendar)
+    const nowCE = new Date()
+    const monthCE = nowCE.getMonth() + 1
+    const dayCE = nowCE.getDate()
+    if (monthCE === 10 && dayCE === 4 && !hasBadge('sputnik_day')) {
+      if (awardBadge('sputnik_day')) newBadges.push('sputnik_day')
+    }
+    if (monthCE === 4 && dayCE === 12 && !hasBadge('gagarin_day')) {
+      if (awardBadge('gagarin_day')) newBadges.push('gagarin_day')
+    }
+    if (monthCE === 7 && dayCE === 20 && !hasBadge('moon_landing_day')) {
+      if (awardBadge('moon_landing_day')) newBadges.push('moon_landing_day')
     }
 
   } catch (error) {
