@@ -1483,6 +1483,40 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCANE TERMINAL ──────────────────────────────────────────────────
+  { patterns: /arcane[\s-]?arts|arcane[\s-]?knowledge|arcane[\s-]?practice/i,           badge: 'arcane_signal' },
+  { patterns: /\bgrimoire\b|spell[\s-]?book|book[\s-]?of[\s-]?shadows/i,                badge: 'grimoire_decoded' },
+  { patterns: /\bincantation\b|sacred[\s-]?words/i,                                     badge: 'incantation_cast' },
+  { patterns: /\bward\b|warding/i,                                                      badge: 'ward_placed' },
+  { patterns: /transmut/i,                                                               badge: 'transmute_active' },
+  { patterns: /sacred[\s-]?sigil|sigils/i,                                              badge: 'sigil_carved' },
+  { patterns: /spirit[\s-]?animal|companion[\s-]?spirit|my[\s-]?familiar/i,             badge: 'familiar_bound' },
+  { patterns: /\bsanctum\b|sacred[\s-]?space/i,                                         badge: 'sanctum_found' },
+  { patterns: /\balchemy\b|alchemical|great[\s-]?work/i,                                badge: 'alchemy_process' },
+  { patterns: /\bcipher\b|decipher/i,                                                   badge: 'cipher_broken' },
+  { patterns: /\brunes?\b|runic/i,                                                      badge: 'rune_inscribed' },
+  { patterns: /\bnexus\b|convergence[\s-]?point/i,                                      badge: 'nexus_activated' },
+  // ── Secret Boss v20 — THE HIDDEN CODEX ────────────────────────────────────────
+  { patterns: /paracelsus|quinta[\s-]?essentia|sulfur[\s-]?mercury/i,                   badge: 'paracelsus_key' },
+  { patterns: /john[\s-]?dee|enochian|scrying[\s-]?mirror/i,                            badge: 'dee_cipher' },
+  { patterns: /emerald[\s-]?tablet|as[\s-]?above[\s-]?so[\s-]?below|hermes[\s-]?trismegistus/i, badge: 'emerald_tablet' },
+  // ── v24 — THE DREAM VAULT ──────────────────────────────────────────────────────
+  { patterns: /dream[\s-]?state|dreamstate/i,                                           badge: 'dream_state' },
+  { patterns: /\blucid\b/i,                                                             badge: 'lucid_signal' },
+  { patterns: /shadow[\s-]?integration|shadow[\s-]?work|shadow[\s-]?process/i,          badge: 'shadow_integration' },
+  { patterns: /\barchetypes?\b/i,                                                       badge: 'archetype_code' },
+  { patterns: /subconscious|unconscious/i,                                              badge: 'subconscious_log' },
+  { patterns: /collective\s+(un)?conscious|collective[\s-]?field/i,                    badge: 'collective_field' },
+  { patterns: /\bsymbols?\b/i,                                                         badge: 'symbol_decoded' },
+  { patterns: /nightmare|night[\s-]?vision/i,                                           badge: 'night_vision' },
+  { patterns: /\bastral\b/i,                                                            badge: 'astral_mode' },
+  { patterns: /prophetic|prophecy/i,                                                    badge: 'prophetic_pulse' },
+  { patterns: /\bliminal\b/i,                                                           badge: 'liminal_gate' },
+  { patterns: /\bintegrat/i,                                                            badge: 'integration_node' },
+  // ── Secret Boss v21 — THE DREAM KEEPER ────────────────────────────────────────
+  { patterns: /carl[\s-]?jung|collective[\s-]?unconscious|synchronicity/i,              badge: 'jungian_key' },
+  { patterns: /lucid[\s-]?dreaming|wake[\s-]?induced|wild[\s-]?technique/i,             badge: 'lucid_mastery' },
+  { patterns: /\bdreamtime\b|the[\s-]?dreaming|dreamtime[\s-]?walks/i,                  badge: 'dreamtime' },
 ]
 
 /**
