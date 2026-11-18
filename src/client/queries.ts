@@ -136,6 +136,15 @@ export const useLogs = createQuery<Log[]>('/api/logs', {
   staleTime: 5 * 60 * 1000, // Cache for 5 minutes — /api/logs has no LIMIT so keep fetches infrequent
 })
 
+// Calendar event stream (calendar_entry / calendar_status / calendar_alert).
+// Polled once a minute so entries created on another device show up and
+// alerts are deduplicated against what other tabs/devices already fired.
+export const useCalendarStream = createQuery<Log[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 60 * 1000,
+  staleTime: 30 * 1000,
+})
+
 export const useCreateLog = createMutation<{ text: string; event?: string; metadata?: Record<string, any> }, Log>(
   'post',
   '/api/logs'

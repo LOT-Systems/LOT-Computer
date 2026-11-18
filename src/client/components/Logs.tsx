@@ -2079,11 +2079,48 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryText = log.metadata?.text as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const phase = log.metadata?.phase as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryText = log.metadata?.text as string | undefined
+          const priority = (log.text || '').match(/^\[(FLASH|IMMEDIATE|ROUTINE)\]/)?.[1]
+          const code = entryType === 'task' ? 'TSK' : entryType === 'call' ? 'CLL' : 'NTE'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-ALRT:" blockView>
+                <div className="flex justify-between items-baseline mb-8">
+                  <span className="uppercase tracking-widest">{phase === 'DAY' ? 'DAY OF' : phase || 'ALERT'}</span>
+                  {priority && <span className="opacity-40 tracking-widest">{priority}</span>}
+                </div>
+                {entryText && <div><span className="opacity-40">{code} </span>{entryText}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_status') {
+          const status = log.metadata?.status as string | undefined
+          const entryText = log.metadata?.text as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">{status === 'open' ? 'REOPENED' : status || 'STATUS'}</div>
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}` : ''}</div>}
               </Block>
             </LogContainer>
           )
