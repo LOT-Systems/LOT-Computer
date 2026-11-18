@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, formatSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryPeriod } from '#shared/utils/logCompression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3739,9 +3740,17 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  const [storyMeta, setStoryMeta] = React.useState<{ header?: string; rankLine?: string } | null>(null)
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      const c = data.chronicle
+      setStoryMeta({
+        header: data.header,
+        rankLine: c
+          ? `CHAPTER ${c.chapter} · ${c.glyph} ${c.rank} · ${c.xp} XP ${c.bar}${c.nextRank ? ` ${c.chaptersToNext} TO ${c.nextRank}` : ''}`
+          : undefined,
+      })
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,47 +4130,30 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(formatSystemHelp())
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryMeta(null)
+          const period = parseStoryPeriod(value)
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
+            const logText = value
+              .replace(/\/story(\s+(day|week|month|year|today|daily|weekly|monthly|yearly|annual|d|w|m|y)\b)?/i, '')
+              .replace(/📖/g, '')
+              .trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              period,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText: value, period })
           }
         }
       }
@@ -4418,13 +4410,23 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">COMPRESSING...</div>
+              )}
+              {storyMeta?.header && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  {storyMeta.header}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
                     <div key={idx}>{line || <br />}</div>
                   ))}
+                </div>
+              )}
+              {storyMeta?.rankLine && (
+                <div className="opacity-30 mt-4" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '11px', letterSpacing: '0.08em' }}>
+                  {storyMeta.rankLine}
                 </div>
               )}
             </Block>

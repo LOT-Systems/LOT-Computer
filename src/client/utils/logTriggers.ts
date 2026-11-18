@@ -115,3 +115,57 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ─── Command registry — single source of truth for /system ──────────────────
+// Every slash command the Log understands, grouped for the /system screen.
+// When you add a RULES entry above, add its row here too.
+
+export interface LogCommand {
+  cmd: string
+  desc: string
+  group: 'NARRATIVE' | 'INTELLIGENCE' | 'SELF-CARE' | 'ENVIRONMENT' | 'NAVIGATION'
+}
+
+export const LOG_COMMANDS: LogCommand[] = [
+  { group: 'NARRATIVE',    cmd: '/story',         desc: 'Compressed story of your week (default)' },
+  { group: 'NARRATIVE',    cmd: '/story day',     desc: 'Compressed story of the last 24 hours' },
+  { group: 'NARRATIVE',    cmd: '/story week',    desc: 'Compressed story of the last 7 days' },
+  { group: 'NARRATIVE',    cmd: '/story month',   desc: 'Compressed story of the last 30 days' },
+  { group: 'NARRATIVE',    cmd: '/story year',    desc: 'Compressed story of the last 365 days' },
+  { group: 'NARRATIVE',    cmd: '/prayer',        desc: 'Contextual scripture' },
+  { group: 'INTELLIGENCE', cmd: '/qi [query]',    desc: 'Ask the Quantum Intelligence engine' },
+  { group: 'INTELLIGENCE', cmd: '/scan',          desc: 'System status overview' },
+  { group: 'INTELLIGENCE', cmd: '/qos',           desc: 'Quantum OS state analysis' },
+  { group: 'INTELLIGENCE', cmd: '/assembly',      desc: 'Self-assembly module status' },
+  { group: 'INTELLIGENCE', cmd: '/phys',          desc: 'Physiological cohort report' },
+  { group: 'SELF-CARE',    cmd: '/breathe',       desc: '4-2-6 breathing exercise' },
+  { group: 'SELF-CARE',    cmd: '/freeze',        desc: 'Pause and reflect protocol' },
+  { group: 'SELF-CARE',    cmd: '/silent',        desc: 'Signal silence check' },
+  { group: 'SELF-CARE',    cmd: '/fast',          desc: 'Orthodox fasting calendar' },
+  { group: 'ENVIRONMENT',  cmd: '/synth',         desc: 'Toggle keyboard sound' },
+  { group: 'ENVIRONMENT',  cmd: '/radio',         desc: 'Toggle radio' },
+  { group: 'ENVIRONMENT',  cmd: '/night',         desc: 'Dark mode' },
+  { group: 'NAVIGATION',   cmd: '/how',           desc: 'Open LOT AI check-in (System tab)' },
+  { group: 'NAVIGATION',   cmd: '/system',        desc: 'This help screen' },
+]
+
+/**
+ * Renders the /system help text. Group headers are bare upper-case lines,
+ * command rows start with "/" and separate cmd/desc with ≥2 spaces — the
+ * format the SYSTEM: block in Logs.tsx parses.
+ */
+export function formatSystemHelp(): string {
+  const lines: string[] = []
+  let group: string | null = null
+  for (const c of LOG_COMMANDS) {
+    if (c.group !== group) {
+      if (group !== null) lines.push('')
+      lines.push(c.group)
+      group = c.group
+    }
+    lines.push(`${c.cmd.padEnd(14)}  ${c.desc}`)
+  }
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  lines.push('', 'Every entry is stamped with its moment: time, weather, place, moon.')
+  return lines.join('\n')
+}
