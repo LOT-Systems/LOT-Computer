@@ -1747,6 +1747,10 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
+  // Check daily somatic grounding check (15:00 UTC every day) — Job 49
+  if (shouldRunDailySomaticGroundingCheck()) {
+    await executeDailySomaticGroundingCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -3522,6 +3526,133 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   } catch (error: any) {
     console.error('Daily total field coherence check failed:', error.message)
     isDailyTotalFieldCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Somatic Grounding Check (Job 49 — 15:00 UTC every day) ────────────
+// Checks for somatic_grounding_window pattern: mood log + selfcare entry + journal (>50w)
+// all within a 3-hour window earlier that day. Writes somatic_grounding_window log event.
+// Surfaces the nervous-system coherence state: sensed → tended → articulated.
+
+let isDailySomaticGroundingRunning = false
+let lastDailySomaticGroundingRun: Date | null = null
+
+function shouldRunDailySomaticGroundingCheck(): boolean {
+  const now = dayjs()
+  if (isDailySomaticGroundingRunning) return false
+  if (lastDailySomaticGroundingRun) {
+    const lastRun = dayjs(lastDailySomaticGroundingRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailySomaticGroundingCheck(): Promise<JobResult> {
+  const jobName = 'daily-somatic-grounding-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySomaticGroundingRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySomaticGroundingRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SOMATIC GROUNDING CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const todayStart = dayjs().startOf('day').toDate()
+    const now        = dayjs().toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+
+    let written = 0
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+        const logs = await Log.findAll({
+          where: {
+            userId,
+            createdAt: { [Op.between]: [todayStart, now] },
+            event: { [Op.in]: ['mood_check', 'self_care_complete', 'journal_entry'] },
+          },
+          order: [['createdAt', 'ASC']],
+        })
+
+        const moodLogs  = logs.filter((l: any) => l.event === 'mood_check')
+        const careLogs  = logs.filter((l: any) => l.event === 'self_care_complete')
+        const jrnLogs   = logs.filter((l: any) => l.event === 'journal_entry' && ((l.metadata as any)?.wordCount ?? 0) >= 50)
+
+        if (!moodLogs.length || !careLogs.length || !jrnLogs.length) continue
+
+        // Find a 3-hour window containing all three
+        const threeHoursMs = 3 * 60 * 60 * 1000
+        let found = false
+        let windowMins = 0
+        let moodValue: number | undefined
+        let careActions = 0
+        let wordCount = 0
+
+        for (const mood of moodLogs) {
+          const moodTime = new Date((mood as any).createdAt).getTime()
+          const windowEnd = moodTime + threeHoursMs
+          const care = careLogs.find((c: any) => {
+            const t = new Date((c as any).createdAt).getTime()
+            return t >= moodTime && t <= windowEnd
+          })
+          const jrn = jrnLogs.find((j: any) => {
+            const t = new Date((j as any).createdAt).getTime()
+            return t >= moodTime && t <= windowEnd
+          })
+          if (care && jrn) {
+            found = true
+            const latestTime = Math.max(
+              new Date((care as any).createdAt).getTime(),
+              new Date((jrn as any).createdAt).getTime()
+            )
+            windowMins = Math.round((latestTime - moodTime) / 60000)
+            moodValue  = (mood as any).metadata?.value as number | undefined
+            careActions = careLogs.filter((c: any) => {
+              const t = new Date((c as any).createdAt).getTime()
+              return t >= moodTime && t <= windowEnd
+            }).length
+            wordCount  = (jrn as any).metadata?.wordCount as number ?? 0
+            break
+          }
+        }
+
+        if (!found) continue
+
+        const existing = await Log.findOne({
+          where: { userId, event: 'somatic_grounding_window' as any, createdAt: { [Op.gte]: todayStart } },
+        })
+        if (existing) continue
+
+        await Log.create({
+          userId,
+          event: 'somatic_grounding_window' as any,
+          text: `Somatic grounding window confirmed — ${dayjs().format('YYYY-MM-DD')}`,
+          metadata: { moodValue, careActions, wordCount, windowMins },
+          context: {},
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Somatic grounding events written: ${written}`)
+    lastDailySomaticGroundingRun = new Date()
+    isDailySomaticGroundingRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily somatic grounding check failed:', error.message)
+    isDailySomaticGroundingRunning = false
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5608,6 +5739,8 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily total field coherence check: 9 AM UTC every day (Job 48)')
+  console.log('   - Daily somatic grounding check: 3 PM UTC every day (Job 49)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5617,7 +5750,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse+total-field-coherence, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit+somatic-grounding, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

@@ -3428,6 +3428,70 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // ── P152: Somatic Grounding Window (2026-11-18 v114) ─────────────────────────
+  // Triggered when mood log + selfcare entry + substantial journal (>50w) all appear
+  // within a 3-hour window. Signals the body has been read, tended, and reflected upon.
+  {
+    const threeHoursMs = 3 * 60 * 60 * 1000
+    const moodSig  = signals.find(s => s.source === 'mood'     && s.timestamp && now - s.timestamp < threeHoursMs)
+    const careSig  = signals.find(s => s.source === 'selfcare' && s.timestamp && now - s.timestamp < threeHoursMs)
+    const jrnSig   = signals.find(s => s.source === 'journal'  && s.timestamp && now - s.timestamp < threeHoursMs && (s.wordCount ?? 0) >= 50)
+    if (moodSig && careSig && jrnSig) {
+      const wordBonus = Math.min(((jrnSig.wordCount ?? 50) - 50) / 200 * 0.20, 0.20)
+      patterns.push({
+        pattern: 'somatic-grounding-window',
+        confidence: Math.min(0.65 + wordBonus, 0.85),
+        suggestedWidget: 'selfcare',
+        suggestedTiming: 'now',
+        reason: `SOMAT: Somatic grounding window active — body read (mood) · care applied · field reflected in journal within 3h. Full somatic loop: sensed → tended → articulated. Nervous system coherence elevated.`,
+      })
+    }
+  }
+
+  // ── P153: Theta Flow State (2026-11-18 v114) ──────────────────────────────────
+  // Triggered when planner entry + memory signal + deep journal (>100w) appear within
+  // 2 hours. Suggests the user is in deep creative/cognitive processing mode.
+  {
+    const twoHoursMs = 2 * 60 * 60 * 1000
+    const planSig = signals.find(s => s.source === 'planner' && s.timestamp && now - s.timestamp < twoHoursMs)
+    const memSig  = signals.find(s => s.source === 'memory'  && s.timestamp && now - s.timestamp < twoHoursMs)
+    const jrnSig  = signals.find(s => s.source === 'journal' && s.timestamp && now - s.timestamp < twoHoursMs && (s.wordCount ?? 0) >= 100)
+    if (planSig && memSig && jrnSig) {
+      const wordBonus = Math.min(((jrnSig.wordCount ?? 100) - 100) / 300 * 0.18, 0.18)
+      patterns.push({
+        pattern: 'theta-flow-state',
+        confidence: Math.min(0.70 + wordBonus, 0.88),
+        suggestedWidget: 'memory',
+        suggestedTiming: 'now',
+        reason: `THETA: Theta flow state detected — structured plan active · memory anchored · deep journal reflection underway. Cognitive depth confirmed: plan → recall → articulate. Inner architecture is building.`,
+      })
+    }
+  }
+
+  // ── P154: Dream Signal Capture (2026-11-18 v114) ──────────────────────────────
+  // Triggered when a substantial journal entry (>100w) appears in night hours (22–05)
+  // paired with memory or positive mood signal. Signals subconscious processing surfaced.
+  {
+    const currentHour = new Date(now).getHours()
+    const isNightHour = currentHour >= 22 || currentHour <= 5
+    if (isNightHour) {
+      const fourHoursMs = 4 * 60 * 60 * 1000
+      const jrnSig  = signals.find(s => s.source === 'journal' && s.timestamp && now - s.timestamp < fourHoursMs && (s.wordCount ?? 0) >= 100)
+      const memSig  = signals.find(s => s.source === 'memory'  && s.timestamp && now - s.timestamp < fourHoursMs)
+      const moodSig = signals.find(s => s.source === 'mood'    && s.timestamp && now - s.timestamp < fourHoursMs && (s.value ?? 0) >= 6)
+      if (jrnSig && (memSig || moodSig)) {
+        const wordBonus = Math.min(((jrnSig.wordCount ?? 100) - 100) / 300 * 0.18, 0.18)
+        patterns.push({
+          pattern: 'dream-signal-capture',
+          confidence: Math.min(0.62 + wordBonus, 0.80),
+          suggestedWidget: 'memory',
+          suggestedTiming: 'now',
+          reason: `DREAM: Dream signal capture active — night-hour deep journal detected with memory/mood anchor. Subconscious processing surfaced: threshold journal written in the liminal window. Record before dawn dissolves it.`,
+        })
+      }
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4128,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  somaticGroundingNode:       ['mood', 'selfcare', 'journal', 'log'],
+  thetaFlowNode:              ['planner', 'memory', 'journal', 'log'],
+  dreamSignalNode:            ['journal', 'memory', 'mood', 'log'],
 }
 
 /**
@@ -4510,6 +4579,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Theta Architect (2026-11-18 v114) ─────────────────────────────────
+  {
+    archetype: 'Theta Architect',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['journal', 'memory', 'selfcare'],
+    patternConditions: ['somatic-grounding-window', 'theta-flow-state', 'recovery-intelligence-arc'],
+    hourRange: [0, 23],
+    directive: 'Somatic field engaged. Inner architecture building. Record the state before it passes — the nervous system is coherent and the mind is reaching deep. What is surfacing now belongs in permanent memory.',
   },
 ]
 

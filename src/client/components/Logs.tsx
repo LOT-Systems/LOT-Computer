@@ -3629,6 +3629,117 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'somatic_grounding_window') {
+          const moodVal     = log.metadata?.moodValue    as number | undefined
+          const careActions = log.metadata?.careActions  as number | undefined
+          const wordCount   = log.metadata?.wordCount    as number | undefined
+          const windowMins  = log.metadata?.windowMins   as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SOMAT:" blockView>
+                <div className="uppercase tracking-widest mb-4">SOMATIC GROUNDING WINDOW</div>
+                {moodVal !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BODY READ</span>
+                    <span className="tabular-nums">{moodVal}/10</span>
+                  </div>
+                )}
+                {careActions !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE ACTIONS</span>
+                    <span className="tabular-nums">{careActions}</span>
+                  </div>
+                )}
+                {wordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD WORDS</span>
+                    <span className="tabular-nums">{wordCount}w</span>
+                  </div>
+                )}
+                {windowMins !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowMins}m</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">SENSED → TENDED → ARTICULATED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'theta_flow_state') {
+          const planDepth  = log.metadata?.planDepth   as number | undefined
+          const memAnchors = log.metadata?.memAnchors  as number | undefined
+          const wordCount  = log.metadata?.wordCount   as number | undefined
+          const windowMins = log.metadata?.windowMins  as number | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="THETA:" blockView>
+                <div className="uppercase tracking-widest mb-4">THETA FLOW STATE</div>
+                {planDepth !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PLAN DEPTH</span>
+                    <span className="tabular-nums">{planDepth}</span>
+                  </div>
+                )}
+                {memAnchors !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM ANCHORS</span>
+                    <span className="tabular-nums">{memAnchors}</span>
+                  </div>
+                )}
+                {wordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL DEPTH</span>
+                    <span className="tabular-nums">{wordCount}w</span>
+                  </div>
+                )}
+                {windowMins !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowMins}m</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">PLAN → RECALL → ARTICULATE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'dream_signal_capture') {
+          const hour       = log.metadata?.captureHour as number | undefined
+          const wordCount  = log.metadata?.wordCount   as number | undefined
+          const memAnchor  = log.metadata?.memAnchor   as boolean | undefined
+          const moodAnchor = log.metadata?.moodAnchor  as boolean | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="DREAM:" blockView>
+                <div className="uppercase tracking-widest mb-4">DREAM SIGNAL CAPTURE</div>
+                {hour !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CAPTURE HOUR</span>
+                    <span className="tabular-nums">{String(hour).padStart(2, '0')}:00 UTC</span>
+                  </div>
+                )}
+                {wordCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SIGNAL DEPTH</span>
+                    <span className="tabular-nums">{wordCount}w</span>
+                  </div>
+                )}
+                {memAnchor !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEM ANCHOR</span>
+                    <span className="tabular-nums">{memAnchor ? 'YES' : 'NO'}</span>
+                  </div>
+                )}
+                {moodAnchor !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MOOD ANCHOR</span>
+                    <span className="tabular-nums">{moodAnchor ? 'YES' : 'NO'}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LIMINAL → SURFACED → RECORDED</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

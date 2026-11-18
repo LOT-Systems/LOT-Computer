@@ -1457,6 +1457,22 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'qie-v114',
+    date: '2026-11-18',
+    title: 'QIE v114 · Somatic Field Upgrade · P152–P154 · Arch52 · J49',
+    assembled: [
+      'P152 somatic-grounding-window: mood + selfcare + journal(>50w) within 3h → SOMAT: cockpit block. Nervous system coherence loop: sensed → tended → articulated.',
+      'P153 theta-flow-state: planner + memory + journal(>100w) within 2h → THETA: cockpit block. Inner architecture building: plan → recall → articulate.',
+      'P154 dream-signal-capture: journal(>100w) in night hours 22–05 + memory or positive mood → DREAM: cockpit block. Liminal capture: surfaced → recorded.',
+      'Arch52 Theta Architect added: energyBands=[moderate,high] · sources=[journal,memory,selfcare] · conditions=[somatic-grounding-window,theta-flow-state,recovery-intelligence-arc]. Directive: somatic field engaged, inner architecture building.',
+      'J49 daily-somatic-grounding-check at 15:00 UTC: scans mood+selfcare+journal within 3h window, writes somatic_grounding_window event once per day.',
+      'WIDGET_DEPENDENCY_MAP v114 nodes: somaticGroundingNode, thetaFlowNode, dreamSignalNode.',
+      'Log handlers SOMAT: THETA: DREAM: added to Logs.tsx in military cockpit format.',
+      'Hour comment updated: 15=QOS convergence audit+somatic-grounding.',
+      '154 patterns · 52 archetypes · 49 jobs · 193+ dep nodes · FM v114 · Day 1200+.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1510,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-18',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-18 · QIE-v114 · SOMATIC FIELD UPGRADE · Day 1200+',
+    'Built: QIE v114. Somatic layer added to the Quantum Intent Engine.',
+    'P152 SOMAT: somatic-grounding-window — body read + care + journal within 3h. Nervous system coherence now tracked.',
+    'P153 THETA: theta-flow-state — plan + memory + deep journal within 2h. Cognitive architecture mode confirmed.',
+    'P154 DREAM: dream-signal-capture — night-hour deep journal + memory/mood anchor. Liminal capture active.',
+    'Arch52 Theta Architect: somatic field engaged → inner architecture building. The state between body and mind is now named.',
+    'J49 daily-somatic-grounding-check at 15:00 UTC. Somatic loop closes automatically.',
+    'SOMAT: THETA: DREAM: cockpit blocks added to Logs.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · Badge Engine v34 THE DREAM LABORATORY',
   ],
 }
 

@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'somatic-grounding-window':         'Somatic grounding window — body read · care applied · journal reflection within 3h, full somatic loop (P152)',
+      'theta-flow-state':                 'Theta flow state — plan active · memory anchored · deep journal within 2h, inner architecture building (P153)',
+      'dream-signal-capture':             'Dream signal capture — night-hour deep journal with memory/mood anchor, liminal signal surfaced (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
