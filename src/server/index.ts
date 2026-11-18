@@ -311,6 +311,16 @@ fastify.register(async (fastify: FastifyInstance) => {
     // Public API
     fastify.register(authRoutes, { prefix: '/auth' })
 
+    // LOT-FM-001 · BASIC · OPEN TAB — public ledger surface (session-aware).
+    // Members get the app shell (Basics tab); strangers get the read-only ledger.
+    fastify.get('/basics', async (req, reply) => {
+      return reply.view('generic-spa', {
+        scriptName: req.user ? 'app' : 'basics',
+        scriptNonce: reply.cspNonce.script,
+        styleNonce: reply.cspNonce.style,
+      })
+    })
+
     // User API
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {

@@ -20,6 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { basicsPublicManifest } from '#shared/constants/basics'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +375,13 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // LOT-FM-001 · BASIC · OPEN TAB — public ration manifest.
+  // Nomenclature + cadence only. COGS withheld (server-only, basics-cogs.ts).
+  fastify.get('/basics', async (_req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return basicsPublicManifest()
+  })
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {

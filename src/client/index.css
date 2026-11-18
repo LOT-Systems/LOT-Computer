@@ -419,3 +419,89 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ============================================================================
+ * LOT-FM-001 · BASIC (RATION) · OPEN TAB — terminal tokens + grid
+ * Mono bold. White ground / black ink. Inversion is the only hierarchy.
+ * 2px rules. Square corners. Fixed character grid. IBM 3270 register.
+ * No color, no radius, no icons. Do not theme.
+ * ========================================================================== */
+.lot-basics {
+  --fm-ground: #fff;
+  --fm-ink: #000;
+  --fm-rule: 2px solid var(--fm-ink);
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Cousine', 'Courier New', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  background: var(--fm-ground);
+  color: var(--fm-ink);
+  border: var(--fm-rule);
+  border-radius: 0;
+  max-width: 88ch;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+.lot-basics * { border-radius: 0 !important; box-shadow: none !important; }
+.lot-basics-inv,
+.lot-basics-status,
+.lot-basics-ledger thead th,
+.lot-basics-group td {
+  background: var(--fm-ink);
+  color: var(--fm-ground);
+}
+.lot-basics-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 2ch;
+  padding: 0 1ch;
+  white-space: nowrap;
+}
+.lot-basics-head { padding: 20px 1ch; border-bottom: var(--fm-rule); }
+.lot-basics-head h1 { font-size: 28px; line-height: 40px; font-weight: 700; margin: 0; }
+.lot-basics-section { border-bottom: var(--fm-rule); }
+.lot-basics-section:last-of-type { border-bottom: 0; }
+.lot-basics-section h2 { font-size: 14px; font-weight: 700; margin: 0; padding: 0 1ch; }
+.lot-basics-doctrine { list-style: none; margin: 0; padding: 20px 1ch; }
+.lot-basics-doctrine li { display: grid; grid-template-columns: 4ch 1fr; }
+.lot-basics-ledger { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.lot-basics-ledger th,
+.lot-basics-ledger td { padding: 0 1ch; text-align: left; vertical-align: top; font-weight: 700; white-space: normal; border-right: 0; }
+.lot-basics-ledger tbody tr + tr td { border-top: 1px solid var(--fm-ink); }
+.lot-basics-ledger .c-ln { width: 5ch; }
+.lot-basics-ledger .c-qty { width: 8ch; white-space: nowrap; }
+.lot-basics-ledger .c-cad { width: 13ch; }
+.lot-basics-ledger tfoot td { border-top: var(--fm-rule); padding-top: 20px; padding-bottom: 20px; }
+.lot-basics-terms { display: grid; grid-template-columns: 13ch 1fr; margin: 0; padding: 20px 1ch; }
+.lot-basics-terms dd { margin: 0; }
+.lot-basics-upgrade { display: flex; flex-wrap: wrap; gap: 1ch 2ch; align-items: center; padding: 20px 1ch; }
+.lot-basics-btn {
+  font: inherit;
+  text-transform: inherit;
+  background: var(--fm-ground);
+  color: var(--fm-ink);
+  border: var(--fm-rule);
+  padding: 0 2ch;
+  cursor: pointer;
+}
+.lot-basics-btn:hover:not(:disabled),
+.lot-basics-btn:focus-visible { background: var(--fm-ink); color: var(--fm-ground); outline: none; }
+.lot-basics-btn:disabled { cursor: not-allowed; border-style: dashed; }
+.lot-basics-public { min-height: 100dvh; background: #fff; color: #000; padding: 16px; box-sizing: border-box; }
+.lot-basics-signin {
+  display: inline-block; margin-top: 16px; padding: 0 1ch;
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Cousine', 'Courier New', ui-monospace, monospace;
+  font-weight: 700; font-size: 14px; line-height: 20px; color: #000; border: 2px solid #000; text-decoration: none;
+}
+.lot-basics-signin:hover, .lot-basics-signin:focus-visible { background: #000; color: #fff; outline: none; }
+@media (max-width: 479px) {
+  .lot-basics { font-size: 12px; line-height: 18px; }
+  .lot-basics-ledger .c-ln { width: 4ch; }
+  .lot-basics-ledger .c-qty { width: 6ch; }
+  .lot-basics-ledger .c-cad { width: 12ch; }
+  .lot-basics-terms { grid-template-columns: 1fr; }
+  .lot-basics-terms dd { margin-bottom: 18px; }
+}
