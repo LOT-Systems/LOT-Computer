@@ -1,0 +1,11 @@
+menu "LOT TILE"
+config LOT_API_HOST
+    string "LOT API base URL"
+    default "https://lot-systems.com/api/device/v1"
+config LOT_DEFAULT_LIVE_MODE
+    bool "Default to Live mode (Wi-Fi kept associated)"
+    default n
+config LOT_MAX_SLEEP_S
+    int "Maximum sleep between syncs (seconds)"
+    default 10800
+endmenu
