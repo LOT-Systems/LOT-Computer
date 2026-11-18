@@ -53,3 +53,19 @@ console.log('\nNODE 3 AUDIT ROW', rowHeld)
 let pass3=0; for (const [k,ok] of Object.entries(checks3)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass3++ }
 const total=Object.keys(checks).length+Object.keys(checks3).length
 console.log(`SMOKE ${pass+pass3}/${total}`); if (pass3!==Object.keys(checks3).length) process.exit(1)
+
+// ─── Node 5 checks: "Calibrate me" copy + release gate ─────────────────────
+import { QI46_COPY, QI46_COPY_APPROVED } from '../dist/server/shared/constants/qi46.js'
+const copy=QI46_COPY.explainer.join(' ')
+const checks5={
+  'N5 copy gate closed until Vadik approves':QI46_COPY_APPROVED===false,
+  'N5 copy passes COSMO® screen':cosmoScreen(copy,R(bright)).status==='CLEARED',
+  'N5 copy states nothing new is collected':/Nothing new is collected/.test(copy),
+  'N5 copy states it is not a person':/not a person/.test(copy),
+  'N5 copy states off at any time':/off at any time/i.test(copy),
+  'N5 copy ≤ 3 sentences, plain words':QI46_COPY.explainer.length<=3&&!/soul|upload|quantum/i.test(copy),
+  'N5 version bumped':QI46_VERSION==='0.6.0-node5',
+}
+let pass5=0; for (const [k,ok] of Object.entries(checks5)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass5++ }
+const total5=total+Object.keys(checks5).length
+console.log(`SMOKE ${pass+pass3+pass5}/${total5}`); if (pass5!==Object.keys(checks5).length) process.exit(1)

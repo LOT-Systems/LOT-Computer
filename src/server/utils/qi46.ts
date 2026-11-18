@@ -27,7 +27,7 @@ import type { Log } from '#shared/types'
 import { extractUserTraits, detectTraumaIndicators } from './memory/trait-extraction.js'
 import { analyzeEnergyState } from './energy.js'
 
-export const QI46_VERSION = '0.5.0-node3'
+export const QI46_VERSION = '0.6.0-node5'
 
 // ─── Output registers ──────────────────────────────────────────────────────
 

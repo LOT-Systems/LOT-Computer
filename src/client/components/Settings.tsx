@@ -17,6 +17,7 @@ import {
   getUserTagByIdCaseInsensitive,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
+import { QI46_COPY, QI46_COPY_APPROVED } from '#shared/constants/qi46'
 import { cn } from '#client/utils'
 import { warmAudioContext } from '#client/utils/sovietChime'
 import { GrowthMilestones, BadgeUnlockFeed } from './stats'
@@ -132,6 +133,37 @@ export const Settings = React.memo(function SettingsInner() {
     },
     []
   )
+
+  // QI·46 Node 5 — "Calibrate me". Admin-only until QI46_COPY_APPROVED.
+  const showQi46 = QI46_COPY_APPROVED || !!me?.isAdmin
+  const [qi46Consent, setQi46Consent] = React.useState<boolean | null>(null)
+  React.useEffect(() => {
+    if (!showQi46) return
+    let alive = true
+    fetch('/api/qi46/consent')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => alive && d && setQi46Consent(d.consent === true))
+      .catch(() => null)
+    return () => {
+      alive = false
+    }
+  }, [showQi46])
+  const onToggleQi46 = React.useCallback(async () => {
+    if (qi46Consent === null) return
+    const next = !qi46Consent
+    setQi46Consent(next)
+    try {
+      const r = await fetch('/api/qi46/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consent: next }),
+      })
+      if (!r.ok) throw new Error(String(r.status))
+    } catch (e) {
+      console.error('Failed to save QI·46 consent:', e)
+      setQi46Consent(!next)
+    }
+  }, [qi46Consent])
 
   const onToggleActivityLogs = React.useCallback(() => {
     setState((state) => ({
@@ -417,6 +449,18 @@ export const Settings = React.memo(function SettingsInner() {
             {isKeyboardSoundOn ? 'On' : 'Off'}
           </Block>
         </div>
+
+        {showQi46 && (
+          <div>
+            <Block label={QI46_COPY.label} onChildrenClick={onToggleQi46}>
+              {qi46Consent === null ? '…' : qi46Consent ? QI46_COPY.on : QI46_COPY.off}
+            </Block>
+            <div className="opacity-30">
+              {QI46_COPY.explainer.join(' ')}
+              {!QI46_COPY_APPROVED && <div>{QI46_COPY.preview}</div>}
+            </div>
+          </div>
+        )}
 
         {/* Data Export Section */}
         <div>

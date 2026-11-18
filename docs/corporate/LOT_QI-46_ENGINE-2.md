@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.5 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17
+### Engine Specification v0.6 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18
 
 ---
 
@@ -20,14 +20,14 @@
 ## 0. NODE STATUS
 
 ```
-NODE           3 of N  — COSMO® audit trail (append-only, no text)
+NODE           5 of N  — "Calibrate me" toggle (admin preview, copy awaiting approval)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.5.0-node3) · qi46-audit.ts
+CODE           src/server/utils/qi46.ts   (v0.6.0-node5) · qi46-audit.ts · shared/constants/qi46.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server build green · smoke 18/18 · migration up/down verified on Postgres 16
-REVIEW         Migration 20261117120000 awaits Vadik's review before it runs in production
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 25/25
+REVIEW         Migration 20261117120000 + Node 5 subscriber copy await Vadik's review
 AUTHORS        Vadik & Kuzya
 ```
 
@@ -224,6 +224,38 @@ GET  /admin-api/users/:userId/qi46/verdicts          → { available, total, hel
 
 ---
 
+## 3c. NODE 5 — "CALIBRATE ME" (assembled 2026-11-18)
+
+> *The upload starts only when the person says yes.* Node 5 is the place where they say it.
+
+### Settings toggle
+
+```
+Calibrate me:  On | Off
+LOT tunes how it speaks to you from what you already share here: your mood, energy and notes.
+Nothing new is collected. Your words are not stored by the engine.
+It is not a person and not therapy. Turn it off at any time.
+```
+
+- Reads `GET /api/qi46/consent` on mount and writes `POST /api/qi46/consent` on click. If the save fails, the toggle reverts.
+- Shows `…` until the server answers, so it never displays a state it has not confirmed.
+- **Release gate:** `QI46_COPY_APPROVED` in `src/shared/constants/qi46.ts`. While it is `false`, only admins see the toggle, with a "Preview" line under it. Flipping it to `true` is the whole release step.
+
+### Copy rules (enforced in smoke)
+
+Every sentence of the copy maps to code that makes it true:
+
+| Sentence | Made true by |
+|---|---|
+| "from what you already share here" / "Nothing new is collected" | `buildBeingVector` reads existing logs only |
+| "Your words are not stored by the engine" | The vector is computed on request. `qi46_cosmo_verdicts` has no text column |
+| "It is not a person and not therapy" | Humanoid honesty rule + `clinical-claim` gate |
+| "Turn it off at any time" | `hasQi46Consent` is checked on every read. Off takes effect on the next request |
+
+The copy itself is run through `cosmoScreen` and must come back CLEARED. Words like *soul*, *upload* and *quantum* stay in the spec and out of the subscriber copy.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
@@ -231,12 +263,12 @@ GET  /admin-api/users/:userId/qi46/verdicts          → { available, total, hel
 | ~~2~~ | ~~Consent flag + admin preview~~ | **ASSEMBLED 2026-11-16** |
 | ~~4~~ | ~~Risk sensitivity: Heavy ≥ moderate~~ | **ASSEMBLED 2026-11-16** (folded into Node 2) |
 | ~~3~~ | ~~COSMO® audit trail~~ | **ASSEMBLED 2026-11-17**. Migration `20261117120000` awaits Vadik's review |
-| **5** | A "Calibrate me" toggle in Settings that calls `/api/qi46/consent` | Vadik approves the copy |
+| ~~5~~ | ~~"Calibrate me" toggle in Settings~~ | **ASSEMBLED 2026-11-18** as admin preview. Release = Vadik approves copy, sets `QI46_COPY_APPROVED = true` |
 | **6** | Wire into one existing surface behind the consent flag (Memory prompts) | Closed beta, 12 founding users |
 
 ---
 
-*QI·46 Engine Specification — v0.5 · Node 3*
+*QI·46 Engine Specification — v0.6 · Node 5*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026*
