@@ -4880,7 +4880,15 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extra: {
+    daysUntilTaian?: number
+    timeZone?: string | null
+    /** From summarizeAstroResonance(): user's historically most-active conditions */
+    topMoonPhase?: string | null
+    topRokuyo?: string | null
+    resonanceSampled?: number
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4897,13 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    daysUntilTaian: extra.daysUntilTaian ?? null,
+    timeZone: extra.timeZone ?? null,
+    // (2026-11-18) Logs-derived personalization: does today match the
+    // conditions this user has historically been most active under?
+    resonantMoon: !!extra.topMoonPhase && extra.topMoonPhase === moonPhase,
+    resonantRokuyo: !!extra.topRokuyo && extra.topRokuyo === rokuyo,
+    resonanceSampled: extra.resonanceSampled ?? 0,
   })
 }
 

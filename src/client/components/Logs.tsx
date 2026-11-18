@@ -363,7 +363,12 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo}
+                    {log.context.astroHourlyZodiac && ` · ${log.context.astroHourlyZodiac} hr`}
+                    {' · '}{log.context.astroMoonPhase}
+                    {typeof log.context.astroMoonIllumination === 'number' && ` (${log.context.astroMoonIllumination}%)`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
@@ -4450,10 +4455,15 @@ const LogContainer: React.FC<{
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    // Ambient astrology snapshot (rokuyo · moon) on every entry's hover line,
+    // keeping each journal entry in sync with the dashboard Astrology block
+    const astroText = log.context?.astroRokuyo
+      ? `${log.context.astroRokuyo}${log.context.astroMoonPhase ? ` · ${log.context.astroMoonPhase}` : ''}`
+      : ''
+    const base = log.context?.city
+      ? `${weatherText} – ${log.context.city}`
+      : weatherText
+    return [base, astroText].filter(Boolean).join(' · ')
   }, [log.context])
 
   return (
