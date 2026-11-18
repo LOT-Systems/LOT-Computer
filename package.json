@@ -46,6 +46,7 @@
     "fix": "prettier --write ./src",
     "start": "node ./dist/server/server/index.js",
     "test:calendar": "npx tsx ./scripts/tests/test-calendar-engine.ts",
+    "test:calendar:watch": "node ./scripts/tests/test-calendar-watch.mjs",
     "test:cold-start": "npx esr ./scripts/tests/test-cold-start.ts",
     "test:cold-start:prod": "APP_HOST=https://lot-systems.com npx esr ./scripts/tests/test-cold-start.ts"
   },

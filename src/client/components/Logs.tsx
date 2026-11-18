@@ -2102,11 +2102,28 @@ export const Logs: React.FC = React.memo(function LogsInner() {
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL-ALRT:" blockView>
                 <div className="flex justify-between items-baseline mb-8">
-                  <span className="uppercase tracking-widest">{phase === 'DAY' ? 'DAY OF' : phase || 'ALERT'}</span>
-                  {priority && <span className="opacity-40 tracking-widest">{priority}</span>}
+                  <span className="uppercase tracking-widest">{phase === 'DAY' ? 'DAY OF' : phase === 'SNZ' ? 'SNZ · RE-ALERT' : phase || 'ALERT'}</span>
+                  {priority && (
+                    <span className="opacity-40 tracking-widest">
+                      {priority}{log.metadata?.source === 'watch' ? ' · WATCH' : ''}
+                    </span>
+                  )}
                 </div>
                 {entryText && <div><span className="opacity-40">{code} </span>{entryText}</div>}
                 {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_snooze') {
+          const minutes = log.metadata?.minutes as number | undefined
+          const until = log.metadata?.until as string | undefined
+          const entryText = log.metadata?.text as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">SNOOZE{minutes ? ` +${minutes} MIN` : ''}</div>
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {until && <div className="opacity-40 mt-8 tabular-nums">RE-ALERT {dayjs(until).format('HH:mm')}</div>}
               </Block>
             </LogContainer>
           )

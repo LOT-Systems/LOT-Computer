@@ -448,6 +448,14 @@ try {
   } catch (error) {
     console.error('Failed to initialize scheduled jobs:', error)
   }
+
+  // Calendar Watch — minute-cadence calendar alert daemon
+  try {
+    const { initializeCalendarWatch } = await import('./calendar-watch.js')
+    initializeCalendarWatch()
+  } catch (error) {
+    console.error('Failed to initialize Calendar Watch:', error)
+  }
   console.log(`App launched: ${config.appHost}`)
 } catch (err) {
   console.error(err)

@@ -34,6 +34,7 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import { CALENDAR_EVENTS } from '#shared/utils/calendar'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -380,7 +381,8 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
-        case 'settings_updated': {
+        case 'settings_updated':
+        case 'calendar_sync': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
           }
@@ -1086,7 +1088,7 @@ export default async (fastify: FastifyInstance) => {
     return fastify.models.Log.findAll({
       where: {
         userId: req.user.id,
-        event: { [Op.in]: ['calendar_entry', 'calendar_status', 'calendar_alert'] },
+        event: { [Op.in]: [...CALENDAR_EVENTS] },
       },
       attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
       order: [['createdAt', 'DESC']],
@@ -1099,7 +1101,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_snooze', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1586,16 +1588,33 @@ export default async (fastify: FastifyInstance) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       if (!text) return reply.throw.badParams('Log text is required')
 
+      const event = req.body.event || 'note'
+      const metadata = req.body.metadata || {}
+
+      // Calendar alerts are idempotent by key: the widget (any tab/device) and
+      // the server-side Calendar Watch may race to log the same alert. The
+      // first write wins; later writers get the existing row back.
+      if (event === 'calendar_alert' && typeof metadata.key === 'string' && metadata.key) {
+        const existing = await fastify.models.Log.findOne({
+          where: { userId: req.user.id, event: 'calendar_alert', metadata: { key: metadata.key } } as any,
+        })
+        if (existing) return existing
+      }
+
       // Get context before creating log to ensure consistency
       const context = await getLogContext(req.user)
 
       const log = await fastify.models.Log.create({
         userId: req.user.id,
         text,
-        event: req.body.event || 'note',
-        metadata: req.body.metadata || {},
+        event,
+        metadata,
         context,
       })
+
+      if (event.startsWith('calendar_')) {
+        sync.emit('calendar_sync', { userId: req.user.id })
+      }
 
       return log
     }

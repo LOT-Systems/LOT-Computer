@@ -15,20 +15,31 @@ import dayjs from '#client/utils/dayjs'
 import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
 import {
+  type AlertPhase,
   type CalendarAlert,
   type CalendarEntry,
   type EntryStatus,
   type EntryType,
+  ALERT_DISPLAY_WINDOW_MINUTES,
+  PHASE_LABEL,
+  SNOOZE_MINUTES,
   TYPE_CODE,
   alertLogText,
+  alertMetadata,
+  alertPriority,
+  deviceZone,
   dueAlerts,
   entryStart,
   foldCalendar,
   formatCountdown,
   localDateKey,
   normalizeTime,
+  zoneTag,
 } from '#client/utils/calendar'
+import { sync } from '#client/sync'
 import { CalendarAlertToast } from './CalendarAlertToast'
+
+const HERE_TZ = deviceZone()
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const UPCOMING_LIMIT = 10
@@ -151,6 +162,8 @@ export function CalendarWidget() {
   const [now, setNow] = React.useState(() => new Date())
   // Status changes applied locally until the stream refetch confirms them.
   const [pendingStatus, setPendingStatus] = React.useState<Record<string, EntryStatus>>({})
+  // Snoozes applied locally until the stream refetch confirms them (epoch ms).
+  const [pendingSnooze, setPendingSnooze] = React.useState<Record<string, number>>({})
   // Alerts this session already logged (covers the window before refetch).
   const sessionFired = React.useRef<Set<string>>(new Set())
 
@@ -158,10 +171,14 @@ export function CalendarWidget() {
 
   const entries = React.useMemo<CalendarEntry[]>(
     () =>
-      folded.entries.map(e =>
-        pendingStatus[e.id] ? { ...e, status: pendingStatus[e.id] } : e
-      ),
-    [folded.entries, pendingStatus]
+      folded.entries.map(e => {
+        let next = e
+        if (pendingStatus[e.id]) next = { ...next, status: pendingStatus[e.id] }
+        const snz = pendingSnooze[e.id]
+        if (snz && (next.snoozeUntil === null || snz > next.snoozeUntil)) next = { ...next, snoozeUntil: snz }
+        return next
+      }),
+    [folded.entries, pendingStatus, pendingSnooze]
   )
 
   const refresh = React.useCallback(() => {
@@ -169,11 +186,21 @@ export function CalendarWidget() {
     queryClient.invalidateQueries(['/api/logs'])
   }, [queryClient])
 
+  // Server (Calendar Watch) or another device wrote a calendar event → pull it now.
+  React.useEffect(() => {
+    const { dispose } = sync.listen('calendar_sync', () => {
+      queryClient.refetchQueries(['/api/calendar'])
+    })
+    return dispose
+  }, [queryClient])
+
   // ── clock: 1s when something is inside 24h, otherwise 30s ──
   const hasNearTimed = React.useMemo(() => {
     const t = now.getTime()
     return entries.some(e => {
-      if (e.status !== 'open' || !e.time) return false
+      if (e.status !== 'open') return false
+      if (e.snoozeUntil !== null && e.snoozeUntil > t - 60_000) return true
+      if (!e.time) return false
       const d = entryStart(e).getTime() - t
       return d > -3_600_000 && d < 86_400_000
     })
@@ -195,51 +222,59 @@ export function CalendarWidget() {
   }, [])
 
   // ── alert daemon ──
+  // 1) Fire what is due on this device and log it (POST is idempotent by key).
+  // 2) Surface alerts fired elsewhere (Calendar Watch, other devices) that are
+  //    still fresh and have not been shown on this device yet.
+  const raiseAlerts = React.useCallback((fresh: CalendarAlert[]) => {
+    if (!fresh.length) return
+    setAlertQueue(q => [...q, ...fresh.filter(f => !q.some(x => x.key === f.key))])
+    playPips(fresh.some(f => alertPriority(f.entry, f.phase) === 'FLASH'))
+    fresh.forEach(f =>
+      systemNotify(
+        `LOT · ${alertPriority(f.entry, f.phase)} · ${PHASE_LABEL[f.phase]}`,
+        `${TYPE_CODE[f.entry.type]} ${f.entry.text}${f.entry.time ? ` · ${f.entry.time}` : ''}`,
+        f.key
+      )
+    )
+  }, [])
+
   React.useEffect(() => {
     if (!alertsEnabled) return
     const fired = new Set<string>([...folded.firedAlerts, ...sessionFired.current])
     const { due, suppressed } = dueAlerts(entries, fired, now)
     suppressed.forEach(k => sessionFired.current.add(k))
-    if (!due.length) return
 
     const fresh: CalendarAlert[] = []
-    for (const { entry, phase } of due) {
-      const key = `${entry.id}:${phase}`
-      sessionFired.current.add(key)
-      if (!claimFired(key)) continue
+    for (const a of due) {
+      sessionFired.current.add(a.key)
+      if (!claimFired(a.key)) continue
       const firedAt = Date.now()
-      const text = alertLogText(entry, phase, new Date(firedAt))
       createLog(
         {
-          text,
+          text: alertLogText(a.entry, a.phase, firedAt),
           event: 'calendar_alert',
-          metadata: {
-            entryId: entry.id,
-            phase,
-            date: entry.date,
-            time: entry.time,
-            entryType: entry.type,
-            text: entry.text,
-            firedAt: new Date(firedAt).toISOString(),
-          },
+          metadata: alertMetadata(a, firedAt, 'client'),
         },
         { onSuccess: refresh }
       )
-      fresh.push({ key, entryId: entry.id, phase, entry, firedAt })
+      fresh.push({ key: a.key, entryId: a.entry.id, phase: a.phase, entry: a.entry, firedAt })
     }
-    if (!fresh.length) return
 
-    setAlertQueue(q => [...q, ...fresh.filter(f => !q.some(x => x.key === f.key))])
-    const flash = fresh.some(f => f.phase === 'T-0' && f.entry.type !== 'note')
-    playPips(flash)
-    fresh.forEach(f =>
-      systemNotify(
-        `LOT · ${f.phase === 'DAY' ? 'DAY OF' : f.phase} · ${TYPE_CODE[f.entry.type]}`,
-        `${f.entry.text}${f.entry.time ? ` · ${f.entry.time}` : ''}`,
-        f.key
-      )
-    )
-  }, [now, entries, folded.firedAlerts, alertsEnabled])
+    const windowMs = ALERT_DISPLAY_WINDOW_MINUTES * 60_000
+    const byId = new Map(entries.map(e => [e.id, e]))
+    for (const [key, at] of folded.firedAt) {
+      if (now.getTime() - at > windowMs || sessionFired.current.has(key)) continue
+      sessionFired.current.add(key)
+      const [entryId, rawPhase] = key.split(':')
+      const entry = byId.get(entryId)
+      if (!entry || entry.status !== 'open') continue
+      const phase = (rawPhase.startsWith('SNZ') ? 'SNZ' : rawPhase) as AlertPhase
+      if (!claimFired(key)) continue
+      fresh.push({ key, entryId, phase, entry, firedAt: at })
+    }
+
+    raiseAlerts(fresh)
+  }, [now, entries, folded.firedAlerts, folded.firedAt, alertsEnabled])
 
   // Drop pending status overrides once the server stream agrees.
   React.useEffect(() => {
@@ -248,6 +283,17 @@ export function CalendarWidget() {
       let changed = false
       for (const e of folded.entries) {
         if (next[e.id] && next[e.id] === e.status) {
+          delete next[e.id]
+          changed = true
+        }
+      }
+      return changed ? next : p
+    })
+    setPendingSnooze(p => {
+      const next = { ...p }
+      let changed = false
+      for (const e of folded.entries) {
+        if (next[e.id] && e.snoozeUntil !== null && e.snoozeUntil >= next[e.id]) {
           delete next[e.id]
           changed = true
         }
@@ -319,7 +365,7 @@ export function CalendarWidget() {
           time: parsedTime,
           text,
           entryType,
-          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          tz: HERE_TZ,
         },
       },
       {
@@ -359,6 +405,38 @@ export function CalendarWidget() {
         onSuccess: refresh,
         onError: () =>
           setPendingStatus(p => {
+            const next = { ...p }
+            delete next[entry.id]
+            return next
+          }),
+      }
+    )
+  }
+
+  const snooze = (alert: CalendarAlert) => {
+    const entry = alert.entry
+    const until = Date.now() + SNOOZE_MINUTES * 60_000
+    setPendingSnooze(p => ({ ...p, [entry.id]: until }))
+    setAlertQueue(q => q.filter(a => a.key !== alert.key))
+    createLog(
+      {
+        text: `[CAL] SNOOZE +${SNOOZE_MINUTES} MIN · ${TYPE_CODE[entry.type]} · ${entry.text} · RE-ALERT ${dayjs(until).format('HH:mm')}`,
+        event: 'calendar_snooze',
+        metadata: {
+          entryId: entry.id,
+          until: new Date(until).toISOString(),
+          minutes: SNOOZE_MINUTES,
+          fromPhase: alert.phase,
+          date: entry.date,
+          time: entry.time,
+          entryType: entry.type,
+          text: entry.text,
+        },
+      },
+      {
+        onSuccess: refresh,
+        onError: () =>
+          setPendingSnooze(p => {
             const next = { ...p }
             delete next[entry.id]
             return next
@@ -411,6 +489,9 @@ export function CalendarWidget() {
             <span className="hidden tablet:inline">{longLabel}</span>
             <span className="tablet:hidden">{shortLabel}</span>
             {entry.time && <span className="text-acc/40"> {entry.time}</span>}
+            {entry.time && zoneTag(entry, HERE_TZ) && (
+              <span className="text-acc/30"> {zoneTag(entry, HERE_TZ)}</span>
+            )}
           </span>
           <span className={cn('phone:text-right break-words min-w-0', overdue ? 'text-acc/40' : 'text-acc')}>
             {entry.text}
@@ -443,9 +524,15 @@ export function CalendarWidget() {
 
   return (
     <Block label="Calendar:" blockView onLabelClick={handleToggleCalendar}>
-      <CalendarAlertToast alerts={alertQueue} onAck={ack} onAckAll={ackAll} />
+      <CalendarAlertToast
+        alerts={alertQueue}
+        onAck={ack}
+        onAckAll={ackAll}
+        onSnooze={snooze}
+        onDone={a => setStatus(a.entry, 'done')}
+      />
       <div className="w-full min-w-0">
-        <div className="mb-16 flex items-center justify-between gap-16">
+        <div className="mb-16 flex flex-wrap items-center justify-between gap-x-16 gap-y-8">
           <Button onClick={handleToggleCalendar}>
             {isCalendarOpen ? 'Close' : 'Add date'}
           </Button>

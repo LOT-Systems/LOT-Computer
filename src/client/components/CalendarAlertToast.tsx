@@ -13,9 +13,11 @@
  *   T-0 · NOW
  *   CLL  Call with operator
  *   14:30 · TUE 17 NOV
- *   ACK                                    1 / 2
+ *   ACK   SNZ +5   DONE                    1 / 2
  *
  * FLASH alerts hold until acknowledged. IMMEDIATE / ROUTINE auto-clear.
+ * SNZ re-arms the alert in SNOOZE_MINUTES; DONE closes a task/call.
+ * Keys: Enter = ACK, S = snooze, D = done (while a FLASH holds focus).
  */
 
 import * as React from 'react'
@@ -24,6 +26,7 @@ import dayjs from '#client/utils/dayjs'
 import {
   type CalendarAlert,
   PHASE_LABEL,
+  SNOOZE_MINUTES,
   TYPE_CODE,
   alertPriority,
   formatDTG,
@@ -39,9 +42,11 @@ type Props = {
   alerts: CalendarAlert[]
   onAck: (key: string) => void
   onAckAll: () => void
+  onSnooze: (alert: CalendarAlert) => void
+  onDone: (alert: CalendarAlert) => void
 }
 
-export function CalendarAlertToast({ alerts, onAck, onAckAll }: Props) {
+export function CalendarAlertToast({ alerts, onAck, onAckAll, onSnooze, onDone }: Props) {
   const current = alerts[0]
   const priority = current ? alertPriority(current.entry, current.phase) : null
 
@@ -52,6 +57,20 @@ export function CalendarAlertToast({ alerts, onAck, onAckAll }: Props) {
     const t = setTimeout(() => onAck(current.key), ms)
     return () => clearTimeout(t)
   }, [current?.key, priority])
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (!current) return
+    const k = e.key.toLowerCase()
+    if (k === 's') {
+      e.preventDefault()
+      onSnooze(current)
+    } else if (k === 'd' && current.entry.type !== 'note') {
+      e.preventDefault()
+      onDone(current)
+    } else if (k === 'escape') {
+      onAck(current.key)
+    }
+  }
 
   if (!current || !priority) return null
 
@@ -64,6 +83,7 @@ export function CalendarAlertToast({ alerts, onAck, onAckAll }: Props) {
     <div
       role="alert"
       aria-live="assertive"
+      onKeyDown={onKeyDown}
       className={cn(
         'fixed top-16 right-16 left-16 phone:left-auto phone:w-[360px] z-50',
         'px-16 py-16 border bg-bac text-acc',
@@ -100,6 +120,14 @@ export function CalendarAlertToast({ alerts, onAck, onAckAll }: Props) {
           >
             ACK
           </button>
+          <button className="text-acc/40 hover:text-acc" onClick={() => onSnooze(current)}>
+            SNZ +{SNOOZE_MINUTES}
+          </button>
+          {entry.type !== 'note' && (
+            <button className="text-acc/40 hover:text-acc" onClick={() => onDone(current)}>
+              DONE
+            </button>
+          )}
           {alerts.length > 1 && (
             <button className="text-acc/40 hover:text-acc" onClick={onAckAll}>
               ACK ALL
