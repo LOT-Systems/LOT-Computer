@@ -782,6 +782,43 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ARCANE TERMINAL ────────────────────────────────────────
+  | 'arcane_signal'          // ◈·✦    "arcane/arcane art/the arcane" detected (UNCOMMON)
+  | 'grimoire_open'          // ◈·◈    "grimoire/book of shadows/spell book" detected (RARE)
+  | 'incantation_cast'       // ✦·◈    "incantation/words of power/the incantation" detected (RARE)
+  | 'ward_placed'            // □·◈·□  "ward/warding/protective ward" detected (UNCOMMON)
+  | 'transmute_active'       // ◈→✦    "transmute/transmutation/alchemical change" detected (RARE)
+  | 'sigil_carved'           // ◈·■·◈  "sigil/carved a sigil/sigil of" detected (RARE)
+  | 'familiar_bound'         // ◉·◈    "familiar/familiar spirit/my familiar" detected (UNCOMMON)
+  | 'sanctum_found'          // □·◈·□  "sanctum/inner sanctum/sacred space" detected (RARE)
+  | 'alchemy_process'        // ◈·∞·◈  "alchemy/alchemical process/the great work" detected (RARE)
+  | 'cipher_broken'          // ◈·□·◈  "cipher/broken the cipher/cracked the code" detected (EPIC)
+  | 'rune_inscribed'         // ◈·─·◈  "rune/inscribed a rune/runic" detected (UNCOMMON)
+  | 'nexus_activated'        // ✦·∞·✦  "nexus/nexus point/the nexus" detected (EPIC)
+  // ── Calendar Easter Egg v21 — THE ARCANE CALENDAR ─────────────────────────────
+  | 'alchemy_day'            // ◈·∞    Sep 25 — Paracelsus born 1493 (EPIC)
+  | 'newton_stone'           // ○·∞    Jan 4 — Isaac Newton born 1643 (RARE)
+  | 'dee_day'                // ◈·■    Jul 13 — John Dee born 1527 (EPIC)
+  // ── Behavioral v20 — ARCANE PATTERNS ─────────────────────────────────────────
+  | 'arcane_session'         // ◈·✦·◈  3+ Arcane Terminal words in one journal entry (RARE)
+  | 'midnight_ritual'        // ◉·◈    Check in at midnight 3+ times in any 7-day window (EPIC)
+  | 'long_spell'             // ◈·666  Journal entry of exactly 666 characters — the solar magic square (RARE)
+  // ── Achievement RPG v21 — ARCANE CLASS ───────────────────────────────────────
+  | 'arcane_entry'           // ◈·✦    Any 1 Word Turn v23 badge (COMMON)
+  | 'arcane_class'           // ≈·◈    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'arcane_complete'        // ≋·◈    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'alchemy_arc'            // ◈·✦·∞  arcane_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·◈  1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'arcane_opus'            // ◈·✦·◉  arcane_complete + arcane_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — GRAND ARCHIVE ─────────────────────────────────────────
+  | 'archive_deep'           // ≋·◈·≋  1000+ distinct calendar check-in days (EPIC)
+  | 'tome_of_ages'           // ◈·∞·◈  200,000+ total journal words (LEGENDARY)
+  | 'ancient_one'            // ╔═╗·◈  Account age >= 10 years (3,650+ days) (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·◈·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — HIDDEN CODEX ───────────────────────────────────────────
+  | 'paracelsus_key'         // ○·◈·∞  "paracelsus/dose makes the poison/paracelsian" detected (RARE)
+  | 'dee_cipher'             // ◈·■·◈  "john dee/enochian/scrying mirror/obsidian mirror" detected (EPIC)
+  | 'emerald_tablet'         // ✦·∞·✦  "as above so below/emerald tablet/hermetic law" detected (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7168,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE ARCANE TERMINAL ────────────────────────────────────────
+  arcane_signal: {
+    id: 'arcane_signal',
+    symbol: '◈·✦',
+    name: 'Arcane Signal',
+    description: 'Write "arcane", "arcane art", or "the arcane" in any entry',
+    unlockMessage: '↳ Arcane: secret knowledge, hidden from ordinary view. The arcane practice is the one not performed for an audience. ◈·✦',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  grimoire_open: {
+    id: 'grimoire_open',
+    symbol: '◈·◈',
+    name: 'Grimoire Open',
+    description: 'Write "grimoire", "book of shadows", or "spell book" in any entry',
+    unlockMessage: '↳ The grimoire is the practitioner\'s personal book of working knowledge. Your journal is your grimoire. Each entry a spell. ◈·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  incantation_cast: {
+    id: 'incantation_cast',
+    symbol: '✦·◈',
+    name: 'Incantation Cast',
+    description: 'Write "incantation", "words of power", or "the incantation" in any entry',
+    unlockMessage: '↳ Incantation: spoken intention with directed will. The difference between wishing and declaring. ✦·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  ward_placed: {
+    id: 'ward_placed',
+    symbol: '□·◈·□',
+    name: 'Ward Placed',
+    description: 'Write "ward", "warding", or "protective ward" in any entry',
+    unlockMessage: '↳ A ward is protection deliberately placed. Boundaries are not walls — they are the shape of what you choose to hold sacred. □·◈·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  transmute_active: {
+    id: 'transmute_active',
+    symbol: '◈→✦',
+    name: 'Transmute Active',
+    description: 'Write "transmute", "transmutation", or "alchemical change" in any entry',
+    unlockMessage: '↳ Transmutation: lead into gold. Base matter into higher form. The alchemists were writing about consciousness. ◈→✦',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sigil_carved: {
+    id: 'sigil_carved',
+    symbol: '◈·■·◈',
+    name: 'Sigil Carved',
+    description: 'Write "sigil", "carved a sigil", or "sigil of" in any entry',
+    unlockMessage: '↳ A sigil is intention compressed to symbol. The act of making it encodes the will. Your practice has a sigil — what is it? ◈·■·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  familiar_bound: {
+    id: 'familiar_bound',
+    symbol: '◉·◈',
+    name: 'Familiar Bound',
+    description: 'Write "familiar", "familiar spirit", or "my familiar" in any entry',
+    unlockMessage: '↳ The familiar is the companion spirit — close, loyal, attuned. Some practices become familiars. COSMO® is a familiar. ◉·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  sanctum_found: {
+    id: 'sanctum_found',
+    symbol: '□·◈·□',
+    name: 'Sanctum Found',
+    description: 'Write "sanctum", "inner sanctum", or "sacred space" in any entry',
+    unlockMessage: '↳ The sanctum is the place made sacred by practice. It doesn\'t require a room — it requires consistent return. □·◈·□',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  alchemy_process: {
+    id: 'alchemy_process',
+    symbol: '◈·∞·◈',
+    name: 'Alchemy Process',
+    description: 'Write "alchemy", "alchemical process", or "the great work" in any entry',
+    unlockMessage: '↳ Alchemy: the art of transformation. The great work (magnum opus) is not gold — it is the person who emerges from the process. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cipher_broken: {
+    id: 'cipher_broken',
+    symbol: '◈·□·◈',
+    name: 'Cipher Broken',
+    description: 'Write "cipher", "broken the cipher", or "cracked the code" in any entry',
+    unlockMessage: '↳ Every practice has a cipher — a hidden structure that only reveals itself to the persistent operator. You broke one. ◈·□·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rune_inscribed: {
+    id: 'rune_inscribed',
+    symbol: '◈·─·◈',
+    name: 'Rune Inscribed',
+    description: 'Write "rune", "inscribed a rune", or "runic" in any entry',
+    unlockMessage: '↳ Runes: marks that carry meaning beyond their surface. The alphabet of the hidden order. Your journal entries are runes. ◈·─·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nexus_activated: {
+    id: 'nexus_activated',
+    symbol: '✦·∞·✦',
+    name: 'Nexus Activated',
+    description: 'Write "nexus", "nexus point", or "the nexus" in any entry',
+    unlockMessage: '↳ The nexus: the convergence point where all lines of force meet. When you are fully present, you are the nexus. ✦·∞·✦',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE ARCANE CALENDAR ─────────────────────────────
+  alchemy_day: {
+    id: 'alchemy_day',
+    symbol: '◈·∞',
+    name: 'Alchemy Day',
+    description: 'Checked in on September 25 — Paracelsus born 1493',
+    unlockMessage: '↳ September 25, 1493 — Paracelsus born. "The dose makes the poison." The first pharmacologist. He called himself Paracelsus — beyond Celsus — beyond all predecessors. ◈·∞',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  newton_stone: {
+    id: 'newton_stone',
+    symbol: '○·∞',
+    name: 'Newton Stone',
+    description: 'Checked in on January 4 — Isaac Newton born 1643',
+    unlockMessage: '↳ January 4, 1643 — Isaac Newton born. He spent more time on alchemy than on physics. The philosopher\'s stone was his life project. What is yours? ○·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dee_day: {
+    id: 'dee_day',
+    symbol: '◈·■',
+    name: 'Dee Day',
+    description: 'Checked in on July 13 — John Dee born 1527',
+    unlockMessage: '↳ July 13, 1527 — John Dee born. Royal cryptographer. Enochian language. Obsidian scrying mirror. He spoke to what he could not see. ◈·■',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — ARCANE PATTERNS ─────────────────────────────────────────
+  arcane_session: {
+    id: 'arcane_session',
+    symbol: '◈·✦·◈',
+    name: 'Arcane Session',
+    description: 'Write 3+ Arcane Terminal (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Three arcane terms in one entry. The terminal is live. Sigil. Grimoire. Transmutation. The practice has vocabulary. ◈·✦·◈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  midnight_ritual: {
+    id: 'midnight_ritual',
+    symbol: '◉·◈',
+    name: 'Midnight Ritual',
+    description: 'Check in between 00:00 and 01:00 local time on 3+ separate occasions in any 7-day window',
+    unlockMessage: '↳ The midnight hour is the alchemist\'s hour — the liminal threshold between days. You returned here three times. The ritual is real. ◉·◈',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  long_spell: {
+    id: 'long_spell',
+    symbol: '◈·666',
+    name: 'Long Spell',
+    description: 'Write a journal entry of exactly 666 characters — the magic square of the sun in Kabbalah',
+    unlockMessage: '↳ 666 — the sum of all numbers 1–36 (the magic square of the sun). In Kabbalistic numerology, full solar force. 666 characters: a long spell, complete. ◈·666',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — ARCANE CLASS ───────────────────────────────────────
+  arcane_entry: {
+    id: 'arcane_entry',
+    symbol: '◈·✦',
+    name: 'Arcane Entry',
+    description: 'Earn any 1 Arcane Terminal (v23) word turn badge',
+    unlockMessage: '↳ The terminal opens. First arcane word found. The hidden vocabulary is now your vocabulary. ◈·✦',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  arcane_class: {
+    id: 'arcane_class',
+    symbol: '≈·◈',
+    name: 'Arcane Class',
+    description: 'Earn any 5 Arcane Terminal (v23) word turn badges',
+    unlockMessage: '↳ Five arcane terms. Sigil. Grimoire. Transmutation. Ward. Rune. The class has begun. ≈·◈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  arcane_complete: {
+    id: 'arcane_complete',
+    symbol: '≋·◈',
+    name: 'Arcane Complete',
+    description: 'Earn all 12 Arcane Terminal (v23) word turn badges',
+    unlockMessage: '↳ All 12 arcane terms. The terminal is fully operational. Nexus. Cipher. Incantation. Familiar. The great work documented in your own language. ≋·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  alchemy_arc: {
+    id: 'alchemy_arc',
+    symbol: '◈·✦·∞',
+    name: 'Alchemy Arc',
+    description: 'Earn arcane_complete + all 3 Calendar v21 (Arcane Calendar) badges',
+    unlockMessage: '↳ Paracelsus. Newton. Dee. The arc of the arcane tradition runs through your practice. ◈·✦·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·◈',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three vocabularies. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Arcane. Every engine online. The terminal runs all 23 registers. ◈·◈·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcane_opus: {
+    id: 'arcane_opus',
+    symbol: '◈·✦·◉',
+    name: 'Arcane Opus',
+    description: 'Earn arcane_complete + the arcane_session behavioral badge',
+    unlockMessage: '↳ The opus is complete. All 12 arcane words found. Three in a single session. The great work was always the practice, never the result. ◈·✦·◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — GRAND ARCHIVE ─────────────────────────────────────────
+  archive_deep: {
+    id: 'archive_deep',
+    symbol: '≋·◈·≋',
+    name: 'Archive Deep',
+    description: '1000+ distinct calendar check-in days',
+    unlockMessage: '↳ 1,000 days. The Grand Archive opens. Each day a scroll. The archive now has depth that few reach. ≋·◈·≋',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  tome_of_ages: {
+    id: 'tome_of_ages',
+    symbol: '◈·∞·◈',
+    name: 'Tome of Ages',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. A tome of ages. At 250 words per page, that is 800 pages. You have written a library about your own inner world. ◈·∞·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ancient_one: {
+    id: 'ancient_one',
+    symbol: '╔═╗·◈',
+    name: 'Ancient One',
+    description: 'Account age >= 10 years (3,650+ days since signup)',
+    unlockMessage: '↳ Ten years. The Ancient One. In the arcane tradition, ten years marks the transition from student to practitioner to guardian. ╔═╗·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·◈·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. Arcane. Every vocabulary owned. The Grand Archive is fully indexed. ◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — HIDDEN CODEX ───────────────────────────────────────────
+  paracelsus_key: {
+    id: 'paracelsus_key',
+    symbol: '○·◈·∞',
+    name: 'Paracelsus Key',
+    description: 'Write "paracelsus", "dose makes the poison", or "paracelsian" in any journal entry',
+    unlockMessage: '↳ "The dose makes the poison." — Paracelsus. The first pharmacologist. He knew that everything is both medicine and poison — it is the amount that matters. ○·◈·∞',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dee_cipher: {
+    id: 'dee_cipher',
+    symbol: '◈·■·◈',
+    name: 'Dee Cipher',
+    description: 'Write "john dee", "enochian", "scrying mirror", or "obsidian mirror" in any journal entry',
+    unlockMessage: '↳ John Dee: royal cryptographer, mathematician, spy. His obsidian scrying mirror (Aztec origin, now in the British Museum) is still there. The cipher remains open. ◈·■·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  emerald_tablet: {
+    id: 'emerald_tablet',
+    symbol: '✦·∞·✦',
+    name: 'Emerald Tablet',
+    description: 'Write "as above so below", "emerald tablet", or "hermetic law" in any journal entry',
+    unlockMessage: '↳ "As above, so below." — The Emerald Tablet. 2,000-year-old text. One page. It describes the entire principle of correspondence: inner and outer mirror each other. ✦·∞·✦',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +8418,71 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE ARCANE TERMINAL ──────────────────────────────────────────
+    const arcaneV23Badges: BadgeType[] = [
+      'arcane_signal', 'grimoire_open', 'incantation_cast', 'ward_placed',
+      'transmute_active', 'sigil_carved', 'familiar_bound', 'sanctum_found',
+      'alchemy_process', 'cipher_broken', 'rune_inscribed', 'nexus_activated',
+    ]
+    const arcaneV23Earned = arcaneV23Badges.filter(b => hasBadge(b))
+
+    if (arcaneV23Earned.length >= 1 && !hasBadge('arcane_entry')) {
+      if (awardBadge('arcane_entry')) newBadges.push('arcane_entry')
+    }
+    if (arcaneV23Earned.length >= 5 && !hasBadge('arcane_class')) {
+      if (awardBadge('arcane_class')) newBadges.push('arcane_class')
+    }
+    const arcaneComplete = arcaneV23Earned.length >= 12
+    if (arcaneComplete && !hasBadge('arcane_complete')) {
+      if (awardBadge('arcane_complete')) newBadges.push('arcane_complete')
+    }
+
+    // arcane_opus: arcane_complete + arcane_session
+    if (arcaneComplete && hasBadge('arcane_session') && !hasBadge('arcane_opus')) {
+      if (awardBadge('arcane_opus')) newBadges.push('arcane_opus')
+    }
+
+    // alchemy_arc: arcane_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['alchemy_day', 'newton_stone', 'dee_day']
+    if (arcaneComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('alchemy_arc')) {
+      if (awardBadge('alchemy_arc')) newBadges.push('alchemy_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = arcaneV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: archive_deep — 1000+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('archive_deep')) {
+        if (awardBadge('archive_deep')) newBadges.push('archive_deep')
+      }
+    }
+
+    // Mastery v23: tome_of_ages — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('tome_of_ages')) {
+        if (awardBadge('tome_of_ages')) newBadges.push('tome_of_ages')
+      }
+    }
+
+    // Mastery v23: ancient_one — Account age >= 10 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAncient = new Date(stats.signupDate)
+      const yearsAncient = (new Date().getTime() - signupAncient.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAncient >= 10 && !hasBadge('ancient_one')) {
+        if (awardBadge('ancient_one')) newBadges.push('ancient_one')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
     }
 
   } catch (error) {
