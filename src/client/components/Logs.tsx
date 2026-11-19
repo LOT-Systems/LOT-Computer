@@ -36,6 +36,7 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { parseStoryCommand, type StoryHorizon } from '#shared/utils/storyCompression'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3706,6 +3707,11 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyLedger, setStoryLedger] = React.useState<string | null>(null)
+  const [storyHorizon, setStoryHorizon] = React.useState<StoryHorizon>('week')
+  // /story fires on a short settle timer so "/story month" can be typed
+  // in full before the horizon is read. Each keystroke re-arms it.
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,6 +3748,8 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryLedger(data.ledger || null)
+      if (data.horizon) setStoryHorizon(data.horizon)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -3932,7 +3940,31 @@ const NoteEditor = ({
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
   const lastTriggerScanRef = React.useRef(log.text || '')
+  const fireStory = React.useCallback(() => {
+    storyTimerRef.current = null
+    const { horizon, residual } = parseStoryCommand(valueRef.current)
+    setStoryHorizon(horizon)
+    try {
+      submitStory({
+        logText: residual,
+        horizon,
+        quantumState: getUserState(),
+        userIndex: getUserIndex(),
+      })
+    } catch {
+      submitStory({ logText: residual, horizon })
+    }
+  }, [submitStory])
+  const armStoryTimer = React.useCallback(() => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    storyTimerRef.current = setTimeout(fireStory, 1200)
+  }, [fireStory])
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
   React.useEffect(() => {
+    // Re-arm a pending /story while the operator is still typing the horizon.
+    if (storyTimerRef.current) armStoryTimer()
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
     lastTriggerScanRef.current = value
     if (fresh.length === 0) return
@@ -4125,7 +4157,11 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of your week (default)',
+          '/story day    Compress the last 24 hours',
+          '/story week   Compress the last 7 days',
+          '/story month  Compress the last 30 days',
+          '/story year   Compress the last 365 days',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4143,6 +4179,12 @@ const NoteEditor = ({
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
+          '',
+          'EMOJI TRIGGERS',
+          '📖 story · 🕯️ prayer · 🎹 synth · 🎧 radio · 🌙 night · 🧊 freeze',
+          '',
+          'EVERY ENTRY RECORDS ITS MOMENT',
+          'Time · place · weather · humidity · moon · zodiac — no photo, no sound.',
         ]
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
@@ -4151,18 +4193,8 @@ const NoteEditor = ({
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          setStoryLedger(null)
+          armStoryTimer()
         }
       }
     }
@@ -4416,9 +4448,14 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={`📖 ${storyHorizon.toUpperCase()}`} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">COMPRESSING {storyHorizon.toUpperCase()}...</div>
+              )}
+              {storyLedger && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  {storyLedger}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

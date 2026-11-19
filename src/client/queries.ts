@@ -27,6 +27,7 @@ import {
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
+import type { StoryHorizon, StoryPacket } from '#shared/utils/storyCompression'
 
 const api = axios.create({
   baseURL: '/',
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    horizon?: StoryHorizon
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +912,9 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    horizon?: StoryHorizon
+    ledger?: string
+    packet?: StoryPacket
+    source?: 'ai' | 'offline'
   }
 >('post', '/api/story')
