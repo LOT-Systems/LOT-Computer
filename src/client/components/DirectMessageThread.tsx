@@ -129,7 +129,7 @@ export const DirectMessageThread: React.FC<DirectMessageThreadProps> = ({ userId
   return (
     <div className="max-w-[700px]">
       <div className="mb-40">
-        <span className="opacity-30">Conversation with {otherUserName}</span>
+        <span className="opacity-30">LOT® Email · {otherUserName}</span>
       </div>
 
       <div className="flex items-center mb-80">
