@@ -1905,6 +1905,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bjohn[\s-]?muir\b|\bthe[\s-]?mountains[\s-]?are[\s-]?calling\b|\byosemite\b|\bsierra[\s-]?nevada\b/i,                                              badge: 'muir_signal' },
   { patterns: /\bwalden\b|\bthoreau\b|\bcivil[\s-]?disobedience\b|\bbean[\s-]?field\b|\bwalden[\s-]?pond\b/i,                                                       badge: 'walden_signal' },
   { patterns: /\bgaia[\s-]?hypothesis\b|\bjames[\s-]?lovelock\b|\bliving[\s-]?earth\b|\bbiosphere\b|\bself[\s-]?regulating[\s-]?system\b/i,                         badge: 'gaia_hypothesis' },
+  // ── v38 — THE BODY ELECTRIC — word turns ─────────────────────────────────
+  { patterns: /\bsomatic\b|\bbody[\s-]?scan\b|\bbodily[\s-]?awareness\b|\bbody[\s-]?based[\s-]?practice\b|\bsomatic[\s-]?practice\b/i,                             badge: 'somatic_field' },
+  { patterns: /\bproprioception\b|\bkinesthetic\b|\bspatial[\s-]?awareness\b|\bbody[\s-]?in[\s-]?space\b|\bbody[\s-]?sense\b|\bvestibular\b/i,                     badge: 'proprioception' },
+  { patterns: /\bstretching?\b|\bflexibility\b|\bmobility[\s-]?work\b|\brange[\s-]?of[\s-]?motion\b|\bmobility[\s-]?practice\b/i,                                  badge: 'stretch_signal' },
+  { patterns: /\bbreathwork\b|\bbreathe?[\s-]?work\b|\bpranayama\b|\bbreathing[\s-]?practice\b|\bbox[\s-]?breathing\b|\bwim[\s-]?hof\b|\bbreath[\s-]?work\b/i,    badge: 'breath_work' },
+  { patterns: /\bchi\b|\bprana\b|\blife[\s-]?force\b|\bvitality\b|\bqi\b|\bki\b|\bbody[\s-]?electric\b|\bI[\s-]?sing[\s-]?the[\s-]?body\b/i,                     badge: 'body_electric' },
+  { patterns: /\bmovement[\s-]?practice\b|\bdaily[\s-]?movement\b|\bintentional[\s-]?movement\b|\bsomatic[\s-]?movement\b|\bembodied[\s-]?movement\b/i,            badge: 'movement_arc' },
+  { patterns: /\brest[\s-]?day\b|\bactive[\s-]?recovery\b|\brecovery[\s-]?day\b|\brest[\s-]?and[\s-]?recovery\b|\bdeload\b|\bdeload[\s-]?week\b/i,                badge: 'rest_signal' },
+  { patterns: /\bposture\b|\bbody[\s-]?alignment\b|\bergonomics\b|\bspinal[\s-]?alignment\b|\balexander[\s-]?technique\b|\bfeldenkrais\b/i,                        badge: 'posture_arc' },
+  { patterns: /\bcold[\s-]?shower\b|\bcold[\s-]?plunge\b|\bice[\s-]?bath\b|\bcold[\s-]?exposure\b|\bcryotherapy\b|\bcold[\s-]?water[\s-]?immersion\b/i,           badge: 'cold_signal' },
+  { patterns: /\bworkout\b|\bexercise[\s-]?session\b|\btraining[\s-]?session\b|\bgym[\s-]?session\b|\bphysical[\s-]?training\b|\bstrength[\s-]?training\b/i,       badge: 'exercise_log' },
+  { patterns: /\bflow[\s-]?state\b|\bin[\s-]?the[\s-]?zone\b|\bpeak[\s-]?performance\b|\boptimal[\s-]?experience\b|\bmihaly\b|\bcsikszentmihalyi\b/i,             badge: 'flow_state' },
+  { patterns: /\bbody[\s-]?wisdom\b|\bsomatic[\s-]?intelligence\b|\bembodied[\s-]?intelligence\b|\blisten[\s-]?to[\s-]?your[\s-]?body\b|\bbody[\s-]?awareness\b/i, badge: 'body_wisdom' },
+  // ── v38 — THE ELECTRIC VAULT — secret boss word triggers ──────────────────
+  { patterns: /\bwalt[\s-]?whitman\b|\bi[\s-]?sing[\s-]?the[\s-]?body\b|\bleaves[\s-]?of[\s-]?grass\b|\bsong[\s-]?of[\s-]?myself\b/i,                            badge: 'whitman_signal' },
+  { patterns: /\bmary[\s-]?shelley\b|\bfrankenstein\b|\bgalvanism\b|\bthe[\s-]?creature\b|\bmodern[\s-]?prometheus\b/i,                                            badge: 'frankenstein_signal' },
+  { patterns: /\bcsikszentmihalyi\b|\bflow[\s-]?theory\b|\boptimal[\s-]?experience\b|\bthe[\s-]?flow[\s-]?experience\b/i,                                          badge: 'csikszentmihalyi_signal' },
 ]
 
 /**
@@ -2323,6 +2340,10 @@ export function runCheckInEasterEggs(
   const dawnWalker = checkDawnWalker()
   if (dawnWalker) awarded.push(dawnWalker)
 
+  // v38 Body Electric: morning_mover (06:00–09:00)
+  const morningMover = checkMorningMover()
+  if (morningMover) awarded.push(morningMover)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -2452,6 +2473,12 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   if (natureSession) awarded.push(natureSession)
   const longWalk = checkLongWalk(journalText)
   if (longWalk) awarded.push(longWalk)
+
+  // v38 Body Electric behavioral
+  const somaticSession = checkSomaticSession(journalText)
+  if (somaticSession) awarded.push(somaticSession)
+  const longBody = checkLongBody(journalText)
+  if (longBody) awarded.push(longBody)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -4603,6 +4630,57 @@ export function checkLongWalk(journalText: string): BadgeType | null {
   if (wordCount >= 400) {
     awardBadge('long_walk')
     return 'long_walk'
+  }
+  return null
+}
+// ── Body Electric v38 — behavioral checks ─────────────────────────────────────
+
+const BODY_WORDS_V38 = [
+  /\bsomatic\b|\bbody[\s-]?scan\b|\bbodily[\s-]?awareness\b|\bbody[\s-]?based[\s-]?practice\b/i,
+  /\bproprioception\b|\bkinesthetic\b|\bspatial[\s-]?awareness\b|\bbody[\s-]?in[\s-]?space\b/i,
+  /\bstretching?\b|\bflexibility\b|\bmobility[\s-]?work\b|\brange[\s-]?of[\s-]?motion\b/i,
+  /\bbreathwork\b|\bbreathe?[\s-]?work\b|\bpranayama\b|\bbreathing[\s-]?practice\b|\bbox[\s-]?breathing\b/i,
+  /\bchi\b|\bprana\b|\blife[\s-]?force\b|\bvitality\b|\bqi\b|\bki\b|\bbody[\s-]?electric\b/i,
+  /\bmovement[\s-]?practice\b|\bdaily[\s-]?movement\b|\bintentional[\s-]?movement\b|\bsomatic[\s-]?movement\b/i,
+  /\brest[\s-]?day\b|\bactive[\s-]?recovery\b|\brecovery[\s-]?day\b|\brest[\s-]?and[\s-]?recovery\b/i,
+  /\bposture\b|\bbody[\s-]?alignment\b|\bergonomics\b|\bspinal[\s-]?alignment\b/i,
+  /\bcold[\s-]?shower\b|\bcold[\s-]?plunge\b|\bice[\s-]?bath\b|\bcold[\s-]?exposure\b|\bcryotherapy\b/i,
+  /\bworkout\b|\bexercise[\s-]?session\b|\btraining[\s-]?session\b|\bgym[\s-]?session\b/i,
+  /\bflow[\s-]?state\b|\bin[\s-]?the[\s-]?zone\b|\bpeak[\s-]?performance\b|\boptimal[\s-]?experience\b/i,
+  /\bbody[\s-]?wisdom\b|\bsomatic[\s-]?intelligence\b|\bembodied[\s-]?intelligence\b|\blisten[\s-]?to[\s-]?your[\s-]?body\b/i,
+]
+
+/** Award somatic_session badge if 3+ Body Electric (v38) words appear in one journal entry. */
+export function checkSomaticSession(journalText: string): BadgeType | null {
+  if (hasBadge('somatic_session')) return null
+  const matchCount = BODY_WORDS_V38.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('somatic_session')
+    return 'somatic_session'
+  }
+  return null
+}
+
+/** Award morning_mover badge if journal entry is written between 06:00 and 09:00 local time. */
+export function checkMorningMover(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('morning_mover')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6 && hour < 9) {
+    awardBadge('morning_mover')
+    return 'morning_mover'
+  }
+  return null
+}
+
+/** Award long_body badge if journal entry has 500+ words. */
+export function checkLongBody(journalText: string): BadgeType | null {
+  if (hasBadge('long_body')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 500) {
+    awardBadge('long_body')
+    return 'long_body'
   }
   return null
 }

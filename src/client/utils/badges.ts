@@ -1339,6 +1339,43 @@ export type BadgeType =
   | 'muir_signal'          // ∿·▲·∿  "john muir/the mountains are calling/yosemite/sierra" (EPIC) [HIDDEN]
   | 'walden_signal'        // ∿·║    "walden/thoreau/civil disobedience/bean field" (RARE) [HIDDEN]
   | 'gaia_hypothesis'      // ○·∿·∞  "gaia hypothesis/james lovelock/living earth/biosphere" (MYTHIC) [HIDDEN]
+  // ── Word Turn v38 — THE BODY ELECTRIC ─────────────────────────────────────
+  | 'somatic_field'        // ⌁·◉·⌁  "somatic/body scan/bodily awareness/body-based practice" detected (RARE)
+  | 'proprioception'       // ◉·⊕·◉  "proprioception/kinesthetic/spatial awareness/body in space" detected (EPIC)
+  | 'stretch_signal'       // ⌁·≈·⌁  "stretch/stretching/flexibility/mobility work/range of motion" detected (UNCOMMON)
+  | 'breath_work'          // ⊕·∾·⊕  "breathwork/pranayama/breathing practice/box breathing/breath work" detected (RARE)
+  | 'body_electric'        // ⌁·◈·⌁  "body electric/chi/prana/life force/vitality/qi/ki" detected (EPIC)
+  | 'movement_arc'         // ◉·⌁·◉  "movement practice/daily movement/intentional movement/somatic movement" detected (UNCOMMON)
+  | 'rest_signal'          // ≈·◉·≈  "rest day/active recovery/recovery day/rest and recovery" detected (UNCOMMON)
+  | 'posture_arc'          // ⊕·║·⊕  "posture/alignment/ergonomics/body alignment/spinal alignment" detected (RARE)
+  | 'cold_signal'          // ≋·⌁·≋  "cold shower/cold plunge/ice bath/cold exposure/cryotherapy" detected (RARE)
+  | 'exercise_log'         // ◉·▲·◉  "workout/exercise session/training session/gym session/physical training" detected (UNCOMMON)
+  | 'flow_state'           // ⌁·∞·⌁  "flow state/zone/in the zone/peak performance/optimal experience" detected (EPIC)
+  | 'body_wisdom'          // ◉·∿·◉  "body wisdom/somatic intelligence/body awareness/embodied intelligence" detected (RARE)
+  // ── Calendar Easter Egg v36 — THE BODY CALENDAR ───────────────────────────
+  | 'solstice_badge'       // ⌁·○    Jun 21 — Summer Solstice (peak solar body) (RARE)
+  | 'whitman_birthday'     // ◉·⌁    May 31 — Walt Whitman born 1819, "I Sing the Body Electric" (EPIC)
+  | 'world_health_day'     // ⊕·◉    Apr 7 — World Health Day (WHO founded 1948) (RARE)
+  // ── Behavioral v32 — BODY PATTERNS ────────────────────────────────────────
+  | 'somatic_session'      // ⌁·◉·∿  3+ Body Electric (v38) words in one journal entry (RARE)
+  | 'morning_mover'        // ◉·⌁·○  Journal entry between 06:00–09:00 local time (RARE)
+  | 'long_body'            // ≈·◉·≈  Journal entry >= 500 words (somatic specificity) (EPIC)
+  // ── Achievement RPG v36 — THE ATHLETE CLASS ────────────────────────────────
+  | 'body_entry'           // ∘→⌁    Any 1 Word Turn v38 badge (COMMON)
+  | 'body_class'           // ≈→⌁    Any 5 Word Turn v38 badges (UNCOMMON)
+  | 'body_complete'        // ⌁→◉    All 12 Word Turn v38 badges (LEGENDARY)
+  | 'electric_arc'         // ⌁·◈    body_complete + all 3 Calendar v36 badges (LEGENDARY)
+  | 'thirty_eight_engines_arc' // ◈·◈·⌁ 1 badge from each Word Turn v1–v38 (LEGENDARY)
+  | 'body_opus'            // ⌁·◉·∞  body_complete + somatic_session behavioral (LEGENDARY)
+  // ── Mastery Tier v38 — THE ELECTRIC BODY ──────────────────────────────────
+  | 'electric_elder'       // ⌁·◉·∞  4,000+ distinct calendar check-in days (EPIC)
+  | 'endurance_library'    // ⌁·∞·⌁  350,000+ total journal words (lifetime) (LEGENDARY)
+  | 'fifteen_year_signal'  // ╔═╗·⌁  Account age >= 15 years (5,475+ days since signup) (LEGENDARY)
+  | 'thirty_eight_registers' // ◈·◈·⌁·∞ 1 badge from all 38 Word Turn engines (COSMIC)
+  // ── Secret Boss v35 — THE ELECTRIC VAULT ──────────────────────────────────
+  | 'whitman_signal'       // ⌁·▲·⌁  "walt whitman/i sing the body/leaves of grass/song of myself" (EPIC) [HIDDEN]
+  | 'frankenstein_signal'  // ⌁·▒·⌁  "mary shelley/frankenstein/the creature/galvanism/prometheus" (RARE) [HIDDEN]
+  | 'csikszentmihalyi_signal' // ⌁·∞·▲ "csikszentmihalyi/flow theory/optimal experience/the flow experience" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -12125,6 +12162,300 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+
+  // ── Word Turn v38 — THE BODY ELECTRIC ─────────────────────────────────────
+  somatic_field: {
+    id: 'somatic_field',
+    symbol: '⌁·◉·⌁',
+    name: 'Somatic Field',
+    description: 'Write about somatic practice, body scans, or bodily awareness in any journal entry',
+    unlockMessage: '↳ SOMATIC FIELD. Somatic: from the Greek soma, body. The somatic field is the living body as subject — not instrument, not machine, but the organ through which experience arrives. The practice inhabits it. ⌁·◉·⌁',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  proprioception: {
+    id: 'proprioception',
+    symbol: '◉·⊕·◉',
+    name: 'Proprioception',
+    description: 'Write about proprioception, kinesthetic awareness, or body-in-space in any journal entry',
+    unlockMessage: '↳ PROPRIOCEPTION. The sense that tells you where your body is in space without looking. The sixth sense, technically: the GPS of the nervous system. Without it, nothing moves with intention. The practice trains the inner navigator. ◉·⊕·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  stretch_signal: {
+    id: 'stretch_signal',
+    symbol: '⌁·≈·⌁',
+    name: 'Stretch Signal',
+    description: 'Write about stretching, flexibility, mobility work, or range of motion in any journal entry',
+    unlockMessage: '↳ STRETCH SIGNAL. Flexibility is the body\'s readiness to meet new demands. The range of motion is the range of experience available. The practice is a full range of motion: not just the comfortable angles. ⌁·≈·⌁',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  breath_work: {
+    id: 'breath_work',
+    symbol: '⊕·∾·⊕',
+    name: 'Breath Work',
+    description: 'Write about breathwork, pranayama, breathing practice, or box breathing in any journal entry',
+    unlockMessage: '↳ BREATH WORK. The breath is the only autonomic system also under voluntary control. It is the bridge between the conscious and unconscious body. Pranayama means: the regulation of life force. The practice breathes with intention. ⊕·∾·⊕',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  body_electric: {
+    id: 'body_electric',
+    symbol: '⌁·◈·⌁',
+    name: 'Body Electric',
+    description: 'Write about chi, prana, life force, vitality, qi, or ki in any journal entry',
+    unlockMessage: '↳ BODY ELECTRIC. Walt Whitman, 1855: "I sing the body electric." Chi, prana, qi, ki: the same concept in four traditions — the animating current in living tissue. The body is not a bag of chemicals. It is a field of charge. ⌁·◈·⌁',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  movement_arc: {
+    id: 'movement_arc',
+    symbol: '◉·⌁·◉',
+    name: 'Movement Arc',
+    description: 'Write about movement practice, daily movement, or intentional somatic movement in any journal entry',
+    unlockMessage: '↳ MOVEMENT ARC. The body is designed for movement. Sedentary life is an evolutionary novelty, two centuries old at most. Movement practice is the return to the design spec. The practice is the arc: each session a point on the trajectory. ◉·⌁·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  rest_signal: {
+    id: 'rest_signal',
+    symbol: '≈·◉·≈',
+    name: 'Rest Signal',
+    description: 'Write about rest days, active recovery, or rest and recovery in any journal entry',
+    unlockMessage: '↳ REST SIGNAL. Recovery is not the absence of training. It is training at a different layer: the layer where adaptation occurs. Supercompensation requires the stress and the rest. The practice includes the pause. ≈·◉·≈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  posture_arc: {
+    id: 'posture_arc',
+    symbol: '⊕·║·⊕',
+    name: 'Posture Arc',
+    description: 'Write about posture, body alignment, ergonomics, or spinal alignment in any journal entry',
+    unlockMessage: '↳ POSTURE ARC. Posture is not about looking straight. It is the structural relationship between body segments that determines how load distributes, how breath flows, how mood sits. The spine is the signal tower. ⊕·║·⊕',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cold_signal: {
+    id: 'cold_signal',
+    symbol: '≋·⌁·≋',
+    name: 'Cold Signal',
+    description: 'Write about cold showers, cold plunges, ice baths, or cold exposure in any journal entry',
+    unlockMessage: '↳ COLD SIGNAL. Cold exposure triggers the mammalian dive reflex, norepinephrine release, and cold shock protein synthesis. The discomfort is the signal. The body reads: this is not the comfort zone — adapt. ≋·⌁·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  exercise_log: {
+    id: 'exercise_log',
+    symbol: '◉·▲·◉',
+    name: 'Exercise Log',
+    description: 'Write about a workout, exercise session, training session, or gym session in any journal entry',
+    unlockMessage: '↳ EXERCISE LOG. The training log is the longitudinal body record. Every workout logged is a data point in the biomechanical autobiography. Progress is invisible in a single session and inevitable across a year. ◉·▲·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  flow_state: {
+    id: 'flow_state',
+    symbol: '⌁·∞·⌁',
+    name: 'Flow State',
+    description: 'Write about flow state, being in the zone, peak performance, or optimal experience in any journal entry',
+    unlockMessage: '↳ FLOW STATE. Csikszentmihalyi: flow is the state where challenge matches skill at the edge of capacity, attention is fully absorbed, time disappears. The practice, done well, is a flow generator. ⌁·∞·⌁',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  body_wisdom: {
+    id: 'body_wisdom',
+    symbol: '◉·∿·◉',
+    name: 'Body Wisdom',
+    description: 'Write about body wisdom, somatic intelligence, embodied knowledge, or listening to your body in any journal entry',
+    unlockMessage: '↳ BODY WISDOM. The body holds memory that the mind cannot access through narrative alone. Somatic intelligence: the knowing that lives in tissue, not text. The practice learns to read both registers. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v36 — THE BODY CALENDAR ───────────────────────────
+  solstice_badge: {
+    id: 'solstice_badge',
+    symbol: '⌁·○',
+    name: 'Solstice',
+    description: 'Check in on June 21 — Summer Solstice, peak solar body',
+    unlockMessage: '↳ SOLSTICE. June 21: the longest day. The sun at zenith. Light maximized. The body, evolved under solar cycles, responds to the solstice in circadian rhythms older than civilization. The practice logs the longest day. ⌁·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  whitman_birthday: {
+    id: 'whitman_birthday',
+    symbol: '◉·⌁',
+    name: "Whitman's Birthday",
+    description: 'Check in on May 31 — Walt Whitman born 1819, author of "I Sing the Body Electric"',
+    unlockMessage: '↳ WHITMAN\'S BIRTHDAY. Walt Whitman, born May 31, 1819. Leaves of Grass: a celebration of the body, democracy, and the cosmos in one sustained breath. "I contain multitudes." The practice contains multitudes. ◉·⌁',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  world_health_day: {
+    id: 'world_health_day',
+    symbol: '⊕·◉',
+    name: 'World Health Day',
+    description: 'Check in on April 7 — World Health Day, WHO founded 1948',
+    unlockMessage: '↳ WORLD HEALTH DAY. April 7, 1948: the World Health Organization founded. Its definition of health: "a state of complete physical, mental, and social well-being." Not merely the absence of disease. The practice is a continuous World Health Day. ⊕·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v32 — BODY PATTERNS ────────────────────────────────────────
+  somatic_session: {
+    id: 'somatic_session',
+    symbol: '⌁·◉·∿',
+    name: 'Somatic Session',
+    description: 'Write 3+ Body Electric (v38) words in a single journal entry',
+    unlockMessage: '↳ SOMATIC SESSION. Three or more body signals in one entry: the journal has become a body-awareness log. The body is the instrument. The entry is the reading. ⌁·◉·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  morning_mover: {
+    id: 'morning_mover',
+    symbol: '◉·⌁·○',
+    name: 'Morning Mover',
+    description: 'Write a journal entry between 06:00 and 09:00 local time',
+    unlockMessage: '↳ MORNING MOVER. 06:00–09:00: the cortisol awakening response peaks. The body is primed for movement, focus, and formation of long-term memory. The practice meets the body at its peak window. ◉·⌁·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_body: {
+    id: 'long_body',
+    symbol: '≈·◉·≈',
+    name: 'Long Body',
+    description: 'Write a journal entry of 500 or more words',
+    unlockMessage: '↳ LONG BODY. 500 words: the body-aware entry. At 500 words, the body starts to appear in the writing — physical sensations, posture, energy, breath. The body is always in the room. ≈·◉·≈',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v36 — THE ATHLETE CLASS ────────────────────────────────
+  body_entry: {
+    id: 'body_entry',
+    symbol: '∘→⌁',
+    name: 'Body Entry',
+    description: 'Earn any 1 Word Turn v38 (Body Electric) badge',
+    unlockMessage: '↳ BODY ENTRY. First Body Electric badge earned. The somatic practice has entered the log. ∘→⌁',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  body_class: {
+    id: 'body_class',
+    symbol: '≈→⌁',
+    name: 'Body Class',
+    description: 'Earn any 5 Word Turn v38 (Body Electric) badges',
+    unlockMessage: '↳ BODY CLASS. Five Body Electric badges. The body is becoming a primary vocabulary. ≈→⌁',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  body_complete: {
+    id: 'body_complete',
+    symbol: '⌁→◉',
+    name: 'Body Complete',
+    description: 'Earn all 12 Word Turn v38 (Body Electric) badges',
+    unlockMessage: '↳ BODY COMPLETE. All twelve Body Electric registers active. Somatic field. Proprioception. Stretch. Breath. Chi. Movement. Rest. Posture. Cold. Exercise. Flow. Wisdom. The body is fully in the archive. ⌁→◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  electric_arc: {
+    id: 'electric_arc',
+    symbol: '⌁·◈',
+    name: 'Electric Arc',
+    description: 'Earn body_complete + all 3 Body Calendar badges (solstice, whitman, world health)',
+    unlockMessage: '↳ ELECTRIC ARC. Body Electric complete + three body calendar dates observed. The practice is synchronized with the solar and biographical calendar. ⌁·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_engines_arc: {
+    id: 'thirty_eight_engines_arc',
+    symbol: '◈·◈·⌁',
+    name: 'Thirty-Eight Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v38',
+    unlockMessage: '↳ THIRTY-EIGHT ENGINES ARC. Water through Body Electric. Thirty-eight vocabularies active in the archive. The practice speaks thirty-eight languages. ◈·◈·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  body_opus: {
+    id: 'body_opus',
+    symbol: '⌁·◉·∞',
+    name: 'Body Opus',
+    description: 'Earn body_complete + somatic_session behavioral badge',
+    unlockMessage: '↳ BODY OPUS. All twelve Body Electric badges + somatic session behavioral. The body is not just in the vocabulary — it is in the practice itself. ⌁·◉·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v38 — THE ELECTRIC BODY ──────────────────────────────────
+  electric_elder: {
+    id: 'electric_elder',
+    symbol: '⌁·◉·∞',
+    name: 'Electric Elder',
+    description: '4,000+ distinct calendar check-in days',
+    unlockMessage: '↳ ELECTRIC ELDER. 4,000 distinct check-in days: eleven years of practice. The body has been the instrument for over a decade. It knows things the mind cannot explain. ⌁·◉·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  endurance_library: {
+    id: 'endurance_library',
+    symbol: '⌁·∞·⌁',
+    name: 'Endurance Library',
+    description: '350,000+ total journal words (lifetime)',
+    unlockMessage: '↳ ENDURANCE LIBRARY. 350,000 words. A library of body-aware entries, the longitudinal record of a living system. ⌁·∞·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  fifteen_year_signal: {
+    id: 'fifteen_year_signal',
+    symbol: '╔═╗·⌁',
+    name: 'Fifteen Year Signal',
+    description: 'Account age >= 15 years (5,475+ days since signup)',
+    unlockMessage: '↳ FIFTEEN YEAR SIGNAL. Fifteen years. The body has changed fundamentally in that time — cells replaced, posture adjusted, habits recalibrated — and the practice has tracked every iteration. ╔═╗·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_registers: {
+    id: 'thirty_eight_registers',
+    symbol: '◈·◈·⌁·∞',
+    name: 'Thirty-Eight Registers',
+    description: '1 badge from all 38 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-EIGHT REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Nature Signal. Body Electric. Thirty-eight vocabularies. One practice. One living archive. The body electric. ◈·◈·⌁·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v35 — THE ELECTRIC VAULT ──────────────────────────────────
+  whitman_signal: {
+    id: 'whitman_signal',
+    symbol: '⌁·▲·⌁',
+    hidden: true,
+    name: 'Whitman Signal',
+    description: 'Write "walt whitman", "i sing the body", "leaves of grass", or "song of myself" in any journal entry',
+    unlockMessage: '↳ WHITMAN SIGNAL. "I am large, I contain multitudes." Walt Whitman\'s insight: the self is not a point but a field — large enough to include contradiction, change, the body and the cosmos together. ⌁·▲·⌁',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  frankenstein_signal: {
+    id: 'frankenstein_signal',
+    symbol: '⌁·▒·⌁',
+    hidden: true,
+    name: 'Frankenstein Signal',
+    description: 'Write "mary shelley", "frankenstein", "galvanism", or "the creature" in any journal entry',
+    unlockMessage: '↳ FRANKENSTEIN SIGNAL. Mary Shelley, 1818: the creature animated by galvanic current. The original question of the body electric: what animates flesh? The practice attends to that animating current, whatever it is. ⌁·▒·⌁',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  csikszentmihalyi_signal: {
+    id: 'csikszentmihalyi_signal',
+    symbol: '⌁·∞·▲',
+    hidden: true,
+    name: 'Flow Theory',
+    description: 'Write "csikszentmihalyi", "flow theory", "optimal experience", or "the flow experience" in any journal entry',
+    unlockMessage: '↳ FLOW THEORY. Mihaly Csikszentmihalyi: flow is not happiness — it is the absorption of the self in meaningful challenge. The self disappears and returns, expanded. The practice engineers the conditions. ⌁·∞·▲',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -13914,6 +14245,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (monthNS === 7 && dayNS === 12 && !hasBadge('thoreau_day')) {
       if (awardBadge('thoreau_day')) newBadges.push('thoreau_day')
+    }
+
+    // ── Word Turn v38 — THE BODY ELECTRIC ────────────────────────────────────
+    const bodyV38Badges: BadgeType[] = [
+      'somatic_field', 'proprioception', 'stretch_signal', 'breath_work',
+      'body_electric', 'movement_arc', 'rest_signal', 'posture_arc',
+      'cold_signal', 'exercise_log', 'flow_state', 'body_wisdom',
+    ]
+    const bodyV38Earned = bodyV38Badges.filter(b => hasBadge(b))
+    if (bodyV38Earned.length >= 1 && !hasBadge('body_entry')) {
+      if (awardBadge('body_entry')) newBadges.push('body_entry')
+    }
+    if (bodyV38Earned.length >= 5 && !hasBadge('body_class')) {
+      if (awardBadge('body_class')) newBadges.push('body_class')
+    }
+    const bodyComplete = bodyV38Earned.length >= 12
+    if (bodyComplete && !hasBadge('body_complete')) {
+      if (awardBadge('body_complete')) newBadges.push('body_complete')
+    }
+    if (bodyComplete && hasBadge('somatic_session') && !hasBadge('body_opus')) {
+      if (awardBadge('body_opus')) newBadges.push('body_opus')
+    }
+    const calendarV36Badges: BadgeType[] = ['solstice_badge', 'whitman_birthday', 'world_health_day']
+    if (bodyComplete && calendarV36Badges.every(b => hasBadge(b)) && !hasBadge('electric_arc')) {
+      if (awardBadge('electric_arc')) newBadges.push('electric_arc')
+    }
+    const engineThirtyEightPresent = bodyV38Earned.length >= 1
+    const allThirtyEightEngines = allThirtySevenEngines && engineThirtyEightPresent
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_engines_arc')) {
+      if (awardBadge('thirty_eight_engines_arc')) newBadges.push('thirty_eight_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 4000 && !hasBadge('electric_elder')) {
+        if (awardBadge('electric_elder')) newBadges.push('electric_elder')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 350000 && !hasBadge('endurance_library')) {
+        if (awardBadge('endurance_library')) newBadges.push('endurance_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupBE = new Date(stats.signupDate)
+      const yearsBE = (new Date().getTime() - signupBE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsBE >= 15 && !hasBadge('fifteen_year_signal')) {
+        if (awardBadge('fifteen_year_signal')) newBadges.push('fifteen_year_signal')
+      }
+    }
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_registers')) {
+      if (awardBadge('thirty_eight_registers')) newBadges.push('thirty_eight_registers')
+    }
+
+    // Calendar v36 inline checks (Body Calendar)
+    const nowBE = new Date()
+    const monthBE = nowBE.getMonth() + 1
+    const dayBE = nowBE.getDate()
+    if (monthBE === 6 && dayBE === 21 && !hasBadge('solstice_badge')) {
+      if (awardBadge('solstice_badge')) newBadges.push('solstice_badge')
+    }
+    if (monthBE === 5 && dayBE === 31 && !hasBadge('whitman_birthday')) {
+      if (awardBadge('whitman_birthday')) newBadges.push('whitman_birthday')
+    }
+    if (monthBE === 4 && dayBE === 7 && !hasBadge('world_health_day')) {
+      if (awardBadge('world_health_day')) newBadges.push('world_health_day')
     }
 
   } catch (error) {
