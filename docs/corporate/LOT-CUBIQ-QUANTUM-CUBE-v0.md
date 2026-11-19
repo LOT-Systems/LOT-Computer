@@ -321,6 +321,24 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE NIGHT FACE                               2026-11-19
+  ─────────────────────────────────────────────────────────────────
+  Full text: docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 10.
+
+  Usership operator, 8 months in, cube on the nightstand. After the
+  evening self-care list (one SETTLE per completed item), the operator
+  turns the cube onto its NIGHT FACE — piston up, so it physically
+  cannot hop. One NUDGE confirms. Everything that arrives overnight is
+  held. The phone stays in the kitchen because the cube makes "nothing
+  will be missed" visible. At 07:15 the operator turns it upright; the
+  queue releases gently — NUDGE for the memory question, then one LEAP
+  for the overnight rare badge. Orientation becomes input; the safe
+  state and the do-not-disturb state are the same physical position.
+
+  (R02 also revises the v.0 hop mechanism to a base piston, adds four-side
+  cliff sensing, a supercap pulse buffer, a firmware rate governor, and
+  narrows v.3 levitation to active electromagnetic — see R02 Section 01.)
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
