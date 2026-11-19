@@ -45,7 +45,6 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -91,6 +90,14 @@ function LazyMount({ children }: { children: React.ReactNode }) {
   const inViewport = useInViewport(ref)
   return <div ref={ref}>{inViewport ? children : null}</div>
 }
+
+// SystemProgressWidget is ~180 KB minified (changelog + assembly map) — the
+// single largest widget. Code-split it so it no longer blocks first paint of
+// the System tab. Still mounted eagerly (inside Suspense) so its background
+// QOS monitor starts on load as before.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
 
 function LoadingDots() {
   const [dots, setDots] = React.useState(1)
@@ -375,6 +382,20 @@ export const System = React.memo(function SystemInner() {
   }, [weather])
 
   const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
+
+  // Mount-stable visibility rolls for occasional widgets (see Intentions /
+  // Subscribe blocks below). Rolled once per mount, never during render.
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
+  const [intentionsCooldownPassed] = React.useState(() => {
+    try {
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+      const cooldownPeriod = twoDaysMs + Math.random() * twoDaysMs * 0.5 // 2–3 days
+      return !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+    } catch {
+      return false
+    }
+  })
 
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
@@ -882,14 +903,13 @@ export const System = React.memo(function SystemInner() {
         {(() => {
           const hasIntention = !!localStorage.getItem('current-intention')
 
-          // Check cooldown (2-3 days since last shown)
+          // Cooldown is rolled once per mount (intentionsCooldownPassed) —
+          // evaluating it here re-rolled Math.random() and re-read the
+          // freshly written 'intentions-last-shown' on every re-render
+          // (usersOnline / weather ticks), unmounting the widget seconds
+          // after it appeared.
           const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+          const cooldownPassed = intentionsCooldownPassed
 
           const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
 
@@ -936,9 +956,9 @@ export const System = React.memo(function SystemInner() {
             return null
           }
 
-          // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          // 20% chance per mount (subscribeRoll) — a per-render roll made
+          // the widget flicker in and out on every store tick.
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1009,6 +1029,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <QuantumStateWidget />
           <PatternRecognitionWidget />
@@ -1016,6 +1037,7 @@ export const System = React.memo(function SystemInner() {
           <SignalStreamWidget />
           <IntegrityWidget />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
@@ -1028,7 +1050,9 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <React.Suspense fallback={null}>
+            <SystemProgressWidget />
+          </React.Suspense>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1042,6 +1066,7 @@ export const System = React.memo(function SystemInner() {
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
+        <LazyMount>
         <div className={cn('flex flex-col', density.sectionGap)}>
           <IntentionPatterns />
           <CollectiveConsciousness />
@@ -1050,6 +1075,7 @@ export const System = React.memo(function SystemInner() {
           <GrowthMilestones />
           <BadgeUnlockFeed />
         </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}

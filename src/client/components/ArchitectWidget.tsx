@@ -18,7 +18,7 @@ import {
   type AssemblyPhase,
 } from '#client/stores/selfAssembly'
 import { intentionEngine } from '#client/stores/intentionEngine'
-import { USERSHIP_TRANSMISSION } from '#client/components/SystemProgressWidget'
+import { USERSHIP_TRANSMISSION } from '#client/components/usershipTransmission'
 import { UserTag } from '#shared/types'
 
 const PHASE_ORDER: AssemblyPhase[] = ['integrated', 'assembled', 'forming', 'awakening', 'dormant']

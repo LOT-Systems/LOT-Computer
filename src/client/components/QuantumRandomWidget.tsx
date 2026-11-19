@@ -30,7 +30,16 @@ function pickCountdown(): number {
   return COUNTDOWN_OPTIONS[quantumRandom(0, COUNTDOWN_OPTIONS.length - 1)]
 }
 
-function useQuantumNumber() {
+// Signal throttle — the countdown cycles every 1–72s (avg ~22s) and two
+// hooks run per widget, which previously emitted ~300 quantum_random
+// signals/hour into the intention engine. With MAX_SIGNALS = 1000 that
+// evicted the whole 7-day signal history (memory answers, check-ins,
+// journal) in ~3 hours of an open System tab. Ambient noise is now
+// recorded at most once per 15 minutes, and only from the primary hook.
+const QUANTUM_SIGNAL_THROTTLE_MS = 15 * 60 * 1000
+let lastQuantumSignalAt = 0
+
+function useQuantumNumber(recordToEngine: boolean) {
   const [number, setNumber] = React.useState(() => quantumRandom(0, 99))
   const [countdown, setCountdown] = React.useState(() => pickCountdown())
   const [remaining, setRemaining] = React.useState(countdown)
@@ -43,7 +52,11 @@ function useQuantumNumber() {
           const nextCountdown = pickCountdown()
           setNumber(next)
           setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          const now = Date.now()
+          if (recordToEngine && now - lastQuantumSignalAt >= QUANTUM_SIGNAL_THROTTLE_MS) {
+            lastQuantumSignalAt = now
+            recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          }
           return nextCountdown
         }
         return prev - 1
@@ -57,8 +70,8 @@ function useQuantumNumber() {
 }
 
 export function QuantumRandomWidget() {
-  const a = useQuantumNumber()
-  const b = useQuantumNumber()
+  const a = useQuantumNumber(true)
+  const b = useQuantumNumber(false)
   const [showPair, setShowPair] = React.useState(() => Math.random() < 0.5)
 
   React.useEffect(() => {
