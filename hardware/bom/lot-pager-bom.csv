@@ -1,0 +1,29 @@
+ref,category,part,mpn,qty_per_unit,est_unit_usd_at_100,est_ext_usd_per_unit,source_link,notes
+U1,MCU,ESP32-S3 SiP (Wi-Fi/BLE + 8MB flash + 8MB PSRAM),ESP32-S3-PICO-1-N8R8,1,4.80,4.80,https://www.digikey.com/en/products/result?keywords=ESP32-S3-PICO-1-N8R8,7x7 mm LGA; needs FCC test. Alt D-01: ESP32-S3-MINI-1 (pre-certified; 2.4 mm tall)
+DS1,Display,Sharp 1.28in 128x128 Memory LCD,LS013B7DH03,1,13.50,13.50,https://www.digikey.com/en/products/result?keywords=LS013B7DH03,Always-on reflective; near-zero hold power; FPC 10-pin
+CAM1,Camera,Himax HM0360 AI vision sensor module (VGA),HM0360 module (Arducam or equivalent),1,12.00,12.00,https://www.arducam.com/?s=HM0360,On-sensor motion detect; mono. Fallback OV2640 colour module
+U2,Sensor,Bosch BME688 gas/temp/RH/pressure (AI),BME688,1,7.50,7.50,https://www.digikey.com/en/products/result?keywords=BME688,Bosch AI Studio gas classification; 3x3x0.93 mm
+U3,Sensor,Bosch BMI270 6-axis IMU (gesture AI),BMI270,1,2.60,2.60,https://www.digikey.com/en/products/result?keywords=BMI270,Wake on pick-up / tap; 2.5x3x0.8 mm
+U4,Sensor,Sensirion SHT45 temp/RH (reference),SHT45-AD1B,1,2.90,2.90,https://www.digikey.com/en/products/result?keywords=SHT45,Optional: accuracy cross-check for weather
+U5,Power,TI Qi receiver + Li-ion charger,BQ51050BYFPR,1,3.20,3.20,https://www.ti.com/product/BQ51050B,WPC Qi Rx with integrated charger; DSBGA
+L1,Power,Qi receiver coil ~20-22 mm with ferrite,Wurth WE-WPCC Rx (select P/N),1,2.80,2.80,https://www.we-online.com/en/components/products/WE-WPCC,Must sit under glass not steel
+U6,Power,Fuel gauge,MAX17048G+T10,1,1.40,1.40,https://www.digikey.com/en/products/result?keywords=MAX17048,ModelGauge; I2C
+U7,Power,Ultra-low-Iq buck 3.3 V,TPS62840DLCR,1,1.10,1.10,https://www.digikey.com/en/products/result?keywords=TPS62840,60 nA Iq
+U8,Power,Battery protection IC + FET,DW01A + FS8205 (or BQ2970),1,0.25,0.25,https://www.lcsc.com/search?q=DW01A,Some cells include PCM; check
+BT1,Power,LiPo pouch 150 mAh ~2.0x25x30 mm,Custom (e.g. 202530 class),1,3.50,3.50,https://www.alibaba.com/trade/search?SearchText=202530+lipo,Needs UN38.3 + MSDS for shipping
+M1,Haptic,Coin vibration motor 8 mm,0820 ERM (or LRA),1,0.70,0.70,https://www.lcsc.com/search?q=coin%20vibration%20motor%208mm,Pager buzz
+SW1,Input,Ultra-thin tact switch,ALPS SKRPACE010 (or EVP-AA),1,0.35,0.35,https://www.digikey.com/en/products/result?keywords=SKRPACE010,Under steel button cap
+ANT1,RF,2.4 GHz chip antenna,Johanson 2450AT18A100 (or equiv),1,0.45,0.45,https://www.digikey.com/en/products/result?keywords=2450AT18A100,Place under glass margin; keep-out from steel
+LED1,Indicator,Camera-active LED 0402,Any 0402 white,1,0.05,0.05,https://www.lcsc.com/search?q=0402%20LED,Privacy indicator; light-piped into camera hole
+J1,Test,Pogo test pads + Tag-Connect footprint,TC2030-NL footprint,1,0.00,0.00,https://www.tag-connect.com,Factory programming; no part placed
+PASS,Passives,Caps/resistors/crystals/ESD (est. 45 parts),Various 0201/0402,1,1.50,1.50,https://www.lcsc.com,Incl. 40 MHz crystal if not in SiP
+PCB,PCB,38x38 mm 6-layer HDI 0.6-0.8 mm ENIG,PCBWay,1,6.00,6.00,https://www.pcbway.com/HighQualityPCB.html,Via-in-pad; panel of 4
+PCBA,Assembly,SMT turnkey assembly both sides,PCBWay,1,9.00,9.00,https://www.pcbway.com/pcb-assembly.html,Plus one-time stencil/setup ~$150-250
+ENC-B,Enclosure,Back shell 316L mirror polish 40x40,PCBWay CNC,1,22.00,22.00,https://www.pcbway.com/rapid-prototyping/manufacture/,Order 120 for 100 good
+ENC-F,Enclosure,Front frame 316L bead-blast or brushed,PCBWay CNC,1,18.00,18.00,https://www.pcbway.com/rapid-prototyping/manufacture/,Pockets for glass + button
+GLS,Enclosure,Front glass 0.55 mm chem. strengthened + black ink mask,Custom cover glass,1,4.50,4.50,https://www.alibaba.com/trade/search?SearchText=custom+cover+glass+0.55mm,Sapphire option ~$18
+BTN,Enclosure,Steel button cap 6 mm + silicone gasket,PCBWay CNC,1,2.00,2.00,https://www.pcbway.com/rapid-prototyping/manufacture/,
+VENT,Enclosure,Acoustic/pressure membrane vent ~3 mm,Gore PolyVent or equiv adhesive vent,1,0.90,0.90,https://www.gore.com/products/categories/venting,For BME688 accuracy
+HW,Enclosure,M1.2 screws x4 + PSA adhesive,Various,1,0.60,0.60,https://www.mcmaster.com,
+PKG,Packaging,Box + card manual + microfiber pouch,Local printer,1,3.50,3.50,,
+CHG,Charger,Qi 5 W desk pad (off-the-shelf; rebrandable),Qi-certified 5 W pad,1,6.00,6.00,https://www.alibaba.com/trade/search?SearchText=qi+5w+charging+pad,Optional: custom steel puck later
