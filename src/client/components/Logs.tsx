@@ -33,7 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail, type LotEmailRecipient } from '#client/queries'
+import { parseEmailCommand, stampEmailSent } from '#client/utils/lotEmail'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3713,6 +3714,53 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+
+  // ── LOT® Email: "/email to Hitomi: ..." composes mail from Log ──
+  const emailDraft = React.useMemo(() => (primary ? parseEmailCommand(value) : null), [value, primary])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const [emailChoices, setEmailChoices] = React.useState<LotEmailRecipient[]>([])
+  const emailSendingRef = React.useRef(false)
+  const { mutate: sendEmail } = useSendEmail()
+  const dispatchEmail = React.useCallback(
+    (receiverId?: string) => {
+      const draft = parseEmailCommand(valueRef.current)
+      if (!draft || !draft.body || emailSendingRef.current) return
+      emailSendingRef.current = true
+      setEmailStatus('TRANSMITTING…')
+      sendEmail(
+        receiverId ? { receiverId, body: draft.body } : { to: draft.to, body: draft.body },
+        {
+          onSuccess: (res) => {
+            emailSendingRef.current = false
+            setEmailChoices([])
+            setEmailStatus(`DELIVERED TO ${res.to.name.toUpperCase()} · VISIBLE IN SYNC`)
+            const stamped = stampEmailSent(valueRef.current, draft, res.to.name, new Date())
+            valueRef.current = stamped
+            setValue(stamped)
+            onChangeRef.current(stamped)
+            setLastSavedAt(new Date())
+            setIsSaved(true)
+          },
+          onError: (err: any) => {
+            emailSendingRef.current = false
+            const data = err?.response?.data
+            if (err?.response?.status === 409 && Array.isArray(data?.recipients)) {
+              setEmailChoices(data.recipients)
+              setEmailStatus('MULTIPLE MATCHES — SELECT RECIPIENT')
+            } else if (err?.response?.status === 404) {
+              setEmailStatus(`NO MEMBER NAMED ${draft.to.toUpperCase()}`)
+            } else {
+              setEmailStatus('MAIL OFFLINE — RETRY')
+            }
+          },
+        }
+      )
+    },
+    [sendEmail]
+  )
+  React.useEffect(() => {
+    if (!emailDraft) { setEmailChoices([]); if (!emailSendingRef.current) setEmailStatus((s) => (s && s.startsWith('DELIVERED') ? s : null)) }
+  }, [emailDraft?.to, !!emailDraft])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3911,6 +3959,13 @@ const NoteEditor = ({
 
       if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
         ev.preventDefault()
+        if (primary) {
+          const draft = parseEmailCommand(valueRef.current)
+          if (draft && draft.body) {
+            dispatchEmail()
+            return
+          }
+        }
         if (valueRef.current !== logTextRef.current) {
           onChangeRef.current(valueRef.current) // Immediate save
           setLastSavedAt(new Date())
@@ -3921,7 +3976,7 @@ const NoteEditor = ({
       }
       // Regular Enter key creates newline (default behavior)
     },
-    [primary]
+    [primary, dispatchEmail]
   )
 
   // --------------------------------------------------------------------
@@ -4139,6 +4194,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to     /email to Hitomi: message — mail a member (Ctrl+Enter)',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4386,6 +4442,36 @@ const NoteEditor = ({
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
             </Block>
           </div>
+        )}
+        {emailDraft && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
+                <div className="flex gap-x-24"><span className="opacity-40 min-w-[48px]">TO</span><span>{emailDraft.to}</span></div>
+                <div className="flex gap-x-24"><span className="opacity-40 min-w-[48px]">BODY</span><span className="opacity-60">{emailDraft.body ? `${emailDraft.body.length} / 2000` : 'Write the message after a colon or on the next line'}</span></div>
+                {emailChoices.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-8">
+                    {emailChoices.map((r) => (
+                      <Button key={r.id} kind="secondary" size="small" onClick={() => dispatchEmail(r.id)}>
+                        {r.name}{r.city ? ` · ${r.city}` : ''}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-8 flex items-center gap-x-16">
+                  <Button kind="secondary" size="small" disabled={!emailDraft.body || emailSendingRef.current} onClick={() => dispatchEmail()}>
+                    Send
+                  </Button>
+                  <span className="opacity-40" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                    {emailStatus || 'CTRL+ENTER TO SEND · ARRIVES IN SYNC'}
+                  </span>
+                </div>
+              </div>
+            </Block>
+          </div>
+        )}
+        {!emailDraft && emailStatus && emailStatus.startsWith('DELIVERED') && (
+          <div className="mt-8 opacity-40" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>✉ {emailStatus}</div>
         )}
         {systemHelp && (
           <div className="mt-8">
