@@ -182,6 +182,9 @@ export function PatternRecognitionWidget() {
       'quantum-presence-crystallization': 'Quantum presence crystallization — presence field + identity crystallized co-active, maximum clarity (P149)',
       'total-field-coherence':            'Total field coherence — all three meta-seals open simultaneously, absolute convergence (P150)',
       'recovery-intelligence-arc':        'Recovery intelligence arc — depletion → care → restoration → reflection loop completed within 6h (P151)',
+      'sustained-field-operator':         'Sustained field operator — total field coherence achieved 2+ times in 7 days, ceiling becomes the floor (P152)',
+      'quantum-resilience-arc':           'Quantum resilience arc — recovery intelligence + total field coherence co-present in 7-day window (P153)',
+      'generative-signal-loop':           'Generative signal loop — signal density peak + action-to-memory loop + 2+ care in 48h, closed positive loop (P154)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

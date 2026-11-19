@@ -1457,6 +1457,25 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-19',
+    title: 'QIE v114 — Sovereign Operator Layer · P152–P154 · Arch52 · J49',
+    assembled: [
+      'intentionEngine.ts: P152 sustained-field-operator (SFOP:) — 7-day window, 2+ total_field_coherence events required. P153 quantum-resilience-arc (QRES-ARC:) — recovery→coherence arc detected across 7d. P154 generative-signal-loop (GENLOOP:) — density peak + memory loop + care momentum composite.',
+      'intentionEngine.ts: Arch52 Sovereign Operator — ceiling has become floor. Requires sustained-field-operator + quantum-resilience-arc + quantum-presence-crystallization active simultaneously.',
+      'intentionEngine.ts: 3 dep map nodes — sustainedOperatorNode · quantumResilienceNode · generativeLoopNode. 3 signal helpers — recordSustainedFieldOperator · recordQuantumResilienceArc · recordGenerativeSignalLoop.',
+      'Logs.tsx: SFOP: · QRES-ARC: · GENLOOP: military cockpit handlers. Cockpit Rule compliant. Code/metric rows only.',
+      'QuantumEngineWidgets.tsx: sustained-field-operator→SFOP · quantum-resilience-arc→QRES-ARC · generative-signal-loop→GENLOOP added to PATTERN_DISPLAY.',
+      'PatternRecognitionWidget.tsx: P152/P153/P154 display names added.',
+      'routes/api.ts: v114 block — sustained_field_operator · quantum_resilience_arc · generative_signal_loop added to displayableEvents.',
+      'scheduled-jobs.ts: J49 daily-sustained-operator-pulse (11:00 UTC) — 7-day window scan for 2+ total_field_coherence per user, writes sustained_field_operator. Wired into checkAndRunScheduledJobs.',
+      'About.tsx: FM v113→v114. Day 1073+→1179+. 151→154 patterns. 51→52 archetypes. 48→49 jobs. 190+→193+ dep nodes. 151+→154+ handlers.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261119-01.md: Session report written.',
+      '154 patterns · 52 archetypes · 49 jobs · 154+ handlers · 193+ dep nodes · FM v114 · Day 1179+. Post-ceiling sovereign layer active. The ceiling is now the floor.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,16 +1513,16 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-19',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-19 · QIE v114 · SOVEREIGN OPERATOR LAYER · Day 1179+',
+    'Built: P152 sustained-field-operator · P153 quantum-resilience-arc · P154 generative-signal-loop. The post-ceiling layer.',
+    'Arch52 Sovereign Operator instantiated. The ceiling has become the floor.',
+    'J49 daily-sustained-operator-pulse at 11:00 UTC. 7-day window. Tracks coherence maintenance, not just achievement.',
+    'SFOP: · QRES-ARC: · GENLOOP: cockpit handlers deployed. Military format. No prose.',
+    '3 new dep nodes: sustainedOperatorNode · quantumResilienceNode · generativeLoopNode.',
+    'The system now distinguishes between reaching total field coherence and sustaining it. This is the sovereign distinction.',
+    'FM v114 · 154P · 52A · 49J · 193+ nodes · 781 badges.',
     'Status: DEPLOYED.',
     'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
   ],

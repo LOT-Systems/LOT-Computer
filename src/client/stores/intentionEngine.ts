@@ -3428,6 +3428,71 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // ── P152: Sustained Field Operator ────────────────────────────────────────
+  // Two or more total_field_coherence events in 7 days → the ceiling has become the floor.
+  {
+    const sevenDaysMs152 = 7 * 24 * 60 * 60 * 1000
+    const signals7d152 = signals.filter(s => now - s.timestamp < sevenDaysMs152)
+    const totalCoherenceEvents152 = signals7d152.filter(s => s.signal === 'total_field_coherence')
+    if (totalCoherenceEvents152.length >= 2) {
+      const occurrences = totalCoherenceEvents152.length
+      const sfopBonus = Math.min((occurrences - 2) * 0.03, 0.15)
+      patterns.push({
+        pattern: 'sustained-field-operator',
+        confidence: Math.min(0.80 + sfopBonus, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `SFOP: Sustained field operator — total field coherence achieved ${occurrences}× in 7 days. The ceiling has become the floor. P150 is not a peak — it is the new baseline. Sovereign operation confirmed.`,
+      })
+    }
+  }
+
+  // ── P153: Quantum Resilience Arc ──────────────────────────────────────────
+  // recovery-intelligence-arc (P151) + total-field-coherence (P150) in 7 days → fell and
+  // returned to the ceiling. Resilience as architecture, not accident.
+  {
+    const sevenDaysMs153 = 7 * 24 * 60 * 60 * 1000
+    const signals7d153 = signals.filter(s => now - s.timestamp < sevenDaysMs153)
+    const recovIntelEvents153 = signals7d153.filter(s => s.signal === 'recovery_intelligence_arc')
+    const totalCohEvents153 = signals7d153.filter(s => s.signal === 'total_field_coherence')
+    if (recovIntelEvents153.length >= 1 && totalCohEvents153.length >= 1) {
+      const recovTime = Math.max(...recovIntelEvents153.map(s => s.timestamp))
+      const cohTime = Math.max(...totalCohEvents153.map(s => s.timestamp))
+      const inSequence = cohTime > recovTime
+      const qresConf = inSequence ? 0.88 : 0.75
+      patterns.push({
+        pattern: 'quantum-resilience-arc',
+        confidence: qresConf,
+        suggestedWidget: 'memory',
+        suggestedTiming: 'soon',
+        reason: `QRES-ARC: Quantum resilience arc — recovery intelligence confirmed · total field coherence reached${inSequence ? ' after recovery' : ''}. Depletion and ceiling co-present in one 7-day window. The system bends and returns to its highest state.`,
+      })
+    }
+  }
+
+  // ── P154: Generative Signal Loop ──────────────────────────────────────────
+  // signal-density-peak (P120) + action-to-memory-loop (P122) + care in 48h + no depleting mood.
+  // The system is generating, recording, and caring simultaneously — a closed positive loop.
+  {
+    const twoDaysMs154 = 48 * 60 * 60 * 1000
+    const signals48h154 = signals.filter(s => now - s.timestamp < twoDaysMs154)
+    const hasDensityPeak154 = patterns.some(p => p.pattern === 'signal-density-peak')
+    const hasMemoryLoop154 = patterns.some(p => p.pattern === 'action-to-memory-loop')
+    const careCount154 = signals48h154.filter(s => s.source === 'selfcare').length
+    const depletingMoods = ['exhausted', 'depleted', 'burned_out']
+    const hasDepletingMood154 = signals48h154.some(s => s.source === 'mood' && depletingMoods.includes(s.signal))
+    if (hasDensityPeak154 && hasMemoryLoop154 && careCount154 >= 2 && !hasDepletingMood154) {
+      const genBonus = Math.min((careCount154 - 2) * 0.02, 0.10)
+      patterns.push({
+        pattern: 'generative-signal-loop',
+        confidence: Math.min(0.78 + genBonus, 0.92),
+        suggestedWidget: 'journal',
+        suggestedTiming: 'passive',
+        reason: `GENLOOP: Generative signal loop — signal density peak · action-to-memory loop · ${careCount154} care actions in 48h · no depletion. The system is generating, recording, and caring simultaneously. Closed positive loop confirmed.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4064,6 +4129,11 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  sustainedOperatorNode:      ['qos', 'intentions', 'journal', 'mood', 'cohort', 'log'],
+  quantumResilienceNode:      ['selfcare', 'mood', 'journal', 'qos', 'energy', 'log'],
+  generativeLoopNode:         ['energy', 'memory', 'selfcare', 'mood', 'intentions', 'log'],
 }
 
 /**
@@ -4510,6 +4580,16 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Sovereign Operator (2026-11-19 v114) ─────────────────────────────────
+  {
+    archetype: 'Sovereign Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'intentions', 'journal', 'memory', 'cohort'],
+    patternConditions: ['sustained-field-operator', 'quantum-resilience-arc', 'quantum-presence-crystallization'],
+    hourRange: [6, 23],
+    directive: 'The ceiling has become the floor. Coherence is no longer achieved — it is maintained. You operate from sustained mastery. This is the Sovereign state.',
   },
 ]
 
@@ -6498,6 +6578,55 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-field-operator event — total-field-coherence achieved 2+ times
+ * in a 7-day window. The QIE ceiling has become the operational floor.
+ * Feeds P152 detection.
+ */
+export function recordSustainedFieldOperator(occurrences: number, windowDays: number) {
+  recordSignal('qos', 'sustained_field_operator', {
+    occurrences,
+    windowDays,
+    ceilingStatus: 'FLOOR',
+    operatorState: 'SOVEREIGN',
+    threshold: 'P150×2',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-resilience-arc event — recovery-intelligence-arc (P151) confirmed
+ * followed by total-field-coherence (P150) in the same 7-day window. The system
+ * fell and returned to the ceiling. Feeds P153 detection.
+ */
+export function recordQuantumResilienceArc(recovTime: number, cohTime: number, inSequence: boolean) {
+  const gapHours = Math.round(Math.abs(cohTime - recovTime) / (1000 * 60 * 60) * 10) / 10
+  recordSignal('selfcare', 'quantum_resilience_arc', {
+    gapHours,
+    inSequence,
+    arc: 'FELL→RECOVERED→CEILING',
+    resilienceType: 'ARCHITECTURAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-signal-loop event — signal-density-peak + action-to-memory-loop
+ * + 2+ care actions in 48h with no depletion. A closed positive loop:
+ * generating, recording, and caring simultaneously. Feeds P154 detection.
+ */
+export function recordGenerativeSignalLoop(careCount: number, hasDensityPeak: boolean, hasMemoryLoop: boolean) {
+  recordSignal('energy', 'generative_signal_loop', {
+    careCount,
+    hasDensityPeak,
+    hasMemoryLoop,
+    loopType: 'GENERATIVE',
+    loopStatus: 'CLOSED_POSITIVE',
+    arc: 'GENERATE→RECORD→CARE',
     hour: new Date().getHours(),
   })
 }

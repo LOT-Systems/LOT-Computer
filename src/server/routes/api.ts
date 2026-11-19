@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // v114: sustained field operator · quantum resilience arc · generative signal loop (P152/P153/P154)
+      'sustained_field_operator',
+      'quantum_resilience_arc',
+      'generative_signal_loop',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

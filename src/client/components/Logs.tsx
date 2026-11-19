@@ -3629,6 +3629,96 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'sustained_field_operator') {
+          const occurrences = log.metadata?.occurrences as number | undefined
+          const windowDays = log.metadata?.windowDays as number | undefined
+          const ceilingStatus = log.metadata?.ceilingStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SFOP:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED FIELD OPERATOR</div>
+                {occurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">P150 EVENTS 7D</span>
+                    <span className="tabular-nums">{occurrences}</span>
+                  </div>
+                )}
+                {windowDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">WINDOW</span>
+                    <span className="tabular-nums">{windowDays}d</span>
+                  </div>
+                )}
+                {ceilingStatus && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CEILING STATUS</span>
+                    <span className="tabular-nums">{ceilingStatus}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE CEILING HAS BECOME THE FLOOR</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_resilience_arc') {
+          const gapHours = log.metadata?.gapHours as number | undefined
+          const inSequence = log.metadata?.inSequence as boolean | undefined
+          const resilienceType = log.metadata?.resilienceType as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QRES-ARC:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM RESILIENCE ARC</div>
+                {gapHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GAP</span>
+                    <span className="tabular-nums">{gapHours}h</span>
+                  </div>
+                )}
+                {inSequence !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SEQUENCE</span>
+                    <span className="tabular-nums">{inSequence ? 'RECOVERY→CEILING' : 'CO-PRESENT'}</span>
+                  </div>
+                )}
+                {resilienceType && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TYPE</span>
+                    <span className="tabular-nums">{resilienceType}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FELL → RECOVERED → CEILING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generative_signal_loop') {
+          const careCount = log.metadata?.careCount as number | undefined
+          const loopType = log.metadata?.loopType as string | undefined
+          const loopStatus = log.metadata?.loopStatus as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GENLOOP:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE SIGNAL LOOP</div>
+                {careCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CARE 48H</span>
+                    <span className="tabular-nums">{careCount}</span>
+                  </div>
+                )}
+                {loopType && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LOOP TYPE</span>
+                    <span className="tabular-nums">{loopType}</span>
+                  </div>
+                )}
+                {loopStatus && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STATUS</span>
+                    <span className="tabular-nums">{loopStatus}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">GENERATE → RECORD → CARE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
