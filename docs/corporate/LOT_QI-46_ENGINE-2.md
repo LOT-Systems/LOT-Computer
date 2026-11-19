@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.6 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18
+### Engine Specification v0.7 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19
 
 ---
 
@@ -20,14 +20,14 @@
 ## 0. NODE STATUS
 
 ```
-NODE           5 of N  — "Calibrate me" toggle (admin preview, copy awaiting approval)
+NODE           6 of N  — Memory prompt surface (prep: wired, flag off by default)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.6.0-node5) · qi46-audit.ts · shared/constants/qi46.ts
+CODE           src/server/utils/qi46.ts   (v0.7.0-node6prep) · qi46-surface.ts · qi46-audit.ts · shared/constants/qi46.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 25/25
-REVIEW         Migration 20261117120000 + Node 5 subscriber copy await Vadik's review
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 37/37
+REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
 
@@ -256,6 +256,52 @@ The copy itself is run through `cosmoScreen` and must come back CLEARED. Words l
 
 ---
 
+## 3d. NODE 6 PREP — MEMORY PROMPT SURFACE (assembled 2026-11-19)
+
+> *The voice reaches the person for the first time, through a question.* It stays off until Vadik turns it on.
+
+### Flow (`GET /api/memory`, Usership AI path)
+
+```
+logs(40) ─► planQi46MemorySurface ─► active? ── no ──► standard prompt (unchanged)
+                                        │
+                                       yes
+                                        ▼
+                         prelude (voice seed) + standard prompt ─► AI engine ─► question
+                                                                                  │
+                                                         COSMO® screen (question + options)
+                                                           │                    │
+                                                        CLEARED               HELD
+                                                           │                    │
+                                                        deliver      regenerate with standard prompt
+                                       audit row (source: surface, labels only) recorded either way
+```
+
+### Gates (all four must pass)
+
+| # | Gate | Skip code |
+|---|---|---|
+| 1 | Server env `QI46_SURFACE_MEMORY=on`. Only the exact string `on` counts. **Default: off** | `flag-off` |
+| 2 | Explicit consent (`metadata.qi46.consent === true`) | `no-consent` |
+| 3 | At least 5 signals (`QI46_MIN_SIGNALS`) | `low-signal` |
+| 4 | Risk below `elevated`. An elevated person always gets the standard path, never a voice experiment | `elevated-risk` |
+
+### Guarantees
+
+- With the flag off, the Memory path is byte-for-byte the same as before. There are no extra AI calls and no audit writes.
+- The prelude contains the calibrated voice seed and the honesty line. It never includes raw log text (checked in smoke).
+- A HELD question is never shown. At most one extra AI call is made, and the standard prompt is used for it.
+- The audit write is fire-and-forget and fails soft if migration `20261117120000` has not run.
+
+### To turn on (closed beta)
+
+1. Run migration `20261117120000` so the audit trail records.
+2. Release Node 5 copy (`QI46_COPY_APPROVED = true`) so people can say yes.
+3. Set `QI46_SURFACE_MEMORY=on` on the droplet and restart.
+4. Watch `/admin-api/users/:id/qi46/verdicts` for the HELD rate across the 12.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
@@ -264,11 +310,13 @@ The copy itself is run through `cosmoScreen` and must come back CLEARED. Words l
 | ~~4~~ | ~~Risk sensitivity: Heavy ≥ moderate~~ | **ASSEMBLED 2026-11-16** (folded into Node 2) |
 | ~~3~~ | ~~COSMO® audit trail~~ | **ASSEMBLED 2026-11-17**. Migration `20261117120000` awaits Vadik's review |
 | ~~5~~ | ~~"Calibrate me" toggle in Settings~~ | **ASSEMBLED 2026-11-18** as admin preview. Release = Vadik approves copy, sets `QI46_COPY_APPROVED = true` |
-| **6** | Wire into one existing surface behind the consent flag (Memory prompts) | Closed beta, 12 founding users |
+| ~~6 prep~~ | ~~Memory prompt surface behind flag~~ | **ASSEMBLED 2026-11-19**, flag `QI46_SURFACE_MEMORY` off by default |
+| **6** | Turn the surface on for the closed beta of 12 | Migration run + Node 5 copy released + flag on |
+| **7** | Beta read-out: HELD rate per reason and per lead register, then tune the calibration weights | ≥ 2 weeks of `surface` audit rows |
 
 ---
 
-*QI·46 Engine Specification — v0.6 · Node 5*
+*QI·46 Engine Specification — v0.7 · Node 6 prep*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026*

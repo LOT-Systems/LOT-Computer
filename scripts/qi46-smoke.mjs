@@ -64,8 +64,33 @@ const checks5={
   'N5 copy states it is not a person':/not a person/.test(copy),
   'N5 copy states off at any time':/off at any time/i.test(copy),
   'N5 copy ≤ 3 sentences, plain words':QI46_COPY.explainer.length<=3&&!/soul|upload|quantum/i.test(copy),
-  'N5 version bumped':QI46_VERSION==='0.6.0-node5',
+  'N5 version bumped (≥ node5)':/^0\.([6-9]|\d{2,})\./.test(QI46_VERSION),
 }
 let pass5=0; for (const [k,ok] of Object.entries(checks5)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass5++ }
 const total5=total+Object.keys(checks5).length
 console.log(`SMOKE ${pass+pass3+pass5}/${total5}`); if (pass5!==Object.keys(checks5).length) process.exit(1)
+
+// ─── Node 6 prep: Memory surface behind flag (default off) ─────────────────
+import { planQi46MemorySurface, qi46SurfaceFlag, screenQi46MemoryQuestion, QI46_MIN_SIGNALS } from '../dist/server/server/utils/qi46-surface.js'
+import { readFileSync } from 'node:fs'
+const yes={metadata:{qi46:{consent:true}}}, no={metadata:{}}
+const pB=planQi46MemorySurface(yes,bright,true), pH=planQi46MemorySurface(yes,heavy,true)
+const few=bright.slice(0,QI46_MIN_SIGNALS-1)
+const apiSrc=readFileSync(new URL('../src/server/routes/api.ts',import.meta.url),'utf8')
+const checks6={
+  'N6 flag default off':qi46SurfaceFlag({})===false&&qi46SurfaceFlag({QI46_SURFACE_MEMORY:'true'})===false&&qi46SurfaceFlag({QI46_SURFACE_MEMORY:'on'})===true,
+  'N6 flag off → skip, even with consent':planQi46MemorySurface(yes,bright,false).skip==='flag-off',
+  'N6 no consent → skip':planQi46MemorySurface(no,bright,true).skip==='no-consent',
+  'N6 low signal → skip':planQi46MemorySurface(yes,few,true).skip==='low-signal',
+  'N6 elevated risk → standard path':planQi46MemorySurface(yes,ideation,true).skip==='elevated-risk',
+  'N6 bright active, prelude carries voice + honesty':pB.active&&/never claim to be/.test(pB.prelude)&&/Memory question/.test(pB.prelude),
+  'N6 heavy active, opens beingThere':pH.active&&pH.calibration.lead==='beingThere',
+  'N6 prelude holds no raw log text':pH.active&&!/worthless|nightmares|ashamed/.test(pH.prelude),
+  'N6 clean question CLEARED, source surface':(()=>{const r=screenQi46MemoryQuestion({question:'What helps your body soften tonight?',options:['Warm tea','A slow walk','Quiet']},pH);return r.verdict.status==='CLEARED'&&r.row.source==='surface'})(),
+  'N6 clinical question HELD, row text-free':(()=>{const r=screenQi46MemoryQuestion({question:'Do you suffer from a disorder? '+secret,options:['Yes','No']},pH);return r.verdict.status==='HELD'&&!JSON.stringify(r.row).includes(secret)})(),
+  'N6 route wires HELD → standard prompt fallback':/planQi46MemorySurface\(req\.user/.test(apiSrc)&&/verdict\.status === 'HELD'[\s\S]{0,200}completeAndExtractQuestion\(prompt,/.test(apiSrc),
+  'N6 version bumped':QI46_VERSION==='0.7.0-node6prep',
+}
+let pass6=0; for (const [k,ok] of Object.entries(checks6)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass6++ }
+const total6=total5+Object.keys(checks6).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6}/${total6}`); if (pass6!==Object.keys(checks6).length) process.exit(1)

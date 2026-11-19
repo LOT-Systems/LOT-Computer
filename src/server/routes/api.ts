@@ -36,6 +36,8 @@ import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
+import { planQi46MemorySurface, qi46SurfaceFlag, screenQi46MemoryQuestion } from '#server/utils/qi46-surface'
+import { recordCosmoVerdict } from '#server/utils/qi46-audit'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
 import { generateContextualPrompts, generatePatternAwareQuestion, analyzePatternEvolution } from '#server/utils/contextual-prompts'
 import { analyzeEnergyState, generateEnergySuggestions } from '#server/utils/energy'
@@ -2221,8 +2223,23 @@ export default async (fastify: FastifyInstance) => {
           // Build prompt with context - buildPrompt already handles duplicate detection
           const prompt = await buildPrompt(req.user, logs, isWeekend, quantumState)
 
-          // Generate question - AI already has instructions to avoid duplicates from buildPrompt
-          const question = await completeAndExtractQuestion(prompt, req.user, promptsShownToday)
+          // QI·46 Node 6 (prep): calibrated voice behind flag QI46_SURFACE_MEMORY=on
+          // (default off) + consent + signal + risk gates. COSMO® screens the result;
+          // HELD falls back to the standard prompt. Audit rows hold labels only.
+          const qi46Plan = planQi46MemorySurface(req.user, logs as any, qi46SurfaceFlag())
+          let question = await completeAndExtractQuestion(
+            qi46Plan.active ? `${qi46Plan.prelude}\n${prompt}` : prompt,
+            req.user,
+            promptsShownToday
+          )
+          if (qi46Plan.active) {
+            const { verdict, row } = screenQi46MemoryQuestion(question, qi46Plan)
+            void recordCosmoVerdict(req.user.id, row)
+            if (verdict.status === 'HELD') {
+              console.warn(`[QI46] Memory question HELD (${row.reasons.join(',')}), using standard prompt`)
+              question = await completeAndExtractQuestion(prompt, req.user, promptsShownToday)
+            }
+          }
 
           console.log(`Generated question for user ${req.user.id}:`, {
             questionId: question.id,
