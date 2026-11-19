@@ -20,6 +20,7 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import { BASIC_PLAN, publicManifest } from '#shared/basics/manifest'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +375,20 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // LOT-FM-001 · OPEN TAB — public ration ledger. Nomenclature + cadence only.
+  // COGS is withheld by construction (publicManifest has no cost fields).
+  fastify.get('/basics/manifest', async (_req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return {
+      plan: BASIC_PLAN.code,
+      designation: BASIC_PLAN.designation,
+      priceUsdMonthly: BASIC_PLAN.priceUsdMonthly,
+      doctrine: BASIC_PLAN.doctrine,
+      terms: BASIC_PLAN.terms,
+      lines: publicManifest(),
+    }
+  })
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {
