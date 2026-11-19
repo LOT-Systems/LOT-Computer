@@ -79,8 +79,13 @@ input:-webkit-autofill {
     @apply font-base;
   }
 
-  *:focus {
+  /* Remove default outline only for pointer interactions; preserve it for keyboard navigation */
+  *:focus:not(:focus-visible) {
     @apply outline-none;
+  }
+  *:focus-visible {
+    outline: 2px solid rgb(var(--acc-color-default) / 0.5);
+    outline-offset: 2px;
   }
 }
 
