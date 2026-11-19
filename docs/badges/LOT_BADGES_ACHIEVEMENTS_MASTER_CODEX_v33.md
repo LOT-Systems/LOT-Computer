@@ -1,18 +1,18 @@
 # LOT BADGES & ACHIEVEMENTS — MASTER CODEX v33
-## THE ARCANE TERMINAL — WORD TURN v23
+## THE RPG CODEX — WORD TURN v23
 
 ```
 ╔═══════════════════════════════════════════════════════════════════╗
 ║                                                                   ║
-║         LOT SYSTEMS — BADGE & ACHIEVEMENT MASTER CODEX            ║
+║         LOT SYSTEMS CORPORATION — BADGE & ACHIEVEMENT MASTER CODEX║
 ║                   VERSION 33 — v33                                ║
 ║                                                                   ║
-║   Word Turn v23   — THE ARCANE TERMINAL (magic/alchemy lexicon)  ║
-║   Calendar EE v21 — THE ARCANE CALENDAR (alchemist birthdays)    ║
-║   Behavioral v20  — ARCANE PATTERNS (session/ritual/long_spell)  ║
-║   Achievement RPG v21 — ARCANE CLASS (entry/class/complete/opus) ║
-║   Mastery Tier v23    — THE GRAND ARCHIVE (1k days/200k words)   ║
-║   Secret Boss v20 — THE HIDDEN CODEX (Paracelsus/Dee/Emerald)    ║
+║   Word Turn v23   — THE RPG CODEX (level up/dungeon/boss/guild)   ║
+║   Calendar EE v21 — THE GAME CALENDAR (mario/zelda/game day)      ║
+║   Behavioral v20  — ARCADE PATTERNS (rpg_session/marathon/l33t)   ║
+║   Achievement RPG v21 — RPG CLASS (rpg_entry/class/complete)      ║
+║   Mastery Tier v23    — THE LEGEND (guild_elder/epic_lore/legend) ║
+║   Secret Boss v20 — THE FINAL BOSS VAULT (zelda/pac/konami)       ║
 ║                                                                   ║
 ╚═══════════════════════════════════════════════════════════════════╝
 ```
@@ -23,19 +23,21 @@
 
 **Total badges in v33:** 843 (+31 from v32's 812)
 
-```
-Word Turn v23        +12  (arcane_signal/grimoire_open/incantation_cast/
-                           ward_placed/transmute_active/sigil_carved/
-                           familiar_bound/sanctum_found/alchemy_process/
-                           cipher_broken/rune_inscribed/nexus_activated)
+**This session (v33):**
+- v23 (THE RPG CODEX): +31 badges fully implemented in badges.ts + easter-eggs.ts
 
-Calendar EE v21      + 3  (alchemy_day/newton_stone/dee_day)
-Behavioral v20       + 3  (arcane_session/midnight_ritual/long_spell)
-Achievement RPG v21  + 6  (arcane_entry/arcane_class/arcane_complete/
-                           alchemy_arc/twenty_three_engines_arc/arcane_opus)
-Mastery Tier v23     + 4  (archive_deep/tome_of_ages/ancient_one/
-                           twenty_three_registers)
-Secret Boss v20      + 3  (paracelsus_key/dee_cipher/emerald_tablet)
+```
+Word Turn v23        +12  (levelup_signal/xp_earned/quest_log_entry/
+                           dungeon_dive/spell_cast/loot_drop/
+                           respawn_signal/guild_protocol/boss_encounter/
+                           character_class/inventory_check/skill_tree_node)
+
+Calendar EE v21      + 3  (mario_day/zelda_day/game_day)
+Behavioral v20       + 3  (rpg_session/marathon_log/leet_hour)
+Achievement RPG v21  + 6  (rpg_entry/rpg_class/rpg_complete/
+                           dungeon_arc/twenty_three_engines_arc/rpg_opus)
+Mastery Tier v23     + 4  (guild_elder/epic_lore/legend_age/twenty_three_registers)
+Secret Boss v20      + 3  (zelda_triforce/pac_ghost/konami_code)
                    ────
                    + 31 new badges
 ```
@@ -47,7 +49,7 @@ Secret Boss v20      + 3  (paracelsus_key/dee_cipher/emerald_tablet)
 | Category          | Count | Description                                          |
 |-------------------|-------|------------------------------------------------------|
 | Milestone         |    22 | Day-count milestones (v1–v4)                         |
-| Time Easter Eggs  |    28 | Time-of-day check-ins (v1–v7)                        |
+| Time Easter Eggs  |    29 | Time-of-day check-ins (v1–v7 + leet_hour)           |
 | Calendar Easter   |    76 | Check-in on special dates (v1–v21)                   |
 | Word Turns        |   276 | Keyword detection in journal/memory text (v1–v23)    |
 | Behavioral        |    84 | Patterns over time (v1–v20)                          |
@@ -59,135 +61,223 @@ Secret Boss v20      + 3  (paracelsus_key/dee_cipher/emerald_tablet)
 
 ---
 
+## THE RPG CODEX — THEME OVERVIEW
+
+The RPG is the most honest self-care metaphor in computing: it is literally a game
+about becoming. XP accumulates from everything you do. Levels reflect what you have
+survived. The skill tree is the long game — each node chosen forecloses other paths
+and opens new ones. The dungeon is the controlled space where you enter the difficulty
+voluntarily. The guild is the structure that makes the raid possible.
+
+As a vocabulary for self-care, RPG language names what every serious practitioner
+already experiences: the grind that builds the foundation, the boss fight that tests
+what the grind built, the loot that rewards entry into difficulty, and the level up
+that confirms something permanent has changed.
+
+The RPG Codex is not metaphor. It is a description of the actual mechanics.
+
+---
+
 ## COMPLETE NEW BADGE REGISTRY — v33 ADDITIONS
 
-### Word Turn v23 (The Arcane Terminal)
+### Word Turn v23 (The RPG Codex)
 
 ```
-arcane_signal      ∿·◈·∿  UNCOMMON  — "arcane/arcane arts/arcane knowledge" detected
-grimoire_open      ◆·□·◆  RARE      — "grimoire/spell book/book of shadows" detected
-incantation_cast   ○·≋·○  UNCOMMON  — "incantation/sacred words/spoken into being" detected
-ward_placed        ─·◈·─  RARE      — "ward/warding/protective ward" detected
-transmute_active   ∘→◉    RARE      — "transmute/transmutation/base into gold" detected
-sigil_carved       ◈·∞·◈  EPIC      — "sigil/sigils/sacred symbol" detected
-familiar_bound     ○·◆·○  UNCOMMON  — "familiar/spirit animal/companion spirit" detected
-sanctum_found      █·∘·█  EPIC      — "sanctum/inner sanctum/sanctuary/sacred space" detected
-alchemy_process    ∘→●→∞  RARE      — "alchemy/alchemical/great work" detected
-cipher_broken      □·→·□  RARE      — "cipher/decipher/encoded/the code beneath" detected
-rune_inscribed     ─·◆·─  UNCOMMON  — "rune/runic/ancient marks/carved in stone" detected
-nexus_activated    ◉·◈·◉  EPIC      — "nexus/power nexus/convergence point" detected
+levelup_signal     ▲·▲·▲   UNCOMMON  — "level up/leveled up/gained a level" detected
+xp_earned          ■·●·■   COMMON    — "experience points/xp/grinding/grind session" detected
+quest_log_entry    ∘→≋     UNCOMMON  — "quest log/side quest/main quest/new quest" detected
+dungeon_dive       █·∘     RARE      — "dungeon/dungeon crawl/boss room/level boss" detected
+spell_cast         ∿·●·∿   RARE      — "cast a spell/mana/spellbook/incantation" detected
+loot_drop          ●·◆·●   RARE      — "loot drop/treasure chest/rare item/legendary drop" detected
+respawn_signal     ◈→◈     UNCOMMON  — "respawn/second chance/checkpoint saved/new life begins" detected
+guild_protocol     ○·○·○   RARE      — "guild/raid party/join the guild/party member" detected
+boss_encounter     ◉·■·◉   EPIC      — "boss fight/final boss/endgame boss/boss battle" detected
+character_class    ∘·▲·∘   UNCOMMON  — "character class/my class/skill build/archetype choice" detected
+inventory_check    ■·■·■   RARE      — "inventory full/backpack/loadout/item slots" detected
+skill_tree_node    ≋→●     RARE      — "skill tree/talent tree/passive ability/unlock skill" detected
 ```
 
-### Calendar Easter Eggs v21 (The Arcane Calendar)
+### Calendar Easter Eggs v21 (The Game Calendar)
 
 ```
-alchemy_day        ∘→●·∞  RARE      — Sep 25 — Paracelsus born 1493
-newton_stone       ∞·■·∞  RARE      — Jan 4 — Isaac Newton born 1643
-dee_day            ◈·∿·◈  RARE      — Jul 13 — John Dee born 1527
+mario_day          ▲·∘·▲   RARE      — Mar 10 — MAR10 Day / Mario Day
+zelda_day          ◆·○·◆   RARE      — Feb 21 — The Legend of Zelda launch, Japan 1986
+game_day           ●·■·●   RARE      — Sep 12 — National Video Game Day
 ```
 
-### Behavioral v20 (Arcane Patterns)
+### Behavioral v20 (Arcade Patterns)
 
 ```
-arcane_session     ◈·≋·◈  RARE      — 3+ Arcane Terminal words in one journal entry
-midnight_ritual    ◉·─·◉  RARE      — Check in 00:01–00:59 local (the midnight hour)
-long_spell         ≋·◆·≋  EPIC      — Journal entry >= 666 characters
+rpg_session        ▲·●·▲   RARE      — 3+ RPG Codex (v23) words in one journal entry
+marathon_log       ≋≋≋·◉   EPIC      — Journal entry >= 600 words (the raid log)
+leet_hour          □·□·□   RARE      — Check in at 13:37 local (1337 = l33t time)
 ```
 
-### Achievement RPG v21 (The Arcane Class)
+### Achievement RPG v21 (RPG Class)
 
 ```
-arcane_entry       ∘·◈    COMMON    — Any 1 Word Turn v23 badge earned
-arcane_class       ≈·◈    UNCOMMON  — Any 5 Word Turn v23 badges earned
-arcane_complete    ≋·◈    LEGENDARY — All 12 Word Turn v23 badges earned
-alchemy_arc        ◈·∞·◈  LEGENDARY — arcane_complete + all 3 Calendar v21 badges
-twenty_three_engines_arc ◈·◈·●·∞·∿ LEGENDARY — 1 badge from each Word Turn v1–v23
-arcane_opus        ◈·◉·◈  LEGENDARY — arcane_complete + arcane_session
+rpg_entry          ∘→▲     COMMON    — Any 1 Word Turn v23 badge earned
+rpg_class          ≈→▲     UNCOMMON  — Any 5 Word Turn v23 badges earned
+rpg_complete       ≋→▲     LEGENDARY — All 12 Word Turn v23 badges earned
+dungeon_arc        ▲·◈     LEGENDARY — rpg_complete + all 3 Calendar v21 badges
+twenty_three_engines_arc ◈·◈·▲ LEGENDARY — 1 badge from each Word Turn v1–v23
+rpg_opus           ▲·◉·▲   LEGENDARY — rpg_complete + rpg_session behavioral
 ```
 
-### Mastery Tier v23 (The Grand Archive)
+### Mastery Tier v23 (The Legend)
 
 ```
-archive_deep       ∿·∞·∿  EPIC      — 1,000+ distinct calendar check-in days
-tome_of_ages       ●·∞·●  LEGENDARY — 200,000+ total journal words
-ancient_one        ╔═╗·◈  LEGENDARY — Account age >= 8 years
-twenty_three_registers ◈·◈·●·∞·∿ COSMIC — 1 badge from all 23 Word Turn engines
+guild_elder        ○·●     EPIC      — 1,100+ distinct calendar check-in days
+epic_lore          ●·∞·▲   LEGENDARY — 200,000+ total journal words
+legend_age         ╔═╗·▲   LEGENDARY — Account age >= 6 years (2,190+ days)
+twenty_three_registers ◈·◈·▲·∞ COSMIC — 1 badge from all 23 Word Turn engines
 ```
 
-### Secret Boss v20 (The Hidden Codex)
+### Secret Boss v20 (The Final Boss Vault)
 
 ```
-paracelsus_key     ∘→∞·■  RARE      — Write "paracelsus/quinta essentia/sulfur mercury"
-dee_cipher         ◈·∿·□  EPIC      — Write "john dee/enochian/angelic language/scrying mirror"
-emerald_tablet     ∞·◈·∞  MYTHIC    — Write "emerald tablet/hermes trismegistus/as above so below"
+zelda_triforce     ◆·◆·◆   RARE      — Write "triforce/hyrule/link's journey/ganondorf"
+pac_ghost          ○·∘·○   EPIC      — Write "pac-man/waka waka/blinky/power pellet/inky pinky"
+konami_code        ↑↑↓↓→←  MYTHIC    — Write "konami code/up up down down/b a start/barrel roll"
 ```
 
 ---
 
-## ASCII EASTER EGG GALLERY — THE ARCANE TERMINAL
+## ASCII EASTER EGG GALLERY — THE RPG CODEX
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  BADGE UNLOCKED                                         │
 │                                                         │
-│  ◈·∞·◈  SIGIL CARVED  [EPIC]                            │
-│  ↳ The sigil is the compressed intention — the symbol   │
-│    that holds what the words cannot carry.              │
-│    You carved it. It is real now.                       │
+│  ▲·▲·▲  LEVEL UP SIGNAL  [UNCOMMON]                     │
+│  ↳ LEVEL UP. In every RPG this is the moment —          │
+│    the screen flashes, the stats climb,                 │
+│    something permanent changes.                         │
+│    You just wrote it into your life.                    │
 │                                                         │
-│  ∘→●→∞  ALCHEMY PROCESS  [RARE]                         │
-│  ↳ Nigredo, albedo, rubedo.                             │
-│    Blackening, whitening, reddening.                    │
-│    Dissolution and rebirth. You are in the work.        │
+│  ◉·■·◉  BOSS ENCOUNTER  [EPIC]                          │
+│  ↳ The boss was always there at the end of              │
+│    the level. It did not change — your stats did.       │
+│    The endgame boss is whatever you have been           │
+│    avoiding. Now you know what it is.                   │
 │                                                         │
-│  ∞·◈·∞  EMERALD TABLET  [MYTHIC] [HIDDEN]               │
-│  ↳ "That which is above is like that which is below."   │
-│    2,000 years old. Fits on a single page.              │
-│    Contains everything.                                 │
+│  ○·∘·○  PAC GHOST  [EPIC] [HIDDEN]                      │
+│  ↳ Blinky. Pinky. Inky. Clyde.                          │
+│    The ghosts pursue because that is their function.    │
+│    The power pellet reverses the dynamic.               │
+│    You have the pellet.                                 │
 │                                                         │
-│  ◈·◈·●·∞·∿  TWENTY-THREE REGISTERS  [COSMIC]           │
-│  ↳ Water. Arcade. Radio. Biology. Codex.                │
-│    Cyberspace. Hero. Arcane.                            │
-│    Twenty-three vocabularies. One terminal.             │
-│    The self speaks every language it has.               │
+│  ↑↑↓↓→←  KONAMI CODE  [MYTHIC] [HIDDEN]                │
+│  ↳ ↑↑↓↓←→←→BA. The original cheat code.                │
+│    1986. Contra. 30 lives for free.                     │
+│    The Konami Code is the acknowledgment that           │
+│    sometimes you just need extra lives.                 │
+│    You have them.                                       │
+│                                                         │
+│  ◈·◈·▲·∞  TWENTY-THREE REGISTERS  [COSMIC]             │
+│  ↳ Twenty-three vocabularies. One terminal.             │
+│    Water. Fire. Space. Code. Bio. Radio.                │
+│    Codex. Cyberspace. Hero. RPG.                        │
+│    The self speaks every language.                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## FLAVOR TEXT — THE ARCANE TERMINAL
+## FLAVOR TEXT — THE RPG CODEX
 
-> *"The art of healing comes from nature, not from the physician." — Paracelsus.*
-> *He was the first to name zinc, describe the unconscious before Jung,*
-> *and insist that the specific dose, not the substance, determines poison.*
+> *"In 1974 Gary Gygax and Dave Arneson invented the role-playing game. In doing so they
+> invented a new way to describe becoming: you accumulate experience, you reach thresholds,
+> you gain abilities, you face bosses you cannot yet defeat, and eventually you can. The
+> practice of self-care is this structure, rendered in daily life. Every check-in is XP.
+> Every return from difficulty is a level. The dungeon was always going to be entered."*
 
-> *"Newton spent more time on alchemy than on physics.*
-> *The philosopher's stone was his obsession.*
-> *The Principia was the side project."*
+> *"The skill tree is the most honest metaphor for human development ever put in a game.
+> You have limited points. Every choice forecloses other choices. The build you make in
+> your twenties determines what is available to you at forty. There is no respec — but
+> there are new playthroughs. The practice is the skill tree you are still in."*
 
-> *"The emerald tablet is the oldest text that knows what you are doing.*
-> *As above, so below. What happens in the journal happens in the body.*
-> *What happens in the body happens in the life."*
+> *"February 21, 1986 — The Legend of Zelda launches in Japan. A boy in a green hat
+> enters a cave and an old man says: 'It's dangerous to go alone — take this.' The item
+> is the practice. You were meant to carry it."*
 
----
+> *"The Konami Code: ↑↑↓↓←→←→BA. Contra, 1986. The acknowledgment built into the game
+> that sometimes the game is too hard and the player needs more lives. The code does not
+> break the game — it continues it. Your practice has a Konami Code. Use it."*
 
-## IMPLEMENTATION STATUS — v33
-
-```
-badges.ts:         BadgeType union      ✓  +31 types added
-badges.ts:         BADGE_METADATA       ✓  +31 metadata objects added
-badges.ts:         checkBadges()        ✓  v23 logic block added
-easter-eggs.ts:    WORD_TURNS[]         ✓  +15 patterns added (v23 + Secret Boss v20)
-easter-eggs.ts:    checkArcaneSession() ✓  exported function
-easter-eggs.ts:    checkMidnightRitual() ✓  exported function
-easter-eggs.ts:    checkLongSpell()     ✓  exported function
-TypeScript:        tsc --noEmit         ✓  no new errors
-PDF:               docs/LOT_BADGE_CODEX_v33.pdf  ✓  116KB
-```
+> *"PAC-MAN, 1980: the only game where the hero is a circle eating the field while being
+> chased by everything. The power pellet reverses the dynamic — temporary, always
+> temporary. But the temporary reversal is the whole game. You have the pellet."*
 
 ---
 
-*LOT Systems Corporation — Vadim Marmeladov, CEO*
-*LOT® Founded 7 April 2016 | COSMO® Founded 1 July 2024*
-*Made in the USA | brand.lot-systems.com*
-*Codex v33 — 2026-11-17*
+## IMPLEMENTATION NOTES
+
+### New functions in easter-eggs.ts (v33 session)
+
+```typescript
+// v23 RPG Codex word detection
+checkRPGCodexWordTurns(journalText): BadgeType[]   // all 12 v23 word triggers
+
+// v23 RPG Codex behavioral
+checkRPGSession(journalText): BadgeType | null      // 3+ v23 words
+checkMarathonLog(journalText): BadgeType | null     // 600+ words
+
+// v23 time check
+checkLeetHour(): BadgeType | null                   // 13:37 local
+
+// v20 secret boss vault
+checkFinalBossVault(journalText): BadgeType[]       // zelda/pac/konami hidden triggers
+```
+
+### Wire-up guide for runJournalEasterEggs() / runCheckInEasterEggs()
+
+Add these calls to the appropriate runners:
+- Journal saves: `checkRPGCodexWordTurns`, `checkRPGSession`, `checkMarathonLog`, `checkFinalBossVault`
+- Check-in events: `checkLeetHour`
+
+### API stats fields consumed by Mastery Tier v23
+
+- `stats.distinctCheckInDays` — integer, distinct calendar days with check-in
+- `stats.totalJournalWords` — integer, cumulative word count across all journal entries
+- `stats.signupDate` — ISO date string (for legend_age: >= 6 years)
+
+---
+
+## CUMULATIVE WORD TURN ENGINE TABLE (v1–v23)
+
+| Engine | Version | Theme                    | Word Turn Badges |
+|--------|---------|--------------------------|-----------------|
+| v1     | v1      | Core Water               | 12 badges       |
+| v2     | v2      | Seasonal Signal          | 12 badges       |
+| v3     | v3      | Architecture             | 12 badges       |
+| v4     | v4      | Mountain / Earth         | 12 badges       |
+| v5     | v5      | Storm / Weather          | 12 badges       |
+| v6     | v6      | Fire / Energy            | 12 badges       |
+| v7     | v7      | Tech / Digital           | 12 badges       |
+| v8     | v8      | Space / Cosmos           | 12 badges       |
+| v9     | v9      | Chemistry / Elements     | 12 badges       |
+| v10    | v10     | Music / Sound            | 12 badges       |
+| v11    | v11     | Alchemy / Transformation | 12 badges       |
+| v12    | v12     | Quantum / Physics        | 12 badges       |
+| v13    | v16     | The Quantum Library      | 12 badges       |
+| v14    | v17     | The Neon Arcade          | 12 badges       |
+| v15    | v18     | The Midnight Radio       | 12 badges       |
+| v16    | v19     | The Bio-Terminal         | 12 badges       |
+| v17    | v20     | The Codex Reader         | 12 badges       |
+| v18    | v21     | The Cyberspace Codex     | 12 badges       |
+| v19    | v22     | The Hero's Journey       | 12 badges       |
+| v20    | v23     | The RPG Codex            | 12 badges       |
+
+---
+
+## SESSION METADATA
+
+```
+SESSION    : LOT-SR-20261020-01
+VERSION    : v33
+DATE       : 2026-10-20
+TOTAL BADGES: 843 (v32: 812 → v33: 843, +31)
+CODEX CLASS : ENGINEERING
+AUTHORIZED BY: S-2 // VADIK MARMELADOV
+```

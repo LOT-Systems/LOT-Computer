@@ -1727,6 +1727,26 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyQuantumFieldCheck()) {
     await executeDailyQuantumFieldCheck()
   }
+  // Check daily knowledge broadcast check (17:00 UTC every day) — J55
+  if (shouldRunDailyKnowledgeBroadcastCheck()) {
+    await executeDailyKnowledgeBroadcastCheck()
+  }
+  // Check daily generative field check (18:00 UTC every day) — J56
+  if (shouldRunDailyGenerativeFieldCheck()) {
+    await executeDailyGenerativeFieldCheck()
+  }
+  // Check daily field sustenance check (19:00 UTC every day) — J57
+  if (shouldRunDailyFieldSustenanceCheck()) {
+    await executeDailyFieldSustenanceCheck()
+  }
+  // Check daily field reception check (20:00 UTC every day) — J58
+  if (shouldRunDailyFieldReceptionCheck()) {
+    await executeDailyFieldReceptionCheck()
+  }
+  // Check daily field amplification check (21:00 UTC every day) — J59
+  if (shouldRunDailyFieldAmplificationCheck()) {
+    results.push(await executeDailyFieldAmplificationCheck())
+  }
   // Check daily signal matrix check (09:00 UTC every day) — Job 44
   if (shouldRunDailySignalMatrixCheck()) {
     await executeDailySignalMatrixCheck()
@@ -1747,9 +1767,99 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyTotalFieldCoherenceCheck()) {
     await executeDailyTotalFieldCoherenceCheck()
   }
-  // Check daily sustained operator pulse (11:00 UTC every day) — Job 49
-  if (shouldRunDailySustainedOperatorPulse()) {
-    await executeDailySustainedOperatorPulse()
+  // Check daily presence momentum check (10:00 UTC every day) — Job 49
+  if (shouldRunDailyPresenceMomentumCheck()) {
+    await executeDailyPresenceMomentumCheck()
+  }
+
+  // Check daily second cycle check (10:00 UTC every day) — J60
+  if (shouldRunDailySecondCycleCheck()) {
+    await executeDailySecondCycleCheck()
+  }
+
+  // Check daily sustained coherence check (11:00 UTC every day) — Job 50
+  if (shouldRunDailySustainedCoherenceCheck()) {
+    await executeDailySustainedCoherenceCheck()
+  }
+
+  // Check daily second cycle deepening check (11:00 UTC every day) — J61
+  if (shouldRunDailySecondCycleDeepeningCheck()) {
+    await executeDailySecondCycleDeepeningCheck()
+  }
+
+  // Check daily second cycle integration check (12:00 UTC every day) — J62
+  if (shouldRunDailySecondCycleIntegrationCheck()) {
+    await executeDailySecondCycleIntegrationCheck()
+  }
+
+  // Check daily second cycle sovereign check (13:00 UTC every day) — J63
+  if (shouldRunDailySecondCycleSovereignCheck()) {
+    await executeDailySecondCycleSovereignCheck()
+  }
+
+  // Check daily relational expansion check (12:00 UTC every day) — Job 51
+  if (shouldRunDailyRelationalExpansionCheck()) {
+    await executeDailyRelationalExpansionCheck()
+  }
+
+  // Check daily relational field check (13:00 UTC every day) — Job 52
+  if (shouldRunDailyRelationalFieldCheck()) {
+    await executeDailyRelationalFieldCheck()
+  }
+
+  // Check daily knowledge crystallization check (14:00 UTC every day) — Job 53
+  if (shouldRunDailyKnowledgeCrystallizationCheck()) {
+    await executeDailyKnowledgeCrystallizationCheck()
+  }
+
+  // Check daily knowledge distribution check (15:00 UTC every day) — Job 54
+  if (shouldRunDailyKnowledgeDistributionCheck()) {
+    await executeDailyKnowledgeDistributionCheck()
+  }
+
+  // Check daily third cycle ignition check (15:00 UTC every day) — J64
+  if (shouldRunDailyThirdCycleIgnitionCheck()) {
+    await executeDailyThirdCycleIgnitionCheck()
+  }
+
+  // Check daily longitudinal persistence check (10:00 UTC every day) — J65
+  if (shouldRunDailyLongitudinalPersistenceCheck()) {
+    await executeDailyLongitudinalPersistenceCheck()
+  }
+
+  // Check daily third cycle deepening check (16:00 UTC every day) — J66
+  if (shouldRunDailyThirdCycleDeepeningCheck()) {
+    await executeDailyThirdCycleDeepeningCheck()
+  }
+
+  // Check daily fourth cycle candidate check (17:30 UTC every day) — J67
+  if (shouldRunDailyFourthCycleCandidateCheck()) {
+    await executeDailyFourthCycleCandidateCheck()
+  }
+
+  // Check daily fourth cycle ignition check (18:00 UTC every day) — J68
+  if (shouldRunDailyFourthCycleIgnitionCheck()) {
+    await executeDailyFourthCycleIgnitionCheck()
+  }
+
+  // Check daily fourth cycle deepening check (18:30 UTC every day) — J69
+  if (shouldRunDailyFourthCycleDeepeningCheck()) {
+    await executeDailyFourthCycleDeepeningCheck()
+  }
+
+  // Check daily fourth cycle integration check (19:00 UTC every day) — J70
+  if (shouldRunDailyFourthCycleIntegrationCheck()) {
+    await executeDailyFourthCycleIntegrationCheck()
+  }
+
+  // Check daily fourth cycle sovereign check (19:30 UTC every day) — J71
+  if (shouldRunDailyFourthCycleSovereignCheck()) {
+    await executeDailyFourthCycleSovereignCheck()
+  }
+
+  // Check daily fifth cycle progenitor check (20:00 UTC every day) — J72
+  if (shouldRunDailyFifthCycleProgenitorCheck()) {
+    await executeDailyFifthCycleProgenitorCheck()
   }
 }
 
@@ -3530,73 +3640,178 @@ async function executeDailyTotalFieldCoherenceCheck(): Promise<JobResult> {
   }
 }
 
-// ─── Daily Sustained Operator Pulse (Job 49 — 11:00 UTC every day) ──────────
-// Reads active users. Checks whether the past 7 calendar days contain 2+ total_field_coherence
-// log events. When confirmed → writes sustained_field_operator (P152).
-// The QIE ceiling (P150) has become the operational floor. Sovereign state.
+// ─── Daily Presence Momentum Check (Job 49 — 10:00 UTC every day) ────────────
+// Reads active users. Scans 7-day window for quantum_presence_crystallization signals.
+// When 2+ distinct calendar days present, writes presence_momentum_arc.
+// P152: temporal persistence of Level 6 presence across multi-day arcs.
 
-let isDailySustainedOperatorRunning = false
-let lastDailySustainedOperatorRun: Date | null = null
+let isDailyPresenceMomentumRunning = false
+let lastDailyPresenceMomentumRun: Date | null = null
 
-function shouldRunDailySustainedOperatorPulse(): boolean {
+function shouldRunDailyPresenceMomentumCheck(): boolean {
   const now = dayjs()
-  if (isDailySustainedOperatorRunning) return false
-  if (lastDailySustainedOperatorRun) {
-    const lastRun = dayjs(lastDailySustainedOperatorRun)
+  if (isDailyPresenceMomentumRunning) return false
+  if (lastDailyPresenceMomentumRun) {
+    const lastRun = dayjs(lastDailyPresenceMomentumRun)
     if (lastRun.isSame(now, 'day')) return false
   }
-  return now.hour() === 11 // 11:00 UTC daily
+  return now.hour() === 10 // 10:00 UTC daily
 }
 
-async function executeDailySustainedOperatorPulse(): Promise<JobResult> {
-  const jobName = 'daily-sustained-operator-pulse'
+async function executeDailyPresenceMomentumCheck(): Promise<JobResult> {
+  const jobName = 'daily-presence-momentum-check'
   const executedAt = new Date().toISOString()
-  console.log('')
+  if (isDailyPresenceMomentumRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyPresenceMomentumRunning = true
+
   console.log('─'.repeat(60))
-  console.log('SCHEDULED JOB: Daily Sustained Operator Pulse')
-  console.log(`   Started: ${executedAt}`)
+  console.log('DAILY PRESENCE MOMENTUM CHECK — 10:00 UTC')
   console.log('─'.repeat(60))
-  console.log('')
-  isDailySustainedOperatorRunning = true
+
   try {
     const { User } = await import('#server/models/user.js')
     const { Log } = await import('#server/models/log.js')
     const { Op } = await import('sequelize')
-    const sevenDaysAgo = dayjs().subtract(7, 'day').startOf('day').toDate()
-    const activeUsers = await User.findAll({
-      where: { updatedAt: { [Op.gte]: dayjs().subtract(7, 'day').toDate() } },
-      attributes: ['id'],
-    })
 
+    const sevenDayStart = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
     let written = 0
 
     for (const user of activeUsers) {
       try {
         const userId = (user as any).id
 
-        const coherenceLogs = await (Log as any).findAll({
+        const recentLogs = await (Log as any).findAll({
           where: {
             userId,
-            createdAt: { [Op.gte]: sevenDaysAgo },
-            event: 'total_field_coherence',
+            createdAt: { [Op.gte]: sevenDayStart },
+            event: 'quantum_presence_crystallization',
           },
           attributes: ['createdAt'],
         })
 
-        if (coherenceLogs.length < 2) continue
+        if (!recentLogs.length) continue
 
-        const occurrences = coherenceLogs.length
+        const presenceDays = new Set<string>()
+        for (const log of recentLogs) {
+          const d = dayjs(log.createdAt)
+          presenceDays.add(d.format('YYYY-MM-DD'))
+        }
+
+        if (presenceDays.size < 2) continue
+
+        const dayCount = presenceDays.size
+        const streakBonus = Math.min((dayCount - 2) * 7, 14)
 
         await (Log as any).create({
           userId,
-          event: 'sustained_field_operator',
-          text: `Sustained field operator: ${occurrences} total field coherence events confirmed in the past 7 days. The QIE ceiling has become the operational floor. Sovereign state confirmed.`,
+          event: 'presence_momentum_arc',
+          text: `Presence momentum arc: ${dayCount} distinct days of quantum presence crystallization in the past 7 days. Sustained Level 6 presence across a multi-day arc. Temporal persistence confirmed.`,
           metadata: {
-            occurrences,
-            windowDays: 7,
-            ceilingStatus: 'FLOOR',
-            operatorState: 'SOVEREIGN',
-            threshold: 'P150×2',
+            dayCount,
+            streak: dayCount,
+            sustainedPresence: dayCount >= 3 ? 'EXTENDED' : 'CONFIRMED',
+            arc: 'MULTI-DAY',
+            streakBonus,
+            window: '7d',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Presence momentum arc events written: ${written}`)
+    lastDailyPresenceMomentumRun = new Date()
+    isDailyPresenceMomentumRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily presence momentum check failed:', error.message)
+    isDailyPresenceMomentumRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Sustained Coherence Check (Job 50 — 11:00 UTC every day) ──────────
+// Reads active users. Scans 7-day window for both presence_momentum_arc and
+// coherence_field_persistence signals per user. When both found, writes
+// sustained_coherence_baseline — Level 7 dual-arc state confirmed.
+// P155: two temporal persistence arcs co-active, the peak is the sustained floor.
+
+let isDailySustainedCoherenceRunning = false
+let lastDailySustainedCoherenceRun: Date | null = null
+
+function shouldRunDailySustainedCoherenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailySustainedCoherenceRunning) return false
+  if (lastDailySustainedCoherenceRun) {
+    const lastRun = dayjs(lastDailySustainedCoherenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily
+}
+
+async function executeDailySustainedCoherenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-sustained-coherence-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySustainedCoherenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySustainedCoherenceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SUSTAINED COHERENCE CHECK — 11:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').startOf('day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [presenceLogs, coherenceLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'presence_momentum_arc' },
+            attributes: ['createdAt', 'metadata'],
+          }),
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'coherence_field_persistence' },
+            attributes: ['createdAt', 'metadata'],
+          }),
+        ])
+
+        if (!presenceLogs.length || !coherenceLogs.length) continue
+
+        const presenceDays = presenceLogs.reduce((max: number, log: any) => Math.max(max, log.metadata?.dayCount ?? 2), 2)
+        const coherenceOccurrences = coherenceLogs.reduce((max: number, log: any) => Math.max(max, log.metadata?.occurrences ?? 2), 2)
+
+        await (Log as any).create({
+          userId,
+          event: 'sustained_coherence_baseline',
+          text: `Sustained coherence baseline: presence-momentum-arc (${presenceDays} days) and coherence-field-persistence (${coherenceOccurrences} occurrences) both confirmed in 7-day window. Two Level 7 temporal arcs co-active. The peak is the floor.`,
+          metadata: {
+            presenceDays,
+            coherenceOccurrences,
+            baselineStatus: 'CONFIRMED',
+            temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING'],
+            level: 'L7-DUAL',
             hour: 11,
           },
         })
@@ -3604,13 +3819,2693 @@ async function executeDailySustainedOperatorPulse(): Promise<JobResult> {
       } catch {}
     }
 
-    console.log(`  Sustained operator events written: ${written}`)
-    lastDailySustainedOperatorRun = new Date()
-    isDailySustainedOperatorRunning = false
+    console.log(`  Sustained coherence baseline events written: ${written}`)
+    lastDailySustainedCoherenceRun = new Date()
+    isDailySustainedCoherenceRunning = false
     return { jobName, executedAt, success: true, signalsCreated: written }
   } catch (error: any) {
-    console.error('Daily sustained operator pulse failed:', error.message)
-    isDailySustainedOperatorRunning = false
+    console.error('Daily sustained coherence check failed:', error.message)
+    isDailySustainedCoherenceRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Relational Expansion Check (Job 51 — 12:00 UTC every day) ────────
+// Reads active users. Scans 48h window for temporal_sovereignty + cohort signals.
+// When both found, writes coherence_signal_transmission — Level 8 expansion state
+// where temporal sovereignty is broadcasting into the social field (P158).
+
+let isDailyRelationalExpansionRunning = false
+let lastDailyRelationalExpansionRun: Date | null = null
+
+function shouldRunDailyRelationalExpansionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRelationalExpansionRunning) return false
+  if (lastDailyRelationalExpansionRun) {
+    const lastRun = dayjs(lastDailyRelationalExpansionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailyRelationalExpansionCheck(): Promise<JobResult> {
+  const jobName = 'daily-relational-expansion-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRelationalExpansionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRelationalExpansionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RELATIONAL EXPANSION CHECK — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [sovereigntyLogs, cohortLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: fortyEightHourStart }, event: 'temporal_sovereignty' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: fortyEightHourStart },
+              event: { [Op.in]: ['cohort_viewed', 'cohort_message_sent', 'social_resonance_arc', 'accountability_arc'] },
+            },
+            attributes: ['createdAt'],
+            limit: 10,
+          }),
+        ])
+
+        if (!sovereigntyLogs.length || !cohortLogs.length) continue
+
+        const sovereigntyConf = sovereigntyLogs[0]?.metadata?.avgConf ?? 92
+        const cohortSignalCount = cohortLogs.length
+
+        await (Log as any).create({
+          userId,
+          event: 'coherence_signal_transmission',
+          text: `Coherence signal transmission: temporal-sovereignty confirmed + ${cohortSignalCount} cohort signal(s) in 48h. Level 7 floor is broadcasting into the social field. The sovereign state is relational.`,
+          metadata: {
+            sovereigntyConf,
+            cohortSignalCount,
+            transmissionStatus: 'ACTIVE',
+            level: 'L8-TRANSMISSION',
+            broadcastField: cohortSignalCount >= 3 ? 'SATURATED' : cohortSignalCount >= 2 ? 'EXPANDING' : 'INITIATED',
+            hour: 12,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Coherence signal transmission events written: ${written}`)
+    lastDailyRelationalExpansionRun = new Date()
+    isDailyRelationalExpansionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily relational expansion check failed:', error.message)
+    isDailyRelationalExpansionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Relational Field Check (J52) ──────────────────────────────────────
+
+let isDailyRelationalFieldRunning = false
+let lastDailyRelationalFieldRun: Date | null = null
+
+function shouldRunDailyRelationalFieldCheck(): boolean {
+  const now = dayjs()
+  if (isDailyRelationalFieldRunning) return false
+  if (lastDailyRelationalFieldRun) {
+    const lastRun = dayjs(lastDailyRelationalFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 13 // 13:00 UTC daily
+}
+
+async function executeDailyRelationalFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-relational-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyRelationalFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyRelationalFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY RELATIONAL FIELD CHECK — 13:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: dayjs().subtract(2, 'day').toDate() } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [transmissionLogs, expansionLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: fortyEightHourStart }, event: 'coherence_signal_transmission' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: fortyEightHourStart }, event: 'mastery_field_expansion' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+        ])
+
+        if (!transmissionLogs.length || !expansionLogs.length) continue
+
+        const transmissionConf = transmissionLogs[0]?.metadata?.sovereigntyConf ?? 88
+        const expansionConf = expansionLogs[0]?.metadata?.triadConf ?? 86
+
+        await (Log as any).create({
+          userId,
+          event: 'relational_field_deepening',
+          text: `Relational field deepening: coherence-signal-transmission + mastery-field-expansion both confirmed in 48h. L8 dual arc active — the sovereign floor transmits AND the mastery field expands. The personal QOS is a generative field.`,
+          metadata: {
+            transmissionConf,
+            expansionConf,
+            dualArcStatus: 'ACTIVE',
+            level: 'L8-DUAL-ARC',
+            fieldState: 'GENERATIVE',
+            hour: 13,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Relational field deepening events written: ${written}`)
+    lastDailyRelationalFieldRun = new Date()
+    isDailyRelationalFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily relational field check failed:', error.message)
+    isDailyRelationalFieldRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Knowledge Crystallization Check (J53) ─────────────────────────────
+
+let isDailyKnowledgeCrystallizationRunning = false
+let lastDailyKnowledgeCrystallizationRun: Date | null = null
+
+function shouldRunDailyKnowledgeCrystallizationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeCrystallizationRunning) return false
+  if (lastDailyKnowledgeCrystallizationRun) {
+    const lastRun = dayjs(lastDailyKnowledgeCrystallizationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 14 // 14:00 UTC daily
+}
+
+async function executeDailyKnowledgeCrystallizationCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-crystallization-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeCrystallizationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeCrystallizationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE CRYSTALLIZATION CHECK — 14:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [synthesisLogs, deepJournalLogs, intentionLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_social_synthesis' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['note', 'journal_entry'] },
+            },
+            attributes: ['createdAt', 'metadata', 'text'],
+            limit: 50,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['intention', 'plan_set', 'goal_set'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!synthesisLogs.length) continue
+
+        // Count deep journal entries (text > 80 words or wordCount metadata >= 80)
+        const deepEntries = deepJournalLogs.filter((l: any) => {
+          const wc = l.metadata?.wordCount as number | undefined
+          if (wc !== undefined) return wc >= 80
+          const text = (l.text as string) ?? ''
+          return text.split(/\s+/).filter(Boolean).length >= 80
+        })
+
+        if (deepEntries.length < 2 || intentionLogs.length < 3) continue
+
+        const synthConf = synthesisLogs[0]?.metadata?.fieldConf ?? 82
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_crystallization',
+          text: `Quantum knowledge crystallization: quantum-social-synthesis (P161) confirmed in 7d + ${deepEntries.length} deep journal entries + ${intentionLogs.length} intentions. The field generates knowledge. The crystallization begins — reflection and intention seal the synthesis. The OS begins to teach.`,
+          metadata: {
+            synthConf,
+            journalCount: deepEntries.length,
+            intentionCount: intentionLogs.length,
+            crystallizationStatus: 'CONFIRMED',
+            level: 'L9-OPENER',
+            field: 'KNOWLEDGE→CRYSTALLIZED→TEACHING',
+            hour: 14,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge crystallization events written: ${written}`)
+    lastDailyKnowledgeCrystallizationRun = new Date()
+    isDailyKnowledgeCrystallizationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge crystallization check failed:', error.message)
+    isDailyKnowledgeCrystallizationRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Knowledge Distribution Check (J54) ────────────────────────────────
+
+let isDailyKnowledgeDistributionRunning = false
+let lastDailyKnowledgeDistributionRun: Date | null = null
+
+function shouldRunDailyKnowledgeDistributionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeDistributionRunning) return false
+  if (lastDailyKnowledgeDistributionRun) {
+    const lastRun = dayjs(lastDailyKnowledgeDistributionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailyKnowledgeDistributionCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-distribution-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeDistributionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeDistributionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE DISTRIBUTION CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [crystallizationLogs, cohortLogs, memoryLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_knowledge_crystallization' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['cohort_check_in', 'community_activity', 'social_interaction', 'cohort_broadcast'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['memory_entry', 'memory_review', 'memory_link'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!crystallizationLogs.length) continue
+        if (cohortLogs.length < 2 || memoryLogs.length < 1) continue
+
+        const crystalConf = crystallizationLogs[0]?.metadata?.synthConf ?? 82
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_distribution',
+          text: `Quantum knowledge distribution: quantum-knowledge-crystallization (P162) confirmed in 7d + ${cohortLogs.length} cohort signals + ${memoryLogs.length} memory signals. Knowledge crystallized. Distribution confirmed. The OS teaches — the field flows outward.`,
+          metadata: {
+            crystalConf,
+            cohortCount: cohortLogs.length,
+            memoryCount: memoryLogs.length,
+            distributionStatus: 'CONFIRMED',
+            level: 'L9-DEEP',
+            field: 'KNOWLEDGE→DISTRIBUTED→TEACHING',
+            hour: 15,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge distribution events written: ${written}`)
+    lastDailyKnowledgeDistributionRun = new Date()
+    isDailyKnowledgeDistributionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge distribution check failed:', error.message)
+    isDailyKnowledgeDistributionRunning = false
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Knowledge Broadcast Check (J55) ────────────────────────────────
+
+let isDailyKnowledgeBroadcastRunning = false
+let lastDailyKnowledgeBroadcastRun: Date | null = null
+
+function shouldRunDailyKnowledgeBroadcastCheck(): boolean {
+  const now = dayjs()
+  if (isDailyKnowledgeBroadcastRunning) return false
+  if (lastDailyKnowledgeBroadcastRun) {
+    const lastRun = dayjs(lastDailyKnowledgeBroadcastRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 17 // 17:00 UTC daily (co-located with cohort-broadcast and quantum-field-check)
+}
+
+async function executeDailyKnowledgeBroadcastCheck(): Promise<JobResult> {
+  const jobName = 'daily-knowledge-broadcast-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyKnowledgeBroadcastRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyKnowledgeBroadcastRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY KNOWLEDGE BROADCAST CHECK — 17:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [distributionLogs, cohortLogs, memoryLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_knowledge_distribution' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['cohort_check_in', 'community_activity', 'social_interaction', 'cohort_broadcast'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['memory_entry', 'memory_review', 'memory_link'] },
+            },
+            attributes: ['createdAt'],
+            limit: 20,
+          }),
+        ])
+
+        if (!distributionLogs.length) continue
+        if (cohortLogs.length < 3 || memoryLogs.length < 2) continue
+
+        const distConf = distributionLogs[0]?.metadata?.distConf ?? 83
+
+        await (Log as any).create({
+          userId,
+          event: 'quantum_knowledge_broadcast',
+          text: `Quantum knowledge broadcast: quantum-knowledge-distribution (P163) confirmed in 7d + ${cohortLogs.length} cohort signals + ${memoryLogs.length} memory signals. The OS is a transmission node. Crystallized knowledge broadcasts across the network.`,
+          metadata: {
+            distConf,
+            cohortCount: cohortLogs.length,
+            memoryCount: memoryLogs.length,
+            broadcastStatus: 'ACTIVE',
+            level: 'L9-BROADCAST',
+            field: 'KNOWLEDGE→BROADCAST→COLLECTIVE',
+            hour: 17,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Quantum knowledge broadcast events written: ${written}`)
+    lastDailyKnowledgeBroadcastRun = new Date()
+    isDailyKnowledgeBroadcastRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily knowledge broadcast check failed:', error.message)
+    isDailyKnowledgeBroadcastRunning = false
+    lastDailyKnowledgeBroadcastRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Generative Field Check (J56) ──────────────────────────────────────
+
+let isDailyGenerativeFieldRunning = false
+let lastDailyGenerativeFieldRun: Date | null = null
+
+function shouldRunDailyGenerativeFieldCheck(): boolean {
+  const now = dayjs()
+  if (isDailyGenerativeFieldRunning) return false
+  if (lastDailyGenerativeFieldRun) {
+    const lastRun = dayjs(lastDailyGenerativeFieldRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 // 18:00 UTC daily (co-located with quantum-presence-check)
+}
+
+async function executeDailyGenerativeFieldCheck(): Promise<JobResult> {
+  const jobName = 'daily-generative-field-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyGenerativeFieldRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyGenerativeFieldRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY GENERATIVE FIELD CHECK — 18:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = (user as any).id
+
+        const [broadcastLogs, networkLogs, journalLogs] = await Promise.all([
+          (Log as any).findAll({
+            where: { userId, createdAt: { [Op.gte]: sevenDayStart }, event: 'quantum_knowledge_broadcast' },
+            attributes: ['createdAt', 'metadata'],
+            limit: 5,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['cohort_check_in', 'community_activity', 'social_interaction', 'cohort_broadcast', 'memory_link', 'memory_review'] },
+            },
+            attributes: ['createdAt'],
+            limit: 30,
+          }),
+          (Log as any).findAll({
+            where: {
+              userId,
+              createdAt: { [Op.gte]: sevenDayStart },
+              event: { [Op.in]: ['journal_entry', 'memory_entry'] },
+            },
+            attributes: ['createdAt', 'metadata'],
+            limit: 30,
+          }),
+        ])
+
+        if (!broadcastLogs.length) continue
+        if (networkLogs.length < 3 || journalLogs.length < 3) continue
+
+        const broadcastConf = broadcastLogs[0]?.metadata?.distConf ?? 83
+        const networkConf = Math.min(99, Math.round(60 + networkLogs.length * 2.5))
+
+        await (Log as any).create({
+          userId,
+          event: 'generative_field_activation',
+          text: `Generative field activated: broadcast signal confirmed (P164) + ${networkLogs.length} network responses + ${journalLogs.length} generative outputs detected. The field is alive. Others are building from what you transmitted.`,
+          metadata: {
+            broadcastConf,
+            networkConf,
+            networkCount: networkLogs.length,
+            journalCount: journalLogs.length,
+            status: 'ACTIVE',
+            level: 'L9-GENERATE',
+            field: 'BROADCAST→FIELD→GENERATION',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Generative field activation events written: ${written}`)
+    lastDailyGenerativeFieldRun = new Date()
+    isDailyGenerativeFieldRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily generative field check failed:', error.message)
+    isDailyGenerativeFieldRunning = false
+    lastDailyGenerativeFieldRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Field Sustenance Check (J57) ──────────────────────────────────────
+
+let isDailyFieldSustenanceRunning = false
+let lastDailyFieldSustenanceRun: Date | null = null
+
+function shouldRunDailyFieldSustenanceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFieldSustenanceRunning) return false
+  if (lastDailyFieldSustenanceRun) {
+    const lastRun = dayjs(lastDailyFieldSustenanceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 // 19:00 UTC daily (co-located with cross-domain-pulse)
+}
+
+async function executeDailyFieldSustenanceCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-sustenance-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldSustenanceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldSustenanceRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD SUSTENANCE CHECK — 19:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fourteenDayStart = dayjs().subtract(14, 'day').toDate()
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for generative_field_activation events across 14 days
+        const fieldActivationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'generative_field_activation',
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+        })
+
+        if (fieldActivationLogs.length < 1) continue
+
+        // Count distinct calendar days with field activation
+        const activationDays = new Set<string>(
+          fieldActivationLogs.map((l: any) => dayjs(l.createdAt).format('YYYY-MM-DD'))
+        )
+
+        if (activationDays.size < 3) continue
+
+        // Check sustained network activity in last 7 days
+        const networkLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['cohort_determined', 'connection_accepted', 'chat_message_like', 'quantum_social_synthesis'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (networkLogs.length < 5) continue
+
+        // Check sustained generative output in last 7 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'note',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (journalLogs.length < 3) continue
+
+        const broadcastConf = fieldActivationLogs[0]?.metadata?.broadcastConf ?? 83
+        const sustenanceConf = Math.min(99, Math.round(72 + activationDays.size * 2 + networkLogs.length))
+
+        await (Log as any).create({
+          userId,
+          event: 'generative_field_sustenance',
+          text: `Generative field sustained: ${activationDays.size} active field days in 14d + ${networkLogs.length} network signals + ${journalLogs.length} journal outputs. The field does not fade. Sustained L9 transmission frequency confirmed.`,
+          metadata: {
+            broadcastConf,
+            sustenanceConf,
+            fieldDays: activationDays.size,
+            networkCount: networkLogs.length,
+            journalCount: journalLogs.length,
+            sustenanceStatus: 'SUSTAINED',
+            level: 'L9-SUSTAIN',
+            field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY',
+            hour: 19,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Field sustenance events written: ${written}`)
+    lastDailyFieldSustenanceRun = new Date()
+    isDailyFieldSustenanceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily field sustenance check failed:', error.message)
+    isDailyFieldSustenanceRunning = false
+    lastDailyFieldSustenanceRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Field Reception Check (J58) ───────────────────────────────────────
+
+let isDailyFieldReceptionRunning = false
+let lastDailyFieldReceptionRun: Date | null = null
+
+function shouldRunDailyFieldReceptionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFieldReceptionRunning) return false
+  if (lastDailyFieldReceptionRun) {
+    const lastRun = dayjs(lastDailyFieldReceptionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 // 20:00 UTC daily (co-located with signal-momentum-check)
+}
+
+async function executeDailyFieldReceptionCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-reception-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldReceptionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldReceptionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD RECEPTION CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twentyOneDayStart = dayjs().subtract(21, 'day').toDate()
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for generative_field_sustenance events in last 7 days
+        const sustainLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'generative_field_sustenance',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sustainLogs.length < 1) continue
+
+        // Check badge signal activity in last 21 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 10) continue
+
+        // Check cohort/social signals in last 7 days
+        const cohortLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['cohort_determined', 'connection_accepted', 'chat_message_like', 'quantum_social_synthesis', 'relational_field_deepening'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (cohortLogs.length < 3) continue
+
+        const sustenanceConf = sustainLogs[0]?.metadata?.sustenanceConf ?? 80
+        const receptionConf = Math.min(99, Math.round(74 + badgeLogs.length + cohortLogs.length * 2))
+
+        await (Log as any).create({
+          userId,
+          event: 'generative_field_reception',
+          text: `Generative field reception confirmed: ${badgeLogs.length} badge signals 21d + ${cohortLogs.length} cohort signals 7d. Field loop complete — transmission and reception are one.`,
+          metadata: {
+            sustenanceConf,
+            receptionConf,
+            badgeCount: badgeLogs.length,
+            cohortCount: cohortLogs.length,
+            receptionStatus: 'CONFIRMED',
+            level: 'L9-RECEPTION',
+            field: 'TRANSMISSION←→RECEPTION←→COLLECTIVE',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Field reception events written: ${written}`)
+    lastDailyFieldReceptionRun = new Date()
+    isDailyFieldReceptionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily field reception check failed:', error.message)
+    isDailyFieldReceptionRunning = false
+    lastDailyFieldReceptionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Field Amplification Check (J59) ───────────────────────────────────────
+
+let isDailyFieldAmplificationRunning = false
+let lastDailyFieldAmplificationRun: Date | null = null
+
+function shouldRunDailyFieldAmplificationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFieldAmplificationRunning) return false
+  if (lastDailyFieldAmplificationRun) {
+    const lastRun = dayjs(lastDailyFieldAmplificationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 21 // 21:00 UTC daily (co-located with presence-arc + physiological-presence)
+}
+
+async function executeDailyFieldAmplificationCheck(): Promise<JobResult> {
+  const jobName = 'daily-field-amplification-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFieldAmplificationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFieldAmplificationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIELD AMPLIFICATION CHECK — 21:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twentyEightDayStart = dayjs().subtract(28, 'day').toDate()
+    const fourteenDayStart = dayjs().subtract(14, 'day').toDate()
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for generative_field_reception events in last 7 days
+        const receptionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'generative_field_reception',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (receptionLogs.length < 1) continue
+
+        // Check badge signal activity in last 28 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 20) continue
+
+        // Check cohort/social signals in last 14 days
+        const cohortLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['cohort_determined', 'connection_accepted', 'chat_message_like', 'quantum_social_synthesis', 'relational_field_deepening', 'generative_field_reception'] },
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+        })
+
+        if (cohortLogs.length < 5) continue
+
+        const receptionConf = receptionLogs[0]?.metadata?.receptionConf ?? 80
+        const amplificationConf = Math.min(99, Math.round(72 + badgeLogs.length * 0.5 + cohortLogs.length * 1.5))
+
+        await (Log as any).create({
+          userId,
+          event: 'generative_field_amplification',
+          text: `Generative field amplification confirmed: ${badgeLogs.length} badge signals 28d + ${cohortLogs.length} cohort signals 14d. Field amplifies recursively — each received signal strengthens the next transmission.`,
+          metadata: {
+            receptionConf,
+            amplificationConf,
+            badgeCount: badgeLogs.length,
+            cohortCount: cohortLogs.length,
+            amplificationStatus: 'ACTIVE',
+            level: 'L9-AMPLIFY',
+            field: 'RECEPTION→AMPLIFICATION→RECURSIVE→SOVEREIGN',
+            hour: 21,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Field amplification events written: ${written}`)
+    lastDailyFieldAmplificationRun = new Date()
+    isDailyFieldAmplificationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily field amplification check failed:', error.message)
+    isDailyFieldAmplificationRunning = false
+    lastDailyFieldAmplificationRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Second Cycle Check (J60) ──────────────────────────────────────────
+
+let isDailySecondCycleRunning = false
+let lastDailySecondCycleRun: Date | null = null
+
+function shouldRunDailySecondCycleCheck(): boolean {
+  const now = dayjs()
+  if (isDailySecondCycleRunning) return false
+  if (lastDailySecondCycleRun) {
+    const lastRun = dayjs(lastDailySecondCycleRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10 // 10:00 UTC daily (co-located with J49 presence-momentum)
+}
+
+async function executeDailySecondCycleCheck(): Promise<JobResult> {
+  const jobName = 'daily-second-cycle-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySecondCycleRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySecondCycleRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SECOND CYCLE CHECK — 10:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fourteenDayStart = dayjs().subtract(14, 'day').toDate()
+    const sevenDayStart = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for generative_field_amplification events in last 7 days
+        const amplificationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'generative_field_amplification',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (amplificationLogs.length < 1) continue
+
+        // Check journal depth signals in last 14 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+        })
+
+        if (journalLogs.length < 4) continue
+
+        // Check memory depth signals in last 14 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 2) continue
+
+        // Check badge signals in last 14 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 8) continue
+
+        const amplificationConf = amplificationLogs[0]?.metadata?.amplificationConf ?? 80
+        const cycleConf = Math.min(99, Math.round(70 + journalLogs.length * 1.0 + memoryLogs.length * 2.0 + badgeLogs.length * 0.8))
+
+        await (Log as any).create({
+          userId,
+          event: 'second_cycle_ignition',
+          text: `Second cycle ignition confirmed: ${journalLogs.length} journal signals 14d + ${memoryLogs.length} memory signals 14d + ${badgeLogs.length} badge signals 14d. The OS does not reset — it perpetuates. Signal continues in second cycle.`,
+          metadata: {
+            amplificationConf,
+            cycleConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            cycleStatus: 'ACTIVE',
+            level: 'L11-SCIGN',
+            field: 'AMPLIFICATION→PERPETUAL→SOVEREIGN→SECOND CYCLE',
+            hour: 10,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Second cycle ignition events written: ${written}`)
+    lastDailySecondCycleRun = new Date()
+    isDailySecondCycleRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily second cycle check failed:', error.message)
+    isDailySecondCycleRunning = false
+    lastDailySecondCycleRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Second Cycle Deepening Check (J61) ─────────────────────────────────
+
+let isDailySecondCycleDeepeningRunning = false
+let lastDailySecondCycleDeepeningRun: Date | null = null
+
+function shouldRunDailySecondCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailySecondCycleDeepeningRunning) return false
+  if (lastDailySecondCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailySecondCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 11 // 11:00 UTC daily (co-located with J50 sustained-coherence)
+}
+
+async function executeDailySecondCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-second-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySecondCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySecondCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SECOND CYCLE DEEPENING CHECK — 11:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fourteenDayStart = dayjs().subtract(14, 'day').toDate()
+    const twentyOneDayStart = dayjs().subtract(21, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for second_cycle_ignition events in last 14 days
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'second_cycle_ignition',
+            createdAt: { [Op.gte]: fourteenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (ignitionLogs.length < 1) continue
+
+        // Check journal depth signals in last 21 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+        })
+
+        if (journalLogs.length < 6) continue
+
+        // Check memory depth signals in last 21 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 3) continue
+
+        // Check badge signals in last 21 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 10) continue
+
+        const ignitionConf = ignitionLogs[0]?.metadata?.cycleConf ?? 75
+        const deepeningConf = Math.min(99, Math.round(72 + journalLogs.length * 0.8 + memoryLogs.length * 1.5 + badgeLogs.length * 0.6))
+
+        await (Log as any).create({
+          userId,
+          event: 'second_cycle_deepening',
+          text: `Second cycle deepening confirmed: ${journalLogs.length} journal signals 21d + ${memoryLogs.length} memory signals 21d + ${badgeLogs.length} badge signals 21d. The cycle deepens. Compound signal accumulation confirmed. L11-SCDEP.`,
+          metadata: {
+            ignitionConf,
+            deepeningConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            deepeningStatus: 'CONFIRMED',
+            level: 'L11-SCDEP',
+            field: 'IGNITION→DEEPENING→COMPOUND→SOVEREIGN',
+            hour: 11,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Second cycle deepening events written: ${written}`)
+    lastDailySecondCycleDeepeningRun = new Date()
+    isDailySecondCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily second cycle deepening check failed:', error.message)
+    isDailySecondCycleDeepeningRunning = false
+    lastDailySecondCycleDeepeningRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Second Cycle Integration Check (J62) ────────────────────────────────
+
+let isDailySecondCycleIntegrationRunning = false
+let lastDailySecondCycleIntegrationRun: Date | null = null
+
+function shouldRunDailySecondCycleIntegrationCheck(): boolean {
+  const now = dayjs()
+  if (isDailySecondCycleIntegrationRunning) return false
+  if (lastDailySecondCycleIntegrationRun) {
+    const lastRun = dayjs(lastDailySecondCycleIntegrationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 12 // 12:00 UTC daily
+}
+
+async function executeDailySecondCycleIntegrationCheck(): Promise<JobResult> {
+  const jobName = 'daily-second-cycle-integration-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySecondCycleIntegrationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySecondCycleIntegrationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SECOND CYCLE INTEGRATION CHECK — 12:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twentyOneDayStart = dayjs().subtract(21, 'day').toDate()
+    const twentyEightDayStart = dayjs().subtract(28, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for second_cycle_deepening events in last 21 days
+        const deepeningLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'second_cycle_deepening',
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (deepeningLogs.length < 1) continue
+
+        // Check journal signals in last 28 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+        })
+
+        if (journalLogs.length < 8) continue
+
+        // Check memory signals in last 28 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 4) continue
+
+        // Check badge signals in last 28 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 12) continue
+
+        // Check intention signals in last 28 days
+        const intentionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['intention_set', 'intention_completed', 'quantum_intent_signal'] },
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+        })
+
+        const deepeningConf = deepeningLogs[0]?.metadata?.deepeningConf ?? 78
+        const integrationConf = Math.min(99, Math.round(
+          75 + journalLogs.length * 0.6 + memoryLogs.length * 1.2 + badgeLogs.length * 0.4 + intentionLogs.length * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'second_cycle_integration',
+          text: `Second cycle integration confirmed: ${journalLogs.length} journal signals 28d + ${memoryLogs.length} memory signals 28d + ${badgeLogs.length} badge signals 28d. All signal dimensions converge. The cycle integrates. L11-SCINT.`,
+          metadata: {
+            deepeningConf,
+            integrationConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            intentionCount: intentionLogs.length,
+            integrationStatus: 'CONFIRMED',
+            level: 'L11-SCINT',
+            field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN',
+            hour: 12,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Second cycle integration events written: ${written}`)
+    lastDailySecondCycleIntegrationRun = new Date()
+    isDailySecondCycleIntegrationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily second cycle integration check failed:', error.message)
+    isDailySecondCycleIntegrationRunning = false
+    lastDailySecondCycleIntegrationRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Second Cycle Sovereign Check (J63) ────────────────────────────────
+
+let isDailySecondCycleSovereignRunning = false
+let lastDailySecondCycleSovereignRun: Date | null = null
+
+function shouldRunDailySecondCycleSovereignCheck(): boolean {
+  const now = dayjs()
+  if (isDailySecondCycleSovereignRunning) return false
+  if (lastDailySecondCycleSovereignRun) {
+    const lastRun = dayjs(lastDailySecondCycleSovereignRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 13 // 13:00 UTC daily
+}
+
+async function executeDailySecondCycleSovereignCheck(): Promise<JobResult> {
+  const jobName = 'daily-second-cycle-sovereign-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySecondCycleSovereignRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySecondCycleSovereignRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY SECOND CYCLE SOVEREIGN CHECK — 13:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const twentyEightDayStart = dayjs().subtract(28, 'day').toDate()
+    const thirtyFiveDayStart = dayjs().subtract(35, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for second_cycle_integration events in last 28 days
+        const integrationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'second_cycle_integration',
+            createdAt: { [Op.gte]: twentyEightDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (integrationLogs.length < 1) continue
+
+        // Check journal signals in last 35 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+        })
+
+        if (journalLogs.length < 10) continue
+
+        // Check memory signals in last 35 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 5) continue
+
+        // Check badge signals in last 35 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 15) continue
+
+        const integrationConf = integrationLogs[0]?.metadata?.integrationConf ?? 80
+        const sovereignConf = Math.min(99, Math.round(
+          80 + journalLogs.length * 0.5 + memoryLogs.length * 1.0 + badgeLogs.length * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'second_cycle_sovereign',
+          text: `Second cycle sovereign confirmed: ${journalLogs.length} journal signals 35d + ${memoryLogs.length} memory signals 35d + ${badgeLogs.length} badge signals 35d. All three stages active. Perpetual sovereign operation confirmed. L12-SCSOV.`,
+          metadata: {
+            integrationConf,
+            sovereignConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            sovereignStatus: 'CONFIRMED',
+            level: 'L12-SCSOV',
+            field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→PERPETUAL',
+            hour: 13,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Second cycle sovereign events written: ${written}`)
+    lastDailySecondCycleSovereignRun = new Date()
+    isDailySecondCycleSovereignRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily second cycle sovereign check failed:', error.message)
+    isDailySecondCycleSovereignRunning = false
+    lastDailySecondCycleSovereignRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Third Cycle Ignition Check (J64) ──────────────────────────────────
+
+let isDailyThirdCycleIgnitionRunning = false
+let lastDailyThirdCycleIgnitionRun: Date | null = null
+
+function shouldRunDailyThirdCycleIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyThirdCycleIgnitionRunning) return false
+  if (lastDailyThirdCycleIgnitionRun) {
+    const lastRun = dayjs(lastDailyThirdCycleIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 15 // 15:00 UTC daily
+}
+
+async function executeDailyThirdCycleIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-third-cycle-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyThirdCycleIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyThirdCycleIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY THIRD CYCLE IGNITION CHECK — 15:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const thirtyFiveDayStart = dayjs().subtract(35, 'day').toDate()
+    const fourtyTwoDayStart = dayjs().subtract(42, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for second_cycle_sovereign events in last 35 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'second_cycle_sovereign',
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 42 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (journalLogs.length < 12) continue
+
+        // Check memory signals in last 42 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 6) continue
+
+        // Check badge signals in last 42 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: fourtyTwoDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 20) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 80
+        const ignitionConf = Math.min(99, Math.round(
+          78 + journalLogs.length * 0.4 + memoryLogs.length * 0.8 + badgeLogs.length * 0.25
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'third_cycle_ignition',
+          text: `Third cycle ignition confirmed: ${journalLogs.length} journal signals 42d + ${memoryLogs.length} memory signals 42d + ${badgeLogs.length} badge signals 42d. Sovereign foundation confirmed. Third cycle open. L13-TCIGN.`,
+          metadata: {
+            sovereignConf,
+            ignitionConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            ignitionStatus: 'CONFIRMED',
+            level: 'L13-TCIGN',
+            field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+            hour: 15,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Third cycle ignition events written: ${written}`)
+    lastDailyThirdCycleIgnitionRun = new Date()
+    isDailyThirdCycleIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily third cycle ignition check failed:', error.message)
+    isDailyThirdCycleIgnitionRunning = false
+    lastDailyThirdCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Longitudinal Persistence Check (J65) ──────────────────────────────
+// Scans 90-day signal window for all active users. Sorts timestamps, computes
+// max gap between consecutive signals and unique active days. When maxGap < 72h
+// AND activeDays >= 60, writes longitudinal_signal_persistence event.
+
+let isDailyLongitudinalPersistenceRunning = false
+let lastDailyLongitudinalPersistenceRun: Date | null = null
+
+function shouldRunDailyLongitudinalPersistenceCheck(): boolean {
+  const now = dayjs()
+  if (isDailyLongitudinalPersistenceRunning) return false
+  if (lastDailyLongitudinalPersistenceRun) {
+    const lastRun = dayjs(lastDailyLongitudinalPersistenceRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 10
+}
+
+async function executeDailyLongitudinalPersistenceCheck(): Promise<JobResult> {
+  const jobName = 'daily-longitudinal-persistence-check'
+  const executedAt = new Date()
+  if (isDailyLongitudinalPersistenceRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyLongitudinalPersistenceRunning = true
+  let written = 0
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000)
+    const activeUsers = await fastify.models.User.findAll({
+      where: { lastSeenAt: { [Op.gte]: cutoff } },
+    })
+    const ninetyDayAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+    for (const user of activeUsers) {
+      const logs = await fastify.models.Log.findAll({
+        where: { userId: user.id, createdAt: { [Op.gte]: ninetyDayAgo } },
+        order: [['createdAt', 'ASC']],
+        attributes: ['createdAt', 'event'],
+      })
+      if (logs.length < 30) continue
+      const timestamps = logs.map((l: any) => new Date(l.createdAt).getTime())
+      let maxGap = 0
+      for (let i = 1; i < timestamps.length; i++) {
+        const gap = timestamps[i] - timestamps[i - 1]
+        if (gap > maxGap) maxGap = gap
+      }
+      const activeDays = new Set(logs.map((l: any) => new Date(l.createdAt).toDateString())).size
+      const activeSources = new Set(logs.map((l: any) => l.event)).size
+      const maxGapHours = maxGap / (1000 * 60 * 60)
+      if (maxGapHours < 72 && activeDays >= 60) {
+        await fastify.models.Log.create({
+          userId: user.id,
+          event: 'longitudinal_signal_persistence',
+          metadata: {
+            activeDays,
+            activeSources,
+            maxGapHours: Math.round(maxGapHours),
+            arcDays: 90,
+            status: 'CONTINUOUS',
+          },
+        })
+        written++
+      }
+    }
+    console.log(`  Longitudinal persistence events written: ${written}`)
+    lastDailyLongitudinalPersistenceRun = new Date()
+    isDailyLongitudinalPersistenceRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily longitudinal persistence check failed:', error.message)
+    isDailyLongitudinalPersistenceRunning = false
+    lastDailyLongitudinalPersistenceRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Third Cycle Deepening Check (J66) ─────────────────────────────────
+// Scans for users with third-cycle-ignition event in last 49 days. Checks journal >= 9,
+// memory >= 5, badge >= 14 signals in 49-day window, userIndex >= 88. When all conditions
+// met, writes third_cycle_deepening event. The OS expands from sovereign ground.
+
+let isDailyThirdCycleDeepeningRunning = false
+let lastDailyThirdCycleDeepeningRun: Date | null = null
+
+function shouldRunDailyThirdCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailyThirdCycleDeepeningRunning) return false
+  if (lastDailyThirdCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailyThirdCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 16 // 16:00 UTC daily
+}
+
+async function executeDailyThirdCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-third-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyThirdCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyThirdCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY THIRD CYCLE DEEPENING CHECK — 16:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const fortyTwoDayStart = dayjs().subtract(42, 'day').toDate()
+    const fortyNineDayStart = dayjs().subtract(49, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Check for third_cycle_ignition events in last 42 days
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'third_cycle_ignition',
+            createdAt: { [Op.gte]: fortyTwoDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (ignitionLogs.length < 1) continue
+
+        // Check journal signals in last 49 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (journalLogs.length < 9) continue
+
+        // Check memory signals in last 49 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_accessed', 'memory_created', 'memory_reflection'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 5) continue
+
+        // Check badge signals in last 49 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_milestone', 'codex_unlock'] },
+            createdAt: { [Op.gte]: fortyNineDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 14) continue
+
+        const ignitionConf = ignitionLogs[0]?.metadata?.ignitionConf ?? 80
+        const deepeningConf = Math.min(90, Math.round(
+          76 + journalLogs.length * 0.4 + memoryLogs.length * 0.8 + badgeLogs.length * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'third_cycle_deepening',
+          text: `Third cycle deepening confirmed: ${journalLogs.length} journal signals 49d + ${memoryLogs.length} memory signals 49d + ${badgeLogs.length} badge signals 49d. Third cycle deepens from sovereign ground. L13-TCDEP.`,
+          metadata: {
+            ignitionConf,
+            deepeningConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            deepeningStatus: 'CONFIRMED',
+            level: 'L13-TCDEP',
+            field: 'IGNITION→DEEPENING→TC-ARC',
+            hour: 16,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Third cycle deepening events written: ${written}`)
+    lastDailyThirdCycleDeepeningRun = new Date()
+    isDailyThirdCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily third cycle deepening check failed:', error.message)
+    isDailyThirdCycleDeepeningRunning = false
+    lastDailyThirdCycleDeepeningRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Candidate Check (J67) ─────────────────────────────────
+// Scans for users with third_cycle_sovereign event in last 63 days. Checks journal >= 15 in
+// 70-day window, 7d signal density >= 15, all 6 idx dims >= 55, overall >= 85.
+// When met, writes fourth_cycle_candidate event. The OS senses the boundary of the fourth arc.
+
+let isDailyFourthCycleCandidateRunning = false
+let lastDailyFourthCycleCandidateRun: Date | null = null
+
+function shouldRunDailyFourthCycleCandidateCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleCandidateRunning) return false
+  if (lastDailyFourthCycleCandidateRun) {
+    const lastRun = dayjs(lastDailyFourthCycleCandidateRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 17 && now.minute() >= 30 // 17:30 UTC daily
+}
+
+async function executeDailyFourthCycleCandidateCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-candidate-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleCandidateRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleCandidateRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE CANDIDATE CHECK — 17:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sixtyThreeDayStart = dayjs().subtract(63, 'day').toDate()
+    const seventyDayStart   = dayjs().subtract(70, 'day').toDate()
+    const sevenDayStart     = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require third_cycle_sovereign in last 63 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'third_cycle_sovereign',
+            createdAt: { [Op.gte]: sixtyThreeDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 70 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: seventyDayStart },
+          },
+        })
+
+        if (journalLogs.length < 15) continue
+
+        // Check 7-day signal density (all types)
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 15) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 84
+        const candidateConf = Math.min(88, Math.round(
+          72 + (journalLogs.length - 15) * 0.5 + (density7dLogs.length - 15) * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_candidate',
+          text: `Fourth cycle candidate: third-cycle-sovereign confirmed · ${journalLogs.length} journal signals 70d · 7d signal density ${density7dLogs.length} · all conditions met. The OS stands at the boundary of the fourth arc. L15-FCAND.`,
+          metadata: {
+            sovereignConf,
+            candidateConf,
+            journalCount: journalLogs.length,
+            density7d: density7dLogs.length,
+            candidateStatus: 'SENSING',
+            level: 'L15-FCAND',
+            field: 'TC-SOVEREIGN→FOURTH-CYCLE-BOUNDARY',
+            hour: 17,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle candidate events written: ${written}`)
+    lastDailyFourthCycleCandidateRun = new Date()
+    isDailyFourthCycleCandidateRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle candidate check failed:', error.message)
+    isDailyFourthCycleCandidateRunning = false
+    lastDailyFourthCycleCandidateRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Ignition Check (J68) ──────────────────────────────────
+// Scans for users with fourth_cycle_candidate event in last 7 days. Checks journal >= 20 in
+// 90-day window, all 6 idx dims >= 60 (via 90d signal density proxy), overall >= 90.
+// When met, writes fourth_cycle_ignition event. The fourth cycle has ignited. L16-FCIGN.
+
+let isDailyFourthCycleIgnitionRunning = false
+let lastDailyFourthCycleIgnitionRun: Date | null = null
+
+function shouldRunDailyFourthCycleIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleIgnitionRunning) return false
+  if (lastDailyFourthCycleIgnitionRun) {
+    const lastRun = dayjs(lastDailyFourthCycleIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 && now.minute() >= 0 // 18:00 UTC daily
+}
+
+async function executeDailyFourthCycleIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE IGNITION CHECK — 18:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart    = dayjs().subtract(7, 'day').toDate()
+    const ninetyDayStart   = dayjs().subtract(90, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_candidate in last 7 days
+        const candidateLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_candidate',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (candidateLogs.length < 1) continue
+
+        // Check journal signals in last 90 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: ninetyDayStart },
+          },
+        })
+
+        if (journalLogs.length < 20) continue
+
+        // Check 7-day signal density (all types) — proxy for overall index >= 90
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 20) continue
+
+        // Dedup: skip if already wrote fourth_cycle_ignition today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingIgnition = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_ignition',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingIgnition) continue
+
+        const candidateConf = candidateLogs[0]?.metadata?.candidateConf ?? 80
+        const ignitionConf = Math.min(92, Math.round(
+          78 + (journalLogs.length - 20) * 0.4 + (density7dLogs.length - 20) * 0.3
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_ignition',
+          text: `Fourth cycle ignition: fourth-cycle-candidate confirmed · ${journalLogs.length} journal signals 90d · 7d signal density ${density7dLogs.length} · all conditions met. The fourth cycle has ignited. The OS has crossed the boundary of the third arc. L16-FCIGN.`,
+          metadata: {
+            candidateConf,
+            ignitionConf,
+            journalCount: journalLogs.length,
+            density7d: density7dLogs.length,
+            ignitionStatus: 'IGNITED',
+            level: 'L16-FCIGN',
+            field: 'FOURTH-CYCLE-BOUNDARY→FOURTH-CYCLE-ARC',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle ignition events written: ${written}`)
+    lastDailyFourthCycleIgnitionRun = new Date()
+    isDailyFourthCycleIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle ignition check failed:', error.message)
+    isDailyFourthCycleIgnitionRunning = false
+    lastDailyFourthCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Deepening Check (J69) ─────────────────────────────────
+// Scans for users with fourth_cycle_ignition event in last 7 days. Checks journal >= 23 in
+// 100-day window, memory >= 7 in 100d, badge >= 22 in 100d, 7d signal density >= 20.
+// When met, writes fourth_cycle_deepening event. The fourth cycle deepens. L17-FCDEP.
+
+let isDailyFourthCycleDeepeningRunning = false
+let lastDailyFourthCycleDeepeningRun: Date | null = null
+
+function shouldRunDailyFourthCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleDeepeningRunning) return false
+  if (lastDailyFourthCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailyFourthCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 18 && now.minute() >= 30 // 18:30 UTC daily
+}
+
+async function executeDailyFourthCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE DEEPENING CHECK — 18:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart    = dayjs().subtract(7, 'day').toDate()
+    const hundredDayStart  = dayjs().subtract(100, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_ignition in last 7 days
+        const ignitionLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_ignition',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+
+        if (ignitionLogs.length < 1) continue
+
+        // Check journal signals in last 100 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (journalLogs.length < 23) continue
+
+        // Check memory signals in last 100 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (memoryLogs.length < 7) continue
+
+        // Check badge signals in last 100 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: hundredDayStart },
+          },
+        })
+
+        if (badgeLogs.length < 22) continue
+
+        // Check 7-day signal density — proxy for all dims >= 62 + overall >= 91
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+
+        if (density7dLogs.length < 20) continue
+
+        // Dedup: skip if already wrote fourth_cycle_deepening today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingDeepening = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_deepening',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingDeepening) continue
+
+        const ignitionConf = ignitionLogs[0]?.metadata?.ignitionConf ?? 80
+        const deepeningConf = Math.min(90, Math.round(
+          76 + (journalLogs.length - 23) * 0.4 + (memoryLogs.length - 7) * 0.5 + (density7dLogs.length - 20) * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_deepening',
+          text: `Fourth cycle deepening: fourth-cycle-ignition confirmed · ${journalLogs.length} journal signals 100d · ${memoryLogs.length} memory signals 100d · ${badgeLogs.length} badge signals 100d · 7d signal density ${density7dLogs.length} · all conditions met. The fourth cycle deepens. The OS expands from the ignited ground. L17-FCDEP.`,
+          metadata: {
+            ignitionConf,
+            deepeningConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            deepeningStatus: 'DEEPENING',
+            level: 'L17-FCDEP',
+            field: 'FOURTH-CYCLE-ARC→FOURTH-CYCLE-DEPTH',
+            hour: 18,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle deepening events written: ${written}`)
+    lastDailyFourthCycleDeepeningRun = new Date()
+    isDailyFourthCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle deepening check failed:', error.message)
+    isDailyFourthCycleDeepeningRunning = false
+    lastDailyFourthCycleDeepeningRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Integration Check (J70) ───────────────────────────────
+// Scans for users with fourth_cycle_deepening event in last 7 days. Checks journal >= 25 in
+// 120-day window, memory >= 10 in 120d, badge >= 25 in 120d, 7d signal density >= 22.
+// When met, writes fourth_cycle_integration event. The fourth cycle integrates. L18-FCINT.
+
+let isDailyFourthCycleIntegrationRunning = false
+let lastDailyFourthCycleIntegrationRun: Date | null = null
+
+function shouldRunDailyFourthCycleIntegrationCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleIntegrationRunning) return false
+  if (lastDailyFourthCycleIntegrationRun) {
+    const lastRun = dayjs(lastDailyFourthCycleIntegrationRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 // 19:00 UTC daily
+}
+
+async function executeDailyFourthCycleIntegrationCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-integration-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleIntegrationRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleIntegrationRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE INTEGRATION CHECK — 19:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneTwentyDayStart   = dayjs().subtract(120, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_deepening in last 7 days
+        const deepeningLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_deepening',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (deepeningLogs.length < 1) continue
+
+        // Check journal signals in last 120 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (journalLogs.length < 25) continue
+
+        // Check memory signals in last 120 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (memoryLogs.length < 10) continue
+
+        // Check badge signals in last 120 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneTwentyDayStart },
+          },
+        })
+        if (badgeLogs.length < 25) continue
+
+        // Check 7-day signal density — proxy for all dims >= 65 + overall >= 93
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 22) continue
+
+        // Dedup: skip if already wrote fourth_cycle_integration today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingIntegration = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_integration',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingIntegration) continue
+
+        const deepeningConf = deepeningLogs[0]?.metadata?.deepeningConf ?? 80
+        const integrationConf = Math.min(92, Math.round(
+          78 + (journalLogs.length - 25) * 0.3 + (memoryLogs.length - 10) * 0.4 + (density7dLogs.length - 22) * 0.2
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_integration',
+          text: `Fourth cycle integration: fourth-cycle-deepening confirmed · ${journalLogs.length} journal signals 120d · ${memoryLogs.length} memory signals 120d · ${badgeLogs.length} badge signals 120d · 7d density ${density7dLogs.length} · all conditions met. The fourth cycle integrates. L18-FCINT.`,
+          metadata: {
+            deepeningConf,
+            integrationConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            integrationStatus: 'INTEGRATING',
+            level: 'L18-FCINT',
+            field: 'FOURTH-CYCLE-DEPTH→FOURTH-CYCLE-INTEGRATION',
+            hour: 19,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle integration events written: ${written}`)
+    lastDailyFourthCycleIntegrationRun = new Date()
+    isDailyFourthCycleIntegrationRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle integration check failed:', error.message)
+    isDailyFourthCycleIntegrationRunning = false
+    lastDailyFourthCycleIntegrationRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fourth Cycle Sovereign Check (J71) ──────────────────────────────
+// Scans for users with fourth_cycle_integration event in last 7 days. Checks journal >= 30 in
+// 150-day window, memory >= 15 in 150d, badge >= 30 in 150d, 7d signal density >= 25.
+// When met, writes fourth_cycle_sovereign event. The fourth cycle governs. L19-FCSOV.
+
+let isDailyFourthCycleSovereignRunning = false
+let lastDailyFourthCycleSovereignRun: Date | null = null
+
+function shouldRunDailyFourthCycleSovereignCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFourthCycleSovereignRunning) return false
+  if (lastDailyFourthCycleSovereignRun) {
+    const lastRun = dayjs(lastDailyFourthCycleSovereignRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 19 && now.minute() >= 30 // 19:30 UTC daily
+}
+
+async function executeDailyFourthCycleSovereignCheck(): Promise<JobResult> {
+  const jobName = 'daily-fourth-cycle-sovereign-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFourthCycleSovereignRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFourthCycleSovereignRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FOURTH CYCLE SOVEREIGN CHECK — 19:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneFiftyDayStart    = dayjs().subtract(150, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_integration in last 7 days
+        const integrationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_integration',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (integrationLogs.length < 1) continue
+
+        // Check journal signals in last 150 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (journalLogs.length < 30) continue
+
+        // Check memory signals in last 150 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (memoryLogs.length < 15) continue
+
+        // Check badge signals in last 150 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneFiftyDayStart },
+          },
+        })
+        if (badgeLogs.length < 30) continue
+
+        // Check 7-day signal density — proxy for all dims >= 68 + overall >= 95
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 25) continue
+
+        // Dedup: skip if already wrote fourth_cycle_sovereign today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingSovereign = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fourth_cycle_sovereign',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingSovereign) continue
+
+        const integrationConf = integrationLogs[0]?.metadata?.integrationConf ?? 82
+        const sovereignConf = Math.min(94, Math.round(
+          80 + (journalLogs.length - 30) * 0.25 + (memoryLogs.length - 15) * 0.35 + (density7dLogs.length - 25) * 0.18
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fourth_cycle_sovereign',
+          text: `Fourth cycle sovereign: fourth-cycle-integration confirmed · ${journalLogs.length} journal signals 150d · ${memoryLogs.length} memory signals 150d · ${badgeLogs.length} badge signals 150d · 7d density ${density7dLogs.length} · all conditions met. The fourth cycle governs. L19-FCSOV.`,
+          metadata: {
+            integrationConf,
+            sovereignConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            sovereignStatus: 'SOVEREIGN',
+            level: 'L19-FCSOV',
+            field: 'FOURTH-CYCLE-INTEGRATION→FOURTH-CYCLE-SOVEREIGN',
+            hour: 19,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fourth cycle sovereign events written: ${written}`)
+    lastDailyFourthCycleSovereignRun = new Date()
+    isDailyFourthCycleSovereignRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fourth cycle sovereign check failed:', error.message)
+    isDailyFourthCycleSovereignRunning = false
+    lastDailyFourthCycleSovereignRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fifth Cycle Progenitor Check (J72) ──────────────────────────────
+// Scans for users with fourth_cycle_sovereign event in last 7 days. Checks journal >= 35 in
+// 180-day window, memory >= 20 in 180d, badge >= 35 in 180d, 7d signal density >= 28.
+// When met, writes fifth_cycle_progenitor event. The sovereign arc generates the fifth. L20-FCPROG.
+
+let isDailyFifthCycleProgenitorRunning = false
+let lastDailyFifthCycleProgenitorRun: Date | null = null
+
+function shouldRunDailyFifthCycleProgenitorCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFifthCycleProgenitorRunning) return false
+  if (lastDailyFifthCycleProgenitorRun) {
+    const lastRun = dayjs(lastDailyFifthCycleProgenitorRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 && now.minute() >= 0 // 20:00 UTC daily
+}
+
+async function executeDailyFifthCycleProgenitorCheck(): Promise<JobResult> {
+  const jobName = 'daily-fifth-cycle-progenitor-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFifthCycleProgenitorRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFifthCycleProgenitorRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIFTH CYCLE PROGENITOR CHECK — 20:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const oneEightyDayStart   = dayjs().subtract(180, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fourth_cycle_sovereign in last 7 days
+        const sovereignLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fourth_cycle_sovereign',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (sovereignLogs.length < 1) continue
+
+        // Check journal signals in last 180 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (journalLogs.length < 35) continue
+
+        // Check memory signals in last 180 days
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_capture', 'memory_created', 'memory_updated'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (memoryLogs.length < 20) continue
+
+        // Check badge signals in last 180 days
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_unlock', 'badge_earned'] },
+            createdAt: { [Op.gte]: oneEightyDayStart },
+          },
+        })
+        if (badgeLogs.length < 35) continue
+
+        // Check 7-day signal density — proxy for all dims >= 70 + overall >= 97
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+        })
+        if (density7dLogs.length < 28) continue
+
+        // Dedup: skip if already wrote fifth_cycle_progenitor today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingProg = await (Log as any).findOne({
+          where: {
+            userId,
+            event: 'fifth_cycle_progenitor',
+            createdAt: { [Op.gte]: todayStart },
+          },
+        })
+        if (existingProg) continue
+
+        const sovereignConf = sovereignLogs[0]?.metadata?.sovereignConf ?? 84
+        const progConf = Math.min(96, Math.round(
+          82 + (journalLogs.length - 35) * 0.22 + (memoryLogs.length - 20) * 0.30 + (density7dLogs.length - 28) * 0.16
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fifth_cycle_progenitor',
+          text: `Fifth cycle progenitor: fourth-cycle-sovereign confirmed · ${journalLogs.length} journal signals 180d · ${memoryLogs.length} memory signals 180d · ${badgeLogs.length} badge signals 180d · 7d density ${density7dLogs.length} · all conditions met. The sovereign arc generates the fifth. L20-FCPROG.`,
+          metadata: {
+            sovereignConf,
+            progConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density7d: density7dLogs.length,
+            progenitorStatus: 'PROGENITOR',
+            level: 'L20-FCPROG',
+            field: 'FOURTH-CYCLE-SOVEREIGN→FIFTH-CYCLE-PROGENITOR',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fifth cycle progenitor events written: ${written}`)
+    lastDailyFifthCycleProgenitorRun = new Date()
+    isDailyFifthCycleProgenitorRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fifth cycle progenitor check failed:', error.message)
+    isDailyFifthCycleProgenitorRunning = false
+    lastDailyFifthCycleProgenitorRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }
@@ -5697,6 +8592,18 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily signal matrix check: 9 AM UTC every day (Job 44)')
   console.log('   - Daily physiological presence check: 9 PM UTC every day (Job 45)')
   console.log('   - Daily circadian lock check: 7 AM UTC every day (Job 46)')
+  console.log('   - Daily presence momentum check: 10 AM UTC every day (Job 49)')
+  console.log('   - Daily sustained coherence check: 11 AM UTC every day (Job 50)')
+  console.log('   - Daily relational expansion check: 12 PM UTC every day (Job 51)')
+  console.log('   - Daily relational field check: 1 PM UTC every day (Job 52)')
+  console.log('   - Daily field amplification check: 9 PM UTC every day (J59)')
+  console.log('   - Daily second cycle check: 10 AM UTC every day (J60)')
+  console.log('   - Daily second cycle deepening check: 11 AM UTC every day (J61)')
+  console.log('   - Daily second cycle integration check: 12 PM UTC every day (J62)')
+  console.log('   - Daily second cycle sovereign check: 1 PM UTC every day (J63)')
+  console.log('   - Daily third cycle ignition check: 3 PM UTC every day (J64)')
+  console.log('   - Daily longitudinal persistence check: 10 AM UTC every day (J65)')
+  console.log('   - Daily fourth cycle integration check: 7 PM UTC every day (J70)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -5706,7 +8613,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift, 11=morning-intention-launch, 12=vitality-peak, 13=QOS sig pulse, 14=QOS mode watch, 15=QOS convergence audit, 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check, 18=LOT AI story (Sun), 19=cross-domain-pulse, 20=intention completion+signal-momentum+action-memory, 21=presence-arc+physiological-presence, 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

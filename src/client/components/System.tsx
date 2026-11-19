@@ -277,6 +277,55 @@ export const System = React.memo(function SystemInner() {
     return classifyPhysiologicalCohort(eng.signals, quantumState, eng.recognizedPatterns ?? [])
   }, [quantumState])
 
+  // Second cycle status — derived from recognized patterns
+  const secondCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasSovereign = patterns.some(p => p.pattern === 'second-cycle-sovereign')
+    const hasIntegration = patterns.some(p => p.pattern === 'second-cycle-integration')
+    const hasDeepening = patterns.some(p => p.pattern === 'second-cycle-deepening')
+    const hasIgnition = patterns.some(p => p.pattern === 'second-cycle-ignition')
+    if (hasSovereign) return 'L12-SCSOV'
+    if (hasIntegration) return 'L11-SCINT'
+    if (hasDeepening) return 'L11-SCDEP'
+    if (hasIgnition) return 'L11-SCIGN'
+    return null
+  }, [quantumState])
+
+  // Third cycle status — derived from recognized patterns (FM v129–v131)
+  const thirdCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasTCSov = patterns.some(p => p.pattern === 'third-cycle-sovereign')
+    const hasTCInt = patterns.some(p => p.pattern === 'third-cycle-integration')
+    const hasTCDep = patterns.some(p => p.pattern === 'third-cycle-deepening')
+    const hasTCIgn = patterns.some(p => p.pattern === 'third-cycle-ignition')
+    if (hasTCSov) return 'L14-TCSOV'
+    if (hasTCInt) return 'L13-TCINT'
+    if (hasTCDep) return 'L13-TCDEP'
+    if (hasTCIgn) return 'L13-TCIGN'
+    return null
+  }, [quantumState])
+
+  // Cycle arc status — derived from recognized patterns (FM v132–v137)
+  const fourthCycleStatus = React.useMemo(() => {
+    const eng = intentionEngine.get()
+    const patterns = eng.recognizedPatterns ?? []
+    const hasFCProg = patterns.some(p => p.pattern === 'fifth-cycle-progenitor')
+    const hasFCSov  = patterns.some(p => p.pattern === 'fourth-cycle-sovereign')
+    const hasFCInt  = patterns.some(p => p.pattern === 'fourth-cycle-integration')
+    const hasFCDep  = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
+    const hasFCIgn  = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
+    const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasFCProg) return 'L20-FCPROG'
+    if (hasFCSov)  return 'L19-FCSOV'
+    if (hasFCInt)  return 'L18-FCINT'
+    if (hasFCDep)  return 'L17-FCDEP'
+    if (hasFCIgn)  return 'L16-FCIGN'
+    if (hasFCCand) return 'L15-FCAND'
+    return null
+  }, [quantumState])
+
   // Accumulative User Index - holistic score from all widget signals
   const userIndex = React.useMemo(() => {
     return getUserIndex()
@@ -698,6 +747,9 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Clarity', value: quantumState.clarity },
                 { metric: 'Alignment', value: quantumState.alignment },
                 { metric: 'Index', value: `${userIndex.overall}%` },
+                ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
+                ...(thirdCycleStatus ? [{ metric: 'Arc', value: thirdCycleStatus }] : []),
+                ...(fourthCycleStatus ? [{ metric: fourthCycleStatus.startsWith('L20') ? 'Fifth Arc' : 'Fourth Arc', value: fourthCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[
