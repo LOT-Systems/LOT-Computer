@@ -4880,7 +4880,8 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  personal?: { resonanceMatches: string[]; resonanceSample: number; localDay: string }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4890,12 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // (2026-11-19) Personal layer from Logs: which facets of today's reading
+    // match the conditions this user most often writes under.
+    resonanceMatches: personal?.resonanceMatches ?? [],
+    resonanceAligned: (personal?.resonanceMatches?.length ?? 0) > 0,
+    resonanceSample: personal?.resonanceSample ?? 0,
+    localDay: personal?.localDay,
   })
 }
 

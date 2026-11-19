@@ -80,15 +80,16 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
-
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // (2026-11-19) Day-count from the date's *local* calendar fields via
+  // Date.UTC, so the six-day cycle flips at local midnight. The previous
+  // getTime() diff against a UTC-midnight anchor flipped at UTC midnight —
+  // a user at UTC-8 saw tomorrow's rokuyo from 4 PM onward — and produced a
+  // negative index for pre-2000 dates.
+  const dayNumber = Math.floor(
+    (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(2000, 0, 1)) / 86400000
+  )
+  const rokuyoIndex = ((dayNumber % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +177,152 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Ambient reading + personalization layer (2026-11-19)
+// Everything below stays ambient/environmental — no birth data, no natal
+// chart. "Personalization" means: the reading is computed in the user's own
+// timeZone, and the user's own Logs history (each entry snapshots the
+// reading it was written under) is folded into a personal "resonance".
+// ─────────────────────────────────────────────────────────────────────────
+
+export const ROKUYO_GUIDANCE: Record<string, string> = {
+  Sensho: 'morning favored',
+  Tomobiki: 'shared plans favored',
+  Senpu: 'afternoon favored',
+  Butsumetsu: 'rest, avoid new starts',
+  Taian: 'auspicious for beginnings',
+  Shakku: 'midday only, move with care',
+}
+
+export interface AstrologyReading {
+  westernZodiac: string
+  hourlyZodiac: string
+  rokuyo: string
+  rokuyoGuidance: string
+  moonPhase: string
+  moonIllumination: number
+  /** Local calendar day (YYYY-MM-DD) the reading belongs to */
+  localDay: string
+  /** Local hour (0–23) the reading was taken at */
+  localHour: number
+  /** timeZone actually used ('device' when none was supplied/valid) */
+  timeZone: string
+}
+
+/**
+ * Wall-clock Date for `instant` as seen in `timeZone`. The returned Date's
+ * getHours()/getDate()/getMonth() readers yield the zone's local fields
+ * regardless of the runtime's own timeZone. Isomorphic (Intl only), so the
+ * client dashboard and the server Logs snapshot share one implementation.
+ * Falls back to `instant` itself on a missing/invalid zone.
+ */
+export function toWallClockInTimeZone(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(instant)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value ?? 0)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+/**
+ * One full ambient reading. Calendar-based fields (rokuyo, zodiac hour,
+ * western sign) use the user's local wall clock; the moon phase uses the
+ * true instant, since the lunar cycle is global and must not be shifted by
+ * a timeZone offset.
+ */
+export function getAstrologyReading(instant: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = toWallClockInTimeZone(instant, timeZone)
+  const moon = getMoonPhase(instant)
+  const rokuyo = getRokuyo(wall)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return {
+    westernZodiac: getWesternZodiac(wall),
+    hourlyZodiac: getHourlyZodiac(wall),
+    rokuyo,
+    rokuyoGuidance: ROKUYO_GUIDANCE[rokuyo] ?? '',
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    localDay: `${wall.getFullYear()}-${pad(wall.getMonth() + 1)}-${pad(wall.getDate())}`,
+    localHour: wall.getHours(),
+    timeZone: wall === instant ? 'device' : (timeZone as string),
+  }
+}
+
+/** Minimal shape of a Log entry's context this module reads. */
+export interface AstroLogContextLike {
+  astroRokuyo?: string | null
+  astroMoonPhase?: string | null
+  astroHourlyZodiac?: string | null
+}
+
+export interface AstroResonance {
+  /** Entries that carried an astro snapshot */
+  sampleSize: number
+  rokuyo: { value: string; share: number } | null
+  moonPhase: { value: string; share: number } | null
+  hourlyZodiac: { value: string; share: number } | null
+}
+
+export const ASTRO_RESONANCE_MIN_SAMPLE = 7
+
+function topOf(values: string[], cycleLength: number): { value: string; share: number } | null {
+  if (!values.length) return null
+  const counts = new Map<string, number>()
+  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1)
+  let best: [string, number] | null = null
+  for (const entry of counts) if (!best || entry[1] > best[1]) best = entry
+  if (!best) return null
+  const share = best[1] / values.length
+  // Only a "resonance" if it clearly beats the uniform baseline for that
+  // cycle (1/6 rokuyo, 1/8 moon phases, 1/12 zodiac hours) by 1.5×.
+  if (share < (1 / cycleLength) * 1.5) return null
+  return { value: best[0], share: Math.round(share * 100) / 100 }
+}
+
+/**
+ * Personal resonance — which ambient conditions this user most often
+ * writes under, derived purely from their own Logs (each entry's context
+ * snapshot from getLogContext). Returns null below the minimum sample.
+ */
+export function computeAstroResonance(
+  logs: Array<{ context?: AstroLogContextLike | null }>
+): AstroResonance | null {
+  const withAstro = logs.filter(l => l?.context?.astroRokuyo)
+  if (withAstro.length < ASTRO_RESONANCE_MIN_SAMPLE) return null
+  const pick = (k: keyof AstroLogContextLike) =>
+    withAstro.map(l => l.context?.[k]).filter((v): v is string => !!v)
+  return {
+    sampleSize: withAstro.length,
+    rokuyo: topOf(pick('astroRokuyo'), 6),
+    moonPhase: topOf(pick('astroMoonPhase'), 8),
+    hourlyZodiac: topOf(pick('astroHourlyZodiac'), 12),
+  }
+}
+
+/** Which of today's reading's facets match the user's resonance. */
+export function getResonanceMatches(reading: AstrologyReading, resonance: AstroResonance | null): string[] {
+  if (!resonance) return []
+  const matches: string[] = []
+  if (resonance.rokuyo?.value === reading.rokuyo) matches.push('rokuyo')
+  if (resonance.moonPhase?.value === reading.moonPhase) matches.push('moon')
+  if (resonance.hourlyZodiac?.value === reading.hourlyZodiac) matches.push('hour')
+  return matches
+}
+
+/** Compact "Taian · Full Moon · Dragon hr" line for a Log entry footer. */
+export function formatAstroContext(ctx?: AstroLogContextLike | null): string {
+  if (!ctx?.astroRokuyo) return ''
+  return [ctx.astroRokuyo, ctx.astroMoonPhase, ctx.astroHourlyZodiac && `${ctx.astroHourlyZodiac} hr`]
+    .filter(Boolean)
+    .join(' · ')
 }

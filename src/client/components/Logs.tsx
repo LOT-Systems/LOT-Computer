@@ -11,6 +11,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
+import { formatAstroContext } from '#shared/utils/astrology'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -363,7 +364,10 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {formatAstroContext(log.context)}
+                    {log.context.astroMoonIllumination != null && ` (${log.context.astroMoonIllumination}%)`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
@@ -4179,10 +4183,10 @@ const NoteEditor = ({
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    // (2026-11-19) Ambient astrology snapshot travels with every entry
+    const astroText = formatAstroContext(log?.context)
+    const base = log?.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astroText].filter(Boolean).join(' · ')
   }, [log?.context])
 
   return (
@@ -4450,10 +4454,10 @@ const LogContainer: React.FC<{
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    // (2026-11-19) Ambient astrology snapshot travels with every entry
+    const astroText = formatAstroContext(log?.context)
+    const base = log?.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astroText].filter(Boolean).join(' · ')
   }, [log.context])
 
   return (

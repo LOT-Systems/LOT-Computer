@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAstrologyReading, computeAstroResonance, getResonanceMatches } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -113,7 +113,7 @@ export const System = React.memo(function SystemInner() {
   const myProfileVisits: number = (me as any)?.metadata?.profileVisits ?? 0
 
   const { data: profile } = useProfile()
-  const { data: logs = [] } = useLogs()
+  const { data: logs = [], isFetched: logsFetched } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
 
 
@@ -203,40 +203,58 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // rokuyo), not a personal natal chart. (2026-11-19) Computed in the user's
+  // saved profile timeZone (falls back to device time), so the dashboard
+  // block and every Logs entry's astro snapshot agree on the same day/hour.
+  const userTimeZone = (me as any)?.timeZone as string | undefined
+  const astrology = React.useMemo(
+    () => getAstrologyReading(new Date(), userTimeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, userTimeZone]
+  )
+
+  // Personal resonance — derived from the user's own Logs, each of which
+  // snapshots the ambient reading it was written under (server getLogContext).
+  const astroResonance = React.useMemo(() => computeAstroResonance(logs as any[]), [logs])
+  const resonanceMatches = React.useMemo(
+    () => getResonanceMatches(astrology, astroResonance),
+    [astrology, astroResonance]
+  )
+  const resonanceLine = React.useMemo(() => {
+    if (!astroResonance) return null
+    const parts = [
+      astroResonance.rokuyo?.value,
+      astroResonance.moonPhase?.value,
+      astroResonance.hourlyZodiac && `${astroResonance.hourlyZodiac.value} hr`,
+    ].filter(Boolean)
+    if (!parts.length) return null
+    const aligned = resonanceMatches.length > 0 ? ` • aligned ${resonanceMatches.length}/3` : ''
+    return `You write most under ${parts.join(' • ')}${aligned}`
+  }, [astroResonance, resonanceMatches])
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
-  // per calendar day, so other widgets (cosmic, system) can react to it.
+  // per local calendar day, so other widgets (cosmic, system) can react to
+  // it — now carrying the personal resonance match as well.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
+    // Wait for Logs so the day's single signal carries the resonance match
+    if (!logsFetched) return
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    try {
+      if (localStorage.getItem(lastRecordedKey) === astrology.localDay) return
+    } catch { /* storage unavailable — still record once per mount */ }
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      { resonanceMatches, resonanceSample: astroResonance?.sampleSize ?? 0, localDay: astrology.localDay }
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, astrology.localDay) } catch { /* noop */ }
+    // resonance read at first post-fetch run only — one signal per local day
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrology.localDay, logsFetched])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +485,8 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            <div className="opacity-60">{astrology.rokuyo}: {astrology.rokuyoGuidance}</div>
+            {resonanceLine && <div className="opacity-60">{resonanceLine}</div>}
           </Block>
         </div>
 
@@ -670,9 +690,13 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
-            </div>
+            <>
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              <div className="opacity-60">{astrology.rokuyo}: {astrology.rokuyoGuidance}</div>
+              {resonanceLine && <div className="opacity-60">{resonanceLine}</div>}
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
