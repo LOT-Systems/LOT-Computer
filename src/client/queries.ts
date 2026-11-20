@@ -141,6 +141,35 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+// Calendar — event-sourced on the Log stream (see #shared/utils/calendar)
+export type CalendarFeed = {
+  serverTime: number
+  logs: Array<Pick<Log, 'id' | 'event' | 'text' | 'metadata'> & { createdAt: string }>
+}
+
+export const useCalendar = createQuery<CalendarFeed>('/api/calendar', {
+  staleTime: 60 * 1000,
+  refetchInterval: 5 * 60 * 1000, // pick up entries made on other devices
+  refetchOnWindowFocus: true,
+})
+
+export const useCreateCalendarEntry = createMutation<
+  { date: string; time: string | null; text: string; entryType: string },
+  Log
+>('post', '/api/calendar/entries')
+
+export const useSetCalendarStatus = createMutation<
+  { id: string; status: 'done' | 'scrubbed' | 'active'; deltaMinutes?: number | null },
+  Log | { ok: true; unchanged: true }
+>('post', (data) => `/api/calendar/entries/${data.id}/status`)
+
+export async function fireCalendarAlert(body: { entryId: string; level: string; text: string }) {
+  const { data } = await api.post<
+    (Log & { duplicate?: boolean }) | { ok: true; skipped: true; reason: string }
+  >('/api/calendar/alerts', body)
+  return data
+}
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

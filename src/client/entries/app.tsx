@@ -20,6 +20,7 @@ import { DirectMessageThread } from '#client/components/DirectMessageThread'
 import { StatusPage } from '#client/components/StatusPage'
 import { ApiPage } from '#client/components/ApiPage'
 import { ConnectionStatus } from '#client/components/ConnectionStatus'
+import { CalendarAlertEngine } from '#client/components/CalendarAlerts'
 import { render } from '#client/utils/render'
 import { listenSSE } from '#client/utils/sse'
 import { useSun } from '#client/utils/sun'
@@ -344,6 +345,8 @@ const App = () => {
   return (
     <>
       <ConnectionStatus />
+      {/* App-wide so calendar alerts fire on every tab, not only System */}
+      <CalendarAlertEngine />
       <Layout>
         <TabPanels />
         <DynamicRoutes />

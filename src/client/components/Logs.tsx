@@ -23,6 +23,7 @@ import {
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
 import { toCelsius } from '#shared/utils'
+import { deltaLabel as calDeltaLabel, milDate as calMilDate } from '#shared/utils/calendar'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -2076,14 +2077,44 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
-        } else if (log.event === 'calendar_entry') {
-          const entryType = log.metadata?.entryType as string | undefined
-          const date = log.metadata?.date as string | undefined
+        } else if (
+          log.event === 'calendar_entry' ||
+          log.event === 'calendar_alert' ||
+          log.event === 'calendar_update'
+        ) {
+          // CAL — scheduled / alert / cleared, one military register for all three
+          const m = log.metadata || {}
+          const entryType = (m.entryType as string | undefined) || 'entry'
+          const date = m.date as string | undefined
+          const time = m.time as string | undefined
+          const text = (m.text as string | undefined) || ''
+          const level =
+            log.event === 'calendar_entry'
+              ? 'SCHEDULED'
+              : log.event === 'calendar_alert'
+                ? String(m.level || 'ALERT')
+                : m.status === 'done' ? 'CLEARED' : m.status === 'scrubbed' ? 'SCRUBBED' : 'REINSTATED'
+          const critical = level === 'EXECUTE' || level === 'OVERDUE'
+          const delta = typeof m.deltaMinutes === 'number' ? (m.deltaMinutes as number) : null
+          let stamp = ''
+          try { stamp = date ? calMilDate(date) + (time ? ` · ${time}` : '') : '' } catch (_) {}
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                <div className="flex justify-between items-baseline gap-8 mb-8">
+                  <span className="tracking-widest">
+                    {critical && <span className="mr-8">■</span>}
+                    {level}
+                  </span>
+                  <span className="opacity-40 uppercase">{entryType}</span>
+                </div>
+                {text && <div className={cn('break-words', level === 'SCRUBBED' && 'line-through opacity-40')}>{text}</div>}
+                {(stamp || delta !== null) && (
+                  <div className="flex justify-between items-baseline gap-8 opacity-40 mt-8 tabular-nums">
+                    <span>{stamp}</span>
+                    {delta !== null && <span>{delta > 0 ? `${calDeltaLabel(delta)} LATE` : 'ON TIME'}</span>}
+                  </div>
+                )}
               </Block>
             </LogContainer>
           )

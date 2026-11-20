@@ -419,3 +419,19 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* Calendar alert overlay — lives here, not injected at runtime: the app CSP
+   (style-src nonce) blocks <style> elements created from JS. */
+@keyframes lot-cal-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes lot-cal-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.15; }
+}
+.lot-cal-alert-in { animation: lot-cal-in 180ms ease-out; }
+.lot-cal-blink { animation: lot-cal-blink 1s steps(1, end) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .lot-cal-alert-in, .lot-cal-blink { animation: none; }
+}
