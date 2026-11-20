@@ -3728,7 +3728,11 @@ const NoteEditor = ({
       emailSendingRef.current = true
       setEmailStatus('TRANSMITTING…')
       sendEmail(
-        receiverId ? { receiverId, body: draft.body } : { to: draft.to, body: draft.body },
+        receiverId
+          ? { receiverId, body: draft.body }
+          : draft.reply
+            ? { reply: true, body: draft.body }
+            : { to: draft.to, body: draft.body },
         {
           onSuccess: (res) => {
             emailSendingRef.current = false
@@ -3748,7 +3752,7 @@ const NoteEditor = ({
               setEmailChoices(data.recipients)
               setEmailStatus('MULTIPLE MATCHES — SELECT RECIPIENT')
             } else if (err?.response?.status === 404) {
-              setEmailStatus(`NO MEMBER NAMED ${draft.to.toUpperCase()}`)
+              setEmailStatus(draft.reply ? 'NO MAIL TO REPLY TO' : `NO MEMBER NAMED ${draft.to.toUpperCase()}`)
             } else {
               setEmailStatus('MAIL OFFLINE — RETRY')
             }
@@ -4195,6 +4199,7 @@ const NoteEditor = ({
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
           '/email to     /email to Hitomi: message — mail a member (Ctrl+Enter)',
+          '/email reply  /email reply: message — answer your latest mail',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4447,7 +4452,7 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="EMAIL:" blockView>
               <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6' }}>
-                <div className="flex gap-x-24"><span className="opacity-40 min-w-[48px]">TO</span><span>{emailDraft.to}</span></div>
+                <div className="flex gap-x-24"><span className="opacity-40 min-w-[48px]">TO</span><span>{emailDraft.reply ? 'LAST SENDER (REPLY)' : emailDraft.to}</span></div>
                 <div className="flex gap-x-24"><span className="opacity-40 min-w-[48px]">BODY</span><span className="opacity-60">{emailDraft.body ? `${emailDraft.body.length} / 2000` : 'Write the message after a colon or on the next line'}</span></div>
                 {emailChoices.length > 0 && (
                   <div className="mt-8 flex flex-wrap gap-8">

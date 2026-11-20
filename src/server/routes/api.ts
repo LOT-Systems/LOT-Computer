@@ -4156,7 +4156,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
   })
 
   fastify.post('/email', async (req: FastifyRequest<{
-    Body: { to?: string; receiverId?: string; body: string }
+    Body: { to?: string; receiverId?: string; reply?: boolean; body: string }
   }>, reply) => {
     try {
       const body = String(req.body?.body || '').trim().slice(0, 2000)
@@ -4165,6 +4165,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       let receiver: any = null
       if (req.body.receiverId) {
         receiver = await fastify.models.User.findByPk(req.body.receiverId)
+      } else if (req.body.reply) {
+        // "/email reply" — answer whoever wrote to me most recently
+        const last = await fastify.models.DirectMessage.findOne({
+          where: { receiverId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          attributes: ['senderId'],
+        })
+        if (!last) return reply.status(404).send({ error: 'NO MAIL TO REPLY TO' })
+        receiver = await fastify.models.User.findByPk(last.senderId)
       } else {
         const { matches } = await resolveEmailRecipient(req.user, req.body.to || '')
         if (matches.length > 1) {

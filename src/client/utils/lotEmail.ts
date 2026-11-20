@@ -14,6 +14,7 @@
  *   /email to <Name>
  *   <body on the following lines>
  *   /email to <Name> <body>          (single-word name)
+ *   /email reply: <body>             (to whoever mailed you last)
  *
  * Everything written before the command stays a private log entry and
  * is never mailed. Only the text after the command is the body.
@@ -24,12 +25,19 @@ export interface EmailDraft {
   body: string
   /** Index of the "/email" token inside the source text. */
   start: number
+  /** True for "/email reply" — server resolves the latest sender. */
+  reply?: boolean
 }
 
 const CMD = /(^|\s)\/email\s+to\s+/i
+const REPLY = /(^|\s)\/email\s+reply(?=[\s:]|$)[ \t]*:?/i
 
 export function parseEmailCommand(text: string): EmailDraft | null {
   if (!text) return null
+  const r = REPLY.exec(text)
+  if (r) {
+    return { to: 'reply', body: text.slice(r.index + r[0].length).trim(), start: r.index + r[1].length, reply: true }
+  }
   const m = CMD.exec(text)
   if (!m) return null
   const start = m.index + m[1].length

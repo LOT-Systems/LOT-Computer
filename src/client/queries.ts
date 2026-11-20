@@ -135,7 +135,7 @@ export const useEmailInbox = createQuery<{ mail: LotEmailRecord[] }>('/api/email
 })
 
 export const useSendEmail = createMutation<
-  { to?: string; receiverId?: string; body: string },
+  { to?: string; receiverId?: string; reply?: boolean; body: string },
   { id: string; to: { id: string; name: string }; createdAt: string }
 >('post', '/api/email')
 

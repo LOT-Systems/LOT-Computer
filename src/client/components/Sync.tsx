@@ -24,7 +24,10 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useSendEmail,
+  type LotEmailRecipient,
 } from '#client/queries'
+import { parseEmailCommand } from '#client/utils/lotEmail'
 import { sync } from '../sync'
 import { SyncMail } from './SyncMail'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -124,14 +127,67 @@ export const Sync = React.memo(function SyncInner() {
     }
   }, [me?.id])
 
-  const onChangeMessage = React.useCallback((value: string) => setMessage(value), [])
+  const onChangeMessage = React.useCallback((value: string) => {
+    setMessage(value)
+    setEmailStatus(null)
+    setEmailChoices([])
+  }, [])
+
+  // LOT® Email from the chat box: "/email to Hitomi: …" is sent privately,
+  // never posted to the public Sync chat.
+  const { mutate: sendEmail, isLoading: isSendingEmail } = useSendEmail()
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const [emailChoices, setEmailChoices] = React.useState<LotEmailRecipient[]>([])
+  const emailDraft = React.useMemo(
+    () => (/^\s*\/email\b/i.test(message) ? parseEmailCommand(message) : null),
+    [message]
+  )
+
+  const dispatchEmail = React.useCallback(
+    (receiverId?: string) => {
+      const draft = parseEmailCommand(message)
+      if (!draft) { setEmailStatus('USE: /email to Name: message'); return }
+      if (!draft.body) { setEmailStatus('EMPTY BODY'); return }
+      setEmailStatus('TRANSMITTING…')
+      sendEmail(
+        receiverId
+          ? { receiverId, body: draft.body }
+          : draft.reply
+            ? { reply: true, body: draft.body }
+            : { to: draft.to, body: draft.body },
+        {
+          onSuccess: (res) => {
+            setMessage('')
+            setEmailChoices([])
+            setEmailStatus(`✉ PRIVATE MAIL DELIVERED TO ${res.to.name.toUpperCase()}`)
+          },
+          onError: (err: any) => {
+            const data = err?.response?.data
+            if (err?.response?.status === 409 && Array.isArray(data?.recipients)) {
+              setEmailChoices(data.recipients)
+              setEmailStatus('MULTIPLE MATCHES — SELECT RECIPIENT')
+            } else if (err?.response?.status === 404) {
+              setEmailStatus(draft.reply ? 'NO MAIL TO REPLY TO' : `NO MEMBER NAMED ${draft.to.toUpperCase()}`)
+            } else {
+              setEmailStatus('MAIL OFFLINE — RETRY')
+            }
+          },
+        }
+      )
+    },
+    [message, sendEmail]
+  )
 
   const onSubmitMessage = React.useCallback(
     (ev?: React.FormEvent) => {
       ev?.preventDefault()
+      if (/^\s*\/email\b/i.test(message)) {
+        dispatchEmail()
+        return
+      }
       createChatMessage({ message })
     },
-    [message]
+    [message, dispatchEmail]
   )
 
   const onToggleLike = React.useCallback(
@@ -217,6 +273,22 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      {(emailDraft || emailStatus) && (
+        <div className="-mt-64 mb-48 flex flex-wrap items-center gap-8 text-acc/40" style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+          <span>
+            {emailStatus ||
+              (emailDraft?.reply
+                ? 'PRIVATE REPLY TO YOUR LAST MAIL · NOT POSTED TO CHAT'
+                : `PRIVATE MAIL TO ${emailDraft!.to.toUpperCase()} · NOT POSTED TO CHAT`)}
+          </span>
+          {emailChoices.map((r) => (
+            <Button key={r.id} kind="secondary" size="small" disabled={isSendingEmail} onClick={() => dispatchEmail(r.id)}>
+              {r.name}{r.city ? ` · ${r.city}` : ''}
+            </Button>
+          ))}
+        </div>
+      )}
 
       <SyncMail meId={me?.id} />
 
