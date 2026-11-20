@@ -142,6 +142,9 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'fourth-cycle-integration':             'FCINT',
   'fourth-cycle-sovereign':               'FCSOV',
   'fifth-cycle-progenitor':               'FCPROG',
+  'fifth-cycle-ignition':                 'FCIGN',
+  'fifth-cycle-resonance':                'FCRES',
+  'temporal-sovereignty-arc':             'TSOV',
 }
 
 type QOSOperatingMode = 'maintenance' | 'recovery' | 'growth' | 'peak'
@@ -575,8 +578,10 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
-                  { pattern: 'fifth-cycle-progenitor',   label: 'L20 · FIFTH CYCLE PROGENITOR',   urgent: true },
-                  { pattern: 'fourth-cycle-sovereign',   label: 'L19 · FOURTH CYCLE SOVEREIGN',   urgent: true },
+                  { pattern: 'fifth-cycle-resonance',    label: 'L22 · FIFTH CYCLE RESONANCE',     urgent: true },
+                  { pattern: 'fifth-cycle-ignition',     label: 'L21 · FIFTH CYCLE IGNITION',      urgent: true },
+                  { pattern: 'fifth-cycle-progenitor',   label: 'L20 · FIFTH CYCLE PROGENITOR',    urgent: true },
+                  { pattern: 'fourth-cycle-sovereign',   label: 'L19 · FOURTH CYCLE SOVEREIGN',    urgent: true },
                   { pattern: 'fourth-cycle-integration', label: 'L18 · FOURTH CYCLE INTEGRATION', urgent: true },
                   { pattern: 'fourth-cycle-deepening',   label: 'L17 · FOURTH CYCLE DEEPENING',   urgent: true },
                   { pattern: 'fourth-cycle-ignition',    label: 'L16 · FOURTH CYCLE IGNITION',    urgent: true },

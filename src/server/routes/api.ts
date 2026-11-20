@@ -1271,6 +1271,10 @@ export default async (fastify: FastifyInstance) => {
       'fourth_cycle_sovereign',
       // v137: fifth cycle progenitor (P185)
       'fifth_cycle_progenitor',
+      // v138: fifth cycle ignition (P186), resonance (P187), temporal sovereignty arc (P188)
+      'fifth_cycle_ignition',
+      'fifth_cycle_resonance',
+      'temporal_sovereignty_arc',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

@@ -1861,6 +1861,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFifthCycleProgenitorCheck()) {
     await executeDailyFifthCycleProgenitorCheck()
   }
+
+  // Check daily fifth cycle ignition check (20:30 UTC every day) — J73
+  if (shouldRunDailyFifthCycleIgnitionCheck()) {
+    await executeDailyFifthCycleIgnitionCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6510,6 +6515,146 @@ async function executeDailyFifthCycleProgenitorCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Fifth Cycle Ignition Check (J73) ────────────────────────────────
+// Scans for users with fifth_cycle_progenitor event in last 7 days. Checks journal >= 7 in
+// 7-day window, memory >= 5 in 7d, badge >= 3 in 7d, density >= 15.
+// When met, writes fifth_cycle_ignition event. The progenitor arc ignites the fifth. L21-FCIGN.
+
+let isDailyFifthCycleIgnitionRunning = false
+let lastDailyFifthCycleIgnitionRun: Date | null = null
+
+function shouldRunDailyFifthCycleIgnitionCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFifthCycleIgnitionRunning) return false
+  if (lastDailyFifthCycleIgnitionRun) {
+    const lastRun = dayjs(lastDailyFifthCycleIgnitionRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 20 && now.minute() >= 30 // 20:30 UTC daily (after J72)
+}
+
+async function executeDailyFifthCycleIgnitionCheck(): Promise<JobResult> {
+  const jobName = 'daily-fifth-cycle-ignition-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFifthCycleIgnitionRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFifthCycleIgnitionRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIFTH CYCLE IGNITION CHECK — 20:30 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fifth_cycle_progenitor in last 7 days
+        const progenitorLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_progenitor',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (progenitorLogs.length < 1) continue
+
+        // Check journal, memory, badge signals in last 7 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          limit: 50,
+        })
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_created', 'memory_updated', 'memory_access'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          limit: 30,
+        })
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_earned', 'badge_unlocked', 'badge_progress'] },
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          limit: 20,
+        })
+        const density7dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          limit: 50,
+        })
+
+        if (journalLogs.length < 7 || memoryLogs.length < 5 || badgeLogs.length < 3 || density7dLogs.length < 15) continue
+
+        // Don't double-write today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingToday = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_ignition',
+            createdAt: { [Op.gte]: todayStart },
+          },
+          limit: 1,
+        })
+        if (existingToday.length > 0) continue
+
+        const progConf = progenitorLogs[0]?.metadata?.sovereignConf ?? 82
+        await (Log as any).create({
+          userId,
+          event: 'fifth_cycle_ignition',
+          text: `Fifth cycle ignition: progenitor arc generates first committed movement. L21-FCIGN.`,
+          metadata: {
+            progenitorConf: progConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            indexScore: density7dLogs.length,
+            ignitionStatus: 'IGNITION',
+            level: 'L21-FCIGN',
+            field: 'FIFTH-CYCLE-PROGENITOR→FIFTH-CYCLE-IGNITION',
+            hour: 20,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fifth cycle ignition events written: ${written}`)
+    lastDailyFifthCycleIgnitionRun = new Date()
+    isDailyFifthCycleIgnitionRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fifth cycle ignition check failed:', error.message)
+    isDailyFifthCycleIgnitionRunning = false
+    lastDailyFifthCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -8604,6 +8749,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily third cycle ignition check: 3 PM UTC every day (J64)')
   console.log('   - Daily longitudinal persistence check: 10 AM UTC every day (J65)')
   console.log('   - Daily fourth cycle integration check: 7 PM UTC every day (J70)')
+  console.log('   - Daily fifth cycle ignition check: 8:30 PM UTC every day (J73)')
   console.log('')
 
   // Check every hour for scheduled jobs

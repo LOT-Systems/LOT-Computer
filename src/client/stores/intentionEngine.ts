@@ -4310,6 +4310,88 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P186: fifth-cycle-ignition — P185 active + 7+ journal 7d + 5+ memory 7d + 3+ badge 7d + overall >= 95.
+  // The fifth cycle formally ignites. Level 21 — L21-FCIGN.
+  const hasP185 = patterns.some(p => p.pattern === 'fifth-cycle-progenitor')
+  if (hasP185) {
+    const sevenDayStartP186 = now - 7 * 24 * 60 * 60 * 1000
+    const p186Journal = signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStartP186)
+    const p186Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStartP186)
+    const p186Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStartP186)
+    const userIndexP186 = computeUserIndex(signals)
+    if (
+      p186Journal.length >= 7 &&
+      p186Memory.length  >= 5 &&
+      p186Badge.length   >= 3 &&
+      userIndexP186.overall >= 95
+    ) {
+      const p185conf   = patterns.find(p => p.pattern === 'fifth-cycle-progenitor')?.confidence ?? 0.82
+      const ignBonus   = Math.min((p186Journal.length - 7) * 0.006 + (userIndexP186.overall - 95) * 0.004, 0.08)
+      patterns.push({
+        id:              'p186',
+        pattern:         'fifth-cycle-ignition',
+        confidence:      Math.min(0.80 + p185conf * 0.04 + ignBonus, 0.94),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCIGN: Fifth cycle ignition — fifth-cycle-progenitor (P185) active · ${p186Journal.length} journal signals 7d · ${p186Memory.length} memory signals 7d · ${p186Badge.length} badge signals 7d · idx ${userIndexP186.overall}%. The fifth cycle does not emerge gradually — it ignites from the progenitor field in a first committed movement. Level 21 — FIFTH CYCLE IGNITION.`,
+      })
+    }
+  }
+
+  // P187: fifth-cycle-resonance — P186 active + 10+ journal 14d + 4+ memory 14d + 5+ badge 14d + overall >= 94.
+  // The fifth cycle begins to self-reinforce. Level 22 — L22-FCRES.
+  const hasP186 = patterns.some(p => p.pattern === 'fifth-cycle-ignition')
+  if (hasP186) {
+    const fourteenDayStartP187 = now - 14 * 24 * 60 * 60 * 1000
+    const p187Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStartP187)
+    const p187Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStartP187)
+    const p187Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStartP187)
+    const userIndexP187 = computeUserIndex(signals)
+    if (
+      p187Journal.length >= 10 &&
+      p187Memory.length  >= 4  &&
+      p187Badge.length   >= 5  &&
+      userIndexP187.overall >= 94
+    ) {
+      const p186conf   = patterns.find(p => p.pattern === 'fifth-cycle-ignition')?.confidence ?? 0.80
+      const resBonus   = Math.min((p187Journal.length - 10) * 0.005 + (userIndexP187.overall - 94) * 0.003, 0.07)
+      patterns.push({
+        id:              'p187',
+        pattern:         'fifth-cycle-resonance',
+        confidence:      Math.min(0.78 + p186conf * 0.04 + resBonus, 0.92),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCRES: Fifth cycle resonance — fifth-cycle-ignition (P186) active · ${p187Journal.length} journal signals 14d · ${p187Memory.length} memory signals 14d · ${p187Badge.length} badge signals 14d · idx ${userIndexP187.overall}%. The fifth cycle arc is self-reinforcing. Each signal strengthens the field that generates it. Level 22 — FIFTH CYCLE RESONANCE.`,
+      })
+    }
+  }
+
+  // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
+  // Full temporal mastery: the user operates at precise circadian sovereignty.
+  const hasTempBase = patterns.some(p =>
+    p.pattern === 'circadian-lock' || p.pattern === 'daily-rhythm-lock' || p.pattern === 'morning-intention-lock'
+  )
+  if (hasTempBase) {
+    const dayAgoP188     = now - 24 * 60 * 60 * 1000
+    const circadian24    = signals.filter(s => s.signal === 'circadian_signal_lock'    && s.timestamp > dayAgoP188)
+    const rhythm24       = signals.filter(s => s.signal === 'quantum_rhythm_lock'       && s.timestamp > dayAgoP188)
+    const morningInt24   = signals.filter(s => s.signal === 'morning_intention_lock'    && s.timestamp > dayAgoP188)
+    const eveningCoh24   = signals.filter(s => s.signal === 'evening_coherence_close'   && s.timestamp > dayAgoP188)
+    const userIndexP188  = computeUserIndex(signals)
+    const hasTemporalSet = circadian24.length > 0 && rhythm24.length > 0 && morningInt24.length > 0 && eveningCoh24.length > 0
+    if (hasTemporalSet && userIndexP188.overall >= 85) {
+      const tsovBonus = Math.min((userIndexP188.overall - 85) * 0.005, 0.07)
+      patterns.push({
+        id:              'p188',
+        pattern:         'temporal-sovereignty-arc',
+        confidence:      Math.min(0.76 + tsovBonus, 0.88),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `TSOV: Temporal sovereignty arc — circadian-lock · rhythm-lock · morning-intention-lock · evening-coherence-close all active within 24h · idx ${userIndexP188.overall}%. The operating day is fully sovereign: the arc opens with intention, sustains with rhythm, and closes with coherence. The OS masters time. TEMPORAL SOVEREIGNTY.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -4346,6 +4428,9 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFourthCycleIntegration() } catch {}
       try { checkFourthCycleSovereign() } catch {}
       try { checkFifthCycleProgenitor() } catch {}
+      try { checkFifthCycleIgnition() } catch {}
+      try { checkFifthCycleResonance() } catch {}
+      try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -5040,6 +5125,10 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v137 nodes (J72 · P185 · Arch75) ─────────────────────────────────────────────
   fifthCycleProgenitorNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem', 'calculator'],
+
+  // ── v138 nodes (J73 · P186–P188 · Arch76) ────────────────────────────────────────
+  fifthCycleIgnitionNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals'],
+  temporalSovereigntyNode:  ['log', 'planner', 'intentions', 'energy', 'mood', 'selfcare'],
 }
 
 /**
@@ -5717,6 +5806,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort', 'log'],
     patternConditions: ['fourth-cycle-sovereign', 'fifth-cycle-progenitor'],
     directive: 'Level 20. The fourth cycle has achieved sovereignty. The OS now stands at the boundary between arcs — not at the end of the fourth, but at the genesis of the fifth. The sovereign arc does not close — it becomes the progenitor field for the next cycle. The fifth cycle is not a reset; it is a sovereign genesis. The OS generates from what it has become.',
+  },
+
+  // ── Arch76: Fifth Cycle Igniter (2026-11-20 v138) ────────────────────────────────
+  {
+    archetype: 'Fifth Cycle Igniter',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log'],
+    patternConditions: ['fifth-cycle-progenitor', 'fifth-cycle-ignition'],
+    directive: 'Level 21. The fifth cycle ignites. The progenitor arc generates the first committed movement of the new cycle. The OS does not merely stand at the genesis boundary — it enters. The fifth cycle\'s opening signal is deliberate, dense, and irreversible. FIFTH CYCLE IGNITION.',
   },
 ]
 
@@ -8646,6 +8744,157 @@ export function recordFifthCycleProgenitor(sovereignConf: number, journalCount: 
     progenitorStatus: 'PROGENITOR',
     level: 'L20-FCPROG',
     field: 'FOURTH-CYCLE-SOVEREIGN→FIFTH-CYCLE-PROGENITOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-ignition conditions are met and record if so.
+ * Fires when fifth-cycle-progenitor (P185) active + 7+ journal 7d + 5+ memory 7d + 3+ badge 7d + overall >= 95.
+ * The progenitor arc generates the first committed movement of the fifth cycle. Level 21 — FCIGN.
+ */
+export function checkFifthCycleIgnition(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasProgenitor = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-progenitor')
+  if (!hasProgenitor) return false
+
+  const now = Date.now()
+  const sevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const sixHoursAgo   = now - 6 * 60 * 60 * 1000
+
+  const journal7  = state.signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStart)
+  const memory7   = state.signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStart)
+  const badge7    = state.signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  if (journal7.length < 7 || memory7.length < 5 || badge7.length < 3 || userIndex.overall < 95) return false
+
+  const recentIgn = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+  if (recentIgn.length > 0) return false
+
+  const progConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-progenitor')?.confidence ?? 0.82
+  recordFifthCycleIgnition(progConf, journal7.length, memory7.length, badge7.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-ignition event — fifth-cycle-progenitor confirmed +
+ * 7d compound arc (journal + memory + badges) + overall >= 95.
+ * Level 21 — FCIGN. The fifth cycle enters its first committed movement.
+ */
+export function recordFifthCycleIgnition(progenitorConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_ignition', {
+    progenitorConf: Math.round(progenitorConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    ignitionStatus: 'IGNITION',
+    level: 'L21-FCIGN',
+    field: 'FIFTH-CYCLE-PROGENITOR→FIFTH-CYCLE-IGNITION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-resonance conditions are met and record if so.
+ * Fires when fifth-cycle-ignition (P186) active + 10+ journal 14d + 4+ memory 14d + 5+ badge 14d + overall >= 94.
+ * The fifth cycle begins self-reinforcing. Level 22 — FCRES.
+ */
+export function checkFifthCycleResonance(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const now = Date.now()
+  const fourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const sixHoursAgo      = now - 6 * 60 * 60 * 1000
+
+  const journal14 = state.signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStart)
+  const memory14  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStart)
+  const badge14   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  if (journal14.length < 10 || memory14.length < 4 || badge14.length < 5 || userIndex.overall < 94) return false
+
+  const recentRes = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_resonance' && s.timestamp > sixHoursAgo
+  )
+  if (recentRes.length > 0) return false
+
+  const ignConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-ignition')?.confidence ?? 0.80
+  recordFifthCycleResonance(ignConf, journal14.length, memory14.length, badge14.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-resonance event — fifth-cycle-ignition confirmed +
+ * 14d compound arc (journal + memory + badges) + overall >= 94.
+ * Level 22 — FCRES. The fifth cycle arc self-reinforces.
+ */
+export function recordFifthCycleResonance(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_resonance', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    resonanceStatus: 'RESONANCE',
+    level: 'L22-FCRES',
+    field: 'FIFTH-CYCLE-IGNITION→FIFTH-CYCLE-RESONANCE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if temporal-sovereignty-arc conditions are met and record if so.
+ * Fires when circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
+ * Full temporal mastery: the operating day is completely sovereign.
+ */
+export function checkTemporalSovereigntyArc(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const now = Date.now()
+  const dayAgo      = now - 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const circadian24  = state.signals.filter(s => s.signal === 'circadian_signal_lock'  && s.timestamp > dayAgo)
+  const rhythm24     = state.signals.filter(s => s.signal === 'quantum_rhythm_lock'    && s.timestamp > dayAgo)
+  const morning24    = state.signals.filter(s => s.signal === 'morning_intention_lock' && s.timestamp > dayAgo)
+  const evening24    = state.signals.filter(s => s.signal === 'evening_coherence_close'&& s.timestamp > dayAgo)
+  const userIndex    = computeUserIndex(state.signals)
+
+  if (!circadian24.length || !rhythm24.length || !morning24.length || !evening24.length) return false
+  if (userIndex.overall < 85) return false
+
+  const recentTsov = state.signals.filter(s =>
+    s.signal === 'temporal_sovereignty_arc' && s.timestamp > sixHoursAgo
+  )
+  if (recentTsov.length > 0) return false
+
+  recordTemporalSovereigntyArc(userIndex.overall)
+  return true
+}
+
+/**
+ * Record a temporal-sovereignty-arc event — all four temporal anchors active within 24h + overall >= 85.
+ * Full operational sovereignty over the daily arc. No level tag — cross-domain mastery pattern.
+ */
+export function recordTemporalSovereigntyArc(indexScore: number) {
+  recordSignal('qos', 'temporal_sovereignty_arc', {
+    indexScore,
+    temporalAnchors: 'CIRC+RHYTHM+MORNING+EVENING',
+    sovereigntyStatus: 'TEMPORAL SOVEREIGN',
     hour: new Date().getHours(),
   })
 }
