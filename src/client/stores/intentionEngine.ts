@@ -4875,20 +4875,32 @@ export function recordCalendarSignal(entryType: string, date: string) {
  * natal chart. Called once per calendar day from the System dashboard so
  * other widgets (cosmic, system) can synchronize against Tier 0 'astrology'.
  */
-export function recordAstrologySignal(
-  rokuyo: string,
-  moonPhase: string,
-  moonIllumination: number,
-  hourlyZodiac: string,
+export function recordAstrologySignal(reading: {
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  hourlyZodiac: string
   westernZodiac: string
-) {
+  rokuyoWindow?: string
+  lunarMonth?: number
+  lunarDay?: number
+  lunarLeapMonth?: boolean
+  personalPeak?: string | null
+}) {
   recordSignal('astrology', 'ambient_reading', {
-    rokuyo,
-    moonPhase,
-    moonIllumination,
-    hourlyZodiac,
-    westernZodiac,
-    auspicious: rokuyo === 'Taian',
+    rokuyo: reading.rokuyo,
+    moonPhase: reading.moonPhase,
+    moonIllumination: reading.moonIllumination,
+    hourlyZodiac: reading.hourlyZodiac,
+    westernZodiac: reading.westernZodiac,
+    rokuyoWindow: reading.rokuyoWindow ?? null,
+    lunarMonth: reading.lunarMonth ?? null,
+    lunarDay: reading.lunarDay ?? null,
+    lunarLeapMonth: reading.lunarLeapMonth ?? false,
+    auspicious: reading.rokuyo === 'Taian',
+    // Personal resonance from Logs: today matches the rokuyo the user writes most on
+    personalPeak: reading.personalPeak ?? null,
+    resonantDay: !!reading.personalPeak && reading.personalPeak === reading.rokuyo,
   })
 }
 

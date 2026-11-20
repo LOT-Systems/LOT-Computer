@@ -68,6 +68,7 @@ export type UserProfile = {
   city: string | null;
   address: string | null;
   phone: string | null;
+  timeZone?: string | null;
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;
@@ -170,6 +171,11 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // Kyureki lunisolar date + rokuyo favorable-hour flag (added 2026-11-20)
+  astroLunarMonth?: number | null;
+  astroLunarDay?: number | null;
+  astroLunarLeap?: boolean | null;
+  astroFavoredNow?: boolean | null;
   [key: string]: any;
 };
 
