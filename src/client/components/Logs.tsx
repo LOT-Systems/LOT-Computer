@@ -1967,6 +1967,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'device_copy') {
+          const copied = (log.metadata?.text as string | undefined) || log.text
+          const deviceName = log.metadata?.deviceName as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="DEVICE [COPY]:" blockView>
+                {copied && <div>{copied}</div>}
+                {deviceName && <div className="opacity-40">{deviceName}</div>}
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'prayer_scripture') {
           const scripture = log.metadata?.scripture as string | undefined
           return (

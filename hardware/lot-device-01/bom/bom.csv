@@ -1,0 +1,28 @@
+ref,category,part,manufacturer,mpn,qty_per_unit,unit_usd_low,unit_usd_high,source,link,notes
+U1,MCU,"Wi-Fi 4 + BLE 5 SoC, 4 MB flash + 2 MB PSRAM in package",Espressif,ESP32-S3FH4R2,1,2.80,3.60,PCBWay turnkey / LCSC,https://www.espressif.com/en/products/socs/esp32-s3,QFN56 7x7x0.9 mm; no external flash needed
+Y1,MCU,40 MHz crystal 2016,Epson / TXC,FA-128 40MHz,1,0.20,0.40,LCSC,https://www.lcsc.com,
+ANT1,RF,2.4 GHz flex antenna (under front glass),Molex,146153-0100,1,0.80,1.40,Digi-Key / Mouser,https://www.molex.com/en-us/products/part-detail/1461530100,Flexible PCB antenna; place on glass side away from steel
+DS1,Display,"1.28in Memory LCD 128x128, always-on",Sharp,LS013B7DH03,1,9.00,13.00,Digi-Key / Mouser,https://www.digikey.com/en/products/result?keywords=LS013B7DH03,Static image ~µW; reflective silver look; verify outline vs 40x40
+CAM1,Camera,Ultra-low-power AI vision sensor (VGA mono),Himax,HM0360 module,1,8.00,15.00,Himax distributor / Arducam,https://www.himax.com.tw/products/cmos-image-sensor/always-on-vision-sensors/,Verify module z-height <=3 mm; DEV KIT alt: OV2640 (~$4)
+SEN1,Sensor,"Weather + gas AI sensor (T, RH, P, VOC/IAQ)",Bosch Sensortec,BME688,1,7.50,10.00,Digi-Key / Mouser,https://www.bosch-sensortec.com/products/environmental-sensors/gas-sensors/bme688/,3x3x0.93 mm; needs ePTFE vent; BME AI-Studio
+SEN2,Sensor,6-axis IMU with on-chip gesture/wake,Bosch Sensortec,BMI270,1,2.50,3.50,Digi-Key / Mouser,https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/,Wrist-tap / pick-up wake
+U2,Power,Qi receiver + Li-ion charger (single chip),Texas Instruments,BQ51050B,1,3.00,4.20,Digi-Key / Mouser,https://www.ti.com/product/BQ51050B,Wireless charging Rx; 4.2 V charge
+L1,Power,"Qi Rx coil, thin (<=0.8 mm), ~20-30 mm",Würth Elektronik,WE-WPCC receiver coil (select),1,2.00,4.00,Digi-Key / Mouser,https://www.we-online.com/en/components/products/WE-WPCC,Must sit under front glass (not behind steel); select exact MPN in EVT
+U3,Power,"Buck 3.3 V, 60 nA Iq, 750 mA",Texas Instruments,TPS62840,1,0.90,1.40,Digi-Key / Mouser,https://www.ti.com/product/TPS62840,100% mode at low battery
+U4,Power,Fuel gauge,Analog Devices,MAX17048,1,1.20,1.80,Digi-Key / Mouser,https://www.analog.com/en/products/max17048.html,Battery % on screen + telemetry b
+BT1,Power,"LiPo cell ~2.0x25x30 mm, 80-120 mAh, with PCM",Grepow / PKCell (custom),202530 custom,1,3.00,6.00,Alibaba vendor,https://www.grepow.com,Needs UN38.3 + MSDS for shipping
+M1,Haptic,"Coin ERM motor 8 mm x 2 mm (pager buzz)",Jinlong Machinery (generic),0820 coin ERM,1,0.40,0.90,LCSC / Alibaba,https://www.lcsc.com,Driven by N-MOSFET + flyback diode
+SW1,Input,"Low-profile tact switch (Copy button)",Alps Alpine,SKRKAEE010,1,0.20,0.40,Digi-Key / Mouser,https://tech.alpsalpine.com/e/products/category/tact-switch/,0.55 mm height; verify actuator under steel button cap
+PCB,PCB,"4-layer 0.6 mm FR4 ENIG, ~38x38 mm",PCBWay,custom,1,1.50,3.50,PCBWay,https://www.pcbway.com/orderonline.aspx,Price at 100 pcs incl. panelisation
+PCBA,Assembly,"SMT assembly + stencil + setup (amortised over 100)",PCBWay,turnkey PCBA,1,8.00,14.00,PCBWay,https://www.pcbway.com/pcb-assembly.html,Includes X-ray for QFN/LGA
+PASS,Passives,"Caps/resistors/inductors/ESD/MOSFET (~45 parts)",various,various,1,1.20,2.20,PCBWay turnkey,https://www.pcbway.com/pcb-assembly.html,
+ENC1,Enclosure,"Front frame 316L CNC (bead-blasted edge, glass seat)",PCBWay CNC,custom,1,14.00,24.00,PCBWay CNC,https://www.pcbway.com/rapid-prototyping/cnc-machining/,Price at 100 sets; verify quote
+ENC2,Enclosure,"Back cover 316L CNC, #8 mirror polish",PCBWay CNC,custom,1,12.00,22.00,PCBWay CNC,https://www.pcbway.com/rapid-prototyping/cnc-machining/,Mirror polish is a post-process line item
+GL1,Enclosure,"Cover glass 0.55 mm, AR coat, black mask print, 38x38",Chinese cover-glass vendor (e.g. via PCBWay sourcing),custom,1,2.00,4.50,PCBWay / Alibaba,https://www.pcbway.com,Camera window + IR-free area for antenna/coil
+HW1,Enclosure,"M1.2 Torx screws, stainless (x4)",generic,M1.2x2.5,4,0.04,0.08,McMaster / Alibaba,https://www.mcmaster.com,
+GSK1,Enclosure,"Die-cut adhesive/gasket (glass + back)",tesa / 3M,tesa 61395 / VHB die-cut,1,0.30,0.80,Die-cut vendor,https://www.tesa.com,
+VENT1,Enclosure,ePTFE vent membrane for BME688,Gore / Donaldson,small adhesive vent,1,0.30,0.80,Distributor,https://www.gore.com/products/categories/venting,
+CHG1,Charger,"Qi 5-10 W transmitter pad, white-label, USB-C",OEM (Shenzhen),white-label Qi pad,1,4.00,8.00,Alibaba vendor,https://www.alibaba.com,Re-shelled in aluminium/steel puck (CHG2)
+CHG2,Charger,"Charger puck shell, aluminium CNC, anodised silver",PCBWay CNC,custom,1,6.00,12.00,PCBWay CNC,https://www.pcbway.com/rapid-prototyping/cnc-machining/,Aluminium top must be glass/ceramic over coil
+CBL1,Charger,USB-C to USB-C cable 1 m,generic,USB-C cable,1,0.80,1.50,Alibaba,https://www.alibaba.com,
+PKG1,Packaging,"Box + insert + printed quick-start card (QR → PDF manual)",local / Alibaba,custom,1,2.00,4.00,Vendor,https://www.alibaba.com,

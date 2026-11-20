@@ -44,6 +44,7 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { registerDeviceUserRoutes } from './device-api.js'
 
 // ============================================================================
 // Helper Functions
@@ -136,6 +137,8 @@ function generateCompassionateResponse(
 export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
+  // LOT-DEVICE-01 pairing + site → device notifications
+  registerDeviceUserRoutes(fastify)
 
   // Admin diagnostic ping endpoint
   fastify.get('/ping', async (req, reply) => {
@@ -1213,6 +1216,8 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // LOT-DEVICE-01: hardware "Copy" button
+      'device_copy',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
