@@ -63,3 +63,24 @@ export async function listCosmoVerdicts(userId: string, limit = 50) {
     return { available: false, total: 0, held: 0, cleared: 0, rows: [] as unknown[] }
   }
 }
+
+/**
+ * QI·46 Node 7 (prep) — fetch label-only rows for the beta read-out.
+ * Window is clamped to 1..90 days and capped at 10 000 rows.
+ */
+export async function listQi46VerdictsForReadout(source: string, days: number) {
+  try {
+    const rows = await sequelize.query(
+      `SELECT "userId", status, reasons, risk_level, lead, engine_version, source
+         FROM qi46_cosmo_verdicts
+        WHERE source = :source
+          AND created_at >= NOW() - (:days || ' days')::interval
+        ORDER BY created_at DESC
+        LIMIT 10000`,
+      { replacements: { source, days: String(days) }, type: QueryTypes.SELECT }
+    )
+    return { available: true, rows: rows as any[] }
+  } catch (err) {
+    return { available: false, rows: [] as any[] }
+  }
+}

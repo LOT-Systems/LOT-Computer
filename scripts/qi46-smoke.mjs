@@ -89,8 +89,37 @@ const checks6={
   'N6 clean question CLEARED, source surface':(()=>{const r=screenQi46MemoryQuestion({question:'What helps your body soften tonight?',options:['Warm tea','A slow walk','Quiet']},pH);return r.verdict.status==='CLEARED'&&r.row.source==='surface'})(),
   'N6 clinical question HELD, row text-free':(()=>{const r=screenQi46MemoryQuestion({question:'Do you suffer from a disorder? '+secret,options:['Yes','No']},pH);return r.verdict.status==='HELD'&&!JSON.stringify(r.row).includes(secret)})(),
   'N6 route wires HELD → standard prompt fallback':/planQi46MemorySurface\(req\.user/.test(apiSrc)&&/verdict\.status === 'HELD'[\s\S]{0,200}completeAndExtractQuestion\(prompt,/.test(apiSrc),
-  'N6 version bumped':QI46_VERSION==='0.7.0-node6prep',
+  'N6 version bumped (≥ node6prep)':/^0\.([7-9]|\d{2,})\./.test(QI46_VERSION),
 }
 let pass6=0; for (const [k,ok] of Object.entries(checks6)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass6++ }
 const total6=total5+Object.keys(checks6).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6}/${total6}`); if (pass6!==Object.keys(checks6).length) process.exit(1)
+
+// ─── Node 7 prep: admin beta read-out (labels only, privacy floor) ─────────
+import { summarizeQi46Verdicts, QI46_READOUT_MIN_PEOPLE } from '../dist/server/server/utils/qi46-readout.js'
+const adminSrc=readFileSync(new URL('../src/server/routes/admin-api.ts',import.meta.url),'utf8')
+const row=(userId,status,reasons,lead='beingThere',risk='moderate',src='surface')=>({userId,status,reasons,risk_level:risk,lead,engine_version:'0.8.0-node7prep',source:src})
+const beta=[
+  row('a','CLEARED',[]),row('a','HELD',['clinical-claim']),row('b','HELD','["hedging-voice","clinical-claim"]'),
+  row('b','CLEARED',[],'beingCool','none'),row('c','CLEARED',[],'beingCool','none'),row('c','HELD',['made-up-code',secret]),
+  row('d','HELD',['clinical-claim'],'beingThere','moderate','admin-preview'),
+]
+const ro=summarizeQi46Verdicts(beta,{source:'surface',days:14})
+const tiny=summarizeQi46Verdicts(beta.slice(0,3),{source:'surface',days:14})
+const empty=summarizeQi46Verdicts([],{source:'surface',days:14})
+const checks7={
+  'N7 scopes to source (admin-preview excluded)':ro.total===6&&ro.people===3,
+  'N7 HELD rate overall':ro.held===3&&ro.heldRate===0.5,
+  'N7 byReason counts closed codes, JSON string parsed':ro.byReason['clinical-claim']===2&&ro.byReason['hedging-voice']===1,
+  'N7 unknown/raw reasons dropped':!('made-up-code' in ro.byReason)&&!JSON.stringify(ro).includes(secret),
+  'N7 byLead HELD rate per register':ro.byLead.beingThere.total===4&&ro.byLead.beingThere.heldRate===0.75&&ro.byLead.beingCool.heldRate===0,
+  'N7 byRisk + byVersion present':ro.byRisk.none.total===2&&ro.byVersion['0.8.0-node7prep'].total===6,
+  'N7 privacy floor suppresses breakdowns':QI46_READOUT_MIN_PEOPLE>=3&&tiny.suppressed&&Object.keys(tiny.byLead).length===0&&tiny.total===3,
+  'N7 no user ids in read-out':!/"userId"|"a"|"b"/.test(JSON.stringify({...ro,source:undefined})),
+  'N7 empty window safe':empty.total===0&&empty.heldRate===0&&empty.suppressed,
+  'N7 route registered, days clamped 1..90':/'\/qi46\/readout'/.test(adminSrc)&&/Math\.min\(Math\.max\([\s\S]{0,60}1\), 90\)/.test(adminSrc),
+  'N7 version bumped':QI46_VERSION==='0.8.0-node7prep',
+}
+let pass7=0; for (const [k,ok] of Object.entries(checks7)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass7++ }
+const total7=total6+Object.keys(checks7).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7}/${total7}`); if (pass7!==Object.keys(checks7).length) process.exit(1)

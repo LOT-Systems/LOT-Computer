@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.7 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19
+### Engine Specification v0.8 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20
 
 ---
 
@@ -20,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           6 of N  — Memory prompt surface (prep: wired, flag off by default)
+NODE           7 of N  — Beta read-out (prep: admin aggregate, privacy floor 3)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.7.0-node6prep) · qi46-surface.ts · qi46-audit.ts · shared/constants/qi46.ts
+CODE           src/server/utils/qi46.ts   (v0.8.0-node7prep) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 37/37
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 48/48
 REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
@@ -302,6 +302,43 @@ logs(40) ─► planQi46MemorySurface ─► active? ── no ──► standar
 
 ---
 
+## 3e. NODE 7 PREP — BETA READ-OUT (assembled 2026-11-20)
+
+Measure the switch-on from day one. Read-only. No new table, no new writes.
+
+### Route (admin only, behind the existing guard)
+
+`GET /admin-api/qi46/readout?days=14&source=surface`
+
+| Param | Rule |
+|---|---|
+| `days` | Default 14, clamped to 1..90 |
+| `source` | `surface` (default) or `admin-preview` |
+
+### Shape
+
+```
+{ available, source, days, total, held, cleared, heldRate, people, suppressed,
+  byReason:  { clinical-claim: n, hedging-voice: n, ... }      // HELD rows only
+  byLead:    { beingThere: {total, held, heldRate}, ... }
+  byRisk:    { none|low|moderate: {total, held, heldRate} }
+  byVersion: { 0.8.0-node7prep: {total, held, heldRate} } }
+```
+
+### Guarantees
+
+- Aggregation is pure (`src/server/utils/qi46-readout.ts`). The smoke test runs the same function the route runs.
+- Reason codes are filtered against the closed `COSMO_REASONS` list a second time. A raw or unknown code never reaches the response.
+- No user ids leave the server. `people` is a count.
+- **Privacy floor**: with fewer than `QI46_READOUT_MIN_PEOPLE = 3` distinct people in the window, only totals are returned (`suppressed: true`).
+- If the migration has not run, `available: false` and zeros are returned. Nothing breaks.
+
+### Not measured yet (F9, carried over)
+
+Skip codes are not written, so there is no "standard path" baseline row to compare against. Adding one needs a write on every Memory request while the flag is on, so it waits for Vadik's call.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
@@ -312,11 +349,13 @@ logs(40) ─► planQi46MemorySurface ─► active? ── no ──► standar
 | ~~5~~ | ~~"Calibrate me" toggle in Settings~~ | **ASSEMBLED 2026-11-18** as admin preview. Release = Vadik approves copy, sets `QI46_COPY_APPROVED = true` |
 | ~~6 prep~~ | ~~Memory prompt surface behind flag~~ | **ASSEMBLED 2026-11-19**, flag `QI46_SURFACE_MEMORY` off by default |
 | **6** | Turn the surface on for the closed beta of 12 | Migration run + Node 5 copy released + flag on |
-| **7** | Beta read-out: HELD rate per reason and per lead register, then tune the calibration weights | ≥ 2 weeks of `surface` audit rows |
+| ~~7 prep~~ | ~~Admin beta read-out~~ | **ASSEMBLED 2026-11-20**: `/admin-api/qi46/readout`, privacy floor 3 |
+| **7** | Read the beta, then tune the calibration weights | ≥ 2 weeks of `surface` audit rows |
+| **8** | Optional skip-code baseline (calibrated vs. standard) | Vadik decides (adds one write per Memory request) |
 
 ---
 
-*QI·46 Engine Specification — v0.7 · Node 6 prep*
+*QI·46 Engine Specification — v0.8 · Node 7 prep*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026*

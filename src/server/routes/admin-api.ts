@@ -20,7 +20,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
 import { assembleQi46, hasQi46Consent, cosmoScreen, toCosmoAuditRow } from '#server/utils/qi46'
-import { recordCosmoVerdict, listCosmoVerdicts } from '#server/utils/qi46-audit'
+import { recordCosmoVerdict, listCosmoVerdicts, listQi46VerdictsForReadout } from '#server/utils/qi46-audit'
+import { summarizeQi46Verdicts } from '#server/utils/qi46-readout'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -471,6 +472,19 @@ export default async (fastify: FastifyInstance) => {
       const user = await fastify.models.User.findByPk(req.params.userId)
       if (!user) return reply.throw.notFound()
       return { userId: user.id, ...(await listCosmoVerdicts(user.id, 50)) }
+    }
+  )
+
+  // QI·46 Node 7 (prep) — beta read-out across everyone. Labels only: HELD rate
+  // by reason, lead register, risk level and engine version. Breakdowns are
+  // suppressed below QI46_READOUT_MIN_PEOPLE distinct people. No user ids out.
+  fastify.get(
+    '/qi46/readout',
+    async (req: FastifyRequest<{ Querystring: { days?: string; source?: string } }>) => {
+      const days = Math.min(Math.max(parseInt(req.query.days || '14', 10) || 14, 1), 90)
+      const source = req.query.source === 'admin-preview' ? 'admin-preview' : 'surface'
+      const { available, rows } = await listQi46VerdictsForReadout(source, days)
+      return { available, ...summarizeQi46Verdicts(rows, { source, days }) }
     }
   )
 
