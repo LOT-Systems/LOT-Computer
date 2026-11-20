@@ -419,3 +419,15 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* Calendar alerts — military-precedence banner entry (CalendarAlerts.tsx) */
+@keyframes calAlertIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.cal-alert-in {
+  animation: calAlertIn 0.24s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-alert-in { animation: none; }
+}

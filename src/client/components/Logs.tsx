@@ -36,6 +36,7 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { formatDTG, isValidDate as isValidCalendarDate } from '#client/utils/calendar'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -2079,11 +2080,65 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryText = log.metadata?.text as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">
+                    {isValidCalendarDate(date) ? formatDTG(date, time || null) : date}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_entry_status') {
+          const status = log.metadata?.status as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const entryText = log.metadata?.text as string | undefined
+          const statusLabel = status === 'active' ? 'RESTORED' : (status || '').toUpperCase()
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">
+                  {statusLabel}{entryType ? ` · ${entryType}` : ''}
+                </div>
+                {entryText && (
+                  <div className={cn('mt-8', status !== 'active' && 'opacity-60', status === 'done' && 'line-through')}>
+                    {entryText}
+                  </div>
+                )}
+                {date && isValidCalendarDate(date) && (
+                  <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">{formatDTG(date, time || null)}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const stage = log.metadata?.stage as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          const dtg = log.metadata?.dtg as string | undefined
+          const entryText = log.metadata?.text as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ALRT:" blockView>
+                <div className="flex items-center gap-8 uppercase tracking-widest">
+                  <span
+                    className={cn(
+                      'inline-block w-[6px] h-[6px] bg-[rgb(var(--acc-color-default))]',
+                      stage === 'ROUTINE' && 'opacity-40'
+                    )}
+                  />
+                  <span>{stage || 'ALERT'}</span>
+                  {entryType && <span className="opacity-40">· {entryType}</span>}
+                </div>
+                {entryText && <div className="mt-8">{entryText}</div>}
+                {dtg && <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">{dtg}</div>}
               </Block>
             </LogContainer>
           )

@@ -1085,6 +1085,8 @@ export default async (fastify: FastifyInstance) => {
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
       'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      // Calendar v2: status changes + fired alerts are part of the operator's record
+      'calendar_entry_status', 'calendar_alert',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1247,6 +1249,23 @@ export default async (fastify: FastifyInstance) => {
 
     // Already have an empty log at top, just return existing logs
     return logs
+  })
+
+  // ============================================================================
+  // CALENDAR — event-sourced from the Log (calendar_entry / _status / _alert)
+  // Dedicated feed so entries never fall out of the 500-row /logs window.
+  // ============================================================================
+  fastify.get('/calendar', async (req: FastifyRequest, reply) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_entry_status', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+    return logs.reverse()
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
@@ -1570,6 +1589,25 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       if (!text) return reply.throw.badParams('Log text is required')
+
+      // Calendar alerts are idempotent per entry+stage: several open tabs or
+      // devices may race to log the same alert — only the first one lands.
+      if (req.body.event === 'calendar_alert') {
+        const entryId = req.body.metadata?.entryId
+        const stage = req.body.metadata?.stage
+        if (typeof entryId !== 'string' || typeof stage !== 'string') {
+          return reply.throw.badParams('calendar_alert requires metadata.entryId and metadata.stage')
+        }
+        const recentAlerts = await fastify.models.Log.findAll({
+          where: { userId: req.user.id, event: 'calendar_alert' },
+          order: [['createdAt', 'DESC']],
+          limit: 500,
+        })
+        const existing = recentAlerts.find(
+          (l) => l.metadata?.entryId === entryId && l.metadata?.stage === stage
+        )
+        if (existing) return existing
+      }
 
       // Get context before creating log to ensure consistency
       const context = await getLogContext(req.user)

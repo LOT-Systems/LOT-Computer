@@ -136,6 +136,17 @@ export const useLogs = createQuery<Log[]>('/api/logs', {
   staleTime: 5 * 60 * 1000, // Cache for 5 minutes — /api/logs has no LIMIT so keep fetches infrequent
 })
 
+/**
+ * Calendar feed — every calendar_entry / calendar_entry_status / calendar_alert
+ * log for the operator, oldest first. Folded client-side by utils/calendar.
+ * Refetched on focus so a second device's changes and alerts converge.
+ */
+export const useCalendarLogs = createQuery<Log[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000,
+  staleTime: 60 * 1000,
+})
+
 export const useCreateLog = createMutation<{ text: string; event?: string; metadata?: Record<string, any> }, Log>(
   'post',
   '/api/logs'
