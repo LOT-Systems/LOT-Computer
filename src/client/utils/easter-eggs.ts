@@ -4684,3 +4684,80 @@ export function checkLongBody(journalText: string): BadgeType | null {
   }
   return null
 }
+
+// ── Dream Laboratory v39 — word turn patterns ─────────────────────────────────
+
+export const DREAM_WORD_MAP: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\blucid[\s-]?dream(?:ing)?\b|\bi[\s-]?became[\s-]?lucid\b|\baware[\s-]?in[\s-]?the[\s-]?dream\b|\bdream[\s-]?aware(?:ness)?\b/i, badge: 'lucid_dreamer' },
+  { regex: /\bhypnagogic\b|\bhypnagogia\b|\bthe[\s-]?edge[\s-]?of[\s-]?sleep\b|\bfalling[\s-]?asleep[\s-]?into\b/i, badge: 'hypnagogic_badge' },
+  { regex: /\bREM\b|\brapid[\s-]?eye[\s-]?movement\b|\bdeep[\s-]?sleep[\s-]?stage\b|\bsleep[\s-]?cycle\b/i, badge: 'rem_signal' },
+  { regex: /\btheta[\s-]?waves?\b|\btheta[\s-]?brainwave\b|\btheta[\s-]?state\b|\btheta[\s-]?frequency\b/i, badge: 'theta_state' },
+  { regex: /\bdreamscape\b|\bdream[\s-]?world\b|\bdream[\s-]?realm\b|\bdream[\s-]?landscape\b/i, badge: 'dreamscape' },
+  { regex: /\bsomnambulant\b|\bsleepwalking\b|\bhalf[\s-]?asleep\b|\bbetween[\s-]?sleep[\s-]?and[\s-]?waking\b/i, badge: 'somnambulant' },
+  { regex: /\bsubconscious\b|\bthe[\s-]?subconscious\b|\bunconscious[\s-]?mind\b|\bthe[\s-]?deep[\s-]?mind\b/i, badge: 'subconscious_map' },
+  { regex: /\bwaking[\s-]?vision\b|\bdream[\s-]?vision\b|\bvision[\s-]?came[\s-]?to[\s-]?me\b|\ba[\s-]?vision\b/i, badge: 'vision_window' },
+  { regex: /\bdelta[\s-]?waves?\b|\bslow[\s-]?wave[\s-]?sleep\b|\bdreamless[\s-]?sleep\b|\bdeepest[\s-]?sleep\b/i, badge: 'delta_wave' },
+  { regex: /\bsleep[\s-]?hygiene\b|\bsleep[\s-]?ritual\b|\bsleep[\s-]?ceremony\b|\bsleep[\s-]?protocol\b|\bwinding[\s-]?down\b/i, badge: 'sleep_ceremony' },
+  { regex: /\bdream[\s-]?journal\b|\bwrite[\s-]?my[\s-]?dreams?\b|\brecorded[\s-]?my[\s-]?dream\b|\bdream[\s-]?log\b|\bdream[\s-]?notes?\b/i, badge: 'dream_journal' },
+  { regex: /\bthe[\s-]?dream[\s-]?told[\s-]?me\b|\bdream[\s-]?message\b|\bnight[\s-]?oracle\b|\bmy[\s-]?dream[\s-]?showed\b|\bthe[\s-]?dream[\s-]?revealed\b/i, badge: 'night_oracle' },
+]
+
+export const DREAM_SECRET_WORDS: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\bcastaneda\b|\bdon[\s-]?juan\b|\bthe[\s-]?separate[\s-]?reality\b|\bdreaming[\s-]?body\b|\btensegrity\b/i, badge: 'castaneda_signal' },
+  { regex: /\bborges\b|\bgarden[\s-]?of[\s-]?forking[\s-]?paths\b|\blibrary[\s-]?of[\s-]?babel\b|\blabyrinths\b/i, badge: 'borges_dream' },
+  { regex: /\ble[\s-]?guin\b|\blathe[\s-]?of[\s-]?heaven\b|\bearthsea\b|\bthe[\s-]?dispossessed\b|\bursula[\s-]?k\b/i, badge: 'le_guin_dream' },
+]
+
+const DREAM_WORDS_V39 = DREAM_WORD_MAP.map(e => e.regex)
+
+/** Scan journal text for all 12 Dream Laboratory (v39) word turns + 3 secret boss words. */
+export function checkDreamWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { regex, badge } of DREAM_WORD_MAP) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  for (const { regex, badge } of DREAM_SECRET_WORDS) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award dream_session badge if 3+ Dream Laboratory (v39) words appear in one journal entry. */
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (hasBadge('dream_session')) return null
+  const matchCount = DREAM_WORDS_V39.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+/** Award liminal_hour badge if check-in occurs between 03:00–04:00 local time. */
+export function checkLiminalHour(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('liminal_hour')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 3 && hour < 4) {
+    awardBadge('liminal_hour')
+    return 'liminal_hour'
+  }
+  return null
+}
+
+/** Award long_dream badge if journal entry has 444+ characters. */
+export function checkLongDream(journalText: string): BadgeType | null {
+  if (hasBadge('long_dream')) return null
+  if (journalText.length >= 444) {
+    awardBadge('long_dream')
+    return 'long_dream'
+  }
+  return null
+}

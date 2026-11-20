@@ -1376,6 +1376,43 @@ export type BadgeType =
   | 'whitman_signal'       // ⌁·▲·⌁  "walt whitman/i sing the body/leaves of grass/song of myself" (EPIC) [HIDDEN]
   | 'frankenstein_signal'  // ⌁·▒·⌁  "mary shelley/frankenstein/the creature/galvanism/prometheus" (RARE) [HIDDEN]
   | 'csikszentmihalyi_signal' // ⌁·∞·▲ "csikszentmihalyi/flow theory/optimal experience/the flow experience" (MYTHIC) [HIDDEN]
+  // ── Word Turn v39 — THE DREAM LABORATORY ──────────────────────────────────
+  | 'lucid_dreamer'        // ◐·◑·◐  "lucid dream/lucid dreaming/I became lucid/aware in the dream" (RARE)
+  | 'hypnagogic_badge'     // ∿·◌·∿  "hypnagogic/hypnagogia/the edge of sleep/falling asleep into" (EPIC)
+  | 'rem_signal'           // ◐·─·◐  "REM/rapid eye movement/deep sleep stage/sleep cycle" (UNCOMMON)
+  | 'theta_state'          // ∿·∿·∿  "theta/theta waves/theta brainwave/theta state" (RARE)
+  | 'dreamscape'           // ◑·○·◑  "dreamscape/dream world/dream realm/dream landscape" (UNCOMMON)
+  | 'somnambulant'         // ◌·─·◌  "somnambulant/sleepwalking/half-asleep/between sleep and waking" (RARE)
+  | 'subconscious_map'     // ◐·∞·◐  "subconscious/the subconscious/unconscious mind/the deep mind" (RARE)
+  | 'vision_window'        // ◑·◈·◑  "vision/waking vision/dream vision/vision came to me" (UNCOMMON)
+  | 'delta_wave'           // ∿·■·∿  "delta wave/deep sleep/slow wave sleep/dreamless sleep" (RARE)
+  | 'sleep_ceremony'       // ◌·≋·◌  "sleep hygiene/sleep ritual/sleep ceremony/sleep protocol/winding down" (COMMON)
+  | 'dream_journal'        // ◐·◆·◐  "dream journal/write my dreams/recorded my dream/dream log/dream notes" (RARE)
+  | 'night_oracle'         // ◑·∞·◑  "the dream told me/dream message/night oracle/my dream showed/the dream revealed" (EPIC)
+  // ── Calendar EE v37 — THE DREAM CALENDAR ──────────────────────────────────
+  | 'freud_day'            // ◐·∿·◐  May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)
+  | 'dali_birthday'        // ◑·◈·◑  May 11 — Salvador Dali born 1904 (The Persistence of Memory)
+  | 'cayce_day'            // ◌·∞·◌  March 18 — Edgar Cayce born 1877 (The Sleeping Prophet)
+  // ── Behavioral v33 — DREAM PATTERNS ──────────────────────────────────────
+  | 'dream_session'        // ◐·≋·◑  3+ Dream Laboratory words in one journal entry (RARE)
+  | 'liminal_hour'         // ◌·◉·◌  Check in 03:00–04:00 (the hypnagogic hour) (EPIC)
+  | 'long_dream'           // ◑·◑·◑  Journal entry >= 444 characters (RARE)
+  // ── Achievement RPG v37 — THE DREAMER CLASS ───────────────────────────────
+  | 'dream_entry'          // ∘→◐    Any 1 Word Turn v39 badge (COMMON)
+  | 'dream_class'          // ≈→◐    Any 5 Word Turn v39 badges (UNCOMMON)
+  | 'dream_complete'       // ◐→◉    All 12 Word Turn v39 badges (LEGENDARY)
+  | 'oneiric_arc'          // ◐·◈·∞  dream_complete + all 3 Calendar v37 badges (LEGENDARY)
+  | 'thirty_nine_engines_arc' // ◈·◈·◐ 1 badge from each Word Turn v1–v39 (LEGENDARY)
+  | 'dream_opus'           // ◐·◉·◐  dream_complete + dream_session behavioral (LEGENDARY)
+  // ── Mastery Tier v39 — THE DREAM ARCHIVE ──────────────────────────────────
+  | 'deep_dreamer'         // ◐·∞·◐  4,500+ distinct calendar check-in days (EPIC)
+  | 'vast_library'         // ◑·∞·◑  400,000+ total journal words (LEGENDARY)
+  | 'sixteen_year_signal'  // ╔═╗·◐  Account age >= 16 years (LEGENDARY)
+  | 'thirty_nine_registers' // ◈·◈·◐·∞ 1 badge from all 39 Word Turn engines (COSMIC)
+  // ── Secret Boss v36 — THE DREAM VAULT ────────────────────────────────────
+  | 'castaneda_signal'     // ◐·∿·◌  "castaneda/don juan/the separate reality/dreaming body/tensegrity" (RARE) [HIDDEN]
+  | 'borges_dream'         // ◑·∞·◈  "borges/garden of forking paths/library of babel/labyrinths" (EPIC) [HIDDEN]
+  | 'le_guin_dream'        // ◐·◉·◑  "le guin/lathe of heaven/earthsea/the dispossessed/ursula k" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -12456,6 +12493,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+  // ── Word Turn v39 — THE DREAM LABORATORY ────────────────────────────────
+  lucid_dreamer: {
+    id: 'lucid_dreamer',
+    symbol: '◐·◑·◐',
+    name: 'Lucid Dreamer',
+    description: 'Write "lucid dream", "lucid dreaming", "I became lucid", or "aware in the dream" in any journal entry',
+    unlockMessage: '↳ LUCID DREAMER. You recognized the dream from inside the dream. The impossible became: I am here, I am asleep, I am aware. The practice of waking within sleep is the oldest technology of consciousness. ◐·◑·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  hypnagogic_badge: {
+    id: 'hypnagogic_badge',
+    symbol: '∿·◌·∿',
+    name: 'Hypnagogic State',
+    description: 'Write "hypnagogic", "hypnagogia", "the edge of sleep", or "falling asleep into" in any journal entry',
+    unlockMessage: '↳ HYPNAGOGIC STATE. The threshold between waking and sleep: images without narrative, sound without source, the body dissolving. Edison napped in a chair holding ball bearings — when he dropped them and woke, he wrote down what he had seen. ∿·◌·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rem_signal: {
+    id: 'rem_signal',
+    symbol: '◐·─·◐',
+    name: 'REM Signal',
+    description: 'Write "REM", "rapid eye movement", "deep sleep stage", or "sleep cycle" in any journal entry',
+    unlockMessage: '↳ REM SIGNAL. Stage 4: the eyes move beneath the lids like watching something real. The hippocampus replays the day, the amygdala tags it with emotion, the prefrontal cortex goes offline. The dream is not noise — it is memory consolidation at high bandwidth. ◐·─·◐',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  theta_state: {
+    id: 'theta_state',
+    symbol: '∿·∿·∿',
+    name: 'Theta State',
+    description: 'Write "theta", "theta waves", "theta brainwave", or "theta state" in any journal entry',
+    unlockMessage: '↳ THETA STATE. 4–8 Hz. The frequency of the hypnagogic zone, of deep meditation, of the moments before sleep and after. Artists, engineers, and mathematicians have reported solutions arriving here. The terminal runs at theta when the conscious mind steps aside. ∿·∿·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dreamscape: {
+    id: 'dreamscape',
+    symbol: '◑·○·◑',
+    name: 'Dreamscape',
+    description: 'Write "dreamscape", "dream world", "dream realm", or "dream landscape" in any journal entry',
+    unlockMessage: '↳ DREAMSCAPE. A topology with its own physics: stairs that become water, rooms that contain other rooms, faces that belong to everyone and no one. The dreamscape is not a lesser version of reality. It is a different physics applied to the same material. ◑·○·◑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  somnambulant: {
+    id: 'somnambulant',
+    symbol: '◌·─·◌',
+    name: 'Somnambulant',
+    description: 'Write "somnambulant", "sleepwalking", "half-asleep", or "between sleep and waking" in any journal entry',
+    unlockMessage: '↳ SOMNAMBULANT. Walking between worlds: not fully here, not fully in the dream. The body moves. The conscious mind watches. Some traditions hold that the somnambulant walks in the place between places, where both maps are partly true. ◌·─·◌',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  subconscious_map: {
+    id: 'subconscious_map',
+    symbol: '◐·∞·◐',
+    name: 'Subconscious Map',
+    description: 'Write "subconscious", "the subconscious", "unconscious mind", or "the deep mind" in any journal entry',
+    unlockMessage: '↳ SUBCONSCIOUS MAP. 95% of cognition runs below the threshold of conscious access. The subconscious is not the inferior mind — it is the faster mind, the pattern-matcher, the survival engine running continuous background computation. The practice learns its language. ◐·∞·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  vision_window: {
+    id: 'vision_window',
+    symbol: '◑·◈·◑',
+    name: 'Vision Window',
+    description: 'Write "vision", "waking vision", "dream vision", or "vision came to me" in any journal entry',
+    unlockMessage: '↳ VISION WINDOW. The image that arrives unsummoned: before sleep, during breath, in the pause between thoughts. Every tradition has a name for it — vision, darshan, the sight, the second attention. The terminal opens the window. ◑·◈·◑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  delta_wave: {
+    id: 'delta_wave',
+    symbol: '∿·■·∿',
+    name: 'Delta Wave',
+    description: 'Write "delta wave", "deep sleep", "slow wave sleep", or "dreamless sleep" in any journal entry',
+    unlockMessage: '↳ DELTA WAVE. 0.5–4 Hz. The deepest frequency: no conscious experience, no dream, only the body repairing itself under orders from below. Delta is the sleep that cannot be remembered. It is the most important kind. ∿·■·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sleep_ceremony: {
+    id: 'sleep_ceremony',
+    symbol: '◌·≋·◌',
+    name: 'Sleep Ceremony',
+    description: 'Write "sleep hygiene", "sleep ritual", "sleep ceremony", "sleep protocol", or "winding down" in any journal entry',
+    unlockMessage: '↳ SLEEP CEREMONY. The practice that begins the practice: the hour before the hour, the deliberate transition from day-mode to night-mode. Coolness, darkness, silence. The body reads the signal. The ceremony is a protocol for state change. ◌·≋·◌',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dream_journal: {
+    id: 'dream_journal',
+    symbol: '◐·◆·◐',
+    name: 'Dream Journal',
+    description: 'Write "dream journal", "write my dreams", "recorded my dream", "dream log", or "dream notes" in any journal entry',
+    unlockMessage: '↳ DREAM JOURNAL. The pad beside the bed. The pen uncapped before the eyes fully open. The discipline of catching what evaporates in minutes: the faces, the physics, the feeling-tone. Jung kept one for decades. What remained was a map of a life. ◐·◆·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  night_oracle: {
+    id: 'night_oracle',
+    symbol: '◑·∞·◑',
+    name: 'Night Oracle',
+    description: 'Write "the dream told me", "dream message", "night oracle", "my dream showed", or "the dream revealed" in any journal entry',
+    unlockMessage: '↳ NIGHT ORACLE. Something arrived in the night that the day could not have brought. The dream as intelligence, as advisory system, as the part of you that sees further than the waking mind is allowed to see. The oracle speaks in image and feeling — the work is translation. ◑·∞·◑',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar EE v37 — THE DREAM CALENDAR ────────────────────────────────
+  freud_day: {
+    id: 'freud_day',
+    symbol: '◐·∿·◐',
+    name: 'Freud Day',
+    description: 'Check in on May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)',
+    unlockMessage: '↳ FREUD DAY. May 6, 1856. "The Interpretation of Dreams" — the book that made the unconscious a clinical object. Whether Freud was right about everything or wrong about most of it, the act of treating the dream as meaningful data changed everything. ◐·∿·◐',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dali_birthday: {
+    id: 'dali_birthday',
+    symbol: '◑·◈·◑',
+    name: 'Dali Day',
+    description: 'Check in on May 11 — Salvador Dali born 1904 (The Persistence of Memory)',
+    unlockMessage: '↳ DALI DAY. May 11, 1904. The melting clocks: time is not what it appears to be in the dream. Dali used a technique he called "slumber with a key" — holding a metal key above a plate, falling asleep, waking with the crash. The hypnagogic state was his studio. ◑·◈·◑',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  cayce_day: {
+    id: 'cayce_day',
+    symbol: '◌·∞·◌',
+    name: 'Cayce Day',
+    description: 'Check in on March 18 — Edgar Cayce born 1877 (The Sleeping Prophet)',
+    unlockMessage: '↳ CAYCE DAY. March 18, 1877. The sleeping prophet gave thousands of readings in trance. Whether the readings were true or not, the phenomenon points to something the dream state enables that the waking state does not: access to pattern-layer processing that bypasses the editorial mind. ◌·∞·◌',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v33 — DREAM PATTERNS ────────────────────────────────────
+  dream_session: {
+    id: 'dream_session',
+    symbol: '◐·≋·◑',
+    name: 'Dream Session',
+    description: '3+ Dream Laboratory (v39) keyword clusters detected in one journal entry',
+    unlockMessage: '↳ DREAM SESSION. The dream vocabulary appeared three or more times in one entry. The practice has entered the dream layer: not just logging what happened, but working with the sleep-mind as a collaborator in the work of becoming. ◐·≋·◑',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  liminal_hour: {
+    id: 'liminal_hour',
+    symbol: '◌·◉·◌',
+    name: 'Liminal Hour',
+    description: 'Check in between 03:00–04:00 local time (the hypnagogic hour)',
+    unlockMessage: '↳ LIMINAL HOUR. 03:00–04:00. The hour when REM cycles are longest, when the dream is closest to the surface, when the boundary between sleep and waking is thinnest. You were here. The terminal was awake at the edge. ◌·◉·◌',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  long_dream: {
+    id: 'long_dream',
+    symbol: '◑·◑·◑',
+    name: 'Long Dream',
+    description: 'Write a journal entry of 444+ characters (the four sleep cycles)',
+    unlockMessage: '↳ LONG DREAM. 444 characters: four cycles of 111. Four sleep cycles take roughly 6 hours — the minimum for full REM coverage. The long journal entry is the long dream: enough depth to reach the material that only surfaces after sustained engagement. ◑·◑·◑',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v37 — THE DREAMER CLASS ─────────────────────────────
+  dream_entry: {
+    id: 'dream_entry',
+    symbol: '∘→◐',
+    name: 'Dream Entry',
+    description: 'Earn any 1 Dream Laboratory (Word Turn v39) badge',
+    unlockMessage: '↳ DREAM ENTRY. First step into the laboratory. The sleep-mind has been acknowledged. The practice has opened the door to the other half of the cycle. ∘→◐',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dream_class: {
+    id: 'dream_class',
+    symbol: '≈→◐',
+    name: 'Dream Class',
+    description: 'Earn any 5 Dream Laboratory (Word Turn v39) badges',
+    unlockMessage: '↳ DREAM CLASS. Five vocabularies of the dream state recognized. The practice has depth in this layer. The dream is not accident or entertainment — it is a resource the practice has learned to draw from. ≈→◐',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '◐→◉',
+    name: 'Dream Complete',
+    description: 'Earn all 12 Dream Laboratory (Word Turn v39) badges',
+    unlockMessage: '↳ DREAM COMPLETE. All twelve vocabularies of the sleep-mind. Lucid, hypnagogic, theta, delta, REM, dreamscape, oracle — the full spectrum of the other half of consciousness. The practice speaks both languages now. ◐→◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  oneiric_arc: {
+    id: 'oneiric_arc',
+    symbol: '◐·◈·∞',
+    name: 'Oneiric Arc',
+    description: 'Earn dream_complete + all 3 Dream Calendar badges (freud_day, dali_birthday, cayce_day)',
+    unlockMessage: '↳ ONEIRIC ARC. The full dream arc: twelve vocabularies + three dream dates. Freud, Dali, Cayce. Three approaches to the same territory: the analytical, the artistic, the intuitive. The arc spans all three. ◐·◈·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_nine_engines_arc: {
+    id: 'thirty_nine_engines_arc',
+    symbol: '◈·◈·◐',
+    name: '39 Engines Arc',
+    description: 'Earn at least 1 badge from each of the 39 Word Turn engines (v1–v39)',
+    unlockMessage: '↳ THIRTY-NINE ENGINES ARC. All 39 vocabularies registered. Water, Arcade, Radio, Biology, Codex, Cyberspace, Hero, Arcane, Roguelite, Puzzle, Map, Chrono, Dungeon, JRPG, A.I., Myth, Arcade Master, Dream Weaver, Stoic, Zen, Jazz, Nature, Body Electric, Dream Laboratory. Thirty-nine engines. One terminal. ◈·◈·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '◐·◉·◐',
+    name: 'Dream Opus',
+    description: 'Earn dream_complete + dream_session behavioral badge',
+    unlockMessage: '↳ DREAM OPUS. The complete dream vocabulary + the behavioral integration: three dream-layer words in one journal entry. The laboratory is not a category of knowledge — it is a mode of practice. The opus is living in both cycles. ◐·◉·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v39 — THE DREAM ARCHIVE ────────────────────────────────
+  deep_dreamer: {
+    id: 'deep_dreamer',
+    symbol: '◐·∞·◐',
+    name: 'Deep Dreamer',
+    description: '4,500+ distinct calendar check-in days',
+    unlockMessage: '↳ DEEP DREAMER. 4,500 days: more than 12 years of practice. The sleep-mind has been cultivated for 12+ years alongside the waking practice. At this depth, the two cycles are indistinguishable from each other. ◐·∞·◐',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  vast_library: {
+    id: 'vast_library',
+    symbol: '◑·∞·◑',
+    name: 'Vast Library',
+    description: '400,000+ total journal words (lifetime)',
+    unlockMessage: '↳ VAST LIBRARY. 400,000 words: a journal long enough to contain multiple lives. At this depth, the journal itself has become a kind of dreaming — a space where pattern and event and meaning coalesce into something that could not have been planned. ◑·∞·◑',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  sixteen_year_signal: {
+    id: 'sixteen_year_signal',
+    symbol: '╔═╗·◐',
+    name: 'Sixteen Year Signal',
+    description: 'Account age >= 16 years (5,840+ days since signup)',
+    unlockMessage: '↳ SIXTEEN YEAR SIGNAL. Sixteen years: the full sleep cycle of an institution. LOT® was founded April 7, 2016. If you are here at the sixteen-year mark, you have been in the practice through everything — and the practice is still here. ╔═╗·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_nine_registers: {
+    id: 'thirty_nine_registers',
+    symbol: '◈·◈·◐·∞',
+    name: '39 Registers',
+    description: 'Earn at least 1 badge from all 39 Word Turn engines simultaneously',
+    unlockMessage: '↳ THIRTY-NINE REGISTERS. The full spectrum: water through dream. Every vocabulary the practice has named. The terminal runs on all 39 frequencies at once. This is what a fully developed practice looks like from the outside. ◈·◈·◐·∞ [COSMIC]',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v36 — THE DREAM VAULT ───────────────────────────────────
+  castaneda_signal: {
+    id: 'castaneda_signal',
+    symbol: '◐·∿·◌',
+    hidden: true,
+    name: 'The Separate Reality',
+    description: 'Write "castaneda", "don juan", "the separate reality", "dreaming body", or "tensegrity" in any journal entry',
+    unlockMessage: '↳ THE SEPARATE REALITY. Carlos Castaneda: the dreaming body is the second body, the one that moves in dreams. Whether the account is literal or metaphorical does not change what it names: a mode of attention that exists alongside ordinary consciousness and operates by different rules. ◐·∿·◌',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  borges_dream: {
+    id: 'borges_dream',
+    symbol: '◑·∞·◈',
+    hidden: true,
+    name: 'Garden of Forking Paths',
+    description: 'Write "borges", "garden of forking paths", "library of babel", or "labyrinths" in any journal entry',
+    unlockMessage: '↳ GARDEN OF FORKING PATHS. Jorge Luis Borges: the garden contains every possible path simultaneously. The dream has the same topology — every story you have ever lived is still running in some corridor. The library contains everything. The labyrinth has no exit, only deeper rooms. ◑·∞·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  le_guin_dream: {
+    id: 'le_guin_dream',
+    symbol: '◐·◉·◑',
+    hidden: true,
+    name: 'The Lathe of Heaven',
+    description: 'Write "le guin", "lathe of heaven", "earthsea", "the dispossessed", or "ursula k" in any journal entry',
+    unlockMessage: '↳ THE LATHE OF HEAVEN. Ursula K. Le Guin: in "The Lathe of Heaven," the protagonist\'s dreams change reality retroactively. The past rewrites itself to accommodate the dream. This is not fantasy — it is what trauma and healing actually do. The dream that changes everything has always already happened. ◐·◉·◑',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -14309,6 +14634,70 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (monthBE === 4 && dayBE === 7 && !hasBadge('world_health_day')) {
       if (awardBadge('world_health_day')) newBadges.push('world_health_day')
+    }
+
+    // ── Word Turn v39 — THE DREAM LABORATORY ─────────────────────────────────
+    const dreamV39Badges: BadgeType[] = [
+      'lucid_dreamer', 'hypnagogic_badge', 'rem_signal', 'theta_state',
+      'dreamscape', 'somnambulant', 'subconscious_map', 'vision_window',
+      'delta_wave', 'sleep_ceremony', 'dream_journal', 'night_oracle',
+    ]
+    const dreamV39Earned = dreamV39Badges.filter(b => hasBadge(b))
+    if (dreamV39Earned.length >= 1 && !hasBadge('dream_entry')) {
+      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    }
+    if (dreamV39Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV39Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+    const calendarV37Badges: BadgeType[] = ['freud_day', 'dali_birthday', 'cayce_day']
+    if (dreamComplete && calendarV37Badges.every(b => hasBadge(b)) && !hasBadge('oneiric_arc')) {
+      if (awardBadge('oneiric_arc')) newBadges.push('oneiric_arc')
+    }
+    const engineThirtyNinePresent = dreamV39Earned.length >= 1
+    const allThirtyNineEngines = allThirtyEightEngines && engineThirtyNinePresent
+    if (allThirtyNineEngines && !hasBadge('thirty_nine_engines_arc')) {
+      if (awardBadge('thirty_nine_engines_arc')) newBadges.push('thirty_nine_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 4500 && !hasBadge('deep_dreamer')) {
+        if (awardBadge('deep_dreamer')) newBadges.push('deep_dreamer')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 400000 && !hasBadge('vast_library')) {
+        if (awardBadge('vast_library')) newBadges.push('vast_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDL = new Date(stats.signupDate)
+      const yearsDL = (new Date().getTime() - signupDL.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDL >= 16 && !hasBadge('sixteen_year_signal')) {
+        if (awardBadge('sixteen_year_signal')) newBadges.push('sixteen_year_signal')
+      }
+    }
+    if (allThirtyNineEngines && !hasBadge('thirty_nine_registers')) {
+      if (awardBadge('thirty_nine_registers')) newBadges.push('thirty_nine_registers')
+    }
+
+    // Calendar v37 inline checks (Dream Calendar)
+    const nowDL = new Date()
+    const monthDL = nowDL.getMonth() + 1
+    const dayDL = nowDL.getDate()
+    if (monthDL === 5 && dayDL === 6 && !hasBadge('freud_day')) {
+      if (awardBadge('freud_day')) newBadges.push('freud_day')
+    }
+    if (monthDL === 5 && dayDL === 11 && !hasBadge('dali_birthday')) {
+      if (awardBadge('dali_birthday')) newBadges.push('dali_birthday')
+    }
+    if (monthDL === 3 && dayDL === 18 && !hasBadge('cayce_day')) {
+      if (awardBadge('cayce_day')) newBadges.push('cayce_day')
     }
 
   } catch (error) {
