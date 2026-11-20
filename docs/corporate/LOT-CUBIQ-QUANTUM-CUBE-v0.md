@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START
+VERSION:  0.1 — DEVELOPMENT START (see R02-R07 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -320,6 +320,92 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE BEDSIDE SETTLE                          2026-11-10
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, evening routine in the Index of
+  Systems, phone charged in another room. CUBIQ pad on a ~100 mm
+  nightstand. Too narrow for THE LEAP (R02 degradation ladder), so the
+  cube's whole vocabulary is THE SETTLE (21:30 wind-down, felt as 2s
+  standing pressure, no light, no sound) and THE NUDGE (06:50 Memory
+  question). Quiet hours forbid all ballistic gestures overnight.
+  Proves the cube is as valuable when it refuses to jump as when it
+  jumps. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, Section 10.
+
+  USE CASE 03 — THE PRACTICE PIANO                          2026-11-11
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, adult returning to piano, 40-minute
+  evening practice, phone in a drawer. CUBIQ pad on the upright's top
+  lid. The cube's surface resonance probe (R03 §06) classifies the lid
+  RESONANT: NUDGE would sound as a faint note through the soundboard, and
+  a landing would sound like a drum. So the cube downgrades to THE SETTLE,
+  fires once at the end of the practice block, never repeats, and holds
+  the waiting Memory question until the operator lifts the cube. Proves
+  the cube must listen to the furniture before it speaks through it.
+  Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R03.md, Section 09.
+
+  USE CASE 04 — THE HOTEL DESK                              2026-11-13
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, frequent traveller, ~10 hotel nights a
+  month. The cube travels in a pocket with no pad: off-pad endurance is
+  months (R04 §04). On each new desk it runs the unknown-surface
+  placement routine (resonance probe, four-ToF edge map, level check)
+  before it allows any ballistic gesture. Here that means NUDGE, SETTLE,
+  and HOP, but not LEAP. At 22:40 local, when the phone and the feed are
+  most tempting, it NUDGEs the Memory question. The operator puts the
+  phone down and picks up the cube. Quiet hours follow the operator's
+  local time. Proves the cube's value isn't tied to one desk: it measures
+  each new surface before it moves on it.
+  Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R04.md, Section 09.
+
+  USE CASE 05 — THE SILENT HOUSEHOLD                        2026-11-14
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, Deaf, a native signer, architectural
+  drafter in a home studio, hearing partner. The home already uses
+  flashing lights for the doorbell and smoke alarm and a bed shaker for
+  waking. For this operator both the phone and the cube are touch
+  channels, so the cube's job is to be told apart from the phone: THE
+  NUDGE becomes a two-beat push signature that a hand on the desk can't
+  mistake for a phone's buzz (R05 §07). The LED ring never blinks, so it
+  never competes with alert lights. During a live signed call, gestures
+  drop to SETTLE, because motion next to a signer pulls the eye off the
+  conversation. Quiet hours still apply for the sleeping partner.
+  Proves that a motion-first, sound-free cube suits Deaf operators
+  especially well, and that they belong on the design panel from the
+  start. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R05.md, Section 09.
+
+  USE CASE 06 — THE MAKER'S BENCH                           2026-11-15
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, studio potter in a garage studio,
+  900 mm plywood bench, concrete floor, phone bagged away from clay and
+  dust. In the workshop, the felt channel and the touch ack both fail:
+  the bench is pounded during wedging and hands are wet with clay. When
+  the shared surface vibrates, the cube DEFERS (G9). It never escalates.
+  Instead, the operator chooses to raise memory_ready one rung to HOP
+  (an operator-set ceiling that QI·46 can lower but never set) and acks
+  by approach. The LEAP spring is cocked only on intent, so when a
+  sleeve knocks the cube onto concrete, nothing fires. SAFE-HOLD,
+  placement and a self-test follow (G8). Dusty ToF windows fail quiet to
+  SETTLE. Proves that hands-busy makers need the visible channel, that
+  drops are routine rather than an edge case, and that only the operator
+  may make the cube louder. Full narrative:
+  LOT-CUBIQ-QUANTUM-CUBE-v0-R06.md, Section 10.
+
+  USE CASE 07 — THE READING ROOM                            2026-11-20
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: R&D tier, part-time doctoral student reading in a
+  university library on long shared oak tables (~35 dB room, next seat
+  1.2 m away). The phone sits face-down and still gets turned over every
+  twelve minutes. In a public quiet room the cube's sound reaches
+  strangers, and no ballistic gesture is quiet enough: even a HOP on a
+  damped desk lands ~10 dB over the room at the next seat (R07 §02). The
+  operator double-taps the top face to set HUSH (G10). One felt SETTLE
+  pulse confirms it. A badge that would LEAP at home arrives as a NUDGE
+  at the wrist, and the neighbour reads on. Only the operator clears
+  HUSH, never a timer or coming home. No microphone is involved. Proves
+  that the operator, not a sensor, should decide that a room is quiet,
+  and that a private felt signal can replace the habit of checking the
+  phone. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R07.md, Section 11.
 
 --------------------------------------------------------------------------------
 08 // BRAND

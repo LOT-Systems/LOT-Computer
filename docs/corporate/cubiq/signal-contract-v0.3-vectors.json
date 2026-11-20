@@ -1,0 +1,1101 @@
+{
+  "contract": "CUBIQ signal contract v0.3",
+  "spec": "docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R07.md §06",
+  "note": "Vectors 01-30 are the v0.2 suite, carried forward unchanged in signal and expectation. Vectors 31-44 are new in v0.3: operator ceilings (R06 F39 / D25, now implemented), G10 hush (operator-set quiet venue), tof_window_dirty -> G7, and G6 extended to ballistic gestures on resonant/unknown surfaces (R07 F46).",
+  "vectors": [
+    {
+      "name": "01 badge_rare, clear desk",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "02 memory_ready asks leap",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "memory_ready",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "03 assembly_phase",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "assembly_phase",
+        "intent": "hop",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "04 unknown class -> settle",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "kiln_cooled",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "05 intent below ceiling kept",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "nudge",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "06 jump on v.0 -> leap",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "jump",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": "device_capability"
+      }
+    },
+    {
+      "name": "07 jump on v.1, 150 mm runway",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "jump",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v1",
+        "surface": "damped",
+        "free_ahead_mm": 150,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "08 call_live hint",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z",
+        "ceiling_hint": "call_live"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "call_live"
+      }
+    },
+    {
+      "name": "09 call_live, operator opted out",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z",
+        "ceiling_hint": "call_live"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "call_live_opt_in": false
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "10 quiet hours",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "quiet_hours": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "quiet_hours"
+      }
+    },
+    {
+      "name": "11 quiet hours, resonant surface",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "resonant",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "quiet_hours": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "quiet_hours"
+      }
+    },
+    {
+      "name": "12 G7 unplaced off-pad",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "unplaced": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G7_unknown_surface"
+      }
+    },
+    {
+      "name": "13 G1 narrow shelf 100 mm",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 100,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "hop",
+        "downgrade_reason": "G1_edge_or_level"
+      }
+    },
+    {
+      "name": "14 G1 very narrow 60 mm",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 60,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "G1_edge_or_level"
+      }
+    },
+    {
+      "name": "15 tilted 5 deg",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 5.0
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "hop",
+        "downgrade_reason": "G1_edge_or_level"
+      }
+    },
+    {
+      "name": "16 G6 nudge on unknown surface",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "memory_ready",
+        "intent": "nudge",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "unknown",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G6_resonant_surface"
+      }
+    },
+    {
+      "name": "17 G4b cadence",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "cadence_ok": false
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "G4b_cadence"
+      }
+    },
+    {
+      "name": "18 G8 fall in last 24 h",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "fall_recent": true
+      },
+      "expect": {
+        "event": "safe_hold",
+        "performed": "none",
+        "downgrade_reason": "G8_fall_recent"
+      }
+    },
+    {
+      "name": "19 G9 machine running",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "machine_vibration": true
+      },
+      "expect": {
+        "event": "deferred",
+        "performed": "none",
+        "downgrade_reason": "G9_machine_vibration"
+      }
+    },
+    {
+      "name": "20 expired",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T11:00:01Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "expired",
+        "performed": "none",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "21 not yet",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T09:59:59Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "held",
+        "performed": "none",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "22 v1 message, no hint",
+      "signal": {
+        "v": 1,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "23 v1 message with hint",
+      "signal": {
+        "v": 1,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z",
+        "ceiling_hint": "call_live"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "hint_requires_v2"
+      }
+    },
+    {
+      "name": "24 missing ttl",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "missing_ttl_s"
+      }
+    },
+    {
+      "name": "25 bool priority",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": true,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "type_priority"
+      }
+    },
+    {
+      "name": "26 bad intent 'shake'",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "shake",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "bad_intent"
+      }
+    },
+    {
+      "name": "27 ttl over 24 h",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 90000,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "bad_ttl"
+      }
+    },
+    {
+      "name": "28 unknown hint",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z",
+        "ceiling_hint": "party"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "rejected",
+        "performed": "none",
+        "downgrade_reason": "bad_ceiling_hint"
+      }
+    },
+    {
+      "name": "29 unknown extra field ignored",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z",
+        "x_future": {
+          "a": 1
+        }
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "30 v.1 jump, 220 mm runway",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR06000000000000001",
+        "class": "badge_rare",
+        "intent": "jump",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-15T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-15T10:05:00Z",
+        "device": "v1",
+        "surface": "damped",
+        "free_ahead_mm": 220,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "31 operator raised memory_ready to hop",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "memory_ready",
+        "intent": "hop",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "memory_ready": "hop"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "hop",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "32 operator asked two rungs, clamped",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "memory_ready",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "memory_ready": "leap"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "hop",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "33 operator lowered badge_rare",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "badge_rare": "nudge"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "operator_ceiling"
+      }
+    },
+    {
+      "name": "34 operator cannot unlock jump",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "jump",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v1",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "badge_rare": "jump"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": "class_ceiling"
+      }
+    },
+    {
+      "name": "35 hush caps leap at nudge",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "hush": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "G10_hush"
+      }
+    },
+    {
+      "name": "36 hush, nudge on resonant",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "memory_ready",
+        "intent": "nudge",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "resonant",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "hush": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G6_resonant_surface"
+      }
+    },
+    {
+      "name": "37 quiet hours reported before hush",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "hush": true,
+        "quiet_hours": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": "quiet_hours"
+      }
+    },
+    {
+      "name": "38 leap on resonant shelf",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "resonant",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G6_resonant_surface"
+      }
+    },
+    {
+      "name": "39 hop on unknown surface",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_common",
+        "intent": "hop",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "unknown",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G6_resonant_surface"
+      }
+    },
+    {
+      "name": "40 short runway reported before G6",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "resonant",
+        "free_ahead_mm": 100,
+        "level_deg": 0.5
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G1_edge_or_level"
+      }
+    },
+    {
+      "name": "41 tof window dirty",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "tof_window_dirty": true
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "settle",
+        "downgrade_reason": "G7_unknown_surface"
+      }
+    },
+    {
+      "name": "42 machine vibration beats hush",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "hush": true,
+        "machine_vibration": true
+      },
+      "expect": {
+        "event": "deferred",
+        "performed": "none",
+        "downgrade_reason": "G9_machine_vibration"
+      }
+    },
+    {
+      "name": "43 unknown gesture in ceilings ignored",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "badge_rare",
+        "intent": "leap",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "badge_rare": "cartwheel"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "leap",
+        "downgrade_reason": null
+      }
+    },
+    {
+      "name": "44 operator raised cohort_ping to nudge",
+      "signal": {
+        "v": 2,
+        "id": "sig_01JCUBIQR07000000000000001",
+        "class": "cohort_ping",
+        "intent": "nudge",
+        "priority": 2,
+        "ttl_s": 3600,
+        "not_before": "2026-11-20T10:00:00Z"
+      },
+      "state": {
+        "now": "2026-11-20T10:05:00Z",
+        "device": "v0",
+        "surface": "damped",
+        "free_ahead_mm": 300,
+        "level_deg": 0.5,
+        "operator_ceilings": {
+          "cohort_ping": "nudge"
+        }
+      },
+      "expect": {
+        "event": "performed",
+        "performed": "nudge",
+        "downgrade_reason": null
+      }
+    }
+  ]
+}
