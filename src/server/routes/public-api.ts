@@ -17,6 +17,7 @@ import { aiEngineManager } from '#server/utils/ai-engines'
 import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
 import { toCelsius } from '#shared/utils'
+import { getPublicManifest } from '#shared/basics'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -500,6 +501,13 @@ export default async (fastify: FastifyInstance) => {
       console.error('[PUBLIC-ANALYTICS] Error:', error.message)
       return reply.code(500).send({ error: 'Analytics unavailable' })
     }
+  })
+
+  // LOT-FM-001 · BASIC (RATION) · OPEN TAB ledger — nomenclature + cadence.
+  // COGS is withheld: the ledger lives server-side in #server/basics/ledger.
+  fastify.get('/basics', async (req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return getPublicManifest()
   })
 
   // Public status endpoint - no authentication required
