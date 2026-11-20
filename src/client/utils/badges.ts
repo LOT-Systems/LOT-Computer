@@ -796,7 +796,7 @@ export interface Badge {
   waterUnlockMessage?: string
   architectureUnlockMessage?: string
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'cosmic'
-  category: 'milestone' | 'easter_egg' | 'word_turn' | 'pattern' | 'achievement_rpg' | 'secret_boss'
+  category: 'milestone' | 'easter_egg' | 'word_turn' | 'pattern' | 'achievement_rpg' | 'secret_boss' | 'behavioral' | 'calendar'
   hidden?: boolean
 }
 
@@ -3211,16 +3211,6 @@ export const BADGES: Record<BadgeType, Badge> = {
   },
 
   // ── Achievement RPG v6 — Arcade Class ─────────────────────────────────────
-  quarter_drop: {
-    id: 'quarter_drop',
-    symbol: '○→◉',
-    name: 'Quarter Drop',
-    description: 'Unlock your first easter egg badge of any type',
-    unlockMessage: '↳ First coin. First easter egg. The arcade is open for business. ○→◉',
-    rarity: 'uncommon',
-    category: 'achievement_rpg',
-    hidden: false,
-  },
   insert_coin_badge: {
     id: 'insert_coin_badge',
     symbol: '↺·○',
@@ -4819,16 +4809,6 @@ export const BADGES: Record<BadgeType, Badge> = {
     description: 'Write "opus" in a journal or memory entry',
     unlockMessage: '↳ The great work. The alchemist\'s goal was never gold — it was completion. The archive marks yours. ∞·∞',
     rarity: 'rare',
-    category: 'word_turn',
-    hidden: true,
-  },
-  elixir_found: {
-    id: 'elixir_found',
-    symbol: '∘∿∘',
-    name: 'Elixir Found',
-    description: 'Write "elixir" in a journal or memory entry',
-    unlockMessage: '↳ The solution has been prepared. The elixir is not a potion — it is a state. ∘∿∘',
-    rarity: 'uncommon',
     category: 'word_turn',
     hidden: true,
   },

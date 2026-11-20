@@ -30,6 +30,10 @@ function pickCountdown(): number {
   return COUNTDOWN_OPTIONS[quantumRandom(0, COUNTDOWN_OPTIONS.length - 1)]
 }
 
+// Module-level so both tickers (and remounts) share one budget.
+const SIGNAL_THROTTLE_MS = 10 * 60 * 1000
+let lastSignalAt = 0
+
 function useQuantumNumber() {
   const [number, setNumber] = React.useState(() => quantumRandom(0, 99))
   const [countdown, setCountdown] = React.useState(() => pickCountdown())
@@ -43,7 +47,15 @@ function useQuantumNumber() {
           const nextCountdown = pickCountdown()
           setNumber(next)
           setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          // Throttled: this ticker fires every 1–72s on its own, with no user
+          // action. Unthrottled it wrote ~320 signals/hour, re-rendering every
+          // intentionEngine subscriber and pushing real user signals out of the
+          // 1000-signal QIE buffer within ~3 hours.
+          const now = Date.now()
+          if (now - lastSignalAt >= SIGNAL_THROTTLE_MS && document.visibilityState === 'visible') {
+            lastSignalAt = now
+            recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          }
           return nextCountdown
         }
         return prev - 1

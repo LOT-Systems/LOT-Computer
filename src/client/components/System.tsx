@@ -45,7 +45,13 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
+// SystemProgressWidget (~180 KB minified changelog/assembly text) and
+// ArchitectWidget (imports SystemProgressWidget's USERSHIP_TRANSMISSION) are
+// code-split: they sit at the bottom of the System tab, so they load as a
+// separate chunk instead of blocking first paint of the app bundle.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -77,7 +83,9 @@ import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
+const ArchitectWidget = React.lazy(() =>
+  import('./ArchitectWidget').then((m) => ({ default: m.ArchitectWidget }))
+)
 import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
@@ -1028,7 +1036,9 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <React.Suspense fallback={null}>
+            <SystemProgressWidget />
+          </React.Suspense>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1037,7 +1047,9 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <React.Suspense fallback={null}>
+          <ArchitectWidget />
+        </React.Suspense>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}

@@ -165,7 +165,14 @@ export const RecipeWidget: React.FC = () => {
 
     loggedRecipesRef.current.add(recipeKey)
     createLog(
-      { text: fullText },
+      {
+        text: fullText,
+        // Typed event so the Log renders the NUTR: military handler and the
+        // server-side source maps (scheduled-jobs, /api assembly) count it as
+        // 'recipe' instead of an ordinary user note.
+        event: 'recipe_viewed',
+        metadata: { mealType: state.mealTime, recipeName: state.recipe },
+      },
       {
         onSuccess: () => console.log(`Logged recipe: ${recipeKey}`),
         onError: (error) => {
