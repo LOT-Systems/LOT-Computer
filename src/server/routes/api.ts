@@ -44,6 +44,15 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import {
+  compressLogs,
+  computeArcadeFromLogs,
+  renderPacketHeader,
+  renderPacketPrompt,
+  renderPacketStory,
+  STORY_PERIODS,
+  type StoryPeriod,
+} from '#shared/utils/log-compression'
 
 // ============================================================================
 // Helper Functions
@@ -5479,6 +5488,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
+  // ARCADE — gamified evolution derived from the Log (`/arcade` in the Log)
+  // Deterministic, no AI call. XP rewards showing up; word XP capped per entry.
+  // ============================================================================
+  fastify.post(
+    '/arcade',
+    { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } },
+    async (req) => {
+      const journal = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: { [Op.in]: ['note', 'journal', 'log_entry'] } },
+        attributes: ['event', 'text', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 10000,
+      })
+      return { arcade: computeArcadeFromLogs(journal as any, new Date()) }
+    }
+  )
+
+  // ============================================================================
   // STORY — Contextual AI Story
   // Generates a 1-2 paragraph story based on recent logs, self-care events,
   // and widget data. The story reflects the operator's recent journey.
@@ -5490,6 +5517,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          period?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5514,21 +5542,32 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       }
 
       const { logText, quantumState, userIndex } = req.body
+      // v2: period compression — `/story day|week|month|year` (default week)
+      const period: StoryPeriod = (STORY_PERIODS as string[]).includes(req.body.period as string)
+        ? (req.body.period as StoryPeriod)
+        : 'week'
+      const PERIOD_MS = { day: 1, week: 7, month: 30, year: 365 }[period] * 86400000
+      const windowStart = new Date(Date.now() - PERIOD_MS * 2) // period + equal baseline
 
+      // Journal entries are stored as event 'note'. v1 filtered for
+      // 'log_entry' / 'journal' only and never saw the Log. Fixed here.
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          createdAt: { [Op.gte]: windowStart },
+          event: { [Op.in]: ['note', 'journal', 'log_entry', 'emotional_checkin', 'memory_answer', 'self_care_checkin', 'energy_checkin'] },
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 4000,
       })
-
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
+      const lifetimeJournal = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: { [Op.in]: ['note', 'journal', 'log_entry'] } },
+        attributes: ['event', 'text', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 10000,
+      })
+      const packet = compressLogs(logs as any, period, new Date(), { arcadeLogs: lifetimeJournal as any })
+      const header = renderPacketHeader(packet)
 
       const selfCareLogs = logs.filter(l =>
         l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
@@ -5547,30 +5586,30 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      // Empty period: no AI call — return the deterministic compression.
+      if (packet.entries === 0) {
+        return { story: renderPacketStory(packet), header, packet, period, logId: null }
+      }
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's Log (journal) and its context snapshots into a short narrative of their ${period}.
+
+The operator invoked /story ${period}. Write 1-2 paragraphs (100-200 words) that compress their ${period}: what they wrote, where and under what sky, when they tend to write, and the high and low peaks. The story should feel personal, grounded, and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
+- Draw ONLY from the compression packet below — never invent events
+- Name the high and the low peak if present, with the place/weather if given
+- If PATTERN is SPIKE or DROP, name the change gently
+- If coverage is high, acknowledge the discipline; if sparse, no guilt
+- Tone follows SENTIMENT MEAN: reflective if negative, warmer if positive
 - End with a single forward-looking sentence — not a pep talk, just a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
 - Keep it under 200 words.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+${renderPacketPrompt(packet)}
 
 ${stateBlock ? stateBlock : 'STATE: unknown'}
-
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
 
 SELF-CARE DATA:
 ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
@@ -5581,7 +5620,7 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story generation user=${req.user.id} period=${period} entries=${packet.entries}`)
 
         const story = await engine.generateCompletion(fullPrompt, 512)
 
@@ -5597,20 +5636,17 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
             story: cleaned,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
+            period,
+            packet: { ...packet, excerpts: [] },
             timestamp: new Date().toISOString(),
           },
         })
 
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story: cleaned, header, packet, period, logId: storyLog.id }
       } catch (error: any) {
         console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        // Offline compression — deterministic, never blank
+        return { story: renderPacketStory(packet), header, packet, period, logId: null }
       }
     }
   )

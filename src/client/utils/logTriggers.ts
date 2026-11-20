@@ -40,7 +40,9 @@ export type LogTrigger =
   | 'qi-rfi'            // /qi — Quantum Intelligence RFI (Request for Information)
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
+  | 'story-period'      // /story day|week|month|year — compressed story for a period
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'arcade-status'     // /arcade — gamified evolution: level, rank, XP, streak
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -66,7 +68,11 @@ const RULES: TriggerRule[] = [
   { trigger: 'qi-rfi',         emojis: [],        keywords: ['qi'] },
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
+  // Regex-fragment keyword: re-fires story generation when a period
+  // argument is typed after /story. Call site debounces both triggers.
+  { trigger: 'story-period',   emojis: [],        keywords: ['story\\s+(?:day|today|week|month|year)'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'arcade-status',  emojis: ['🕹️', '🕹'], keywords: ['arcade', 'xp', 'level'] },
 ]
 
 /**

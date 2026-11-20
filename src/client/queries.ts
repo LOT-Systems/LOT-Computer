@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import type { ArcadeState, CompressionPacket, StoryPeriod } from '#shared/utils/log-compression'
 import axios, { AxiosError } from 'axios'
 import {
   useQuery,
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    period?: StoryPeriod
     quantumState?: {
       energy?: string
       clarity?: string
@@ -909,6 +911,15 @@ export const useStoryGeneration = createMutation<
   },
   {
     story: string
+    header?: string[]
+    packet?: CompressionPacket
+    period?: StoryPeriod
     logId: string | null
   }
 >('post', '/api/story')
+
+// ARCADE — gamified evolution from the Log (`/arcade`)
+export const useArcadeStatus = createMutation<
+  Record<string, never>,
+  { arcade: ArcadeState }
+>('post', '/api/arcade')

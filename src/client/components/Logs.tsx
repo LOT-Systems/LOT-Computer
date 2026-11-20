@@ -33,7 +33,8 @@ import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcadeStatus } from '#client/queries'
+import { parseStoryPeriod, type StoryPeriod } from '#shared/utils/log-compression'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3707,6 +3708,11 @@ const NoteEditor = ({
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [storyHeader, setStoryHeader] = React.useState<string[] | null>(null)
+  const [storyPeriod, setStoryPeriod] = React.useState<StoryPeriod>('week')
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => () => { if (storyTimerRef.current) clearTimeout(storyTimerRef.current) }, [])
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3739,9 +3745,23 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  const { mutate: submitArcade } = useArcadeStatus({
+    onSuccess: ({ arcade: a }) => {
+      const filled = Math.round((a.xpIntoLevel / Math.max(1, a.xpForNextLevel)) * 10)
+      setArcadeResult([
+        `LEVEL           ${a.level} · ${a.rank}`,
+        `XP              ${a.xp} TOTAL`,
+        `NEXT LEVEL      ${'█'.repeat(filled)}${'░'.repeat(10 - filled)} ${a.xpIntoLevel}/${a.xpForNextLevel}`,
+        `STREAK          ${a.streakDays} DAY${a.streakDays === 1 ? '' : 'S'}`,
+        'RULE            SHOW UP. ONE LINE COUNTS.',
+      ].join('\n'))
+    },
+    onError: () => setArcadeResult('ARCADE OFFLINE'),
+  })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.header || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4125,7 +4145,11 @@ const NoteEditor = ({
           'AVAILABLE COMMANDS',
           '',
           '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
+          '/story        Compressed story of your week (default)',
+          '/story day    Compress today',
+          '/story month  Compress the last 30 days',
+          '/story year   Compress the last 365 days',
+          '/arcade       Level, rank, XP and streak',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
           '/assembly     Self-assembly module status',
@@ -4143,27 +4167,40 @@ const NoteEditor = ({
           '',
           'SHORTCUTS',
           'Ctrl+Enter    Save log immediately',
+          '',
+          'EMOJI TRIGGERS',
+          '📖 story   🕯️ prayer   🎹 synth   🎧 radio   🌙 night   🧊 freeze   🕹️ arcade',
         ]
         setSystemHelp(lines.join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
-      } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+      } else if (trigger === 'arcade-status') {
+        setArcadeResult(null)
+        submitArcade({})
+      } else if (trigger === 'story-mode' || trigger === 'story-period') {
+        // Debounced: give the operator a moment to type a period
+        // (`/story month`). Period is parsed from the latest text at fire time.
+        if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+        storyTimerRef.current = setTimeout(() => {
+          storyTimerRef.current = null
+          const text = valueRef.current || ''
+          const period = parseStoryPeriod(text)
+          setStoryPeriod(period)
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryHeader(null)
+          const logText = text
+            .replace(/\/story(\s+(day|today|week|month|year|d|w|m|y))?/gi, '')
+            .replace(/📖/g, '')
+            .trim()
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
+            submitStory({ logText, period, quantumState: state, userIndex: index })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, period })
           }
-        }
+        }, 1800)
       }
     }
   }, [value])
@@ -4414,11 +4451,23 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
+            </Block>
+          </div>
+        )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={`📖 ${storyPeriod.toUpperCase()}`} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 uppercase tracking-widest">Compressing {storyPeriod}...</div>
+              )}
+              {storyHeader && storyHeader.length > 0 && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '12px', letterSpacing: '0.04em', whiteSpace: 'pre-wrap' }}>
+                  {storyHeader.map((line, idx) => <div key={idx}>{line}</div>)}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
