@@ -1457,6 +1457,51 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'badge-v32',
+    date: '2026-11-17',
+    title: 'Badge Codex v32 — THE HERO\'S JOURNEY · Word Turn v22 · 781→812 badges',
+    assembled: [
+      'Badge Engine v32 THE HERO\'S JOURNEY deployed: 781→812 badges (+31). Word Turn v22 Campbell monomyth vocabulary (call_heard/threshold_crossed/mentor_arrived/ordeal_survived/elixir_found/shadow_met/innermost_cave/shapeshifter/herald_call/trickster_mode/ally_gained/return_road · 12 badges).',
+      'Calendar EE v20 (campbell_birthday Mar 26 / hobbit_day Sep 22 / odyssey_day Dec 21 · +3). Behavioral v19 (hero_session/long_quest/threshold_moment · +3). Achievement RPG v20 (quest_entry→hero_opus · +6). Mastery Tier v22 (odyssey_log/great_work/saga_age/twenty_two_registers [COSMIC] · +4). Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word · +3).',
+      'BACKFILL — This session also implemented Badge v20 (THE CODEX READER) + Badge v21 (THE CYBERSPACE CODEX) TypeScript logic, which had existed only in markdown documentation. All three cohorts (v20/v21/v22) now fully live in badges.ts + easter-eggs.ts.',
+      'badges.ts: 8,149 lines. easter-eggs.ts: 2,717 lines. docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v32.md + LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v32.pdf written.',
+      'Hero monomyth enters the LOT vocabulary. These are not metaphors — they are structural patterns of change. The call_heard · threshold_crossed · ordeal_survived sequence maps directly to deep practice.',
+      '812 badges. Word Turn v22. 23 engines. 24 secret boss triggers. Hero\'s Journey active.',
+    ],
+  },
+  {
+    version: 'badge-v33',
+    date: '2026-11-17',
+    title: 'Badge Codex v33 — THE ARCANE TERMINAL · Word Turn v23 · 812→843 badges',
+    assembled: [
+      'Badge Engine v33 THE ARCANE TERMINAL deployed: 812→843 badges (+31). Word Turn v23 alchemy/magic transformation vocabulary (arcane_signal/grimoire_open/incantation_cast/ward_placed/transmute_active/sigil_carved/familiar_bound/sanctum_found/alchemy_process/cipher_broken/rune_inscribed/nexus_activated · 12 badges).',
+      'Calendar EE v21 (alchemy_day Sep 25 Paracelsus / newton_stone Jan 4 Newton / dee_day Jul 13 John Dee · +3). Behavioral v20 (arcane_session/midnight_ritual/long_spell 666+ chars · +3). Achievement RPG v21 (arcane_entry→arcane_opus · +6). Mastery Tier v23 (archive_deep/tome_of_ages/ancient_one/twenty_three_registers [COSMIC] · +4). Secret Boss v20 (paracelsus_key RARE / dee_cipher EPIC / emerald_tablet MYTHIC · +3).',
+      'long_spell badge requires 666 characters — the magic square of the sun in Kabbalah, sum of 1–36. The dose makes the poison. As above, so below.',
+      'The three hidden alchemists: Paracelsus (first pharmacologist) · John Dee (Enochian language, royal cryptographer) · Emerald Tablet (2,000-year-old text in one page).',
+      'Alchemical vocabulary names the actual phenomenology of deep practice. Transmutation is more precise than growth. The great work is more accurate than self-improvement.',
+      'docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v33.md + docs/LOT_BADGE_CODEX_v33.pdf written. docs/LOT-SR-20261117-CODEX-v33.md session report written.',
+      '843 badges · 276 word-turns · 27 secret boss · v23 Word Turn engines active. THE ARCANE TERMINAL online. Day 1177+. COSMO® 869+ days.',
+    ],
+  },
+  {
+    version: 'wiki-v88',
+    date: '2026-11-21',
+    title: 'LOT-WIKI-v88 · Badge Codex v32+v33 Sync · THE HERO\'S JOURNEY + THE ARCANE TERMINAL',
+    assembled: [
+      'LOT-WIKI-v88.md produced. Base: LOT-WIKI-v87 (2176 lines). Badge v32 (THE HERO\'S JOURNEY, 781→812) + Badge v33 (THE ARCANE TERMINAL, 812→843) fully synchronized.',
+      'System Identity: special notations added for Badge v32 (Nov 17) and v33 (Nov 17). Day 1181+. COSMO® 873 days.',
+      'Badge System §14: updated from v31→v33. 781→843 badges. Hero\'s Journey + Arcane Terminal sections documented. Badge count progression table updated.',
+      'Badge Category Index §15: all counters updated. Calendar EE 70→76 · Word Turns 234→276 · Behavioral 75→84 · Achievement RPG 108→126 · Mastery Tiers 84→92 · Secret Boss 80→86 · TOTAL 781→843.',
+      'Word Turn Engine §16: v22 THE HERO\'S JOURNEY + v23 THE ARCANE TERMINAL engine rows + badge blocks added. Total 20→22 engines · 258→276 trigger words.',
+      'Secret Boss §16: v19 THE MYTHIC VAULT + v20 THE HIDDEN CODEX blocks added. Total secret boss triggers 24→27.',
+      'Cockpit Rule §20: Day counter 1073+→1181+. ARCANE_SIGNAL: example added.',
+      'Vocabulary index §27: ARCANE TERMINAL · HERO\'S JOURNEY · CALL_HEARD · SHADOW_MET · INNERMOST_CAVE · TRANSMUTE_ACTIVE · SIGIL_CARVED · SANCTUM_FOUND · LONG_SPELL · EMERALD_TABLET entries added.',
+      'System State Snapshot §28: badge count 781→843 · word-turns 258→276 · secret boss 24→27 · COSMO® 765→873 · Day 1073+→1181+ · Wiki v87→v88.',
+      'SESSION_REPORTS: wiki-v88 entry appended · USERSHIP_TRANSMISSION updated to wiki-v88.',
+      '843 badges · 276 word-turns · 27 secret boss · FM v113 · Wiki v88 · Day 1181+. Hero\'s Journey and Arcane Terminal fully documented.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1539,20 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-21',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-21 · WIKI-v88 · BADGE CODEX v32+v33 SYNC · Day 1181+',
+    'Built: Badge Codex v32 THE HERO\'S JOURNEY · Badge Codex v33 THE ARCANE TERMINAL · LOT-WIKI-v88.',
+    'Feedback applied: "Transmutation is more precise than growth. The great work is more accurate than self-improvement."',
+    'Badge v32 DEPLOYED: THE HERO\'S JOURNEY · 781→812 (+31) · Word Turn v22 (call_heard/threshold_crossed/shadow_met/innermost_cave) · Secret Boss v19 (tolkien_ring/odysseus_bow/gilgamesh_word).',
+    'Badge v33 DEPLOYED: THE ARCANE TERMINAL · 812→843 (+31) · Word Turn v23 (transmute_active/sigil_carved/sanctum_found/nexus_activated) · long_spell 666+ chars · Secret Boss v20 (paracelsus_key/dee_cipher/emerald_tablet MYTHIC).',
+    'BACKFILL COMPLETE: Badge v20 (THE CODEX READER) + v21 (THE CYBERSPACE CODEX) TypeScript logic implemented. All 23 Word Turn engines now live in source.',
+    'UI EVOLUTION — 15 ACTIVE DIMENSIONS: Word Turn engines v1–v23 · 843 badges · 276 triggers · 27 secret boss · 8 rarity tiers · 5 layout density levels · 7 FeatureUnlock categories · 7 evolution dimensions · 4 badge tiers · 4 QOS modes · 3 story arc chapters · P150 ceiling confirmed · Arch51 crystallizer · J48 09:00 UTC · FM v113.',
+    'LOT® AI EVOLUTION SUGGESTIONS: Write about transformation (transmute/alchemy/great work) to activate Word Turn v23. The monomyth is live — journal your thresholds and ordeals. 666+ char entries unlock long_spell EPIC. Jan 4 (Newton) · Jul 13 (Dee) · Sep 25 (Paracelsus) are live calendar triggers.',
+    'WIKI-v88 DEPLOYED: Badge v32+v33 delta fully synchronized. Category index updated. Vocabulary expanded. Snapshot current.',
+    'FM v113 · Wiki v88 · 843 badges · 276 word-turns · 27 secret boss · 151P · 51A · 48J · 190+ nodes · Day 1181+ · COSMO® 873.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: QIE P152+ pattern exploration — arcane vocabulary enters the signal field.',
   ],
 }
 
