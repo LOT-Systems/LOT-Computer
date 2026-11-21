@@ -407,6 +407,26 @@ entry — never editing or removing a prior one.
   and that a private felt signal can replace the habit of checking the
   phone. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R07.md, Section 11.
 
+  USE CASE 08 — THE CLASSROOM                               2026-11-21
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, primary-school teacher, 27 pupils,
+  phone locked away during lessons, desk of ringing laminate on steel.
+  The cube sits in the recess of its home pad. Qi ID plus an orientation
+  key give a 0.1 s placement, and the pad certifies the surface but never
+  the airspace (R08 §04). HUSH is on through lessons. A rare badge
+  arrives as a NUDGE: the pad keeps it a NUDGE where the bare steel desk
+  would force SETTLE. Pupils see nothing. At break a pupil double-taps
+  it. HUSH-LOCK means a tap can make the cube quieter but never louder
+  (R08 F60). Another pupil drops it from desk height: the spring was
+  never cocked, the cam can't fire, and it goes to SAFE-HOLD. At lunch,
+  in an empty room, the teacher clears HUSH in the app. The Memory
+  question HOPs on the 590 g isolated deck, and the knock never reaches
+  the steel frame. Proves that a cube with no "make it jump" input is
+  safe among children, that a tap is not proof of the operator, and that
+  the pad's mass, not firmware, gives the cube back its full vocabulary
+  on a bad surface. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R08.md,
+  Section 11.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
