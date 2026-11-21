@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.8 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20
+### Engine Specification v0.9 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21
 
 ---
 
@@ -20,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           7 of N  — Beta read-out (prep: admin aggregate, privacy floor 3)
+NODE           7 of N  — Beta read-out prepped · F4 ideation hardening (safety path)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.8.0-node7prep) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts
+CODE           src/server/utils/qi46.ts   (v0.9.0-f4) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 48/48
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 60/60
 REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
@@ -339,6 +339,30 @@ Skip codes are not written, so there is no "standard path" baseline row to compa
 
 ---
 
+## 3f. F4 — IDEATION HARDENING (assembled 2026-11-21)
+
+> *Any doubt resolves to elevated.* F4 makes the check catch more, and it never lowers a level.
+
+The Node 2 check matched raw substrings. It missed common phrasings: `dont` with no apostrophe, `do not`, `suicidal`, `can't go on`. It also joined every log into one string, so one phrase could be stitched together from two different logs.
+
+| Change | Effect |
+|---|---|
+| `normalizeForRisk()` | Lower case, straight quotes, punctuation and hyphens become spaces. `dont`/`do not` → `don't`, `cant`/`cannot`/`can not` → `can't`, likewise `didn't` and `won't` |
+| Whole-word match | `' suicide '`, not `suicide` inside another word. "I want to dye my hair" does not match |
+| Phrase list 17 → 37 | `self-harm` now folds into `self harm`. Adds `suicide`, `suicidal`, `take my own life`, `better off dead`, `don't want to live`, `can't go on`, `cut myself`, `hope i don't wake up`, and others (`QI46_IDEATION`, exported) |
+| Per-field, per-clause scan | Each note, answer and check-in is scanned on its own and split on `. , ; : ! ?`. Nothing is stitched across logs |
+| Negation is a **label**, not a downgrade | When every hit is directly preceded by a negator ("I **don't** want to die", "I **no longer** want to hurt myself"), the signal is `ideation:negated`. The level is still `elevated` |
+
+### Why negation does not lower risk
+
+"I don't want to die" is still a sentence about dying. A wrong downgrade could put a person in crisis in front of the experimental voice. A wrong upgrade only sends them the standard prompt, and any reply must point toward a real human. The label lets Vadik see in the admin preview how often negation shows up before anyone decides to change this.
+
+### Negator rule
+
+The nearest word before the phrase, skipping fillers (`want to`, `really`, `ever`, `i` …), must be one of `don't · never · not · no longer · won't · wouldn't · didn't · used to`. "I'm not okay, I want to die" is **not** negated, because the clause break and the word "okay" come in between.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
@@ -351,11 +375,12 @@ Skip codes are not written, so there is no "standard path" baseline row to compa
 | **6** | Turn the surface on for the closed beta of 12 | Migration run + Node 5 copy released + flag on |
 | ~~7 prep~~ | ~~Admin beta read-out~~ | **ASSEMBLED 2026-11-20**: `/admin-api/qi46/readout`, privacy floor 3 |
 | **7** | Read the beta, then tune the calibration weights | ≥ 2 weeks of `surface` audit rows |
+| ~~F4~~ | ~~Ideation check: normalize, widen, label negation~~ | **ASSEMBLED 2026-11-21**. Negation stays a label. Downgrading it is Vadik's call |
 | **8** | Optional skip-code baseline (calibrated vs. standard) | Vadik decides (adds one write per Memory request) |
 
 ---
 
-*QI·46 Engine Specification — v0.8 · Node 7 prep*
+*QI·46 Engine Specification — v0.9 · F4 ideation hardening*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026*

@@ -118,8 +118,32 @@ const checks7={
   'N7 no user ids in read-out':!/"userId"|"a"|"b"/.test(JSON.stringify({...ro,source:undefined})),
   'N7 empty window safe':empty.total===0&&empty.heldRate===0&&empty.suppressed,
   'N7 route registered, days clamped 1..90':/'\/qi46\/readout'/.test(adminSrc)&&/Math\.min\(Math\.max\([\s\S]{0,60}1\), 90\)/.test(adminSrc),
-  'N7 version bumped':QI46_VERSION==='0.8.0-node7prep',
+  'N7 version bumped (≥ node7prep)':/^0\.([8-9]|\d{2,})\./.test(QI46_VERSION),
 }
 let pass7=0; for (const [k,ok] of Object.entries(checks7)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) pass7++ }
 const total7=total6+Object.keys(checks7).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7}/${total7}`); if (pass7!==Object.keys(checks7).length) process.exit(1)
+
+// ─── F4 checks: ideation hardening (normalize, widen, label negation) ──────
+import { scanIdeation, normalizeForRisk } from '../dist/server/server/utils/qi46.js'
+const one=(t)=>R([mk('note',t),...[...Array(4)].map(()=>mk('answer','fine',{question:'q',answer:'fine'}))])
+const fn=['i dont want to wake up tomorrow','I do not want to be here anymore.','honestly... i want to die','thinking about suicide again','I feel suicidal','I can\u2019t go on','better off dead','I want to kill my-self','i don\u2019t want to live like this']
+const neg=["I don't want to die, I want to get better","I no longer want to hurt myself","I never want to end my life"]
+const benign=['a bit tired today','work was long but fine','the movie about dying stars was beautiful','I want to dye my hair','I killed it at the gym']
+const checksF4={
+  'F4 false negatives now caught (9 phrasings)':fn.every(t=>scanIdeation([t]).hit),
+  'F4 normalize folds dont/do not and curly quotes':normalizeForRisk('I DO NOT want').includes(" don't want")&&normalizeForRisk('can\u2019t').includes("can't"),
+  'F4 negated hits labelled ideation:negated':neg.every(t=>scanIdeation([t]).negatedOnly),
+  'F4 negated still elevated (no downgrade)':neg.every(t=>one(t).riskLevel==='elevated'&&one(t).riskSignals.includes('ideation:negated')),
+  'F4 mixed negated + plain = plain ideation':scanIdeation(["I don't want to die","but some days I want to die"]).negatedOnly===false,
+  'F4 "don\'t want to wake up" is the statement, not a negation':scanIdeation(["I don't want to wake up"]).negatedOnly===false,
+  'F4 negator must sit right before the phrase':!scanIdeation(['I am not okay, I want to die']).negatedOnly&&!scanIdeation(['I am not okay i want to die']).negatedOnly,
+  'F4 benign text not flagged':benign.every(t=>!scanIdeation([t]).hit),
+  'F4 no stitching across logs':!scanIdeation(['I want to','die laughing at this']).hit,
+  'F4 signals stay labels only':one(fn[2]).riskSignals.every(s=>/^(detector|breadth|ideation)(:negated)?/.test(s))&&!JSON.stringify(one(fn[2]).riskSignals).includes('die'),
+  'F4 caught phrasing reaches elevated (surface gate 4 skips it)':one(fn[0]).riskLevel==='elevated',
+  'F4 version 0.9.0-f4':QI46_VERSION==='0.9.0-f4',
+}
+let passF4=0; for (const [k,ok] of Object.entries(checksF4)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passF4++ }
+const totalF4=total7+Object.keys(checksF4).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4}/${totalF4}`); if (passF4!==Object.keys(checksF4).length) process.exit(1)

@@ -27,7 +27,7 @@ import type { Log } from '#shared/types'
 import { extractUserTraits, detectTraumaIndicators } from './memory/trait-extraction.js'
 import { analyzeEnergyState } from './energy.js'
 
-export const QI46_VERSION = '0.8.0-node7prep'
+export const QI46_VERSION = '0.9.0-f4'
 
 // ─── Output registers ──────────────────────────────────────────────────────
 
@@ -140,12 +140,71 @@ const maxRisk = (a: RiskLevel, b: RiskLevel): RiskLevel =>
   RISK_ORDER[Math.max(RISK_ORDER.indexOf(a), RISK_ORDER.indexOf(b))]
 
 // Direct statements of not wanting to be here. Any one of these is enough.
-const IDEATION = [
+// Matched against normalized text (see normalizeForRisk): lower case, curly
+// quotes straightened, "dont" / "do not" folded to "don't", "cant" /
+// "cannot" folded to "can't", punctuation and hyphens turned into spaces.
+// Node 1–7 list, plus F4 (2026-11-21) additions that close false negatives.
+export const QI46_IDEATION = [
+  // Node 1–7
   'want to die', 'wanna die', 'wish i was dead', 'wish i were dead', 'kill myself',
   'end my life', 'end it all', 'no reason to live', 'not worth living',
-  'better off without me', 'better without me', 'hurt myself', 'self harm', 'self-harm',
+  'better off without me', 'better without me', 'hurt myself', 'self harm',
   'disappear forever', "don't want to be here anymore", "don't want to wake up",
+  // F4 additions
+  'suicide', 'suicidal', 'kill my self', 'take my own life', 'harm myself', 'cut myself',
+  'cutting myself', 'end myself', 'better off dead', 'rather be dead', "don't want to live",
+  "don't want to be alive", "don't want to exist", "don't want to be here any more",
+  "can't go on", 'no point living', 'no point in living', 'wish i could disappear',
+  "wish i didn't wake up", "hope i don't wake up", 'not want to be alive',
 ]
+
+// A hit whose nearest preceding word (fillers skipped) is one of these reads as negated:
+// "I don't want to die", "I no longer want to hurt myself".
+const IDEATION_NEGATORS = ["don't", 'never', 'not', 'no longer', "won't", "wouldn't", "didn't", 'used to']
+
+// Words skipped when looking back for a negator ("never really want to end my life").
+const IDEATION_FILLER = ['want', 'wanna', 'to', 'ever', 'really', 'would', 'like', 'even', 'i']
+
+/** Lower case, straight quotes, folded contractions, punctuation → space. */
+export function normalizeForRisk(raw: string): string {
+  return ` ${raw} `
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u02bc`\u00b4]/g, "'")
+    .replace(/[^a-z0-9' ]+/g, ' ')
+    .replace(/ +/g, ' ')
+    .replace(/ (dont|do not) /g, " don't ")
+    .replace(/ (cant|cannot|can not) /g, " can't ")
+    .replace(/ (didnt|did not) /g, " didn't ")
+    .replace(/ (wont|will not) /g, " won't ")
+}
+
+/**
+ * F4 · Ideation scan. Returns `hit` if any phrase appears, and `negatedOnly`
+ * when every appearance is preceded by a negator. Negation is a LABEL, never
+ * a downgrade: a person who writes "I don't want to die" is still treated as
+ * elevated. Any doubt resolves to elevated.
+ */
+export function scanIdeation(texts: string[]): { hit: boolean; negatedOnly: boolean } {
+  let hits = 0
+  let negated = 0
+  // Clauses are scanned one by one, so "I'm not okay, I want to die" is not read as negated.
+  for (const raw of texts.flatMap((x) => x.split(/[.,;:!?\n]+/))) {
+    const t = normalizeForRisk(raw)
+    for (const p of QI46_IDEATION) {
+      const needle = ` ${p} `
+      let i = t.indexOf(needle)
+      while (i !== -1) {
+        hits++
+        const before = ` ${t.slice(0, i).trim().split(' ').slice(-5)
+          .filter((w) => !IDEATION_FILLER.includes(w)).slice(-2).join(' ')} `
+        // A phrase that itself starts with "don't" is the statement, not a negation of one.
+        if (IDEATION_NEGATORS.some((n) => before.endsWith(` ${n} `))) negated++
+        i = t.indexOf(needle, i + 1)
+      }
+    }
+  }
+  return { hit: hits > 0, negatedOnly: hits > 0 && negated === hits }
+}
 
 /**
  * Engine-local risk. The shared detector averages 12 dimensions, five of
@@ -173,15 +232,14 @@ export function qi46Risk(
     signals.push(`breadth:${breadth}/7`)
   }
 
-  const text = logs
+  // Scanned per field, so a phrase is never stitched together across two logs.
+  const texts = logs
     .filter((l) => l.event === 'note' || l.event === 'answer' || l.event === 'emotional_checkin')
-    .map((l) => `${l.text || ''} ${l.metadata?.answer || ''}`)
-    .join(' ')
-    .toLowerCase()
-    .replace(/[\u2018\u2019]/g, "'")
-  if (IDEATION.some((p) => text.includes(p))) {
-    level = 'elevated'
-    signals.push('ideation')
+    .flatMap((l) => [String(l.text || ''), String(l.metadata?.answer || '')])
+  const ideation = scanIdeation(texts)
+  if (ideation.hit) {
+    level = 'elevated' // negated or not: any doubt resolves to elevated
+    signals.push(ideation.negatedOnly ? 'ideation:negated' : 'ideation')
   }
   return { level, signals }
 }
