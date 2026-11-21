@@ -20,6 +20,19 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import {
+  BASIC_FORM,
+  BASIC_MODULE,
+  BASIC_PRICE_USD,
+  BASIC_LOAD,
+  BASIC_CLASSES,
+  BASIC_INTERVAL_LABEL,
+  BASIC_DOCTRINE,
+  BASIC_TERMS,
+  basicFirstIssue,
+  basicIssuesPerYear,
+} from '#shared/constants/basics'
+import { publicBasicEnvelope } from '#server/utils/basics-envelope'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -374,6 +387,34 @@ let analyticsLastCheck = 0
 const ANALYTICS_CACHE_DURATION = 60 * 1000 // 1 minute
 
 export default async (fastify: FastifyInstance) => {
+  // LOT-FM-001 OPEN TAB — public ration ledger. Nomenclature + cadence only.
+  // COGS withheld: the envelope is reported as HELD/BREACH, never in dollars.
+  fastify.get('/basics', async (req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return {
+      form: BASIC_FORM,
+      module: BASIC_MODULE,
+      priceUsd: BASIC_PRICE_USD,
+      doctrine: BASIC_DOCTRINE,
+      terms: BASIC_TERMS,
+      classes: BASIC_CLASSES,
+      load: BASIC_LOAD.map((it) => ({
+        ln: it.ln,
+        cls: it.cls,
+        nomen: it.nomen,
+        qty: it.qty,
+        ui: it.ui,
+        cadence: BASIC_INTERVAL_LABEL[it.interval],
+        first: basicFirstIssue(it),
+        perYear: basicIssuesPerYear(it),
+        sized: !!it.sized,
+      })),
+      envelope: publicBasicEnvelope(),
+      enrollment: 'CLOSED', // Month 2 opens UPGRADE
+      asOf: new Date().toISOString(),
+    }
+  })
+
   fastify.get('/analytics', async (req, reply) => {
     const now = Date.now()
     if (analyticsCache && (now - analyticsLastCheck) < ANALYTICS_CACHE_DURATION) {

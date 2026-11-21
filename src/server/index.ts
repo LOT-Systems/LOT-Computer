@@ -49,6 +49,7 @@ const fastify = Fastify({
 })
 
 const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const BASICS_ROUTE = '/basics'
 
 // ==============================================================================
 // SECURITY PLUGINS
@@ -231,6 +232,16 @@ fastify.get('/status', async (req, reply) => {
   })
 })
 
+// LOT-FM-001 OPEN TAB — public ration ledger page (no authentication required).
+// Logged-in members get the same surface inside the app at /basics.
+fastify.get('/open-tab', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'basics',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
@@ -345,6 +356,14 @@ fastify.register(async (fastify: FastifyInstance) => {
 
     // Client app / index page
     fastify.register(async (fastify) => {
+      // /basics: members get the in-app tab; strangers get the public OPEN TAB.
+      fastify.get(BASICS_ROUTE, async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: req.user ? 'app' : 'basics',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
+        })
+      })
       KNOWN_CLIENT_ROUTES.forEach((route) => {
         fastify.get(route, async function (req, reply) {
           if (req.user) {

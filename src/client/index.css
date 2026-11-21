@@ -419,3 +419,77 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* =============================================================================
+ * LOT-FM-001 — BASIC (RATION) TERMINAL TOKENS
+ * White ground / black ink. Inversion-only hierarchy. 2px rules. Square
+ * corners. Fixed character grid. IBM 3270 register. No color, no radius.
+ * Scoped to .fm so the rest of the System keeps its theme.
+ * ========================================================================== */
+.fm {
+  --fm-ground: #fff;
+  --fm-ink: #000;
+  --fm-rule: 2px;
+  --fm-ch: 1ch;
+  --fm-row: 1.5rem;
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Cousine', 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: var(--fm-row);
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--fm-ink);
+  background: var(--fm-ground);
+  border: var(--fm-rule) solid var(--fm-ink);
+  border-radius: 0;
+  max-width: 96ch;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: none;
+}
+.fm * { border-radius: 0 !important; }
+.fm-inv { background: var(--fm-ink); color: var(--fm-ground); }
+.fm-bar { padding: 0 1ch; white-space: pre-wrap; }
+.fm-rule { border-top: var(--fm-rule) solid var(--fm-ink); }
+.fm-sec { padding: var(--fm-row) 1ch; }
+.fm-sec + .fm-sec { border-top: var(--fm-rule) solid var(--fm-ink); }
+.fm-h { display: inline-block; padding: 0 1ch; margin-left: -1ch; background: var(--fm-ink); color: var(--fm-ground); }
+.fm-status { display: flex; flex-wrap: wrap; gap: 0 2ch; padding: 0 1ch; }
+.fm-status > span { white-space: nowrap; }
+.fm-kv { display: grid; grid-template-columns: 14ch 1fr; column-gap: 1ch; }
+.fm-kv dt::after { content: ' ' ; }
+.fm-list { list-style: none; margin: 0; padding: 0; }
+.fm-list li { display: grid; grid-template-columns: 4ch 1fr; }
+.fm-ledger { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.fm-ledger th, .fm-ledger td { padding: 0 1ch 0 0; text-align: left; vertical-align: top; font-weight: 700; white-space: normal; overflow-wrap: anywhere; }
+.fm-ledger thead th { border-bottom: var(--fm-rule) solid var(--fm-ink); white-space: nowrap; overflow-wrap: normal; }
+.fm-ledger tbody tr:hover { background: var(--fm-ink); color: var(--fm-ground); }
+.fm-ledger tr.fm-clsrow td { padding-top: var(--fm-row); }
+.fm-ledger .fm-n { text-align: right; }
+.fm-ledger col.c-ln { width: 4ch; }
+.fm-ledger col.c-qty { width: 5ch; }
+.fm-ledger col.c-ui { width: 4ch; }
+.fm-ledger col.c-cad { width: 13ch; }
+.fm-ledger col.c-first { width: 6ch; }
+.fm-ledger col.c-yr { width: 5ch; }
+.fm-short { display: none; }
+.fm-btn {
+  font: inherit; text-transform: inherit; color: var(--fm-ink); background: var(--fm-ground);
+  border: var(--fm-rule) solid var(--fm-ink); padding: 0 1ch; cursor: pointer;
+}
+.fm-btn:hover, .fm-btn:focus-visible { background: var(--fm-ink); color: var(--fm-ground); outline: none; }
+.fm-btn[disabled] { cursor: default; border-style: dashed; }
+.fm-btn[disabled]:hover { background: var(--fm-ground); color: var(--fm-ink); }
+.fm a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .fm { font-size: 12px; }
+  .fm-long { display: none; }
+  .fm-short { display: inline; }
+  .fm-ledger col.c-cad { width: 4ch; }
+  .fm-ledger col.c-yr { width: 0; }
+  .fm-ledger .c-yr-cell { display: none; }
+  .fm-kv { grid-template-columns: 11ch 1fr; }
+}
+@media print {
+  .fm { border: var(--fm-rule) solid #000; max-width: none; }
+  .fm-noprint { display: none !important; }
+}
