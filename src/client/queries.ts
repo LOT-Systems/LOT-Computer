@@ -141,6 +141,14 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+export const useCalendar = createQuery<
+  { id: string; event: string; text: string | null; metadata: Record<string, any>; createdAt: string }[]
+>('/api/calendar', {
+  refetchOnWindowFocus: true, // Alerts depend on fresh status across devices
+  staleTime: 60 * 1000,
+  refetchInterval: 5 * 60 * 1000,
+})
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

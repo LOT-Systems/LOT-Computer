@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1247,6 +1247,28 @@ export default async (fastify: FastifyInstance) => {
 
     // Already have an empty log at top, just return existing logs
     return logs
+  })
+
+  // Calendar — dedicated feed so entries never fall out of the 500-row /logs
+  // window. Returns entries, status changes and fired alerts (oldest first);
+  // the client folds them into the current schedule (src/client/utils/calendar.ts).
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_status', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 5000,
+    })
+    return logs.reverse().map((l) => ({
+      id: l.id,
+      event: l.event,
+      text: l.text,
+      metadata: l.metadata,
+      createdAt: l.createdAt,
+    }))
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
