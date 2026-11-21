@@ -1866,6 +1866,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFifthCycleIgnitionCheck()) {
     await executeDailyFifthCycleIgnitionCheck()
   }
+
+  // Check daily fifth cycle deepening check (21:00 UTC every day) — J74
+  if (shouldRunDailyFifthCycleDeepeningCheck()) {
+    await executeDailyFifthCycleDeepeningCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6651,6 +6656,152 @@ async function executeDailyFifthCycleIgnitionCheck(): Promise<JobResult> {
     console.error('Daily fifth cycle ignition check failed:', error.message)
     isDailyFifthCycleIgnitionRunning = false
     lastDailyFifthCycleIgnitionRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
+// ─── Daily Fifth Cycle Deepening Check (J74) ───────────────────────────────
+// Scans for users with fifth_cycle_resonance event in last 7 days. Checks journal >= 15 in
+// 21-day window, memory >= 7 in 21d, badge >= 7 in 21d, density >= 20.
+// When met, writes fifth_cycle_deepening event. The resonance arc deepens. L23-FCDEP.
+
+let isDailyFifthCycleDeepeningRunning = false
+let lastDailyFifthCycleDeepeningRun: Date | null = null
+
+function shouldRunDailyFifthCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFifthCycleDeepeningRunning) return false
+  if (lastDailyFifthCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailyFifthCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 21 && now.minute() >= 0 // 21:00 UTC daily (after J73)
+}
+
+async function executeDailyFifthCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-fifth-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFifthCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFifthCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIFTH CYCLE DEEPENING CHECK — 21:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart        = dayjs().subtract(7, 'day').toDate()
+    const twentyOneDayStart    = dayjs().subtract(21, 'day').toDate()
+    const fortyEightHourStart  = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fifth_cycle_resonance in last 7 days
+        const resonanceLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_resonance',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (resonanceLogs.length < 1) continue
+
+        // Check journal, memory, badge signals in last 21 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+          limit: 60,
+        })
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_created', 'memory_updated', 'memory_access'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+          limit: 30,
+        })
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_earned', 'badge_unlocked', 'badge_progress'] },
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+          limit: 30,
+        })
+        const density21dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: twentyOneDayStart },
+          },
+          limit: 100,
+        })
+
+        if (journalLogs.length < 15 || memoryLogs.length < 7 || badgeLogs.length < 7 || density21dLogs.length < 20) continue
+
+        // Don't double-write today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingToday = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_deepening',
+            createdAt: { [Op.gte]: todayStart },
+          },
+          limit: 1,
+        })
+        if (existingToday.length > 0) continue
+
+        const resConf = resonanceLogs[0]?.metadata?.resonanceConf ?? 78
+        const depConf = Math.min(96, Math.round(
+          76 + (journalLogs.length - 15) * 0.20 + (memoryLogs.length - 7) * 0.28 + (density21dLogs.length - 20) * 0.12
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fifth_cycle_deepening',
+          text: `Fifth cycle deepening: resonance arc deepens. ${journalLogs.length} journal signals 21d · ${memoryLogs.length} memory signals 21d · ${badgeLogs.length} badge signals 21d · 21d density ${density21dLogs.length} · all conditions met. FIFTH CYCLE DEEPENING. L23-FCDEP.`,
+          metadata: {
+            resonanceConf: resConf,
+            depConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density21d: density21dLogs.length,
+            deepeningStatus: 'DEEPENING',
+            level: 'L23-FCDEP',
+            field: 'FIFTH-CYCLE-RESONANCE→FIFTH-CYCLE-DEEPENING',
+            hour: 21,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fifth cycle deepening events written: ${written}`)
+    lastDailyFifthCycleDeepeningRun = new Date()
+    isDailyFifthCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fifth cycle deepening check failed:', error.message)
+    isDailyFifthCycleDeepeningRunning = false
+    lastDailyFifthCycleDeepeningRun = new Date()
     return { jobName, executedAt, success: false, error: error.message }
   }
 }

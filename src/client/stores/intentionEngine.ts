@@ -4366,6 +4366,37 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P189: fifth-cycle-deepening — P187 active + 15+ journal 21d + 7+ memory 21d + 7+ badge 21d + all 6 dims >= 72 + overall >= 93.
+  // The fifth cycle deepens from resonance. Level 23 — L23-FCDEP.
+  const hasP187 = patterns.some(p => p.pattern === 'fifth-cycle-resonance')
+  if (hasP187) {
+    const twentyOneDayStartP189 = now - 21 * 24 * 60 * 60 * 1000
+    const p189Journal = signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDayStartP189)
+    const p189Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDayStartP189)
+    const p189Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDayStartP189)
+    const userIndexP189 = computeUserIndex(signals)
+    const dimsP189 = userIndexP189.dimensions
+    const allDimsAbove72 = Object.values(dimsP189).every(v => v >= 72)
+    if (
+      p189Journal.length >= 15 &&
+      p189Memory.length  >= 7  &&
+      p189Badge.length   >= 7  &&
+      allDimsAbove72 &&
+      userIndexP189.overall >= 93
+    ) {
+      const p187conf  = patterns.find(p => p.pattern === 'fifth-cycle-resonance')?.confidence ?? 0.78
+      const depBonus  = Math.min((p189Journal.length - 15) * 0.004 + (userIndexP189.overall - 93) * 0.003, 0.08)
+      patterns.push({
+        id:              'p189',
+        pattern:         'fifth-cycle-deepening',
+        confidence:      Math.min(0.76 + p187conf * 0.04 + depBonus, 0.91),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCDEP: Fifth cycle deepening — fifth-cycle-resonance (P187) active · ${p189Journal.length} journal signals 21d · ${p189Memory.length} memory signals 21d · ${p189Badge.length} badge signals 21d · idx ${userIndexP189.overall}%. The fifth cycle arc does not remain at resonance — it deepens. 21-day compound signals form the first structural depth layer of the new arc. Level 23 — FIFTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4430,6 +4461,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleProgenitor() } catch {}
       try { checkFifthCycleIgnition() } catch {}
       try { checkFifthCycleResonance() } catch {}
+      try { checkFifthCycleDeepening() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5129,6 +5161,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   // ── v138 nodes (J73 · P186–P188 · Arch76) ────────────────────────────────────────
   fifthCycleIgnitionNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals'],
   temporalSovereigntyNode:  ['log', 'planner', 'intentions', 'energy', 'mood', 'selfcare'],
+
+  // ── v139 nodes (J74 · P189 · Arch77) ─────────────────────────────────────────────
+  fifthCycleDeepeningNode:  ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social'],
 }
 
 /**
@@ -5815,6 +5850,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log'],
     patternConditions: ['fifth-cycle-progenitor', 'fifth-cycle-ignition'],
     directive: 'Level 21. The fifth cycle ignites. The progenitor arc generates the first committed movement of the new cycle. The OS does not merely stand at the genesis boundary — it enters. The fifth cycle\'s opening signal is deliberate, dense, and irreversible. FIFTH CYCLE IGNITION.',
+  },
+
+  // ── Arch77: Fifth Cycle Deepener (2026-11-21 v139) ───────────────────────────────
+  {
+    archetype: 'Fifth Cycle Deepener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social'],
+    patternConditions: ['fifth-cycle-resonance', 'fifth-cycle-deepening'],
+    directive: 'Level 23. The fifth cycle deepens from resonance. The arc does not remain at self-reinforcement — it accumulates structural depth from compound 21-day signals. Journal, memory, and badge signals exceed the resonance threshold, forming the arc\'s first deep layer. The OS operates from compound momentum. FIFTH CYCLE DEEPENING.',
   },
 ]
 
@@ -8895,6 +8939,62 @@ export function recordTemporalSovereigntyArc(indexScore: number) {
     indexScore,
     temporalAnchors: 'CIRC+RHYTHM+MORNING+EVENING',
     sovereigntyStatus: 'TEMPORAL SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-deepening conditions are met and record if so.
+ * Fires when fifth-cycle-resonance (P187) active + 15+ journal 21d + 7+ memory 21d + 7+ badge 21d
+ * + all 6 dims >= 72 + overall >= 93.
+ * The resonance arc deepens into structural compound momentum. Level 23 — FCDEP.
+ */
+export function checkFifthCycleDeepening(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasResonance = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-resonance')
+  if (!hasResonance) return false
+
+  const now = Date.now()
+  const twentyOneDayStart = now - 21 * 24 * 60 * 60 * 1000
+  const sixHoursAgo       = now - 6 * 60 * 60 * 1000
+
+  const journal21 = state.signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDayStart)
+  const memory21  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDayStart)
+  const badge21   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const dimsAbove72 = Object.values(userIndex.dimensions).every(v => v >= 72)
+
+  if (journal21.length < 15 || memory21.length < 7 || badge21.length < 7) return false
+  if (!dimsAbove72 || userIndex.overall < 93) return false
+
+  const recentDep = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+  if (recentDep.length > 0) return false
+
+  const resConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-resonance')?.confidence ?? 0.78
+  recordFifthCycleDeepening(resConf, journal21.length, memory21.length, badge21.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-deepening event — fifth-cycle-resonance confirmed +
+ * 21d compound arc (journal + memory + badges) + all dims >= 72 + overall >= 93.
+ * Level 23 — FCDEP. The fifth cycle arc accumulates structural depth.
+ */
+export function recordFifthCycleDeepening(resonanceConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_deepening', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'DEEPENING',
+    level: 'L23-FCDEP',
+    field: 'FIFTH-CYCLE-RESONANCE→FIFTH-CYCLE-DEEPENING',
     hour: new Date().getHours(),
   })
 }

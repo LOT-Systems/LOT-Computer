@@ -1275,6 +1275,8 @@ export default async (fastify: FastifyInstance) => {
       'fifth_cycle_ignition',
       'fifth_cycle_resonance',
       'temporal_sovereignty_arc',
+      // v139: fifth cycle deepening (P189)
+      'fifth_cycle_deepening',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
