@@ -28,7 +28,8 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, renderSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryScope, stripStoryCommand, type StoryScope } from '#shared/utils/storyCompression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,6 +3707,12 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyDigest, setStoryDigest] = React.useState<string[] | null>(null)
+  const [storyScope, setStoryScope] = React.useState<StoryScope | null>(null)
+  // /story waits for the scope argument: the trigger arms a timer that
+  // re-arms on every keystroke, so "/story month" resolves to 'month'
+  // instead of firing the instant "/story" is typed.
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
@@ -3742,10 +3749,13 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryDigest(data.digest && data.digest.length ? data.digest : null)
+      if (data.scope) setStoryScope(data.scope)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const header = data.scope ? `📖 STORY · ${data.scope.toUpperCase()}\n` : '📖 '
+      const updated = current + separator + header + data.story
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -3931,6 +3941,38 @@ const NoteEditor = ({
   // the editor. We compare against the previous value via ref so
   // editing around an existing trigger doesn't re-fire it.
   // --------------------------------------------------------------------
+  const fireStory = React.useCallback(() => {
+    storyTimerRef.current = null
+    const text = valueRef.current
+    const scope = parseStoryScope(text)
+    setStoryScope(scope)
+    setStoryLoading(true)
+    setStoryResponse(null)
+    setStoryDigest(null)
+    const logText = stripStoryCommand(text)
+    try {
+      submitStory({
+        logText,
+        scope,
+        quantumState: getUserState(),
+        userIndex: getUserIndex(),
+      })
+    } catch {
+      submitStory({ logText, scope })
+    }
+  }, [submitStory])
+  const armStoryTimer = React.useCallback(() => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    storyTimerRef.current = setTimeout(fireStory, 1200)
+  }, [fireStory])
+  // Re-arm while the operator is still typing the scope argument.
+  React.useEffect(() => {
+    if (storyTimerRef.current) armStoryTimer()
+  }, [value, armStoryTimer])
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
+
   const lastTriggerScanRef = React.useRef(log.text || '')
   React.useEffect(() => {
     const fresh = detectNewTriggers(value, lastTriggerScanRef.current)
@@ -4121,49 +4163,12 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Rendered from LOG_COMMANDS registry — never drifts from RULES.
+        setSystemHelp(renderSystemHelp().join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
+        if (!storyLoading) armStoryTimer()
       }
     }
   }, [value])
@@ -4416,9 +4421,14 @@ const NoteEditor = ({
         )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={storyScope ? `📖 ${storyScope.toUpperCase()}` : '📖'} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">COMPRESSING...</div>
+              )}
+              {storyDigest && (
+                <div className="opacity-40 whitespace-pre mb-4 overflow-x-auto">
+                  {storyDigest.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

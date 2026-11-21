@@ -115,3 +115,66 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+// ---------------------------------------------------------------------------
+// COMMAND REGISTRY — single source of truth for /system
+// ---------------------------------------------------------------------------
+
+export interface LogCommandSpec {
+  usage: string        // as typed, e.g. "/story [day|week|month|year]"
+  description: string
+  group: 'AI' | 'SYSTEM' | 'CARE' | 'AMBIENT'
+}
+
+/**
+ * Every slash command the Log understands. /system renders this list,
+ * so adding a RULES entry without a spec here is a doctrine violation
+ * (scripts/tests/log-commands.test.ts enforces parity).
+ */
+export const LOG_COMMANDS: Record<Exclude<LogTrigger, 'cohort-support'>, LogCommandSpec> = {
+  'story-mode':     { group: 'AI',      usage: '/story [day|week|month|year]', description: 'Compressed story of your period (default week)' },
+  'qi-rfi':         { group: 'AI',      usage: '/qi [query]',   description: 'Ask the Quantum Intelligence engine' },
+  'prayer-mode':    { group: 'AI',      usage: '/prayer',       description: 'Contextual scripture' },
+  'how-checkin':    { group: 'AI',      usage: '/how',          description: 'Open LOT AI check-in (System tab)' },
+  'ai-scan':        { group: 'SYSTEM',  usage: '/scan',         description: 'System status overview' },
+  'assembly-check': { group: 'SYSTEM',  usage: '/assembly',     description: 'Self-assembly module status' },
+  'qos-report':     { group: 'SYSTEM',  usage: '/qos',          description: 'Quantum OS state analysis' },
+  'phys-report':    { group: 'SYSTEM',  usage: '/phys',         description: 'Physiological cohort report' },
+  'sil-check':      { group: 'SYSTEM',  usage: '/sil',          description: 'Signal silence pattern check' },
+  'system-help':    { group: 'SYSTEM',  usage: '/system',       description: 'This command index' },
+  'breathe':        { group: 'CARE',    usage: '/breathe',      description: '4-2-6 breathing exercise' },
+  'freeze-widgets': { group: 'CARE',    usage: '/freeze',       description: 'Pause and reflect protocol' },
+  'silent-mode':    { group: 'CARE',    usage: '/silent',       description: 'Signal silence acknowledgement' },
+  'force-fast':     { group: 'CARE',    usage: '/fast',         description: 'Orthodox fasting calendar' },
+  'toggle-synth':   { group: 'AMBIENT', usage: '/synth',        description: 'Toggle keyboard sound (🎹)' },
+  'radio-toggle':   { group: 'AMBIENT', usage: '/radio',        description: 'Toggle radio (🎧)' },
+  'night-mode':     { group: 'AMBIENT', usage: '/night',        description: 'Dark mode (🌙)' },
+}
+
+/** Keywords (aliases) for a trigger, exposed for help rendering/tests. */
+export function getTriggerKeywords(trigger: LogTrigger): string[] {
+  return RULES.find(r => r.trigger === trigger)?.keywords || []
+}
+
+/** Terminal Grid rendering of the /system command index. */
+export function renderSystemHelp(): string[] {
+  const groups: LogCommandSpec['group'][] = ['AI', 'SYSTEM', 'CARE', 'AMBIENT']
+  const lines: string[] = ['LOT® LOG — COMMAND INDEX', '']
+  for (const g of groups) {
+    lines.push(`[ ${g} ]`)
+    for (const spec of Object.values(LOG_COMMANDS)) {
+      if (spec.group !== g) continue
+      lines.push(`${(spec.usage + '                              ').slice(0, 30)}${spec.description}`)
+    }
+    lines.push('')
+  }
+  lines.push('[ SIGNALS ]')
+  lines.push(`${'❗ / ‼️                        '.slice(0, 30)}Cohort support flag`)
+  lines.push('')
+  lines.push('SHORTCUTS')
+  lines.push(`${'Ctrl+Enter                    '.slice(0, 30)}Save log immediately`)
+  lines.push('')
+  lines.push('Every entry is recorded with its context: time, weather,')
+  lines.push('humidity, location, moon and sky. No photo. No sound.')
+  return lines
+}
