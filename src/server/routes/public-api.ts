@@ -61,7 +61,7 @@ async function checkDatabase(): Promise<SystemCheck> {
   }
 }
 
-async function checkWeatherAPI(): Promise<SystemCheck> {
+async function checkEngineStack(): Promise<SystemCheck> {
   const start = Date.now()
   try {
     // Check Weather API
@@ -350,14 +350,14 @@ async function performHealthChecks(): Promise<{
     checkSettings(),
     checkUsers(),
     checkSystems(),
-    checkWeatherAPI(),
+    checkEngineStack(),
     checkDatabase(),
     checkMemory(),
   ])
 
-  // Determine overall status
-  const hasErrors = checks.some((c) => c.status === 'error')
-  const overall = hasErrors ? 'error' : 'ok'
+  // Determine overall status: error if any critical check fails, degraded for partial failures
+  const errorCount = checks.filter((c) => c.status === 'error').length
+  const overall = errorCount === 0 ? 'ok' : errorCount >= checks.length / 2 ? 'error' : 'degraded'
 
   return {
     version: VERSION,
@@ -703,7 +703,7 @@ export default async (fastify: FastifyInstance) => {
 
       // Make a minimal API call to test the key
       const message = await client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-5-5',
         max_tokens: 10,
         messages: [
           {
