@@ -871,6 +871,40 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE ARCANE CALENDAR ───────────────────────────────────────
+  // Alchemy Day: September 25 — Paracelsus born 1493
+  if (!hasBadge('alchemy_day') && month === 9 && day === 25) {
+    awardBadge('alchemy_day')
+    awarded.push('alchemy_day')
+  }
+  // Dee Day: July 13 — John Dee born 1527
+  if (!hasBadge('dee_day') && month === 7 && day === 13) {
+    awardBadge('dee_day')
+    awarded.push('dee_day')
+  }
+  // Newton Stone: January 4 — Isaac Newton born 1643
+  if (!hasBadge('newton_stone') && month === 1 && day === 4) {
+    awardBadge('newton_stone')
+    awarded.push('newton_stone')
+  }
+
+  // ── Calendar v22 — THE DREAM CALENDAR ────────────────────────────────────────
+  // Freud Day: May 6 — Sigmund Freud born 1856
+  if (!hasBadge('freud_day') && month === 5 && day === 6) {
+    awardBadge('freud_day')
+    awarded.push('freud_day')
+  }
+  // Jung Day: July 26 — Carl Jung born 1875
+  if (!hasBadge('jung_day') && month === 7 && day === 26) {
+    awardBadge('jung_day')
+    awarded.push('jung_day')
+  }
+  // Tesla Vision: July 10 — Nikola Tesla born 1856
+  if (!hasBadge('tesla_vision') && month === 7 && day === 10) {
+    awardBadge('tesla_vision')
+    awarded.push('tesla_vision')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1517,40 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCANE TERMINAL ─────────────────────────────────────────────────
+  { patterns: /\balchem(y|ist|ical)\b/i,                                                 badge: 'alchemical_word' },
+  { patterns: /\btransmut(ation|e|ing)\b|\blead[\s-]?into[\s-]?gold\b/i,                badge: 'transmutation_found' },
+  { patterns: /\bprima[\s-]?materia\b|\bfirst[\s-]?matter\b|\braw[\s-]?material[\s-]?of\b/i, badge: 'prima_materia' },
+  { patterns: /\bnigredo\b|\bblackening\b|\bdark[\s-]?phase[\s-]?of\b/i,                badge: 'nigredo_state' },
+  { patterns: /\bsolve[\s-]?et[\s-]?coagula\b|\bdissolve[\s-]?and[\s-]?coagulate\b/i,  badge: 'solve_coagula' },
+  { patterns: /\bmagnum[\s-]?opus\b|\bthe[\s-]?great[\s-]?work\b|\bopus[\s-]?magnum\b/i, badge: 'magnum_opus_found' },
+  { patterns: /\bphilosopher'?s[\s-]?stone\b|\blapis[\s-]?philosophorum\b|\bstone[\s-]?of[\s-]?(the[\s-])?wise\b/i, badge: 'philosopher_stone' },
+  { patterns: /\bcaduceus\b|\bhermetic\b|\bhermes[\s-]?trismegistus\b/i,                badge: 'caduceus_found' },
+  { patterns: /\bsanctum\b|\binner[\s-]?sanctum\b|\bthe[\s-]?sanctum\b/i,               badge: 'sanctum_found' },
+  { patterns: /\bcipher\b|\bdecode[\s-]?the\b|\bbreak[\s-]?the[\s-]?cipher\b/i,         badge: 'cipher_key' },
+  { patterns: /\brune\b|\bcarved[\s-]?rune\b|\bbind[\s-]?the[\s-]?rune\b/i,             badge: 'rune_carved' },
+  { patterns: /\bnexus\b|\bquantum[\s-]?nexus\b|\bnexus[\s-]?point\b/i,                 badge: 'nexus_opened' },
+  // ── v23 Secret Boss — THE HIDDEN CODEX word triggers ─────────────────────────
+  { patterns: /\bparacelsus\b|\bbombastus\b|\bdose[\s-]?makes[\s-]?the[\s-]?poison\b/i, badge: 'paracelsus_key' },
+  { patterns: /\bjohn[\s-]?dee\b|\benochian\b|\bobsidian[\s-]?mirror\b/i,                badge: 'dee_cipher' },
+  { patterns: /\bemerald[\s-]?tablet\b|\bas[\s-]?above[\s-]?so[\s-]?below\b|\bhermes[\s-]?trismegistus\b.*\btablet\b/i, badge: 'emerald_tablet' },
+  // ── v24 — THE DREAM LABORATORY ────────────────────────────────────────────────
+  { patterns: /\blucid[\s-]?dream(ing)?\b|\bbecome[\s-]?lucid\b/i,                      badge: 'lucid_state' },
+  { patterns: /\bhypnagogic\b|\bhalf[\s-]?asleep\b|\bedge[\s-]?of[\s-]?sleep\b/i,       badge: 'hypnagogic_log' },
+  { patterns: /\bdream[\s-]?journal\b|\bdreamed[\s-]?of\b|\blast[\s-]?night[\s-]?i[\s-]?dreamed\b/i, badge: 'dream_archive' },
+  { patterns: /\bsomatic\b|\bbody[\s-]?memory\b|\bsoma\b/i,                              badge: 'somatic_signal' },
+  { patterns: /\btheta[\s-]?wave\b|\btheta[\s-]?state\b|\btheta[\s-]?rhythm\b/i,        badge: 'theta_wave' },
+  { patterns: /\bdelta[\s-]?wave\b|\bdeep[\s-]?sleep[\s-]?stage\b|\bdelta[\s-]?sleep\b/i, badge: 'delta_anchor' },
+  { patterns: /\brem[\s-]?phase\b|\brapid[\s-]?eye[\s-]?movement\b|\brem[\s-]?cycle\b/i, badge: 'rem_cycle' },
+  { patterns: /\bvision[\s-]?quest\b|\bwaking[\s-]?vision\b|\bsaw[\s-]?clearly\b/i,     badge: 'vision_state' },
+  { patterns: /\bsubconscious\b|\bunconscious[\s-]?mind\b|\bbelow[\s-]?the[\s-]?surface\b/i, badge: 'subconscious_note' },
+  { patterns: /\bliminal\b|\bthreshold[\s-]?state\b|\bliminal[\s-]?space\b/i,            badge: 'liminal_found' },
+  { patterns: /\boneiric\b|\bdream[\s-]?state\b|\bdreamscape\b/i,                        badge: 'oneiric_field' },
+  { patterns: /\bsleep[\s-]?hygiene\b|\bsleep[\s-]?schedule\b|\bsleep[\s-]?architecture\b/i, badge: 'sleep_archive' },
+  // ── v24 Secret Boss — THE DREAM BOSSES word triggers ─────────────────────────
+  { patterns: /\bjung(ian)?\b|\bcollective[\s-]?unconscious\b|\bthe[\s-]?archetype\b/i,  badge: 'jung_archetype' },
+  { patterns: /\bmorpheus\b|\bhypnos\b|\bsandman\b|\bgod[\s-]?of[\s-]?dreams\b/i,       badge: 'morpheus_field' },
+  { patterns: /\bdream[\s-]?within[\s-]?a[\s-]?dream\b|\bwithin[\s-]?the[\s-]?dream\b|\bpoe[\s-]?dream\b/i, badge: 'lucid_apex' },
 ]
 
 /**
@@ -2711,6 +2779,120 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── v23 Behavioral — ARCANE PATTERNS ────────────────────────────────────────
+
+const ARCANE_WORDS = [
+  'alchemi', 'transmut', 'prima materia', 'nigredo', 'solve et coagula',
+  'magnum opus', 'philosopher', 'caduceus', 'sanctum', 'cipher', 'rune', 'nexus',
+]
+
+/**
+ * Award arcane_session if journal entry contains 3+ arcane vocabulary words.
+ */
+export function checkArcaneSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcane_session')) return null
+  const lower = journalText.toLowerCase()
+  const matched = ARCANE_WORDS.filter(w => lower.includes(w))
+  if (matched.length >= 3) {
+    awardBadge('arcane_session')
+    return 'arcane_session'
+  }
+  return null
+}
+
+/**
+ * Award midnight_ritual if user checks in between 00:00–01:00 on 3+ different nights.
+ */
+export function checkMidnightRitual(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_ritual')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour !== 0) return null
+
+  try {
+    const key = 'midnight_ritual_dates'
+    const stored = localStorage.getItem(key)
+    const dates: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = now.toISOString().slice(0, 10)
+    if (!dates.includes(todayStr)) {
+      dates.push(todayStr)
+      localStorage.setItem(key, JSON.stringify(dates.slice(-30)))
+    }
+    if (dates.length >= 3) {
+      awardBadge('midnight_ritual')
+      return 'midnight_ritual'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+/**
+ * Award long_spell if journal entry is 666+ characters.
+ */
+export function checkLongSpell(journalText: string): BadgeType | null {
+  if (hasBadge('long_spell')) return null
+  if (journalText.length >= 666) {
+    awardBadge('long_spell')
+    return 'long_spell'
+  }
+  return null
+}
+
+// ── v24 Behavioral — DREAM PATTERNS ─────────────────────────────────────────
+
+const DREAM_WORDS = [
+  'lucid dream', 'hypnagogic', 'dream journal', 'somatic', 'theta wave',
+  'delta wave', 'rem ', 'vision quest', 'subconscious', 'liminal', 'oneiric', 'sleep',
+]
+
+/**
+ * Award dream_session if journal entry contains 3+ dream vocabulary words.
+ */
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (hasBadge('dream_session')) return null
+  const lower = journalText.toLowerCase()
+  const matched = DREAM_WORDS.filter(w => lower.includes(w))
+  if (matched.length >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+/**
+ * Award pre_dawn_log if user checks in between 04:00 and 05:30 local time.
+ */
+export function checkPreDawnLog(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('pre_dawn_log')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  const totalMinutes = hour * 60 + minute
+  if (totalMinutes >= 240 && totalMinutes <= 330) {
+    awardBadge('pre_dawn_log')
+    return 'pre_dawn_log'
+  }
+  return null
+}
+
+/**
+ * Award vision_sequence if journal entry contains 4+ dream vocabulary words.
+ */
+export function checkVisionSequence(journalText: string): BadgeType | null {
+  if (hasBadge('vision_sequence')) return null
+  const lower = journalText.toLowerCase()
+  const matched = DREAM_WORDS.filter(w => lower.includes(w))
+  if (matched.length >= 4) {
+    awardBadge('vision_sequence')
+    return 'vision_sequence'
   }
   return null
 }

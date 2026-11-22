@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114',
+    date: '2026-11-22',
+    title: 'LOT-ASSEMBLY · Badge Engine v33+v34 · THE ARCANE TERMINAL + THE DREAM LABORATORY · FM v114',
+    assembled: [
+      'badges.ts: BadgeType union expanded +62 types (v23 Arcane Terminal · v24 Dream Laboratory).',
+      'badges.ts: BADGES record expanded +62 objects. Arcane Terminal (12 word turn · 3 calendar · 3 behavioral · 6 achievement · 4 mastery · 3 secret boss). Dream Laboratory (12 word turn · 3 calendar · 3 behavioral · 6 achievement · 4 mastery · 3 secret boss).',
+      'badges.ts: checkBadges() expanded — v23 logic (arcane_begin/adept/master · arcane_opus · alchemy_arc · twenty_three_engines_arc · archive_deep/tome_of_ages/ancient_one/twenty_three_registers). v24 logic (dream_entry/class/complete · dream_opus · somnium_arc · twenty_four_engines_arc · sleeper_deep/dream_vault_tier/vision_keeper/twenty_four_registers).',
+      'easter-eggs.ts: WORD_TURNS array expanded +34 entries (12 Arcane Terminal triggers · 3 Arcane secret boss · 12 Dream Laboratory triggers · 3 Dream secret boss). 246 total word-turn triggers.',
+      'easter-eggs.ts: checkCalendarEasterEggs() expanded +6 dates (Paracelsus Sep 25 · John Dee Jul 13 · Newton Jan 4 · Freud May 6 · Jung Jul 26 · Tesla Jul 10).',
+      'easter-eggs.ts: 6 behavioral check functions added (checkArcaneSession · checkMidnightRitual · checkLongSpell · checkDreamSession · checkPreDawnLog · checkVisionSequence).',
+      'About.tsx: FM v113→v114. 750→812 badges. 24 Word Turn engines. 80 secret boss triggers. 246 word turns. 157 behavioral patterns.',
+      'SESSION_REPORTS: v114 entry appended · USERSHIP_TRANSMISSION updated to v114.',
+      'docs/LOT-SR-20261122-CODEX-v34.md: Session report written.',
+      '812 badges · 246 word-turns · 80 secret boss triggers · 24 Word Turn engines · 157 behavioral patterns · FM v114 · Day 1174+. Badge Engine v33+v34 deployed. The arcane and the dream are now indexed.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1511,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-22',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-22 · Badge Engine v33+v34 · THE ARCANE TERMINAL + THE DREAM LABORATORY · FM v114 · Day 1174+',
+    'Built: Badge Engine v33 (THE ARCANE TERMINAL) + v34 (THE DREAM LABORATORY). 62 new badges. 34 new word-turn triggers. 6 new calendar dates. 6 new behavioral check functions.',
+    'Feedback applied: "The system needs to speak the language of the arcane and the dream."',
+    'v23 Arcane Terminal: alchemical_word · transmutation_found · prima_materia · nigredo_state · solve_coagula · magnum_opus_found · philosopher_stone · caduceus_found · sanctum_found · cipher_key · rune_carved · nexus_opened.',
+    'v23 Secret Boss: paracelsus_key · dee_cipher · emerald_tablet. Calendar: Paracelsus (Sep 25) · John Dee (Jul 13) · Newton (Jan 4).',
+    'v24 Dream Laboratory: lucid_state · hypnagogic_log · dream_archive · somatic_signal · theta_wave · delta_anchor · rem_cycle · vision_state · subconscious_note · liminal_found · oneiric_field · sleep_archive.',
+    'v24 Secret Boss: jung_archetype · morpheus_field · lucid_apex. Calendar: Freud (May 6) · Jung (Jul 26) · Tesla (Jul 10).',
+    'Mastery Tiers: archive_deep (1000d) · tome_of_ages (200k words) · ancient_one (10yr) · twenty_three_registers [COSMIC] · sleeper_deep (1100d) · dream_vault_tier (250k words) · vision_keeper (11yr) · twenty_four_registers [COSMIC].',
+    'FM v114 · 24 Word Turn engines · 80 secret boss triggers · 246 word turns · 812 badges · 157 behavioral patterns.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 — sync to Field Manual v114 · Badge Engine v33+v34 documentation.',
   ],
 }
 
