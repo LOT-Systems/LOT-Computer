@@ -303,7 +303,7 @@ export type BadgeType =
   | 'high_score_badge'  // ▓→∗   New personal longest-streak record
   | 'extra_life'        // ◉→○   Return after 7+ days, prior streak 30+
   // ── Achievement RPG v6 — Arcade Class ────────────────────────────────────────
-  | 'quarter_drop'      // ○→◉  First easter egg unlocked (any type)
+  | 'first_quarter'     // ○→◉  First easter egg unlocked (any type)
   | 'insert_coin_badge' // ↺·○  Return after 30+ consecutive days away
   | 'arcade_champion'   // ≈·≋  Earn badge from every Word Turn engine v1–v9
   | 'game_over_retry'   // ◐→◆  3 different return-after-absence badges
@@ -750,7 +750,7 @@ export type BadgeType =
   | 'threshold_crossed'      // ─→─    "threshold/crossing the line/new world begins" detected (RARE)
   | 'mentor_arrived'         // ○·≋·○  "mentor/wise guide/guardian spirit/wise elder" detected (UNCOMMON)
   | 'ordeal_survived'        // ◈·■    "ordeal/survived the test/greatest challenge" detected (RARE)
-  | 'elixir_found'           // ∘·●·∘  "elixir/the gift/treasure found/boon" detected (RARE)
+  | 'hero_elixir'            // ∘·●·∘  "elixir/the gift/treasure found/boon" detected (RARE)
   | 'shadow_met'             // ▓·○    "shadow self/dark night of the/inner demon" detected (EPIC)
   | 'innermost_cave'         // █·∘·█  "innermost cave/darkest moment/bottom of pit" detected (EPIC)
   | 'shapeshifter'           // ◈→◉    "shapeshifter/transformed/no longer the same" detected (RARE)
@@ -3211,8 +3211,8 @@ export const BADGES: Record<BadgeType, Badge> = {
   },
 
   // ── Achievement RPG v6 — Arcade Class ─────────────────────────────────────
-  quarter_drop: {
-    id: 'quarter_drop',
+  first_quarter: {
+    id: 'first_quarter',
     symbol: '○→◉',
     name: 'Quarter Drop',
     description: 'Unlock your first easter egg badge of any type',
@@ -6880,8 +6880,8 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'rare',
     category: 'word_turn',
   },
-  elixir_found: {
-    id: 'elixir_found',
+  hero_elixir: {
+    id: 'hero_elixir',
     symbol: '∘·●·∘',
     name: 'Elixir Found',
     description: 'Write "elixir", "the gift", "treasure found", or "the boon" in any entry',

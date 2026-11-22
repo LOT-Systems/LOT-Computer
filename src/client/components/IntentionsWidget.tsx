@@ -10,6 +10,7 @@ import React from 'react'
 import { useStore } from '@nanostores/react'
 import { Block, Button } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { useCreateLog } from '#client/queries'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { $featureUnlocks } from '#client/stores/evolution'
 
@@ -28,6 +29,7 @@ type Intention = {
  */
 export function IntentionsWidget() {
   const [view, setView] = React.useState<IntentionView>('current')
+  const { mutate: createLog } = useCreateLog()
   const [intention, setIntention] = React.useState<Intention | null>(null)
   const [isSettingIntention, setIsSettingIntention] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
@@ -86,6 +88,13 @@ export function IntentionsWidget() {
     })
 
     localStorage.setItem('current-intention', JSON.stringify(newIntention))
+    // Persist to the Log (server stamps weather/location/time context) so
+    // intentions are first-class records for Memory, Story and the QIE.
+    createLog({
+      text: `Intention: ${newIntention.focus}`,
+      event: 'intention',
+      metadata: { intention: newIntention.focus, monthYear: newIntention.monthYear },
+    })
     setIntention(newIntention)
     setInputValue('')
     setIsSettingIntention(false)

@@ -1471,7 +1471,7 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bthreshold\b|\bcrossing[\s-]?the[\s-]?line\b|\bnew[\s-]?world[\s-]?(begins|started)\b/i, badge: 'threshold_crossed' },
   { patterns: /\bmentor\b|\bwise[\s-]?(guide|advisor|teacher|elder)\b|\bguardian[\s-]?spirit\b/i, badge: 'mentor_arrived' },
   { patterns: /\bordeal\b|\bsurvived[\s-]?(the[\s-])?test\b|\bgreatest[\s-]?challenge\b/i, badge: 'ordeal_survived' },
-  { patterns: /\belixir\b|\bthe[\s-]?boon\b|\btreasure[\s-]?(found|carried|home)\b/i,  badge: 'elixir_found' },
+  { patterns: /\belixir\b|\bthe[\s-]?boon\b|\btreasure[\s-]?(found|carried|home)\b/i,  badge: 'hero_elixir' },
   { patterns: /\bshadow[\s-]?self\b|\bdark[\s-]?night[\s-]?of[\s-]?the\b|\binner[\s-]?demon\b/i, badge: 'shadow_met' },
   { patterns: /\binnermost[\s-]?cave\b|\bdarkest[\s-]?moment\b|\bbottom[\s-]?of[\s-]?(the[\s-])?pit\b/i, badge: 'innermost_cave' },
   { patterns: /\bshapeshifter\b|\btransformed\b|\bno[\s-]?longer[\s-]?the[\s-]?same\b/i, badge: 'shapeshifter' },
