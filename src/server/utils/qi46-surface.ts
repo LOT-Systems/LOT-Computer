@@ -19,6 +19,8 @@
  *   3. enough signal to calibrate (≥ QI46_MIN_SIGNALS)
  *   4. risk below 'elevated' — an elevated person gets the standard path,
  *      never a voice experiment
+ *   5. language covered (F12) — if any field is in a language the ideation
+ *      scan cannot read, risk is unknown, so the standard path is used
  * After generation, COSMO® screens question + options. HELD → the caller
  * falls back to the uncalibrated prompt. Every screened question yields an
  * audit row with source 'surface' (labels only, never text).
@@ -43,6 +45,7 @@ export type Qi46SurfaceSkip =
   | 'no-consent'
   | 'low-signal'
   | 'elevated-risk'
+  | 'uncovered-language'
 
 export type Qi46SurfacePlan =
   | { active: false; skip: Qi46SurfaceSkip }
@@ -65,6 +68,7 @@ export function planQi46MemorySurface(
   const { vector, calibration, systemPrompt } = assembleQi46(logs, consent)
   if (vector.signalCount < QI46_MIN_SIGNALS) return { active: false, skip: 'low-signal' }
   if (vector.riskLevel === 'elevated') return { active: false, skip: 'elevated-risk' }
+  if (vector.riskSignals.includes('language:uncovered')) return { active: false, skip: 'uncovered-language' }
   const prelude = [
     systemPrompt,
     'Apply this voice only to the tone of one Memory question and its answer options.',

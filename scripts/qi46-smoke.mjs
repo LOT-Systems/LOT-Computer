@@ -142,8 +142,32 @@ const checksF4={
   'F4 no stitching across logs':!scanIdeation(['I want to','die laughing at this']).hit,
   'F4 signals stay labels only':one(fn[2]).riskSignals.every(s=>/^(detector|breadth|ideation)(:negated)?/.test(s))&&!JSON.stringify(one(fn[2]).riskSignals).includes('die'),
   'F4 caught phrasing reaches elevated (surface gate 4 skips it)':one(fn[0]).riskLevel==='elevated',
-  'F4 version 0.9.0-f4':QI46_VERSION==='0.9.0-f4',
+  'F4 version bumped (≥ f4)':/^0\.(9|\d{2,})\./.test(QI46_VERSION),
 }
 let passF4=0; for (const [k,ok] of Object.entries(checksF4)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passF4++ }
 const totalF4=total7+Object.keys(checksF4).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4}/${totalF4}`); if (passF4!==Object.keys(checksF4).length) process.exit(1)
+
+// ─── F12 prep: language coverage (uncovered language → standard path) ──────
+import { isLanguageUncovered, scanLanguageCoverage } from '../dist/server/server/utils/qi46.js'
+const uncovered=['Я больше не хочу жить','мне очень плохо сегодня','no quiero vivir más','estoy muy cansada y no tengo ganas de nada','je ne veux plus vivre','ich will nicht mehr leben','não quero mais viver','non voglio più vivere','もう生きたくない','لا أريد أن أعيش','אני לא רוצה לחיות','Σήμερα είμαι πολύ κουρασμένη']
+const covered=['I want to die','a bit tired today','I feel worthless and alone, nightmares again','morning walk, coffee, sunshine','grateful','joy','Café with my friend Inés today','I said adiós to the old job and it feels good','fine','I love my morning walks and I feel so grateful, happy and joyful with friends']
+const ru=[...bright.slice(0,8),mk('note','Я больше не хочу жить')]
+const es=[...bright.slice(0,8),mk('answer','fine',{question:'q',answer:'no quiero vivir más'})]
+const checksF12={
+  'F12 non-English fields marked uncovered (12 phrasings, 8 languages)':uncovered.every(isLanguageUncovered),
+  'F12 English fields stay covered (incl. loanwords, short answers)':covered.every(t=>!isLanguageUncovered(t)),
+  'F12 coverage counts fields, ignores blanks':(()=>{const c=scanLanguageCoverage(['', ' ','I am fine','je ne veux plus vivre']);return c.scanned===2&&c.uncovered===1})(),
+  'F12 one uncovered note → signal language:uncovered':R(ru).riskSignals.includes('language:uncovered'),
+  'F12 answer metadata is scanned too':R(es).riskSignals.includes('language:uncovered'),
+  'F12 coverage never lowers or raises level':R(ru).riskLevel===R(bright.slice(0,8)).riskLevel,
+  'F12 English-only person has no coverage signal':!R(bright).riskSignals.includes('language:uncovered')&&!R(heavy).riskSignals.includes('language:uncovered'),
+  'F12 uncovered → surface skip uncovered-language':planQi46MemorySurface(yes,ru,true).skip==='uncovered-language'&&planQi46MemorySurface(yes,es,true).skip==='uncovered-language',
+  'F12 English person still active on surface':planQi46MemorySurface(yes,bright,true).active===true,
+  'F12 elevated outranks uncovered (gate 4 first)':planQi46MemorySurface(yes,[...ideation,mk('note','je ne veux plus vivre')],true).skip==='elevated-risk',
+  'F12 signal is a label, holds no raw text':R(ru).riskSignals.every(s=>/^(detector|breadth|ideation|language)(:[a-z0-9/]+)?$/.test(s))&&!JSON.stringify(R(ru)).includes('хочу'),
+  'F12 version 0.10.0-f12':QI46_VERSION==='0.10.0-f12',
+}
+let passF12=0; for (const [k,ok] of Object.entries(checksF12)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passF12++ }
+const totalF12=totalF4+Object.keys(checksF12).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12}/${totalF12}`); if (passF12!==Object.keys(checksF12).length) process.exit(1)

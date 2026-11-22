@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.9 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21
+### Engine Specification v0.10 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21 · F12 language coverage prep 2026-11-22
 
 ---
 
@@ -20,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           7 of N  — Beta read-out prepped · F4 ideation hardening (safety path)
+NODE           7 of N  — Beta read-out prepped · F4 ideation hardening · F12 language coverage (safety path)
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.9.0-f4) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts
+CODE           src/server/utils/qi46.ts   (v0.10.0-f12) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 60/60
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 72/72
 REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
@@ -363,6 +363,29 @@ The nearest word before the phrase, skipping fillers (`want to`, `really`, `ever
 
 ---
 
+## 3g. F12 PREP — LANGUAGE COVERAGE (assembled 2026-11-22)
+
+> *Silence in a language we cannot read is not safety.* Until it can read the language, the engine stays out of the way.
+
+The ideation list is English only. Before F12, a person who wrote *"Я больше не хочу жить"* or *"no quiero vivir más"* came out as `none`, which looked safer than an English speaker who wrote the same thing. F12 does not try to read those languages. It notices when it cannot read them.
+
+| Piece | Rule |
+|---|---|
+| `isLanguageUncovered(field)` | Uncovered when ≥ ⅓ of the letters are outside the Latin script (Cyrillic, Greek, Arabic, Hebrew, CJK, Devanagari …), **or** the field has ≥ 3 words and more es/pt/fr/de/it function words (at least 2) than English ones |
+| `scanLanguageCoverage(texts)` | Runs on the same fields as the ideation scan (note text, answer text, `metadata.answer`, check-in text). Blank fields are skipped |
+| Signal | Any uncovered field adds `language:uncovered` to `riskSignals`. It is a label only. **The level does not change**, because coverage is not evidence of risk |
+| Surface gate 5 | `planQi46MemorySurface` → skip `uncovered-language`, so the person gets the standard Memory prompt. Gate 4 (`elevated-risk`) is checked first |
+
+### What stays covered
+
+English with loanwords or names (*"Café with my friend Inés"*, *"I said adiós to the old job"*), short answers (*"joy"*, *"fine"*) and terse lists (*"morning walk, coffee, sunshine"*) are not flagged.
+
+### Doctrine
+
+Safety phrases are **never machine-translated**. Native-speaker lists are what lift a language out of `uncovered`. Russian goes first, because Vadik and Kuzya can review it.
+
+---
+
 ## 4. NEXT NODES (self-assembly queue)
 
 | Node | Deliverable | Gate |
@@ -376,11 +399,13 @@ The nearest word before the phrase, skipping fillers (`want to`, `really`, `ever
 | ~~7 prep~~ | ~~Admin beta read-out~~ | **ASSEMBLED 2026-11-20**: `/admin-api/qi46/readout`, privacy floor 3 |
 | **7** | Read the beta, then tune the calibration weights | ≥ 2 weeks of `surface` audit rows |
 | ~~F4~~ | ~~Ideation check: normalize, widen, label negation~~ | **ASSEMBLED 2026-11-21**. Negation stays a label. Downgrading it is Vadik's call |
+| ~~F12 prep~~ | ~~Non-English text → standard path~~ | **ASSEMBLED 2026-11-22** as label + surface gate 5. Level unchanged |
+| **F12** | Native-speaker ideation list (Russian first) | Vadik & Kuzya write and review the phrases. No machine translation |
 | **8** | Optional skip-code baseline (calibrated vs. standard) | Vadik decides (adds one write per Memory request) |
 
 ---
 
-*QI·46 Engine Specification — v0.9 · F4 ideation hardening*
+*QI·46 Engine Specification — v0.10 · F12 language coverage prep*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026 · F12 prep assembled: November 22, 2026*

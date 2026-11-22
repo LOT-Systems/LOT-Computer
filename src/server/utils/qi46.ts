@@ -27,7 +27,7 @@ import type { Log } from '#shared/types'
 import { extractUserTraits, detectTraumaIndicators } from './memory/trait-extraction.js'
 import { analyzeEnergyState } from './energy.js'
 
-export const QI46_VERSION = '0.9.0-f4'
+export const QI46_VERSION = '0.10.0-f12'
 
 // ─── Output registers ──────────────────────────────────────────────────────
 
@@ -206,6 +206,68 @@ export function scanIdeation(texts: string[]): { hit: boolean; negatedOnly: bool
   return { hit: hits > 0, negatedOnly: hits > 0 && negated === hits }
 }
 
+// ─── F12 · Language coverage (prep) ───────────────────────────────────────
+//
+// The ideation list is English only. A person writing in Russian, Spanish or
+// German is never flagged, so they would look safer than they are. Until
+// native-speaker lists exist, any field the scan cannot read is marked
+// `language:uncovered`, and the Memory surface keeps that person on the
+// standard path. Coverage is not evidence of risk, so the level is unchanged.
+// Safety phrases are never machine-translated.
+
+// Common English function words. Shared words ("a", "me", "no") stay out of both lists.
+const EN_WORDS = new Set([
+  'i', "i'm", 'im', 'you', 'he', 'she', 'we', 'they', 'it', 'my', 'your', 'our', 'the', 'an', 'and',
+  'or', 'but', 'so', 'to', 'of', 'in', 'on', 'at', 'for', 'with', 'from', 'about', 'is', 'am', 'are',
+  'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'did', "don't", "can't", 'can', 'not',
+  'will', 'would', 'want', 'feel', 'feeling', 'felt', 'today', 'just', 'really', 'very', 'this',
+  'that', 'what', 'when', 'all', 'more', 'some', 'like', 'myself', 'again', 'still', 'too', 'much',
+])
+
+// Function words of the Latin-script languages most likely in the cohort.
+const FOREIGN_WORDS = new Set([
+  // es
+  'que', 'de', 'la', 'el', 'y', 'en', 'mi', 'es', 'por', 'con', 'para', 'una', 'los', 'las', 'se',
+  'lo', 'mas', 'más', 'pero', 'estoy', 'quiero', 'yo', 'muy', 'hoy', 'nada', 'tengo', 'soy',
+  // pt
+  'eu', 'não', 'nao', 'mais', 'quero', 'meu', 'minha', 'um', 'uma', 'estou', 'muito', 'hoje',
+  // fr
+  'je', 'ne', 'pas', 'le', 'et', 'plus', 'suis', 'veux', 'mon', 'ma', 'une', 'est', 'moi', 'tout',
+  // de
+  'ich', 'nicht', 'und', 'der', 'das', 'ist', 'mehr', 'mich', 'mein', 'bin', 'zu', 'ein', 'eine', 'heute',
+  // it
+  'io', 'non', 'che', 'di', 'più', 'sono', 'voglio', 'il', 'è', 'oggi',
+])
+
+/**
+ * F12 · Is this one field written in a language the ideation list covers?
+ * Uncovered when a third or more of its letters are outside the Latin script
+ * (Cyrillic, Greek, Arabic, Hebrew, CJK, Devanagari …), or when it has at
+ * least 3 words and more foreign function words than English ones.
+ */
+export function isLanguageUncovered(raw: string): boolean {
+  const letters = raw.match(/\p{L}/gu) || []
+  if (letters.length >= 3) {
+    const nonLatin = letters.filter((c) => !/\p{Script=Latin}/u.test(c)).length
+    if (nonLatin / letters.length >= 1 / 3) return true
+  }
+  const words = raw
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u02bc`\u00b4]/g, "'")
+    .split(/[^\p{L}']+/u)
+    .filter(Boolean)
+  if (words.length < 3) return false
+  const en = words.filter((w) => EN_WORDS.has(w)).length
+  const foreign = words.filter((w) => FOREIGN_WORDS.has(w)).length
+  return foreign >= 2 && foreign > en
+}
+
+/** F12 · How many of these fields the English-only ideation scan cannot read. */
+export function scanLanguageCoverage(texts: string[]): { scanned: number; uncovered: number } {
+  const fields = texts.filter((t) => t.trim().length > 0)
+  return { scanned: fields.length, uncovered: fields.filter(isLanguageUncovered).length }
+}
+
 /**
  * Engine-local risk. The shared detector averages 12 dimensions, five of
  * them eating-disorder, so a person heavy in many trauma dimensions at
@@ -241,6 +303,8 @@ export function qi46Risk(
     level = 'elevated' // negated or not: any doubt resolves to elevated
     signals.push(ideation.negatedOnly ? 'ideation:negated' : 'ideation')
   }
+  // F12: a field the English list cannot read is unknown risk, not no risk.
+  if (scanLanguageCoverage(texts).uncovered > 0) signals.push('language:uncovered')
   return { level, signals }
 }
 
