@@ -600,6 +600,7 @@ export const useCollectiveStats = () =>
   }>('/api/stats/collective', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
   })()
 
 export const useGrowthStats = () =>
@@ -620,6 +621,7 @@ export const useGrowthStats = () =>
   }>('/api/stats/growth', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
   })()
 
 export const usePatternStats = () =>
@@ -630,6 +632,7 @@ export const usePatternStats = () =>
   }>('/api/stats/patterns', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
   })()
 
 export const useWellnessStats = () =>
@@ -644,6 +647,7 @@ export const useWellnessStats = () =>
   }>('/api/stats/wellness', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
   })()
 
 export const useBadgeStats = () =>
@@ -658,6 +662,7 @@ export const useBadgeStats = () =>
   }>('/api/stats/badges', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
   })()
 
 export const useMemoryEngineStats = () =>
@@ -671,6 +676,7 @@ export const useMemoryEngineStats = () =>
   }>('/api/stats/memory-engine', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
     retry: false, // Don't retry if user doesn't have access
   })()
 
@@ -692,6 +698,7 @@ export const useAIUsageStats = () =>
   }>('/api/stats/ai-usage', {
     refetchInterval: 120000, // Refetch every 2 minutes
     refetchIntervalInBackground: false,
+    staleTime: 120000, // System tab remounts on every visit — don't refire 7 stats calls each time
     retry: false,
   })()
 

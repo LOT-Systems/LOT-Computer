@@ -98,11 +98,13 @@ export function useBreathe(enabled: boolean) {
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
-      setState({
-        phase: currentPhase,
-        count: countdown,
-        display,
-      })
+      // Skip identical frames: this state lives in System.tsx, so every
+      // setState re-renders the whole System tab (was 10×/s unconditionally).
+      setState(prev =>
+        prev.display === display && prev.phase === currentPhase
+          ? prev
+          : { phase: currentPhase, count: countdown, display }
+      )
     }
 
     // Update immediately
