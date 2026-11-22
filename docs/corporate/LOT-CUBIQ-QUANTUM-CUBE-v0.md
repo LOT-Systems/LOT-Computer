@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START (see R02-R07 reports for amendments to §03/§06)
+VERSION:  0.1 — DEVELOPMENT START (see R02-R09 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -426,6 +426,26 @@ entry — never editing or removing a prior one.
   the pad's mass, not firmware, gives the cube back its full vocabulary
   on a bad surface. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R08.md,
   Section 11.
+
+  USE CASE 09 — THE COFFEE TABLE                            2026-11-22
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, 81, living alone. Daughter and
+  grandson are in their LOT® cohort. The phone stays in a drawer because
+  every buzz might be bad news. The table is glass on chrome: resonant
+  and slippery. On its home pad the cube knows its deck in 0.43 s
+  (R09 §04). The Memory question HOPs, raised one rung by the operator,
+  and the platform asked for exactly that much and no more (R09 §03). The
+  daughter's cohort ping can never exceed NUDGE. It arrives while the
+  cube is in the operator's hands, so it is a SETTLE, a slow push in the
+  palm. She sees "sent", never "felt", "off its pad" or "fall": device
+  events are operator-private (R09 F74). A drop on the rug goes to
+  SAFE-HOLD, and only the operator is told. An epic achievement LEAPs
+  across the deck. The pad's feet grip the glass (μ ≥ 0.6 spec, R09 §05).
+  Proves that the people who send to a cube cannot turn it up, that a
+  notification object must not report on its owner, and that the hand
+  is a surface. CUBIQ is not a care or fall-alarm device and is never
+  sold as one. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R09.md,
+  Section 10.
 
 --------------------------------------------------------------------------------
 08 // BRAND
