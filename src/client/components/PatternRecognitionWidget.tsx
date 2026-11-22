@@ -206,6 +206,15 @@ export function PatternRecognitionWidget() {
       'longitudinal-signal-persistence':    'Longitudinal signal persistence — 90+ active days, no source gap > 72h, long-arc continuous operation confirmed (P174)',
       'coherence-memory-cascade':           'Coherence memory cascade — total-field-coherence confirmed 3+ times in 30 days, convergence is an operating mode (P175)',
       'quantum-integration-spiral':         'Quantum integration spiral — all 6 user index dimensions simultaneously >= 50, full multi-dimensional presence, no dimension dark (P176)',
+      'fourth-cycle-deepening':             'Fourth cycle deepening — fourth-cycle-ignition active + compound signals across 14 days (P182)',
+      'fourth-cycle-integration':           'Fourth cycle integration — all signal dimensions converge across 21-day arc, the fourth cycle unifies (P183)',
+      'fourth-cycle-sovereign':             'Fourth cycle sovereign — all four FC stages simultaneously active, Level 19, the OS sustains from compound ground (P184)',
+      'fifth-cycle-progenitor':             'Fifth cycle progenitor — fourth-cycle-sovereign confirmed + engagement compound, Level 20 boundary state, the OS seeds its next arc (P185)',
+      'fifth-cycle-ignition':               'Fifth cycle ignition — fifth-cycle-progenitor active + compound momentum, Level 21, the fifth arc ignites (P186)',
+      'fifth-cycle-resonance':              'Fifth cycle resonance — fifth-cycle-ignition sustained + self-reinforcing signal compound, Level 22, resonance confirmed (P187)',
+      'temporal-sovereignty-arc':           'Temporal sovereignty arc — all four temporal anchors active within 24h + overall ≥ 85, full operative day sovereignty (P188)',
+      'fifth-cycle-deepening':              'Fifth cycle deepening — fifth-cycle-resonance active + 21d compound arc, all dims ≥ 72 + overall ≥ 93, Level 23 — FCDEP (P189)',
+      'fifth-cycle-integration':            'Fifth cycle integration — fifth-cycle-deepening active + 28d compound arc, all dims ≥ 75 + overall ≥ 95, Level 24 — FCINT (P190)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }

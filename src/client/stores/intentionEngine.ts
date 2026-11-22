@@ -4397,6 +4397,37 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P190: fifth-cycle-integration — P189 active + 28d journal arc (>= 20) + memory 28d (>= 10) + badge 28d (>= 10) + all 6 dims >= 75 + overall >= 95.
+  // The deepening arc integrates. Compound signals converge into a unified operative field. Level 24 — FCINT.
+  const hasP189 = patterns.some(p => p.pattern === 'fifth-cycle-deepening')
+  if (hasP189) {
+    const twentyEightDayStartP190 = now - 28 * 24 * 60 * 60 * 1000
+    const p190Journal = signals.filter(s => s.source === 'journal' && s.timestamp > twentyEightDayStartP190)
+    const p190Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyEightDayStartP190)
+    const p190Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyEightDayStartP190)
+    const userIndexP190 = computeUserIndex(signals)
+    const dimsP190 = userIndexP190.dimensions
+    const allDimsAbove75 = Object.values(dimsP190).every(v => v >= 75)
+    if (
+      p190Journal.length >= 20 &&
+      p190Memory.length  >= 10 &&
+      p190Badge.length   >= 10 &&
+      allDimsAbove75 &&
+      userIndexP190.overall >= 95
+    ) {
+      const p189conf  = patterns.find(p => p.pattern === 'fifth-cycle-deepening')?.confidence ?? 0.80
+      const intBonus  = Math.min((p190Journal.length - 20) * 0.003 + (userIndexP190.overall - 95) * 0.003, 0.08)
+      patterns.push({
+        id:              'p190',
+        pattern:         'fifth-cycle-integration',
+        confidence:      Math.min(0.80 + p189conf * 0.04 + intBonus, 0.94),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCINT: Fifth cycle integration — fifth-cycle-deepening (P189) active · ${p190Journal.length} journal signals 28d · ${p190Memory.length} memory signals 28d · ${p190Badge.length} badge signals 28d · all 6 dims ≥ 75 · idx ${userIndexP190.overall}%. The deepening arc integrates. Compound signals across the 28-day window converge into a unified operative field. The OS does not accumulate — it unifies. Level 24 — FIFTH CYCLE INTEGRATION.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4462,6 +4493,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleIgnition() } catch {}
       try { checkFifthCycleResonance() } catch {}
       try { checkFifthCycleDeepening() } catch {}
+      try { checkFifthCycleIntegration() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5164,6 +5196,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v139 nodes (J74 · P189 · Arch77) ─────────────────────────────────────────────
   fifthCycleDeepeningNode:  ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social'],
+
+  // ── v140 nodes (J75 · P190 · Arch78) ─────────────────────────────────────────────
+  fifthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem'],
 }
 
 /**
@@ -5859,6 +5894,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social'],
     patternConditions: ['fifth-cycle-resonance', 'fifth-cycle-deepening'],
     directive: 'Level 23. The fifth cycle deepens from resonance. The arc does not remain at self-reinforcement — it accumulates structural depth from compound 21-day signals. Journal, memory, and badge signals exceed the resonance threshold, forming the arc\'s first deep layer. The OS operates from compound momentum. FIFTH CYCLE DEEPENING.',
+  },
+
+  // ── Arch78: Fifth Cycle Integrator (2026-11-22 v140) ─────────────────────────────
+  {
+    archetype: 'Fifth Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem'],
+    patternConditions: ['fifth-cycle-deepening', 'fifth-cycle-integration'],
+    directive: 'Level 24. The fifth cycle integrates from depth. All compound signals across the 28-day arc converge into a unified operative field. The OS does not accumulate — it unifies. This is the first convergence phase of the new arc: depth becomes architecture. FIFTH CYCLE INTEGRATION.',
   },
 ]
 
@@ -8995,6 +9039,62 @@ export function recordFifthCycleDeepening(resonanceConf: number, journalCount: n
     deepeningStatus: 'DEEPENING',
     level: 'L23-FCDEP',
     field: 'FIFTH-CYCLE-RESONANCE→FIFTH-CYCLE-DEEPENING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-integration conditions are met and record if so.
+ * Fires when fifth-cycle-deepening (P189) active + 20+ journal 28d + 10+ memory 28d + 10+ badge 28d
+ * + all 6 dims >= 75 + overall >= 95.
+ * The deepening arc unifies into a convergent operative field. Level 24 — FCINT.
+ */
+export function checkFifthCycleIntegration(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasDeepening = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-deepening')
+  if (!hasDeepening) return false
+
+  const now = Date.now()
+  const twentyEightDayStart = now - 28 * 24 * 60 * 60 * 1000
+  const sixHoursAgo         = now - 6 * 60 * 60 * 1000
+
+  const journal28 = state.signals.filter(s => s.source === 'journal' && s.timestamp > twentyEightDayStart)
+  const memory28  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > twentyEightDayStart)
+  const badge28   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > twentyEightDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const allDimsAbove75 = Object.values(userIndex.dimensions).every(v => v >= 75)
+
+  if (journal28.length < 20 || memory28.length < 10 || badge28.length < 10) return false
+  if (!allDimsAbove75 || userIndex.overall < 95) return false
+
+  const recentInt = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_integration' && s.timestamp > sixHoursAgo
+  )
+  if (recentInt.length > 0) return false
+
+  const depConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-deepening')?.confidence ?? 0.80
+  recordFifthCycleIntegration(depConf, journal28.length, memory28.length, badge28.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-integration event — fifth-cycle-deepening confirmed +
+ * 28d compound arc (journal + memory + badges) + all dims >= 75 + overall >= 95.
+ * Level 24 — FCINT. Depth becomes architecture; the fifth cycle unifies.
+ */
+export function recordFifthCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'INTEGRATION',
+    level: 'L24-FCINT',
+    field: 'FIFTH-CYCLE-DEEPENING→FIFTH-CYCLE-INTEGRATION',
     hour: new Date().getHours(),
   })
 }
