@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getAmbientReading, getAmbientLogEcho, AmbientReading, AmbientLogEcho } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -99,6 +99,34 @@ function LoadingDots() {
     return () => clearInterval(id)
   }, [])
   return <span className="opacity-40">{'·'.repeat(dots)}</span>
+}
+
+/**
+ * Second line of the Astrology block: today's rokuyo guidance, the
+ * countdown to the next Taian, and the Logs echo (entries written on the
+ * same day-type / under the same moon). Ambient conditions only — not a
+ * natal chart.
+ */
+function AstrologyDetail({ astrology, echo }: { astrology: AmbientReading; echo: AmbientLogEcho }) {
+  const taian = astrology.daysUntilTaian === 0
+    ? 'Taian today'
+    : astrology.daysUntilTaian > 0
+      ? `Taian in ${astrology.daysUntilTaian}d`
+      : ''
+  return (
+    <>
+      {astrology.rokuyoGuidance && (
+        <div className="opacity-60">
+          {astrology.rokuyoGuidance}{taian && astrology.rokuyo !== 'Taian' ? ` · ${taian}` : ''}
+        </div>
+      )}
+      {echo.tracked > 0 && (
+        <div className="opacity-40">
+          Logs: {echo.sameRokuyo} on {astrology.rokuyo} · {echo.sameMoonPhase} under {astrology.moonPhase}
+        </div>
+      )}
+    </>
+  )
 }
 
 export const System = React.memo(function SystemInner() {
@@ -203,40 +231,51 @@ export const System = React.memo(function SystemInner() {
   }, [])
 
   // Astrology calculations — ambient conditions (zodiac hour, moon phase,
-  // rokuyo), not a personal natal chart.
-  const astrology = React.useMemo(() => {
-    const now = new Date()
-    const hourlyZodiac = getHourlyZodiac(now)
-    const westernZodiac = getWesternZodiac(now)
-    const moonPhase = getMoonPhase(now)
-    const rokuyo = getRokuyo(now)
-
-    return {
-      hourlyZodiac,
-      westernZodiac,
-      moonPhase: moonPhase.phase,
-      moonIllumination: moonPhase.illumination,
-      rokuyo,
-    }
+  // rokuyo), not a personal natal chart. Personalized to the user's saved
+  // profile timeZone (falls back to device-local), matching the server-side
+  // Logs snapshot so dashboard and journal always agree.
+  const astroTimeZone = me?.timeZone || null
+  const astrology = React.useMemo(
+    () => getAmbientReading(new Date(), astroTimeZone),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [astrologyTick])
+    [astrologyTick, astroTimeZone]
+  )
+
+  // Logs echo — how many past entries were written on this same rokuyo
+  // day-type / under this same moon phase (from each log's context snapshot).
+  const astrologyEcho = React.useMemo(
+    () => getAmbientLogEcho(logs, astrology),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logs, astrology.rokuyo, astrology.moonPhase]
+  )
 
   // Synchronize the ambient astrology reading into the QIE signal bus once
-  // per calendar day, so other widgets (cosmic, system) can react to it.
+  // per calendar day (in the reading's timeZone), so other widgets (cosmic,
+  // system) can react to it.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
+    const today = astroTimeZone ? dayjs().tz(astroTimeZone).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
     const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    try {
+      if (localStorage.getItem(lastRecordedKey) === today) return
+    } catch { /* storage blocked — still record */ }
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      {
+        daysUntilTaian: astrology.daysUntilTaian,
+        timeZone: astrology.timeZone,
+        logEchoSameRokuyo: astrologyEcho.sameRokuyo,
+        logEchoSameMoon: astrologyEcho.sameMoonPhase,
+        logEchoTracked: astrologyEcho.tracked,
+      }
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, today) } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astrology.rokuyo, astrology.moonPhase, astroTimeZone, astrologyEcho.tracked])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +506,7 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            <AstrologyDetail astrology={astrology} echo={astrologyEcho} />
           </Block>
         </div>
 
@@ -670,9 +710,12 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
-            <div>
-              {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
-            </div>
+            <>
+              <div>
+                {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
+              </div>
+              <AstrologyDetail astrology={astrology} echo={astrologyEcho} />
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}

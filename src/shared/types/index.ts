@@ -71,6 +71,8 @@ export type UserProfile = {
   tags: string[];
   hideActivityLogs: boolean;
   timeChime?: boolean;
+  // Saved IANA zone — personalizes the ambient Astrology reading
+  timeZone?: string | null;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
 };
@@ -170,6 +172,7 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  astroDaysUntilTaian?: number | null;
   [key: string]: any;
 };
 

@@ -4880,7 +4880,14 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extras: {
+    daysUntilTaian?: number
+    timeZone?: string | null
+    logEchoSameRokuyo?: number
+    logEchoSameMoon?: number
+    logEchoTracked?: number
+  } = {}
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4896,12 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // (2026-11-22) personalization + Logs sync: zone the reading was taken
+    // in, Taian countdown, and how often the user has logged under this
+    // same rokuyo/moon — lets downstream widgets weigh ambient resonance.
+    ...extras,
+    resonant: (extras.logEchoTracked ?? 0) > 0 &&
+      (extras.logEchoSameRokuyo ?? 0) / (extras.logEchoTracked as number) > 1 / 6,
   })
 }
 

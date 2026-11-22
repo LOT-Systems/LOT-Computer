@@ -80,17 +80,132 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *local calendar* days (via Date.UTC on the wall-clock
+  // Y/M/D) rather than raw milliseconds against a UTC-midnight anchor —
+  // the old ms-diff flipped the rokuyo mid-day for any non-UTC runtime
+  // (e.g. 16:00 local in UTC-8). (2026-11-22 fix)
+  return ROKUYO[mod(getLocalDayNumber(date) - ROKUYO_ANCHOR_DAY, 6)]
+}
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
+const DAY_MS = 1000 * 60 * 60 * 24
+const ROKUYO_ANCHOR_DAY = Date.UTC(2000, 0, 1) / DAY_MS
 
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+function mod(n: number, m: number): number {
+  return ((n % m) + m) % m
+}
 
-  return ROKUYO[rokuyoIndex]
+/** Whole-day number of the date's local wall-clock calendar day. */
+function getLocalDayNumber(date: Date): number {
+  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS)
+}
+
+/** One-line ambient guidance for each rokuyo day. */
+export const ROKUYO_GUIDANCE: Record<string, string> = {
+  Sensho: 'Act early — mornings favor you.',
+  Tomobiki: 'Shared plans go well; good for gatherings.',
+  Senpu: 'Go slow early; afternoons favor you.',
+  Butsumetsu: 'Quiet day — rest, close loops, start nothing big.',
+  Taian: 'Most auspicious day — begin what matters.',
+  Shakku: 'Take care; only midday (11–13) is clear.',
+}
+
+export function getRokuyoGuidance(rokuyo: string): string {
+  return ROKUYO_GUIDANCE[rokuyo] ?? ''
+}
+
+/** Days from `date` (0 = today) until the next given rokuyo day. */
+export function getDaysUntilRokuyo(date: Date, target: string): number {
+  const targetIdx = (ROKUYO as readonly string[]).indexOf(target)
+  if (targetIdx < 0) return -1
+  const todayIdx = mod(getLocalDayNumber(date) - ROKUYO_ANCHOR_DAY, 6)
+  return mod(targetIdx - todayIdx, 6)
+}
+
+/**
+ * Convert a real instant into a Date whose *local* getters
+ * (getHours/getDate/...) read the wall clock of `timeZone`. Falls back to
+ * the instant itself when no/invalid timeZone is given.
+ */
+export function toWallClockInZone(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value ?? 0)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+export interface AmbientReading {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  rokuyoGuidance: string
+  moonPhase: string
+  moonIllumination: number
+  daysUntilTaian: number
+  /** IANA zone the reading was taken in, or null for device/runtime local */
+  timeZone: string | null
+}
+
+/**
+ * The full ambient reading for a moment, personalized to the user's saved
+ * timeZone. Calendar-bound parts (zodiac hour, sign, rokuyo) use the zone's
+ * wall clock; the moon phase uses the true instant (it is global).
+ * Ambient conditions only — not a natal chart.
+ */
+export function getAmbientReading(instant: Date = new Date(), timeZone?: string | null): AmbientReading {
+  const wall = toWallClockInZone(instant, timeZone)
+  const moon = getMoonPhase(instant)
+  const rokuyo = getRokuyo(wall)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    rokuyo,
+    rokuyoGuidance: getRokuyoGuidance(rokuyo),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    daysUntilTaian: getDaysUntilRokuyo(wall, 'Taian'),
+    timeZone: timeZone || null,
+  }
+}
+
+export interface AmbientLogEcho {
+  /** past logs written on the same rokuyo day-type */
+  sameRokuyo: number
+  /** past logs written under the same moon phase */
+  sameMoonPhase: number
+  /** total logs carrying an astrology snapshot */
+  tracked: number
+}
+
+/**
+ * Cross-reference the current reading against the user's Logs, whose
+ * `context` carries the astro snapshot taken at write time
+ * (see server getLogContext). Pure — works on any {context} array.
+ */
+export function getAmbientLogEcho(
+  logs: Array<{ context?: Record<string, any> | null }>,
+  reading: Pick<AmbientReading, 'rokuyo' | 'moonPhase'>
+): AmbientLogEcho {
+  let sameRokuyo = 0
+  let sameMoonPhase = 0
+  let tracked = 0
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx || !ctx.astroRokuyo) continue
+    tracked++
+    if (ctx.astroRokuyo === reading.rokuyo) sameRokuyo++
+    if (ctx.astroMoonPhase === reading.moonPhase) sameMoonPhase++
+  }
+  return { sameRokuyo, sameMoonPhase, tracked }
 }
 
 /**
