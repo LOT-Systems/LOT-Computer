@@ -3629,6 +3629,29 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'calendar_entry' || log.event === 'calendar_alert' || log.event === 'calendar_status') {
+          const md = (log.metadata || {}) as Record<string, any>
+          const type = String(md.entryType || 'note').toUpperCase()
+          const clock = md.time ? String(md.time).replace(':', '') + 'J' : '----J'
+          const head =
+            log.event === 'calendar_entry' ? 'SCHEDULED' :
+            log.event === 'calendar_alert'
+              ? (md.stage === 'T-15' ? 'WARNING ORDER · T-15' : md.stage === 'T-0' ? 'EXECUTE · T-0' : 'DAY ORDER')
+              : (md.status === 'done' ? 'COMPLETE' : md.status === 'cancelled' ? 'SCRUBBED' : 'REOPENED')
+          const when = md.date ? dayjs(md.date).format('DD MMM YY').toUpperCase() : ''
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">
+                  {log.event === 'calendar_alert' ? '■ ' : ''}{head}
+                </div>
+                <div className="opacity-60 uppercase tracking-widest tabular-nums">
+                  {type} · {when} {clock}
+                </div>
+                <div>{md.text || log.text}</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (

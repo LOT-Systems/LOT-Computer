@@ -76,6 +76,7 @@ import { CosmicUpdateWidget } from './CosmicUpdateWidget'
 import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
+import { useCalendarEntries } from '#client/hooks/useCalendarEntries'
 import { BenchmarkWidget } from './BenchmarkWidget'
 import { ArchitectWidget } from './ArchitectWidget'
 import { IntegrityWidget } from './IntegrityWidget'
@@ -381,17 +382,12 @@ export const System = React.memo(function SystemInner() {
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
 
   // Temporal Planner — next scheduled calendar entry, from QIE signal pipeline
+  const { entries: calendarEntries } = useCalendarEntries()
   const upcomingCalendar = React.useMemo(() => {
     const today = dayjs().format('YYYY-MM-DD')
-    const entries = logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
-      .map(log => ({
-        date: log.metadata!.date as string,
-        text: (log.metadata!.text as string) || log.text || '',
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date))
-    return { next: entries[0] ?? null, count: entries.length }
-  }, [logs])
+    const open = calendarEntries.filter(e => e.status === 'open' && e.date >= today)
+    return { next: open[0] ?? null, count: open.length }
+  }, [calendarEntries])
 
   // Check for recipe and planner suggestions when component mounts
   React.useEffect(() => {
@@ -725,6 +721,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Next:">
             {dayjs(upcomingCalendar.next.date).format('ddd, MMMM D')}
+            {upcomingCalendar.next.time && ` · ${upcomingCalendar.next.time}`}
             {' — '}
             {upcomingCalendar.next.text}
             {upcomingCalendar.count > 1 && ` (+${upcomingCalendar.count - 1} more)`}

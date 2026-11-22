@@ -9,131 +9,202 @@
 import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import { Block, Button } from '#client/components/ui'
-import { useCreateLog, useLogs } from '#client/queries'
+import { useCreateCalendarEntry, useSetCalendarStatus } from '#client/queries'
 import { cn } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
-import type { Dayjs } from '#client/utils/dayjs'
 import { recordCalendarSignal } from '#client/stores/intentionEngine'
-
-type EntryType = 'note' | 'task' | 'call'
-
-type CalendarEntry = {
-  date: string
-  text: string
-  type: EntryType
-}
+import {
+  useCalendarEntries,
+  useNow,
+  getDesktopAlertsEnabled,
+  setDesktopAlertsEnabled,
+} from '#client/hooks/useCalendarEntries'
+import {
+  ENTRY_TYPES,
+  agenda,
+  countdown,
+  entryDateTime,
+  getMonthGrid,
+  isOverdue,
+  parseTime,
+  toDateKey,
+  TYPE_CODE,
+} from '#shared/utils/calendar'
+import type { CalendarEntry, EntryStatus, EntryType } from '#shared/utils/calendar'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
-function getMonthWeeks(year: number, month: number): Dayjs[][] {
-  const first = dayjs().year(year).month(month).startOf('month')
-  const last = dayjs().year(year).month(month).endOf('month')
-
-  let isoDay = first.day() === 0 ? 6 : first.day() - 1
-  const start = first.subtract(isoDay, 'day')
-
-  const weeks: Dayjs[][] = []
-  let current = start
-
-  while (current.isBefore(last) || current.isSame(last, 'day') || weeks.length < 5) {
-    const week: Dayjs[] = []
-    for (let i = 0; i < 7; i++) {
-      week.push(current)
-      current = current.add(1, 'day')
-    }
-    weeks.push(week)
-    if (weeks.length >= 6) break
-  }
-
-  return weeks
+function whenLabel(e: CalendarEntry, now: Date): string {
+  const todayKey = toDateKey(now)
+  const tomorrowKey = toDateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1))
+  const day =
+    e.date === todayKey ? 'Today' :
+    e.date === tomorrowKey ? 'Tomorrow' :
+    dayjs(entryDateTime(e)).format(
+      e.date.slice(0, 4) === String(now.getFullYear()) ? 'ddd, MMM D' : 'ddd, MMM D, YYYY'
+    )
+  return e.time ? `${day} · ${e.time}` : day
 }
 
 export function CalendarWidget() {
   const queryClient = useQueryClient()
-  const { data: logs = [] } = useLogs()
-  const { mutate: createLog } = useCreateLog()
+  const { entries, isLoading, isError, refetch } = useCalendarEntries()
+  const { mutate: createEntry, isLoading: isSaving } = useCreateCalendarEntry()
+  const { mutate: setStatus } = useSetCalendarStatus()
+  const now = useNow(30000)
 
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
-  const [viewMonth, setViewMonth] = React.useState(() => dayjs())
+  const [viewMonth, setViewMonth] = React.useState(() => {
+    const d = new Date()
+    return { year: d.getFullYear(), month: d.getMonth() }
+  })
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null)
   const [isAddingEntry, setIsAddingEntry] = React.useState(false)
   const [entryText, setEntryText] = React.useState('')
+  const [entryTime, setEntryTime] = React.useState('')
   const [entryType, setEntryType] = React.useState<EntryType>('note')
+  const [error, setError] = React.useState<string | null>(null)
+  const [openRow, setOpenRow] = React.useState<string | null>(null)
+  const [desktopOn, setDesktopOn] = React.useState(() => getDesktopAlertsEnabled())
 
-  const entries = React.useMemo<CalendarEntry[]>(() => {
-    return logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata)
-      .map(log => ({
-        date: log.metadata?.date as string,
-        text: log.metadata?.text as string || log.text || '',
-        type: (log.metadata?.entryType as EntryType) || 'note',
-      }))
-      .filter(e => e.date && e.text)
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [logs])
+  const todayKey = toDateKey(now)
+  const upcoming = React.useMemo(() => agenda(entries, now), [entries, now])
 
-  const upcomingEntries = React.useMemo(() => {
-    const today = dayjs().format('YYYY-MM-DD')
-    return entries
-      .filter(e => e.date >= today)
-      .slice(0, 10)
-  }, [entries])
-
-  const entriesOnDate = React.useMemo(() => {
-    if (!selectedDate) return []
-    return entries.filter(e => e.date === selectedDate)
-  }, [entries, selectedDate])
+  const entriesOnDate = React.useMemo(
+    () => (selectedDate ? entries.filter(e => e.date === selectedDate) : []),
+    [entries, selectedDate]
+  )
 
   const datesWithEntries = React.useMemo(() => {
     const set = new Set<string>()
-    entries.forEach(e => set.add(e.date))
+    entries.forEach(e => { if (e.status === 'open') set.add(e.date) })
     return set
   }, [entries])
 
-  const today = dayjs().format('YYYY-MM-DD')
   const weeks = React.useMemo(
-    () => getMonthWeeks(viewMonth.year(), viewMonth.month()),
+    () => getMonthGrid(viewMonth.year, viewMonth.month),
     [viewMonth]
   )
+  const monthLabel = dayjs(new Date(viewMonth.year, viewMonth.month, 1)).format('MMMM, YYYY')
+  const isCurrentView = viewMonth.year === now.getFullYear() && viewMonth.month === now.getMonth()
 
-  const handleDateClick = (d: Dayjs) => {
-    const key = d.format('YYYY-MM-DD')
-    if (selectedDate === key) {
-      setSelectedDate(null)
-    } else {
-      setSelectedDate(key)
-    }
+  const shiftMonth = (delta: number) =>
+    setViewMonth(v => {
+      const d = new Date(v.year, v.month + delta, 1)
+      return { year: d.getFullYear(), month: d.getMonth() }
+    })
+
+  const resetForm = () => {
+    setEntryText('')
+    setEntryTime('')
+    setError(null)
+  }
+
+  const handleDateClick = (key: string) => {
+    setSelectedDate(prev => (prev === key ? null : key))
+    setIsAddingEntry(false)
+    resetForm()
+  }
+
+  const invalidate = () => {
+    queryClient.invalidateQueries(['/api/calendar'])
+    queryClient.invalidateQueries(['/api/logs'])
   }
 
   const handleAddEntry = () => {
-    if (!selectedDate || !entryText.trim()) return
+    if (!selectedDate || isSaving) return
+    const text = entryText.trim()
+    if (!text) return setError('Text required')
+    const time = parseTime(entryTime)
+    if (time === undefined) return setError('Time: HH:MM')
 
-    const dateLabel = dayjs(selectedDate).format('dddd, MMMM D, YYYY')
-
-    createLog({
-      text: `[SCHEDULE] ${entryType}: ${entryText.trim()} (${dateLabel})`,
-      event: 'calendar_entry',
-      metadata: {
-        date: selectedDate,
-        text: entryText.trim(),
-        entryType,
-      },
-    }, {
+    setError(null)
+    const date = selectedDate
+    createEntry({ date, time, text, entryType }, {
       onSuccess: () => {
-        queryClient.refetchQueries(['/api/logs'])
-        try { recordCalendarSignal(entryType, selectedDate!) } catch (_) {}
+        invalidate()
+        resetForm()
+        setIsAddingEntry(false)
+        try { recordCalendarSignal(entryType, date) } catch (_) {}
       },
+      onError: () => setError('Not saved — retry'),
     })
+  }
 
-    setEntryText('')
-    setIsAddingEntry(false)
+  const handleStatus = (e: CalendarEntry, status: EntryStatus) => {
+    setOpenRow(null)
+    setStatus({ entryId: e.id, status }, { onSuccess: invalidate })
   }
 
   const handleToggleCalendar = () => {
     if (!isCalendarOpen) {
-      setViewMonth(dayjs())
+      setViewMonth({ year: now.getFullYear(), month: now.getMonth() })
     }
     setIsCalendarOpen(!isCalendarOpen)
+  }
+
+  const toggleDesktop = async () => {
+    if (desktopOn) {
+      setDesktopAlertsEnabled(false)
+      setDesktopOn(false)
+      return
+    }
+    try {
+      const perm = Notification.permission === 'default'
+        ? await Notification.requestPermission()
+        : Notification.permission
+      const on = perm === 'granted'
+      setDesktopAlertsEnabled(on)
+      setDesktopOn(on)
+    } catch {}
+  }
+  const canDesktop = typeof window !== 'undefined' && 'Notification' in window
+
+  const renderRow = (e: CalendarEntry, showDate: boolean) => {
+    const overdue = isOverdue(e, now)
+    const at = entryDateTime(e)
+    const soon = e.time && e.date === todayKey && !overdue
+    const isOpen = openRow === e.id
+    const done = e.status !== 'open'
+    return (
+      <div key={e.id}>
+        <div
+          className={cn(
+            'flex flex-wrap justify-between gap-x-16 cursor-pointer',
+            done && 'text-acc/30 line-through'
+          )}
+          onClick={() => setOpenRow(isOpen ? null : e.id)}
+        >
+          <span>
+            {showDate ? whenLabel(e, now) : (e.time || '—')}
+            {overdue && <span className="text-acc/40 uppercase tracking-widest"> · Overdue</span>}
+            {soon && <span className="text-acc/40 tabular-nums"> · {countdown(at, now)}</span>}
+          </span>
+          <span className="text-right break-words min-w-0 ml-auto">
+            {e.type !== 'note' && <span className="text-acc/40">{TYPE_CODE[e.type]} </span>}
+            {e.text}
+          </span>
+        </div>
+        {isOpen && (
+          <div className="flex gap-16 text-acc/40 mb-4">
+            {e.status === 'open' ? (
+              <>
+                <button className="hover:text-acc transition-opacity" onClick={() => handleStatus(e, 'done')}>
+                  Done
+                </button>
+                <button className="hover:text-acc transition-opacity" onClick={() => handleStatus(e, 'cancelled')}>
+                  Scrub
+                </button>
+              </>
+            ) : (
+              <button className="hover:text-acc transition-opacity" onClick={() => handleStatus(e, 'open')}>
+                Reopen
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -141,7 +212,7 @@ export function CalendarWidget() {
       <div className="w-full">
         <div className="mb-16">
           <Button onClick={handleToggleCalendar}>
-            Add date
+            {isCalendarOpen ? 'Close' : 'Add date'}
           </Button>
         </div>
 
@@ -150,35 +221,43 @@ export function CalendarWidget() {
             <div className="flex items-center gap-8 mb-8">
               <button
                 className="text-acc/40 hover:text-acc transition-opacity"
-                onClick={() => setViewMonth(viewMonth.subtract(1, 'month'))}
+                onClick={() => shiftMonth(-1)}
+                aria-label="Previous month"
               >
                 {'<—'}
               </button>
-              <span className="text-acc">
-                {viewMonth.format('MMMM, YYYY')}
-              </span>
+              <span className="text-acc">{monthLabel}</span>
               <button
                 className="text-acc/40 hover:text-acc transition-opacity"
-                onClick={() => setViewMonth(viewMonth.add(1, 'month'))}
+                onClick={() => shiftMonth(1)}
+                aria-label="Next month"
               >
                 {'—>'}
               </button>
+              {!isCurrentView && (
+                <button
+                  className="text-acc/30 hover:text-acc/60 transition-opacity ml-8"
+                  onClick={() => setViewMonth({ year: now.getFullYear(), month: now.getMonth() })}
+                >
+                  Today
+                </button>
+              )}
             </div>
 
             <div className="space-y-1">
               {weeks.map((week, wi) => (
                 <div key={wi} className="flex gap-0">
                   {week.map((d, di) => {
-                    const key = d.format('YYYY-MM-DD')
-                    const isToday = key === today
-                    const isCurrentMonth = d.month() === viewMonth.month()
+                    const key = toDateKey(d)
+                    const isToday = key === todayKey
+                    const isCurrentMonth = d.getMonth() === viewMonth.month
                     const isSelected = key === selectedDate
                     const hasEntry = datesWithEntries.has(key)
 
                     return (
                       <button
                         key={key}
-                        onClick={() => handleDateClick(d)}
+                        onClick={() => handleDateClick(key)}
                         className={cn(
                           'py-0.5 px-0.5 transition-opacity whitespace-nowrap',
                           'min-w-[2.5em] text-left',
@@ -187,10 +266,11 @@ export function CalendarWidget() {
                           !isCurrentMonth && 'text-acc/20',
                           isCurrentMonth && !isToday && 'text-acc/40',
                           isToday && 'text-acc',
-                          hasEntry && isCurrentMonth && !isToday && 'text-acc/60',
+                          hasEntry && isCurrentMonth && !isToday && 'text-acc/80',
                         )}
                       >
-                        {DAY_LETTERS[di]}{d.date()}
+                        {DAY_LETTERS[di]}{d.getDate()}
+                        {hasEntry && <span className="text-acc/60">·</span>}
                       </button>
                     )
                   })}
@@ -214,7 +294,7 @@ export function CalendarWidget() {
             {isAddingEntry && selectedDate && (
               <div className="mt-8">
                 <div className="flex gap-8 mb-8">
-                  {(['note', 'task', 'call'] as EntryType[]).map(t => (
+                  {ENTRY_TYPES.map(t => (
                     <button
                       key={t}
                       onClick={() => setEntryType(t)}
@@ -226,19 +306,37 @@ export function CalendarWidget() {
                       {t}
                     </button>
                   ))}
+                  <span className="text-acc/30 ml-auto">
+                    {dayjs(selectedDate).format('ddd, MMM D')}
+                  </span>
                 </div>
                 <div className="flex gap-8 items-center">
                   <input
                     type="text"
+                    inputMode="numeric"
+                    value={entryTime}
+                    onChange={e => { setEntryTime(e.target.value); setError(null) }}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
+                    placeholder="HH:MM"
+                    aria-label="Time (optional)"
+                    maxLength={7}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 w-[5.5em] outline-none focus:border-acc/40 tabular-nums"
+                  />
+                  <input
+                    type="text"
                     value={entryText}
-                    onChange={e => setEntryText(e.target.value)}
+                    onChange={e => { setEntryText(e.target.value); setError(null) }}
                     onKeyDown={e => { if (e.key === 'Enter') handleAddEntry() }}
                     placeholder={`Add ${entryType}...`}
-                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 outline-none focus:border-acc/40"
+                    maxLength={280}
+                    className="bg-transparent border border-acc/20 text-acc px-4 py-2 flex-1 min-w-0 outline-none focus:border-acc/40"
                     autoFocus
                   />
-                  <Button onClick={handleAddEntry}>Add</Button>
+                  <Button onClick={handleAddEntry} disabled={isSaving}>
+                    {isSaving ? '...' : 'Add'}
+                  </Button>
                 </div>
+                {error && <div className="text-acc/40 mt-4">{error}</div>}
               </div>
             )}
 
@@ -247,33 +345,37 @@ export function CalendarWidget() {
                 <div className="text-acc/40 mb-4">
                   {dayjs(selectedDate).format('dddd, MMMM D')}
                 </div>
-                {entriesOnDate.map((e, i) => (
-                  <div key={i} className="text-acc/80 mb-1">
-                    {e.text}
-                  </div>
-                ))}
+                {entriesOnDate.map(e => renderRow(e, false))}
               </div>
             )}
           </div>
         )}
 
-        {upcomingEntries.length > 0 && (
+        {isError && (
+          <button className="text-acc/40 hover:text-acc transition-opacity" onClick={() => refetch()}>
+            Calendar offline — retry
+          </button>
+        )}
+
+        {upcoming.length > 0 && (
           <div className="space-y-1">
-            {upcomingEntries.map((entry, i) => (
-              <div key={i} className="flex justify-between gap-16">
-                <span className="text-acc whitespace-nowrap">
-                  {dayjs(entry.date).format('dddd, MMMM D, YYYY')}
-                </span>
-                <span className="text-acc text-right">
-                  {entry.text}
-                </span>
-              </div>
-            ))}
+            {upcoming.map(e => renderRow(e, true))}
           </div>
         )}
 
-        {upcomingEntries.length === 0 && !isCalendarOpen && (
+        {!isLoading && !isError && upcoming.length === 0 && !isCalendarOpen && (
           <div className="text-acc/40">No upcoming dates.</div>
+        )}
+
+        {canDesktop && (upcoming.length > 0 || isCalendarOpen) && (
+          <div className="mt-8">
+            <button
+              className="text-acc/30 hover:text-acc/60 transition-opacity"
+              onClick={toggleDesktop}
+            >
+              Desktop alerts: {desktopOn ? 'On' : 'Off'}
+            </button>
+          </div>
         )}
       </div>
     </Block>

@@ -43,6 +43,7 @@ import { generateUserNarrative } from '#server/utils/rpg-narrative'
 import { generateChatCatalysts, generateConversationStarters, shouldShowChatCatalyst } from '#server/utils/cohort-chat-catalyst'
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
+import * as cal from '#shared/utils/calendar'
 import { registerOSRoutes } from './os-api.js'
 
 // ============================================================================
@@ -1084,7 +1085,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1615,6 +1616,117 @@ export default async (fastify: FastifyInstance) => {
         }
       })
       return log
+    }
+  )
+
+  // ============================================================================
+  // CALENDAR — entries, lifecycle, alerts. All state lives in the Log.
+  // Dedicated read so entries never fall out of the /logs 500-row window.
+  // ============================================================================
+
+  const findCalendarEntry = async (userId: string, entryId: unknown) => {
+    if (typeof entryId !== 'string' || !/^[0-9a-f-]{36}$/i.test(entryId)) return null
+    const log = await fastify.models.Log.findOne({
+      where: { id: entryId, userId, event: 'calendar_entry' },
+    })
+    if (!log) return null
+    const [entry] = cal.buildEntries([
+      { id: log.id, event: log.event, text: log.text, metadata: log.metadata, createdAt: log.createdAt },
+    ])
+    return entry || null
+  }
+
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const alertSince = dayjs().subtract(3, 'day').toDate()
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        [Op.or]: [
+          { event: { [Op.in]: ['calendar_entry', 'calendar_status'] } },
+          { event: 'calendar_alert', createdAt: { [Op.gte]: alertSince } },
+        ],
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'ASC']],
+      limit: 5000,
+    })
+    return logs
+  })
+
+  fastify.post(
+    '/calendar/entries',
+    async (
+      req: FastifyRequest<{ Body: { date?: string; time?: string | null; text?: string; entryType?: string } }>,
+      reply
+    ) => {
+      const { date, entryType } = req.body || {}
+      const text = String(req.body?.text || '').trim().slice(0, 280)
+      const time = req.body?.time ? cal.parseTime(String(req.body.time)) : null
+      if (!cal.isDateKey(date)) return reply.throw.badParams('Invalid date')
+      if (time === undefined) return reply.throw.badParams('Invalid time')
+      if (!text) return reply.throw.badParams('Text is required')
+      const type: cal.EntryType = cal.ENTRY_TYPES.includes(entryType as cal.EntryType)
+        ? (entryType as cal.EntryType)
+        : 'note'
+
+      const context = await getLogContext(req.user)
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: cal.entryLogText({ date, time, text, type }),
+        event: 'calendar_entry',
+        metadata: { date, time, text, entryType: type },
+        context,
+      })
+      return log
+    }
+  )
+
+  fastify.post(
+    '/calendar/status',
+    async (req: FastifyRequest<{ Body: { entryId?: string; status?: string } }>, reply) => {
+      const status = req.body?.status as cal.EntryStatus
+      if (!['open', 'done', 'cancelled'].includes(status)) return reply.throw.badParams('Invalid status')
+      const entry = await findCalendarEntry(req.user.id, req.body?.entryId)
+      if (!entry) return reply.throw.notFound()
+
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: cal.statusLogText(entry, status),
+        event: 'calendar_status',
+        metadata: { entryId: entry.id, status, date: entry.date, time: entry.time, text: entry.text, entryType: entry.type },
+        context: {},
+      })
+      return log
+    }
+  )
+
+  // Idempotent: one log per (entry, stage). `created` tells the client whether
+  // this call is the one that should raise the on-screen notification.
+  fastify.post(
+    '/calendar/alerts',
+    async (req: FastifyRequest<{ Body: { entryId?: string; stage?: string } }>, reply) => {
+      const stage = req.body?.stage as cal.AlertStage
+      if (!['T-15', 'T-0', 'DAY'].includes(stage)) return reply.throw.badParams('Invalid stage')
+      const entry = await findCalendarEntry(req.user.id, req.body?.entryId)
+      if (!entry) return reply.throw.notFound()
+
+      const existing = await fastify.models.Log.findOne({
+        where: {
+          userId: req.user.id,
+          event: 'calendar_alert',
+          metadata: { entryId: entry.id, stage },
+        },
+      })
+      if (existing) return { created: false, log: existing }
+
+      const log = await fastify.models.Log.create({
+        userId: req.user.id,
+        text: cal.alertLogText(entry, stage),
+        event: 'calendar_alert',
+        metadata: { entryId: entry.id, stage, date: entry.date, time: entry.time, text: entry.text, entryType: entry.type },
+        context: {},
+      })
+      return { created: true, log }
     }
   )
 

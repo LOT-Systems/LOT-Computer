@@ -141,6 +141,27 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+// Calendar — dedicated read (all entries, never truncated by /logs window)
+export const useCalendar = createQuery<Log[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000,
+})
+
+export const useCreateCalendarEntry = createMutation<
+  { date: string; time: string | null; text: string; entryType: string },
+  Log
+>('post', '/api/calendar/entries')
+
+export const useSetCalendarStatus = createMutation<
+  { entryId: string; status: 'open' | 'done' | 'cancelled' },
+  Log
+>('post', '/api/calendar/status')
+
+export async function fireCalendarAlert(entryId: string, stage: string) {
+  const { data } = await api.post<{ created: boolean; log: Log }>('/api/calendar/alerts', { entryId, stage })
+  return data
+}
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`
