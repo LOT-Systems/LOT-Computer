@@ -41,6 +41,7 @@ export type LogTrigger =
   | 'system-help'       // /system — list all available slash commands
   | 'story-mode'        // /story — generate contextual story from recent data
   | 'how-checkin'       // /how — open LOT AI check-in (navigates to System tab)
+  | 'arcade-level'      // /level — Arcade evolution: XP, level, rank
 
 interface TriggerRule {
   trigger: LogTrigger
@@ -67,7 +68,60 @@ const RULES: TriggerRule[] = [
   { trigger: 'system-help',    emojis: [],        keywords: ['system', 'commands'] },
   { trigger: 'story-mode',     emojis: ['📖'],    keywords: ['story'] },
   { trigger: 'how-checkin',    emojis: [],        keywords: ['how'] },
+  { trigger: 'arcade-level',   emojis: ['🕹️', '🕹'], keywords: ['level', 'xp', 'arcade'] },
 ]
+
+// ─────────────────────────────────────────────────────────────────────
+// COMMAND REGISTRY — single source of truth for /system
+// ─────────────────────────────────────────────────────────────────────
+
+export type CommandGroup = 'STORY' | 'INTELLIGENCE' | 'SELF-CARE' | 'ARCADE' | 'ENVIRONMENT' | 'SYSTEM'
+
+export interface CommandSpec {
+  trigger: LogTrigger
+  usage: string
+  description: string
+  group: CommandGroup
+}
+
+export const COMMAND_GROUP_ORDER: CommandGroup[] = ['STORY', 'INTELLIGENCE', 'SELF-CARE', 'ARCADE', 'ENVIRONMENT', 'SYSTEM']
+
+export const COMMANDS: CommandSpec[] = [
+  { trigger: 'story-mode',     group: 'STORY',        usage: '/story',        description: 'Compressed story of your week (default)' },
+  { trigger: 'story-mode',     group: 'STORY',        usage: '/story day',    description: 'Compress today' },
+  { trigger: 'story-mode',     group: 'STORY',        usage: '/story month',  description: 'Compress the last 30 days' },
+  { trigger: 'story-mode',     group: 'STORY',        usage: '/story year',   description: 'Compress the last 365 days' },
+  { trigger: 'qi-rfi',         group: 'INTELLIGENCE', usage: '/qi [query]',   description: 'Ask the Quantum Intelligence engine' },
+  { trigger: 'ai-scan',        group: 'INTELLIGENCE', usage: '/scan',         description: 'System status overview' },
+  { trigger: 'qos-report',     group: 'INTELLIGENCE', usage: '/qos',          description: 'Quantum OS state analysis' },
+  { trigger: 'phys-report',    group: 'INTELLIGENCE', usage: '/phys',         description: 'Physiological cohort report' },
+  { trigger: 'assembly-check', group: 'INTELLIGENCE', usage: '/assembly',     description: 'Self-assembly module status' },
+  { trigger: 'how-checkin',    group: 'SELF-CARE',    usage: '/how',          description: 'Open LOT AI check-in (System tab)' },
+  { trigger: 'breathe',        group: 'SELF-CARE',    usage: '/breathe',      description: '4-2-6 breathing exercise' },
+  { trigger: 'freeze-widgets', group: 'SELF-CARE',    usage: '/freeze',       description: 'Pause and reflect protocol' },
+  { trigger: 'prayer-mode',    group: 'SELF-CARE',    usage: '/prayer',       description: 'Generate contextual scripture' },
+  { trigger: 'force-fast',     group: 'SELF-CARE',    usage: '/fast',         description: 'Orthodox fasting calendar' },
+  { trigger: 'silent-mode',    group: 'SELF-CARE',    usage: '/silent',       description: 'Signal silence check' },
+  { trigger: 'arcade-level',   group: 'ARCADE',       usage: '/level',        description: 'Your evolution: rank, level, XP, streak' },
+  { trigger: 'night-mode',     group: 'ENVIRONMENT',  usage: '/night',        description: 'Dark mode' },
+  { trigger: 'radio-toggle',   group: 'ENVIRONMENT',  usage: '/radio',        description: 'Toggle radio' },
+  { trigger: 'toggle-synth',   group: 'ENVIRONMENT',  usage: '/synth',        description: 'Toggle keyboard sound' },
+  { trigger: 'system-help',    group: 'SYSTEM',       usage: '/system',       description: 'This command index' },
+]
+
+/** Renders the /system index: group headers + `/cmd  description` rows. */
+export function renderSystemHelp(): string {
+  const lines: string[] = []
+  for (const group of COMMAND_GROUP_ORDER) {
+    const rows = COMMANDS.filter(c => c.group === group)
+    if (!rows.length) continue
+    if (lines.length) lines.push('')
+    lines.push(group)
+    for (const c of rows) lines.push(`${(c.usage + '              ').slice(0, 14)}${c.description}`)
+  }
+  lines.push('', 'SHORTCUTS', 'Ctrl+Enter    Save log immediately')
+  return lines.join('\n')
+}
 
 /**
  * Returns every trigger present in `text`. An empty array means the

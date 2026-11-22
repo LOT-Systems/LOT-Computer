@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, renderSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcadeLevel } from '#client/queries'
+import { parseStoryScope, stripStoryCommand, type StoryScope } from '#shared/utils/story-compression'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,7 +3707,23 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyDigest, setStoryDigest] = React.useState<string[] | null>(null)
+  const [storyScope, setStoryScope] = React.useState<StoryScope>('week')
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => () => { if (storyTimerRef.current) clearTimeout(storyTimerRef.current) }, [])
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string[] | null>(null)
+  const [arcadeLoading, setArcadeLoading] = React.useState(false)
+  const { mutate: submitArcade } = useArcadeLevel({
+    onSuccess: (data) => {
+      setArcadeResult(data.lines)
+      setArcadeLoading(false)
+    },
+    onError: () => {
+      setArcadeResult(['ARCADE OFFLINE — Engine unavailable.'])
+      setArcadeLoading(false)
+    },
+  })
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3742,6 +3759,8 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryDigest(data.digest || null)
+      if (data.scope) setStoryScope(data.scope)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,48 +4140,39 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        setSystemHelp(renderSystemHelp())
+      } else if (trigger === 'arcade-level') {
+        if (!arcadeLoading) {
+          setArcadeLoading(true)
+          setArcadeResult(null)
+          submitArcade({})
+        }
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
+        // Debounced: give the operator a beat to type the scope
+        // (`/story day|week|month|year`) before the engine fires.
+        if (!storyLoading && !storyTimerRef.current) {
           setStoryLoading(true)
           setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
+          setStoryDigest(null)
+          storyTimerRef.current = setTimeout(() => {
+            storyTimerRef.current = null
+            const raw = valueRef.current
+            const scope = parseStoryScope(raw)
+            setStoryScope(scope)
+            const logText = stripStoryCommand(raw)
+            try {
+              submitStory({
+                logText,
+                scope,
+                quantumState: getUserState(),
+                userIndex: getUserIndex(),
+              })
+            } catch {
+              submitStory({ logText, scope })
+            }
+          }, 1200)
         }
       }
     }
@@ -4414,11 +4424,30 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        {(arcadeLoading || arcadeResult) && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              {arcadeLoading && !arcadeResult && (
+                <div className="opacity-40 tracking-widest">READING EVOLUTION...</div>
+              )}
+              {arcadeResult && (
+                <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  {arcadeResult.join('\n')}
+                </div>
+              )}
+            </Block>
+          </div>
+        )}
         {(storyLoading || storyResponse) && (
           <div className="mt-8">
-            <Block label="📖" blockView>
+            <Block label={`📖 ${storyScope.toUpperCase()}:`} blockView>
               {storyLoading && !storyResponse && (
-                <div className="opacity-40 tracking-widest">...</div>
+                <div className="opacity-40 tracking-widest">COMPRESSING...</div>
+              )}
+              {storyDigest && storyDigest.length > 0 && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap', letterSpacing: '0.03em' }}>
+                  {storyDigest.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">
