@@ -44,6 +44,7 @@ import { generateChatCatalysts, generateConversationStarters, shouldShowChatCata
 import { generateCompassionateInterventions, shouldShowIntervention } from '#server/utils/compassionate-interventions'
 import dayjs from '#server/utils/dayjs'
 import { registerOSRoutes } from './os-api.js'
+import { registerEmailRoutes } from './email-api.js'
 
 // ============================================================================
 // Helper Functions
@@ -136,6 +137,7 @@ function generateCompassionateResponse(
 export default async (fastify: FastifyInstance) => {
   // Register User Operating System API routes
   registerOSRoutes(fastify)
+  registerEmailRoutes(fastify)
 
   // Admin diagnostic ping endpoint
   fastify.get('/ping', async (req, reply) => {
@@ -378,6 +380,16 @@ export default async (fastify: FastifyInstance) => {
             attributes: ['id'],
           })
           write({ event, data: { ...payload, isLiked: !!myLike } })
+          break
+        }
+        case 'lot_email': {
+          // LOT® Email — deliver only to the two people on the envelope
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({
+              event,
+              data: { ...data.email, isMine: data.senderId === req.user.id },
+            })
+          }
           break
         }
         case 'settings_updated': {

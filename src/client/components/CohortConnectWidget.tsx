@@ -10,7 +10,8 @@ import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button } from '#client/components/ui'
-import { useCohorts, useEnergy, useProfile } from '#client/queries'
+import { useCohorts, useEnergy, useProfile, useSendLotEmail } from '#client/queries'
+import { MAX_LOT_EMAIL_LENGTH } from '#shared/utils/lot-email'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { usePunctuationContext } from '#client/hooks/usePunctuationContext'
 import { recordSignal, getUserState } from '#client/stores/intentionEngine'
@@ -28,6 +29,22 @@ export const CohortConnectWidget: React.FC = () => {
   const { data: energyData } = useEnergy()
   const { data: profileData } = useProfile()
   const [expandedMemberId, setExpandedMemberId] = React.useState<string | null>(null)
+  // LOT® Email — compose straight from a cohort match
+  const [emailingId, setEmailingId] = React.useState<string | null>(null)
+  const [emailText, setEmailText] = React.useState('')
+  const [emailStatus, setEmailStatus] = React.useState<Record<string, string>>({})
+  const { mutate: sendEmail, isLoading: isSendingEmail } = useSendLotEmail({
+    onSuccess: (email) => {
+      setEmailStatus((prev) => ({ ...prev, [email.to.id]: 'Sent. It lands in their Sync.' }))
+      setEmailingId(null)
+      setEmailText('')
+      recordSignal('mood', 'cohort_email_sent', { userId: email.to.id, hour: new Date().getHours() })
+    },
+    onError: (err: any, vars) => {
+      const id = vars.toUserId || ''
+      setEmailStatus((prev) => ({ ...prev, [id]: err?.response?.data?.error || 'Not sent' }))
+    },
+  })
   const logCtx = useLogContext()
   const punctuation = usePunctuationContext()
   const hasRecordedRef = React.useRef(false)
@@ -269,7 +286,44 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                      <Button
+                        size="small"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation()
+                          setEmailingId(emailingId === match.user.id ? null : match.user.id)
+                        }}
+                      >
+                        Email
+                      </Button>
                     </div>
+
+                    {emailingId === match.user.id && (
+                      <form
+                        className="flex flex-col gap-y-8"
+                        onClick={(e) => e.stopPropagation()}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+                          if (!emailText.trim() || isSendingEmail) return
+                          sendEmail({ toUserId: match.user.id, body: emailText.trim(), source: 'cohort' })
+                        }}
+                      >
+                        <textarea
+                          value={emailText}
+                          onChange={(e) => setEmailText(e.target.value.slice(0, MAX_LOT_EMAIL_LENGTH))}
+                          placeholder={`To ${match.user.firstName}...`}
+                          rows={3}
+                          className="w-full bg-transparent border border-acc/20 rounded p-8 outline-none focus:border-acc/40 resize-none"
+                        />
+                        <div>
+                          <Button size="small" type="submit" disabled={!emailText.trim() || isSendingEmail}>
+                            {isSendingEmail ? 'Sending...' : 'Send email'}
+                          </Button>
+                        </div>
+                      </form>
+                    )}
+                    {emailStatus[match.user.id] && (
+                      <div className="opacity-40">{emailStatus[match.user.id]}</div>
+                    )}
                   </div>
                 )}
               </div>

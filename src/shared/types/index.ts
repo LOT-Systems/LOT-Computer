@@ -200,6 +200,30 @@ export type DirectMessage = {
   updatedAt: Date;
 };
 
+// LOT® Email — member-to-member mail (composed in Log, delivered into Sync)
+export type LotEmailSource = 'log' | 'cohort' | 'sync';
+export type LotEmail = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  body: string;
+  source: LotEmailSource;
+  readAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicLotEmail = {
+  id: string;
+  body: string;
+  source: LotEmailSource;
+  isMine: boolean;
+  readAt: string | null;
+  createdAt: string;
+  from: { id: string; firstName: string | null; lastName: string | null };
+  to: { id: string; firstName: string | null; lastName: string | null };
+};
+
 // Chat Message Types
 export type ChatMessage = {
   id: string;
@@ -450,4 +474,5 @@ export type SyncEvents = {
   chatMessage: PublicChatMessage;
   chatMessageLike: ChatMessageLikeEventPayload;
   settings_updated: Record<string, never>;
+  lot_email: PublicLotEmail;
 };

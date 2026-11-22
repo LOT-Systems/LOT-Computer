@@ -36,6 +36,8 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { LogEmailComposer } from './LogEmailComposer'
+import { markEmailSent } from '#shared/utils/lot-email'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3713,6 +3715,15 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email: after a successful send, "/email" → "✉" and save, so the
+  // command can't re-fire and the log keeps a readable record.
+  const onEmailSent = React.useCallback(() => {
+    const updated = markEmailSent(valueRef.current)
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+    setIsSaved(true)
+  }, [])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4139,6 +4150,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email        /email to Name. message — LOT® Email, lands in their Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4387,6 +4399,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        <LogEmailComposer text={value} onSent={onEmailSent} />
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>
