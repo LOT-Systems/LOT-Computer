@@ -1,0 +1,15 @@
+@page { size: A5; margin: 14mm 12mm 16mm; }
+body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.5pt; line-height: 1.45; color: #111; background: #fff; }
+h1 { font-size: 18pt; letter-spacing: .02em; border-bottom: 2px solid #111; padding-bottom: 4px; page-break-before: always; }
+h2 { font-size: 12pt; margin-top: 1.4em; } h3 { font-size: 10.5pt; }
+table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: .6em 0; page-break-inside: auto; }
+th, td { border: 0.5pt solid #999; padding: 3px 5px; vertical-align: top; text-align: left; }
+th { background: #eee; }
+code, pre { font-family: Menlo, Consolas, monospace; font-size: 7.5pt; }
+pre { font-size: 6pt !important; line-height: 1.25; background: #f4f4f4; padding: 6px; white-space: pre; overflow: hidden; border-left: 2px solid #111; }
+blockquote { margin: 0; padding: 4px 10px; border-left: 3px solid #aaa; color: #333; }
+a { color: #111; }
+.cover { height: 160mm; display: flex; flex-direction: column; justify-content: center; }
+.cover .sq { width: 40mm; height: 40mm; background: linear-gradient(135deg,#f4f4f4,#bdbdbd 45%,#fafafa 60%,#9e9e9e); border: 0.5pt solid #777; margin-bottom: 10mm; }
+.cover .t { font-size: 26pt; font-weight: 700; } .cover p { color: #444; }
+pre, pre code { white-space: pre !important; word-wrap: normal !important; overflow-wrap: normal !important; }
