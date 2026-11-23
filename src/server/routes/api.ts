@@ -1835,6 +1835,30 @@ export default async (fastify: FastifyInstance) => {
     return csv
   })
 
+  // Export complete activity log as CSV (advertised on ApiPage as /api/export/all-logs).
+  // Every widget that posts to the Log (self-care, mood, planner, recipe, calendar,
+  // memory, QIE signals…) lands here — this is the user's full widget-usage data log.
+  fastify.get('/export/all-logs', async (req, reply) => {
+    const logs = await fastify.models.Log.findAll({
+      where: { userId: req.user.id },
+      attributes: ['createdAt', 'event', 'text', 'context'],
+      order: [['createdAt', 'ASC']],
+      limit: 50000,
+    })
+
+    const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`
+    const csvRows = ['Date,Time,Event,Text,Context']
+    logs.forEach((log: any) => {
+      const date = dayjs(log.createdAt).format('YYYY-MM-DD')
+      const time = dayjs(log.createdAt).format('HH:mm:ss')
+      csvRows.push([date, time, esc(log.event), esc(log.text), esc(log.context ? JSON.stringify(log.context) : '')].join(','))
+    })
+
+    reply.header('Content-Type', 'text/csv')
+    reply.header('Content-Disposition', `attachment; filename="all-logs-${dayjs().format('YYYY-MM-DD')}.csv"`)
+    return csvRows.join('\n')
+  })
+
   // Export complete training dataset for AI (humanoids, cars, personal AI)
   fastify.get('/export/training-data', async (req, reply) => {
     console.log(`📦 Training data export requested by user ${req.user.id}`)

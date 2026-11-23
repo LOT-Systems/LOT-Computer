@@ -45,7 +45,11 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
+// Lazy: SystemProgressWidget carries ~180 KB of changelog data — keep it out of
+// the initial app.js parse. ArchitectWidget imports from it, so it is lazy too.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -77,7 +81,9 @@ import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
+const ArchitectWidget = React.lazy(() =>
+  import('./ArchitectWidget').then((m) => ({ default: m.ArchitectWidget }))
+)
 import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
@@ -621,10 +627,10 @@ export const System = React.memo(function SystemInner() {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
+                  !isMirrorOn && !isCustomThemeEnabled && (weather?.humidity ?? 0) >= 50 && 'text-blue-500'
                 )}
               >
-                {weather?.humidity}%
+                {weather?.humidity ?? '—'}%
               </span>
             </Block>
             <Block
@@ -1028,7 +1034,9 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <React.Suspense fallback={null}>
+            <SystemProgressWidget />
+          </React.Suspense>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />
@@ -1037,7 +1045,9 @@ export const System = React.memo(function SystemInner() {
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <React.Suspense fallback={null}>
+          <ArchitectWidget />
+        </React.Suspense>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}

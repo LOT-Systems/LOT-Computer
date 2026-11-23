@@ -62,7 +62,10 @@ export const MemoryWidget = React.memo(function MemoryWidget() {
   const { data: loadedQuestion = null, error, isLoading, refetch } = useMemory()
 
   const { mutate: createMemory } = useCreateMemory({
-    onSuccess: ({ response, insight }) => {
+    onSuccess: ({ response, insight, duplicate }) => {
+      // Double-tap guard: server dedupes answers within 30s and returns
+      // { ok, duplicate } with no response — the first call already rendered.
+      if (duplicate || !response) return
       // Mark question as answered before hiding it
       if (question?.id) {
         markQuestionAnswered(question.id)

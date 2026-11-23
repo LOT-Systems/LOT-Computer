@@ -73,6 +73,7 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  joinedAt?: Date | null;
 };
 
 export type User = {

@@ -98,11 +98,13 @@ export function useBreathe(enabled: boolean) {
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
-      setState({
-        phase: currentPhase,
-        count: countdown,
-        display,
-      })
+      // Dedupe: the 100ms tick only matters when the visible frame changes.
+      // Returning prev skips the re-render (System tab re-rendered 10×/s before).
+      setState((prev) =>
+        prev.phase === currentPhase && prev.count === countdown && prev.display === display
+          ? prev
+          : { phase: currentPhase, count: countdown, display }
+      )
     }
 
     // Update immediately
