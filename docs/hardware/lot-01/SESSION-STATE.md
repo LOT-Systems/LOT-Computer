@@ -30,5 +30,8 @@ D-7 (new) order 20 LS013B7DH03 panels now (long lead) + 2 bench kits (~$500)?
 - `lot-systems.com`, `brand.`, `institute.` (CQGS) still fail DNS here. Allow them in the environment's network settings.
 - PlatformIO/Espressif download hosts are blocked, so `main.cpp`/`hw.cpp` are not compiled.
 
+## Gotcha
+`.gitignore` line 50 `server/` hides NEW files under `src/server/`: use `git add -f`.
+
 ## How to re-verify (≈ 2 min)
 `yarn install && yarn server:build` → start a throwaway Postgres → `DB_*=… DB_SSL=false JWT_SECRET=x LOT_DEVICES_ENABLED=true node docs/hardware/lot-01/connector/device-api.itest.mjs` → `ARDUINOJSON_SRC=… docs/hardware/lot-01/firmware/test/native/run.sh`
