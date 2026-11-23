@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START (see R02-R09 reports for amendments to §03/§06)
+VERSION:  0.1 — DEVELOPMENT START (see R02-R10 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -446,6 +446,27 @@ entry — never editing or removing a prior one.
   is a surface. CUBIQ is not a care or fall-alarm device and is never
   sold as one. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R09.md,
   Section 10.
+
+  USE CASE 10 — THE MOORING                                 2026-11-23
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, 38, a translator living aboard a
+  narrowboat that must move every fourteen days. Solar and 12 V power,
+  signal that drops out in the cuttings, and a ply-on-steel dinette
+  table that sits on water. A passing boat's wash rocks the deck ±1.5°.
+  R05's "still for ≥ 2 s" check would have made the cube unplaced, so
+  SETTLE would be its only gesture. Placement v0.3 sees the table moving
+  WITH the cube and classes the motion GENTLE, and the morning Memory
+  HOP lands 0.8 mm off (R10 §05). Under way, the engine (G9) and then
+  ±4° of roll (G11 ROUGH) defer an epic achievement. A cohort ping
+  reaches the phone 30 minutes late and expires on its 15-minute TTL,
+  so it is never performed late. Back at a mooring, a tea towel covers
+  the pad's deck edge. edge_seen is false, so there is no pad credit,
+  and the deferred LEAP falls through to a SETTLE. The queued uplink
+  tells only the operator to clear the deck (R10 F78, F79). Proves
+  that a moving surface is not an unsafe one, that on-device decisions
+  plus per-class TTLs need no network to stay correct, and that a pad's
+  claim must be checked against what the cube can see. Full narrative:
+  LOT-CUBIQ-QUANTUM-CUBE-v0-R10.md, Section 10.
 
 --------------------------------------------------------------------------------
 08 // BRAND

@@ -2,6 +2,7 @@
  * CUBIQ(tm) Quantum Cube — signal contract, platform reference (TypeScript).
  *
  * Spec:  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R09.md §02-§03
+ *        docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R10.md §02 (contract v0.6-DRAFT, decideV06Draft)
  * Ports: scripts/cubiq-r07-contract-check.py  decide()  (contract v0.3)
  *        scripts/cubiq-r08-fsm-sim.py          decide()  (contract v0.4: home-pad credit)
  *
@@ -41,7 +42,12 @@ export interface CubiqSignal {
 export interface CubiqPadState {
   model_ok?: boolean
   home_spot?: boolean
+  /** v0.6-draft (R10 F78): the ToF sees the deck's front edge where the pad ID says it is */
+  edge_seen?: boolean
 }
+
+/** v0.6-draft (R10 F80). Absent means 'still'; any value other than still/gentle is rough. */
+export type SurfaceMotion = 'still' | 'gentle' | 'rough'
 
 export interface CubiqDeviceState {
   now: string
@@ -59,6 +65,7 @@ export interface CubiqDeviceState {
   call_live_opt_in?: boolean
   unplaced?: boolean
   cadence_ok?: boolean
+  surface_motion?: SurfaceMotion | string
 }
 
 export type Decision = [Outcome, Gesture, string | null]
@@ -136,7 +143,12 @@ export function classCeiling(cls: string, op?: Record<string, string>): [Gesture
 }
 
 /** Contract v0.3 decision (R07 §06), with an injectable runway table for the v0.4 pad credit. */
-function decideCore(sig: Record<string, unknown>, st: CubiqDeviceState, freeAhead: Record<string, number>): Decision {
+function decideCore(
+  sig: Record<string, unknown>,
+  st: CubiqDeviceState,
+  freeAhead: Record<string, number>,
+  v06 = false,
+): Decision {
   const err = validate(sig)
   if (err) return ['rejected', 'none', err]
   const s = sig as unknown as CubiqSignal
@@ -146,6 +158,9 @@ function decideCore(sig: Record<string, unknown>, st: CubiqDeviceState, freeAhea
   if (now < nb) return ['held', 'none', null]
   if (st.fall_recent) return ['safe_hold', 'none', 'G8_fall_recent']
   if (st.machine_vibration) return ['deferred', 'none', 'G9_machine_vibration']
+  const motion = st.surface_motion ?? 'still'
+  // v0.6-draft G11: a surface that moves under the cube beyond 'gentle' defers, like G9
+  if (v06 && motion !== 'still' && motion !== 'gentle') return ['deferred', 'none', 'G11_moving_surface']
 
   let reason: string | null = null
   let r = RANK[s.intent]
@@ -164,6 +179,7 @@ function decideCore(sig: Record<string, unknown>, st: CubiqDeviceState, freeAhea
   if (st.quiet_hours) cap('nudge', 'quiet_hours')
   if (st.hush) cap('nudge', 'G10_hush')
   if (st.unplaced || st.tof_window_dirty) cap('settle', 'G7_unknown_surface')
+  if (v06 && motion === 'gentle') cap('leap', 'G11_moving_surface') // R10 §05: JUMP only
   if (!(st.cadence_ok ?? true) && r >= RANK.hop) cap('nudge', 'G4b_cadence')
   const free = st.free_ahead_mm ?? 1000
   for (const g of ['jump', 'leap', 'hop'] as const) {
@@ -191,6 +207,23 @@ export function decide(sig: Record<string, unknown>, st: CubiqDeviceState): Deci
     return decideCore(sig, credited, runway)
   }
   return decideCore(sig, st, FREE_AHEAD_MM)
+}
+
+/**
+ * Contract v0.6-DRAFT (R10 §02). NOT ADOPTED: edge_seen thresholds wait for bench item B31.
+ *   · pad credit needs model_ok, home_spot AND edge_seen, each the literal `true`
+ *   · surface_motion: 'gentle' caps jump at leap; anything but still/gentle defers (G11)
+ * decide() above stays the v0.5 behaviour until S-2 adopts v0.6.
+ */
+export function decideV06Draft(sig: Record<string, unknown>, st: CubiqDeviceState): Decision {
+  const pad = st.pad
+  if (pad && pad.model_ok === true && pad.home_spot === true && pad.edge_seen === true) {
+    const credited: CubiqDeviceState = { ...st }
+    if (!st.tof_window_dirty) credited.surface = 'damped'
+    const runway = Object.assign(table<number>({}), FREE_AHEAD_MM, PAD_FREE_AHEAD_MM)
+    return decideCore(sig, credited, runway, true)
+  }
+  return decideCore(sig, st, FREE_AHEAD_MM, true)
 }
 
 // ------------------------------------------------------------------ platform encoder (R09 F64)
