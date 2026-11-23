@@ -4880,7 +4880,9 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // v2 (2026-11-23): personalization derived from the user's own Logs
+  personal?: { rokuyoNote?: string; samePhaseLogs?: number; topPhase?: string | null; taggedLogs?: number }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4891,9 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    ...(personal || {}),
+    // True when today's moon phase is the one this user writes under most
+    resonantPhase: !!personal?.topPhase && personal.topPhase === moonPhase,
   })
 }
 

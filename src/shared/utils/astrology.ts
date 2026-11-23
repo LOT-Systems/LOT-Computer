@@ -131,31 +131,35 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number 
 
   // Calculate days since known new moon
   const daysSinceNewMoon = (date.getTime() - knownNewMoon) / secondsInDay
-  const phase = daysSinceNewMoon % lunarCycle
+  // Normalised into [0, cycle) — also correct for dates before 2000
+  const phase = ((daysSinceNewMoon % lunarCycle) + lunarCycle) % lunarCycle
 
   // Calculate illumination (0-100%)
   const illumination = Math.round(50 * (1 - Math.cos((phase / lunarCycle) * 2 * Math.PI)))
 
-  // Determine phase name
+  // Principal phases are instants (0, ¼, ½, ¾ of the cycle); each label
+  // covers a window CENTRED on its instant. (Pre-2026-11-23 the windows
+  // started at the instant, so the night of a true full moon read as
+  // "Waxing Gibbous ~99%".)
+  const halfWindow = 0.92 // days either side of a principal phase
+  const q = lunarCycle / 4
   let phaseName: string
-  if (phase < 1.84566) {
+  if (phase < halfWindow || phase >= lunarCycle - halfWindow) {
     phaseName = 'New Moon'
-  } else if (phase < 7.38264) {
+  } else if (phase < q - halfWindow) {
     phaseName = 'Waxing Crescent'
-  } else if (phase < 8.84566) {
+  } else if (phase < q + halfWindow) {
     phaseName = 'First Quarter'
-  } else if (phase < 14.76529) {
+  } else if (phase < 2 * q - halfWindow) {
     phaseName = 'Waxing Gibbous'
-  } else if (phase < 16.22892) {
+  } else if (phase < 2 * q + halfWindow) {
     phaseName = 'Full Moon'
-  } else if (phase < 22.14855) {
+  } else if (phase < 3 * q - halfWindow) {
     phaseName = 'Waning Gibbous'
-  } else if (phase < 23.61224) {
+  } else if (phase < 3 * q + halfWindow) {
     phaseName = 'Last Quarter'
-  } else if (phase < 29.53059) {
-    phaseName = 'Waning Crescent'
   } else {
-    phaseName = 'New Moon'
+    phaseName = 'Waning Crescent'
   }
 
   return { phase: phaseName, illumination }
@@ -176,4 +180,106 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Ambient reading v2 (2026-11-23) — single source of truth for the
+// dashboard Astrology block, the server Logs context snapshot, and the QIE
+// 'astrology' signal. Ambient conditions only, never a natal chart.
+// ─────────────────────────────────────────────────────────────────────────
+
+export type AmbientReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  moonPhase: string
+  moonIllumination: number
+  rokuyo: string
+}
+
+/** One call, one consistent reading for a given wall-clock Date. */
+export function getAmbientReading(date: Date): AmbientReading {
+  const moon = getMoonPhase(date)
+  return {
+    hourlyZodiac: getHourlyZodiac(date),
+    westernZodiac: getWesternZodiac(date),
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    rokuyo: getRokuyo(date),
+  }
+}
+
+export type RokuyoGuidance = {
+  /** Short traditional meaning of the day */
+  note: string
+  /** Whether the current hour falls in the day's favoured window */
+  favourableNow: boolean
+}
+
+/**
+ * Traditional rokuyo time windows, evaluated against the current hour.
+ * Sensho favours the morning, Senpu the afternoon, Shakku only the
+ * noon hour (11–13), Tomobiki everything except noon, Taian the whole
+ * day, Butsumetsu none of it.
+ */
+export function getRokuyoGuidance(rokuyo: string, hour: number): RokuyoGuidance {
+  const noon = hour >= 11 && hour < 13
+  switch (rokuyo) {
+    case 'Taian':
+      return { note: 'auspicious all day', favourableNow: true }
+    case 'Sensho':
+      return { note: 'mornings favoured', favourableNow: hour < 12 }
+    case 'Senpu':
+      return { note: 'afternoons favoured', favourableNow: hour >= 12 }
+    case 'Tomobiki':
+      return { note: 'good except at noon', favourableNow: !noon }
+    case 'Shakku':
+      return { note: 'only noon is clear', favourableNow: noon }
+    case 'Butsumetsu':
+      return { note: 'quiet day, go gently', favourableNow: false }
+    default:
+      return { note: '', favourableNow: false }
+  }
+}
+
+export type LogAstroResonance = {
+  /** Entries carrying an ambient astro snapshot in their context */
+  taggedCount: number
+  /** Entries written under the same moon phase as now */
+  samePhaseCount: number
+  /** Entries written under the same rokuyo as today */
+  sameRokuyoCount: number
+  /** The moon phase this user has written under most often */
+  topPhase: string | null
+}
+
+type LogLike = { event?: string; context?: Record<string, any> | null }
+
+/**
+ * Personalization from the user's own Logs: how often they write under
+ * the current moon phase / rokuyo, and which phase they write under most.
+ * Only counts entries with an astro snapshot (written after 2026-07-27,
+ * when getLogContext() started recording one).
+ */
+export function getLogAstroResonance(logs: LogLike[], reading: AmbientReading): LogAstroResonance {
+  const phaseCounts: Record<string, number> = {}
+  let taggedCount = 0
+  let samePhaseCount = 0
+  let sameRokuyoCount = 0
+  for (const log of logs) {
+    const phase = log.context?.astroMoonPhase
+    if (!phase) continue
+    taggedCount++
+    phaseCounts[phase] = (phaseCounts[phase] || 0) + 1
+    if (phase === reading.moonPhase) samePhaseCount++
+    if (log.context?.astroRokuyo === reading.rokuyo) sameRokuyoCount++
+  }
+  let topPhase: string | null = null
+  let topCount = 0
+  for (const [phase, count] of Object.entries(phaseCounts)) {
+    if (count > topCount) {
+      topPhase = phase
+      topCount = count
+    }
+  }
+  return { taggedCount, samePhaseCount, sameRokuyoCount, topPhase }
 }

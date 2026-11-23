@@ -4178,11 +4178,14 @@ const NoteEditor = ({
     if (log.context?.humidity) {
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
+    // Ambient astro snapshot (getLogContext, since 2026-07-27) rides along
+    // with weather so each entry shows the sky it was written under.
+    const astro = log.context?.astroMoonPhase
+      ? `${log.context.astroMoonPhase}${log.context?.astroRokuyo ? `, ${log.context.astroRokuyo}` : ''}`
+      : ''
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    const base = log.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astro].filter(Boolean).join(' · ')
   }, [log?.context])
 
   return (
@@ -4449,11 +4452,14 @@ const LogContainer: React.FC<{
     if (log.context?.humidity) {
       weatherParts.push(`${Math.round(log.context.humidity)}%`)
     }
+    // Ambient astro snapshot (getLogContext, since 2026-07-27) rides along
+    // with weather so each entry shows the sky it was written under.
+    const astro = log.context?.astroMoonPhase
+      ? `${log.context.astroMoonPhase}${log.context?.astroRokuyo ? `, ${log.context.astroRokuyo}` : ''}`
+      : ''
     const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
+    const base = log.context?.city ? `${weatherText} – ${log.context.city}` : weatherText
+    return [base, astro].filter(Boolean).join(' · ')
   }, [log.context])
 
   return (
