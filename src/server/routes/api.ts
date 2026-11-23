@@ -34,6 +34,21 @@ import {
 import { sync } from '../sync.js'
 import * as weather from '#server/utils/weather'
 import { getLogContext } from '#server/utils/logs'
+import {
+  compressLogs,
+  renderDigestBlock,
+  renderDigestHeader,
+  fallbackStory,
+  parseStoryHorizon,
+  computeArcade,
+  renderArcade,
+  stripCommands,
+  stripMachineOutput,
+  STORY_HORIZONS,
+  HORIZON_MS,
+  CHILD_HORIZON,
+  type StoryHorizon,
+} from '#shared/utils/log-compression'
 import { defaultQuestions, defaultReplies } from '#server/utils/questions'
 import { buildPrompt, completeAndExtractQuestion, generateMemoryStory, generateRecipeSuggestion, extractUserTraits, determineUserCohort, calculateIntelligentPacing } from '#server/utils/memory'
 import { analyzeUserPatterns, findCohortMatches, type PatternInsight } from '#server/utils/patterns'
@@ -5479,9 +5494,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed User Story (LCX-1)
+  // Pipeline: LOT user data → QIE compression (shared/utils/log-compression)
+  //           → Together AI narrative → generated_story Log row (persisted).
+  // Horizons: /story [day|week|month|year] (default week, rolling window).
+  // Recursive compression: a month story is fed the week stories inside it,
+  // a year story the month stories — each loop compresses the last.
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5508,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          horizon?: StoryHorizon
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5513,33 +5532,38 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         })
       }
 
-      const { logText, quantumState, userIndex } = req.body
+      const { logText: rawLogText, quantumState, userIndex } = req.body || ({} as any)
+      const horizon: StoryHorizon = STORY_HORIZONS.includes(req.body?.horizon as StoryHorizon)
+        ? (req.body.horizon as StoryHorizon)
+        : parseStoryHorizon(rawLogText || '')
+      // The invoking entry is context, not instruction: strip commands and prior machine output.
+      const logText = stripCommands(stripMachineOutput(rawLogText || '')).substring(0, 500)
+
+      const now = new Date()
+      const windowStart = new Date(now.getTime() - HORIZON_MS[horizon])
 
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, createdAt: { [Op.gte]: windowStart } },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        limit: 3000,
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
+      // ── Stage 1: QIE compression (deterministic, no vendor) ──────────────
+      const digest = compressLogs(logs as any, horizon, now)
+      const header = renderDigestHeader(digest)
 
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
+      // Recursive loop: previous stories of the child horizon inside this window.
+      const child = CHILD_HORIZON[horizon]
+      const childStories = child
+        ? logs
+            .filter(l => l.event === 'generated_story' && (l.metadata as any)?.horizon === child)
+            .slice(0, 6)
+            .reverse()
+            .map(l => (l.text || '').substring(0, 400))
+            .filter(Boolean)
+        : []
 
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
-
-      let stateBlock = ''
+      let stateBlock = 'STATE: unknown'
       if (quantumState && quantumState.energy) {
         stateBlock = `OPERATOR STATE: ${quantumState.energy} energy, ${quantumState.clarity} clarity, ${quantumState.alignment} alignment`
       }
@@ -5547,71 +5571,141 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const wordBudget = { day: 120, week: 180, month: 220, year: 260 }[horizon]
+      const span = { day: 'day', week: 'week', month: 'month', year: 'year' }[horizon]
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's recorded ${span} into a short narrative.
+
+The operator invoked /story ${horizon}. The data below is a COMPRESSED DIGEST produced by the LOT Quantum Intent Engine from their journal entries, mood check-ins, self-care answers and the environmental context recorded with each one (weather, city, moon, season).
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Use only facts present in the digest. Never invent events, people or places.
+- Name the HIGH and LOW peaks if present, with their context (weather, place, moon) when it adds meaning
+- Reflect the RHYTHM and MOOD DRIFT signals honestly — a quiet stretch or a falling mood is acknowledged with compassion, not fixed
+- If prior compressed stories are given, treat them as the earlier chapters and write the next level of compression — do not repeat them
+- Tone matches the operator's state: reflective if low, energized if high
+- End with a single forward-looking sentence — a quiet truth, not a pep talk
+- Return ONLY the story paragraphs. No title. No commentary. No preamble. No lists.
+- Keep it under ${wordBudget} words.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const dataBlock = `OPERATOR LOG ENTRY: "${logText || '(no text)'}"
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${renderDigestBlock(digest)}
+${childStories.length ? `\nPRIOR ${String(child).toUpperCase()} STORIES (earlier chapters):\n${childStories.map(s => `- ${s}`).join('\n')}` : ''}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
 
+      // ── Stage 2: vendor narrative (Together AI) — fallback is deterministic ─
+      let story: string
+      let engineUsed: 'together' | 'fallback' = 'together'
+      const hasSignal = digest.counts.journal + digest.counts.moods + digest.counts.selfCare > 0
+      if (!hasSignal) {
+        story = fallbackStory(digest)
+        engineUsed = 'fallback'
+      } else {
+        try {
+          const { aiEngineManager } = await import('#server/utils/ai-engines.js')
+          const engine = aiEngineManager.getEngine('together')
+          console.log(`📖 Story ${horizon} for user ${req.user.id}: ${digest.counts.journal} entries, rhythm ${digest.rhythm}`)
+          const raw = await engine.generateCompletion(fullPrompt, horizon === 'year' ? 768 : 512)
+          story = (raw || '').trim().replace(/^["']|["']$/g, '')
+          if (!story) throw new Error('empty completion')
+        } catch (error: any) {
+          console.error('Story generation failed, using deterministic fallback:', error?.message || error)
+          story = fallbackStory(digest)
+          engineUsed = 'fallback'
+        }
+      }
+
+      // ── Stage 3: persist (the story becomes data for the next loop) ──────
       try {
-        const { aiEngineManager } = await import('#server/utils/ai-engines.js')
-        const engine = aiEngineManager.getEngine('together')
-
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
         const context = await getLogContext(req.user)
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
-          text: cleaned,
+          text: story,
           event: 'generated_story',
           context,
           metadata: {
-            story: cleaned,
-            logText: (logText || '').substring(0, 500),
+            story,
+            horizon,
+            engine: engineUsed,
+            logText,
             quantumState: quantumState || null,
-            timestamp: new Date().toISOString(),
+            digest: {
+              windowStart: digest.windowStart,
+              windowEnd: digest.windowEnd,
+              counts: digest.counts,
+              rhythm: digest.rhythm,
+              moodDrift: digest.moodDrift,
+              peaks: digest.peaks,
+              environment: digest.environment,
+              followUp: digest.followUp,
+            },
+            childStoriesUsed: childStories.length,
+            timestamp: now.toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story, logId: storyLog.id, horizon, header, followUp: digest.followUp }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persistence failed:', error?.message || error)
+        return { story, logId: null, horizon, header, followUp: digest.followUp }
       }
+    }
+  )
+
+  // ============================================================================
+  // STORY LATEST — read the most recent persisted compressed story.
+  // GET /api/story/latest?horizon=day|week|month|year (omit for any horizon).
+  // Specified in docs/corporate/LOT-AI-PRODUCT-BRIEF.md (Story API payload).
+  // ============================================================================
+  fastify.get(
+    '/story/latest',
+    async (req: FastifyRequest<{ Querystring: { horizon?: string } }>) => {
+      const requested = req.query?.horizon as StoryHorizon | undefined
+      const horizon = requested && STORY_HORIZONS.includes(requested) ? requested : null
+      const rows = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'generated_story' },
+        order: [['createdAt', 'DESC']],
+        limit: horizon ? 50 : 1,
+      })
+      // Stories created before LCX-1 carry no horizon; they were week-scale.
+      const match = horizon
+        ? rows.find(r => ((r.metadata as any)?.horizon || 'week') === horizon)
+        : rows[0]
+      if (!match) return { story: null, horizon, createdAt: null, digest: null }
+      const meta = (match.metadata || {}) as any
+      return {
+        story: match.text,
+        horizon: meta.horizon || 'week',
+        createdAt: match.createdAt,
+        engine: meta.engine || 'together',
+        digest: meta.digest || null,
+      }
+    }
+  )
+
+  // ============================================================================
+  // ARCADE — gamified evolution readout for /arcade in the Log.
+  // XP for presence only; never decreases. See shared/utils/log-compression.
+  // ============================================================================
+  fastify.post(
+    '/arcade',
+    { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } },
+    async (req) => {
+      const logs = await fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: ['note', 'journal', 'log_entry', 'emotional_checkin', 'memory_answer', 'answer', 'self_care_checkin', 'energy_checkin', 'generated_story'] },
+        },
+        attributes: ['event', 'text', 'context', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 20000,
+      })
+      const arcade = computeArcade(logs as any)
+      return { ...arcade, report: renderArcade(arcade) }
     }
   )
 }

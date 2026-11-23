@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, renderSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryHorizon, stripCommands, stripMachineOutput, toMachineBlock } from '#shared/utils/log-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useArcadeReport } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,7 +3707,10 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string | null>(null)
+  const [storyFollowUp, setStoryFollowUp] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3739,13 +3743,21 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  const { mutate: submitArcade } = useArcadeReport({
+    onSuccess: (data) => setArcadeResult(data.report),
+    onError: () => setArcadeResult('ARCADE OFFLINE — XP is safe, readout unavailable.'),
+  })
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.header || null)
+      setStoryFollowUp(data.followUp || null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      // toMachineBlock keeps the story one contiguous block so future
+      // compressions can strip it exactly (shared/utils/log-compression).
+      const updated = current + separator + toMachineBlock('📖', data.story)
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4121,47 +4133,33 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Rendered from COMMAND_REGISTRY — cannot drift from RULES.
+        setSystemHelp(renderSystemHelp())
+      } else if (trigger === 'arcade-report') {
+        setArcadeResult('SYNCING XP LEDGER...')
+        submitArcade({})
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
         if (!storyLoading) {
           setStoryLoading(true)
           setStoryResponse(null)
+          setStoryHeader(null)
+          setStoryFollowUp(null)
+          // "/story", "/story day|week|month|year" — default week.
+          const horizon = parseStoryHorizon(value)
+          const logText = stripCommands(stripMachineOutput(value))
           try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
             const state = getUserState()
             const index = getUserIndex()
             submitStory({
               logText,
+              horizon,
               quantumState: state,
               userIndex: index,
             })
           } catch {
-            submitStory({ logText: value })
+            submitStory({ logText, horizon })
           }
         }
       }
@@ -4393,13 +4391,13 @@ const NoteEditor = ({
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {systemHelp.split('\n').map((line, idx) => {
                   if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
+                  if (/\S\s{2,}\S/.test(line)) {
                     const spaceIdx = line.search(/\s{2,}/)
                     const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '100px', opacity: 1, whiteSpace: 'nowrap' }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4420,6 +4418,11 @@ const NoteEditor = ({
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
+              {storyHeader && (
+                <div className="opacity-40" style={{ fontSize: '11px', letterSpacing: '0.08em', paddingBottom: '8px', whiteSpace: 'pre-wrap' }}>
+                  {storyHeader}
+                </div>
+              )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
@@ -4427,6 +4430,18 @@ const NoteEditor = ({
                   ))}
                 </div>
               )}
+              {storyFollowUp && (
+                <div className="opacity-40" style={{ paddingTop: '12px' }}>
+                  → {storyFollowUp}
+                </div>
+              )}
+            </Block>
+          </div>
+        )}
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
             </Block>
           </div>
         )}
