@@ -3,257 +3,230 @@
  * Vadim Marmeladov — CEO, Owner LOT®
  * LOT® Founded 7 April 2016 | Made in the USA
  *
- * LOT-FM-001 / BASICS TAB
- * Month 1: Ledger & Doctrine (read-only)
- * Month 2: Upgrade state machine (PENDING → ON STRENGTH → STEADY STATE)
- * Month 3: Issue & Fulfillment (box ships)
+ * LOT-FM-001 / BASICS TAB — the hardware/physical part of the LOT® System.
+ * M1  LEDGER & DOCTRINE   — OPEN TAB, read-only, public at /basics
+ * M2  UPGRADE & ROSTER    — USERSHIP/AI → PENDING → ON STRENGTH → STEADY STATE
+ * M3  ISSUE & FULFILLMENT — issue log accrues, NEXT ISSUE advances
  */
 
 import * as React from 'react'
-import { RATION_MANIFEST, ISSUE_PRICE_USD, LOT_FM_REF } from './rationManifest'
-import { UpgradeControl } from './UpgradeControl'
+import {
+  RATION_MANIFEST,
+  ISSUE_PRICE_USD,
+  LOT_FM_REF,
+  firstOfNextMonth,
+  RationCadence,
+} from '#shared/basics'
+import { UpgradeControl, STATUS_LABELS } from './UpgradeControl'
 import { RosterForm } from './RosterForm'
 import { IssueLog } from './IssueLog'
 import { RationSubscriptionState, RationRoster } from './types'
+import { T, base, inv, row, button } from './tokens'
 
-// Forced terminal palette — white ground / black ink, ignores app theme.
-const T = {
-  bg:       '#ffffff',
-  ink:      '#000000',
-  rule:     '2px solid #000000',
-  ruleHalf: '1px solid #000000',
-  dimBg:    '#f0f0f0',
-  font:     "'Liberation Mono', 'Lucida Console', 'Courier New', Courier, monospace",
-  size:     '13px',
-  lineH:    '1.5',
-} as const
+const DOCTRINE = [
+  'LOT ISSUES. LOT DOES NOT SELL.',
+  'THE MEMBER IS ON STRENGTH.',
+  'LOAD IS FIXED. CADENCE IS FIXED. PRICE IS FIXED.',
+  'NEED OVER PREFERENCE. NO CURATION. NO UPSELL.',
+  'THE LEDGER IS THE MARKETING.',
+  'STAND DOWN AT ANY TIME. RATION DROPS. AI PLAN RETAINED.',
+]
 
-const base: React.CSSProperties = {
-  fontFamily:    T.font,
-  fontSize:      T.size,
-  lineHeight:    T.lineH,
-  color:         T.ink,
-  background:    T.bg,
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.03em',
-  borderRadius:  0,
-}
+const CADENCE_ORDER: RationCadence[] = ['MONTHLY', 'QUARTERLY', 'SEMI-ANNUAL', 'ANNUAL']
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function Header({ status }: { status: string }) {
-  const isActive = status === 'ON_STRENGTH' || status === 'STEADY_STATE'
+function Section({ title, right }: { title: string; right?: string }) {
   return (
-    <div style={{ ...base, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderBottom: T.rule, background: T.ink, color: T.bg }}>
-      <span style={{ fontWeight: 700 }}>LOT BASICS / {LOT_FM_REF} / RATION SYSTEM</span>
-      <span style={{ fontWeight: 700, letterSpacing: '0.12em' }}>{isActive ? 'ON STRENGTH' : 'OPEN TAB'}</span>
+    <div style={{ ...inv, display: 'flex', justifyContent: 'space-between', gap: '2ch', padding: '4px 1ch' }}>
+      <span>{title}</span>
+      {right && <span>{right}</span>}
     </div>
   )
 }
 
-type FieldRowProps = { label: string; value: React.ReactNode; dim?: boolean }
-function FieldRow({ label, value, dim }: FieldRowProps) {
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ ...base, display: 'flex', gap: '24px', padding: '4px 12px', borderBottom: T.ruleHalf, opacity: dim ? 0.45 : 1 }}>
-      <span style={{ minWidth: '168px', flexShrink: 0 }}>{label}</span>
-      <span style={{ fontWeight: 700 }}>{value}</span>
+    <div style={row}>
+      <span style={{ minWidth: T.labelCh, flexShrink: 0 }}>{label}</span>
+      <span>{value}</span>
     </div>
   )
 }
 
-function SectionHeader({ children }: { children: React.ReactNode }) {
+function Ledger() {
+  const counts = CADENCE_ORDER.map((c) => ({
+    c,
+    n: RATION_MANIFEST.filter((i) => i.cadence === c).length,
+  })).filter((x) => x.n > 0)
   return (
-    <div style={{ ...base, fontWeight: 700, padding: '5px 12px', borderBottom: T.rule, borderTop: T.rule, background: T.dimBg, letterSpacing: '0.08em' }}>
-      {children}
-    </div>
-  )
-}
-
-function ManifestTable() {
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ ...base, display: 'flex', fontWeight: 700, padding: '4px 12px', borderBottom: T.rule, background: T.ink, color: T.bg, letterSpacing: '0.08em' }}>
-        <span style={{ minWidth: '44px',  flexShrink: 0 }}>NO.</span>
+    <div>
+      <div style={{ ...row, borderBottom: T.rule }}>
+        <span style={{ width: '5ch', flexShrink: 0 }}>NO.</span>
         <span style={{ flex: 1 }}>NOMENCLATURE</span>
-        <span style={{ minWidth: '120px', textAlign: 'right', flexShrink: 0 }}>CADENCE</span>
+        <span style={{ width: '12ch', flexShrink: 0, textAlign: 'right' }}>CADENCE</span>
       </div>
-      {RATION_MANIFEST.map((item, i) => (
-        <div
-          key={item.no}
-          style={{ ...base, display: 'flex', padding: '3px 12px', borderBottom: T.ruleHalf, background: i % 2 === 0 ? T.bg : '#f9f9f9' }}
-        >
-          <span style={{ minWidth: '44px', flexShrink: 0, opacity: 0.55 }}>{item.no}</span>
-          <span style={{ flex: 1 }}>{item.nomenclature}</span>
-          <span style={{ minWidth: '120px', textAlign: 'right', flexShrink: 0, fontWeight: item.cadence === 'MONTHLY' ? 700 : 400 }}>
-            {item.cadence}
-          </span>
+      {RATION_MANIFEST.map((item) => (
+        <div key={item.no} style={row}>
+          <span style={{ width: '5ch', flexShrink: 0 }}>{item.no}</span>
+          <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{item.nomenclature}</span>
+          <span style={{ width: '12ch', flexShrink: 0, textAlign: 'right' }}>{item.cadence}</span>
         </div>
       ))}
+      <div style={row}>
+        <span style={{ minWidth: T.labelCh, flexShrink: 0 }}>COUNT</span>
+        <span>{counts.map((x) => `${x.c} ${x.n}`).join(' / ')}</span>
+      </div>
+      <div style={row}>
+        <span style={{ minWidth: T.labelCh, flexShrink: 0 }}>COGS</span>
+        <span>WITHHELD</span>
+      </div>
     </div>
   )
 }
 
-function Doctrine() {
-  const lines = [
-    'LOT ISSUES THE RATION. THE SUBSCRIBER IS ON STRENGTH.',
-    'NO CURATION. NO MARKETING. ITEMS SELECTED BY NEED, NOT PREFERENCE.',
-    'COST IS FIXED. LOAD IS FIXED. CADENCE IS FIXED. COGS IS WITHHELD.',
-    'SUBSCRIBE → PENDING → ON STRENGTH → STEADY STATE.',
-    'STAND DOWN AT ANY TIME. RATION DROPS; AI PLAN IS RETAINED.',
-  ]
+function StatusLine({ status, next }: { status: string; next: string }) {
   return (
-    <div style={{ padding: '8px 12px' }}>
-      {lines.map((line, i) => (
-        <div key={i} style={{ ...base, padding: '2px 0', opacity: i === 0 ? 1 : 0.65, fontWeight: i === 0 ? 700 : 400 }}>
-          {i > 0 && <span style={{ marginRight: '8px', opacity: 0.3 }}>—</span>}
-          {line}
-        </div>
-      ))}
+    <div style={{ ...inv, display: 'flex', flexWrap: 'wrap', columnGap: '2ch', padding: '4px 1ch' }}>
+      <span>STATUS {status}</span>
+      <span>NEXT ISSUE {next}</span>
+      <span>LOAD {RATION_MANIFEST.length}</span>
+      <span>REF {LOT_FM_REF}</span>
     </div>
   )
 }
 
-function StatusLine({ state }: { state: RationSubscriptionState | null }) {
-  const now = new Date()
-  const nextIssueDate = state?.nextIssueDate
-    ?? new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().slice(0, 10)
-
-  return (
-    <div style={{ ...base, display: 'flex', flexWrap: 'wrap', gap: '24px', padding: '5px 12px', borderTop: T.rule, opacity: 0.5, fontSize: '11px', letterSpacing: '0.06em' }}>
-      <span>STATUS: {state?.status ?? 'OPEN_TAB'}</span>
-      <span>NEXT ISSUE: {nextIssueDate}</span>
-      <span>LOAD: {RATION_MANIFEST.length} ITEMS</span>
-      <span>REF: {LOT_FM_REF}</span>
-    </div>
-  )
+type Props = {
+  /** Public OPEN TAB for strangers: no fetch, no controls. */
+  publicMode?: boolean
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+export function Basics({ publicMode = false }: Props) {
+  const [sub, setSub] = React.useState<RationSubscriptionState | null>(null)
+  const [fetchDone, setFetchDone] = React.useState(publicMode)
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+  const [mode, setMode] = React.useState<'idle' | 'roster' | 'confirm-stand-down'>('idle')
 
-export function Basics() {
-  const [subState, setSubState] = React.useState<RationSubscriptionState | null>(null)
-  const [loading, setLoading]   = React.useState(false)
-  const [fetchDone, setFetchDone] = React.useState(false)
-  const [error, setError]       = React.useState<string | null>(null)
-  const [showRosterForm, setShowRosterForm] = React.useState(false)
-
-  // Fetch subscription status on mount
-  React.useEffect(() => {
-    fetch('/api/basics/status', { credentials: 'include' })
-      .then((r) => r.json())
-      .then((data) => {
-        setSubState(data)
-        setFetchDone(true)
-      })
-      .catch(() => setFetchDone(true))
+  const load = React.useCallback(() => {
+    return fetch('/api/basics/status', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data && setSub(data))
+      .catch(() => {})
+      .finally(() => setFetchDone(true))
   }, [])
 
-  const status = subState?.status ?? 'OPEN_TAB'
+  React.useEffect(() => {
+    if (!publicMode) load()
+  }, [publicMode, load])
 
-  const handleSubscribe = () => {
-    setShowRosterForm(true)
-  }
+  const status = sub?.status ?? 'OPEN_TAB'
 
-  const handleRosterSubmit = async (roster: RationRoster) => {
+  const post = async (path: string, body?: unknown) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/basics/subscribe', {
+      const res = await fetch(path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
         credentials: 'include',
-        body: JSON.stringify(roster),
+        body: body ? JSON.stringify(body) : undefined,
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Subscribe failed')
-      setSubState((prev) => ({ ...(prev ?? { issueCount: 0, lastIssueDate: null, subscribedAt: new Date().toISOString(), standDownAt: null, roster: null }), ...data }))
-      setShowRosterForm(false)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'REQUEST FAILED')
+      await load()
+      setMode('idle')
     } catch (e: any) {
-      setError(e.message)
+      setError(String(e.message || e).toUpperCase())
     } finally {
       setLoading(false)
     }
   }
 
-  const handleStandDown = async () => {
-    if (!confirm('STAND DOWN? RATION WILL BE DROPPED. AI PLAN RETAINED. CONFIRM.')) return
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/basics/stand-down', { method: 'POST', credentials: 'include' })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Stand down failed')
-      setSubState((prev) => prev ? { ...prev, ...data, standDownAt: new Date().toISOString(), nextIssueDate: null } : null)
-    } catch (e: any) {
-      setError(e.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const onRoster = (roster: RationRoster) => post('/api/basics/subscribe', roster)
+  const onStandDown = () => post('/api/basics/stand-down')
+
+  const active = status === 'PENDING' || status === 'ON_STRENGTH' || status === 'STEADY_STATE'
 
   return (
-    <div style={{ fontFamily: T.font, fontSize: T.size, lineHeight: T.lineH, color: T.ink, background: T.bg, minHeight: '100vh' }}>
-      <style>{`.lot-basics { --lot-basics-rule: 2px solid #000; --lot-basics-font: ${T.font}; }`}</style>
+    <div style={{ ...base, width: '100%' }}>
+      <div style={{ ...base, maxWidth: '80ch', border: T.rule }}>
+        <div style={{ ...inv, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2ch', padding: '6px 1ch' }}>
+          <span>LOT® BASICS / {LOT_FM_REF}</span>
+          <span>{active ? 'ON STRENGTH' : 'OPEN TAB'}</span>
+        </div>
 
-      <div className="lot-basics" style={{ maxWidth: '760px', margin: '0 auto', border: T.rule }}>
+        <Field label="ISSUE" value="CIVILIAN RATION / 23 ITEMS" />
+        <Field label="PRICE" value={`USD ${ISSUE_PRICE_USD}.00 / MONTH`} />
+        <Field label="TERMS" value="ADDITIVE TO USERSHIP (AI PLAN)" />
+        <Field label="CADENCE" value="MONTHLY / 1ST OF MONTH" />
+        <Field label="EXIT" value="STAND DOWN AT ANY TIME" />
 
-        <Header status={status} />
-
-        <FieldRow label="ISSUE PRICE"    value={`USD ${ISSUE_PRICE_USD}.00 / MONTH`} />
-        <FieldRow label="LANDED COST"    value="WITHHELD" dim />
-        <FieldRow label="MARGIN FLOOR"   value="≥ 60 %" dim />
-        <FieldRow label="SUBSCRIPTION"   value="ADDITIVE TO USERSHIP AI PLAN" />
-        <FieldRow label="OPEN TAB"       value="MANIFEST IS PUBLIC — NO GATE" />
-
-        {/* ── UPGRADE CONTROL (Month 2) ───────────────────────────────── */}
-        {fetchDone && (
+        {!publicMode && fetchDone && (
           <>
-            <SectionHeader>UPGRADE / STATE</SectionHeader>
+            <Section title="UPGRADE" right={STATUS_LABELS[status]} />
             <UpgradeControl
               status={status}
-              nextIssueDate={subState?.nextIssueDate ?? null}
-              issueCount={subState?.issueCount ?? 0}
-              subscribedAt={subState?.subscribedAt ?? null}
-              standDownAt={subState?.standDownAt ?? null}
-              onSubscribe={handleSubscribe}
-              onStandDown={handleStandDown}
+              eligible={sub?.eligible ?? false}
+              billing={sub?.billing ?? 'NONE'}
+              nextIssueDate={sub?.nextIssueDate ?? null}
+              issueCount={sub?.issueCount ?? 0}
+              subscribedAt={sub?.subscribedAt ?? null}
+              standDownAt={sub?.standDownAt ?? null}
+              onSubscribe={() => setMode('roster')}
+              onStandDown={() => setMode('confirm-stand-down')}
               loading={loading}
             />
 
-            {showRosterForm && (status === 'OPEN_TAB' || status === 'STAND_DOWN') && (
+            {mode === 'confirm-stand-down' && (
+              <div style={{ ...base, padding: '8px 1ch', borderBottom: T.rule }}>
+                <div style={{ marginBottom: '8px' }}>CONFIRM STAND DOWN. RATION DROPS. AI PLAN RETAINED.</div>
+                <div style={{ display: 'flex', gap: '2ch', flexWrap: 'wrap' }}>
+                  <button onClick={onStandDown} disabled={loading} style={button(true, loading)}>
+                    {loading ? 'PROCESSING' : 'CONFIRM — STAND DOWN'}
+                  </button>
+                  <button onClick={() => setMode('idle')} disabled={loading} style={button(false, loading)}>
+                    HOLD
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {mode === 'roster' && (status === 'OPEN_TAB' || status === 'STAND_DOWN') && (
               <>
-                <SectionHeader>ROSTER INTAKE</SectionHeader>
-                <RosterForm onSubmit={handleRosterSubmit} loading={loading} error={error} />
+                <Section title="ROSTER INTAKE" right="SIZING / SHIPPING / CADENCE" />
+                <RosterForm onSubmit={onRoster} onCancel={() => setMode('idle')} loading={loading} error={error} />
               </>
             )}
 
-            {error && !showRosterForm && (
-              <div style={{ ...base, padding: '5px 12px', borderTop: T.ruleHalf, color: '#c00', fontWeight: 700 }}>
-                ERROR: {error}
-              </div>
+            {error && mode !== 'roster' && (
+              <div style={{ ...inv, padding: '4px 1ch', borderBottom: T.rule }}>ERROR: {error}</div>
+            )}
+
+            {(active || (sub?.issues?.length ?? 0) > 0) && (
+              <>
+                <Section title="ISSUE LOG" right={`${String(sub?.issueCount ?? 0).padStart(3, '0')} ISSUED`} />
+                <IssueLog entries={sub?.issues ?? []} nextIssueDate={sub?.nextIssueDate ?? null} />
+              </>
             )}
           </>
         )}
 
-        {/* ── ISSUE LOG (Month 3: live data) ──────────────────────────── */}
-        {fetchDone && (status === 'ON_STRENGTH' || status === 'STEADY_STATE' || status === 'PENDING') && (
-          <>
-            <SectionHeader>ISSUE LOG</SectionHeader>
-            <IssueLog
-              entries={subState?.issues ?? []}
-              nextIssueDate={subState?.nextIssueDate ?? null}
-            />
-          </>
+        <Section title="LOAD" right={`${RATION_MANIFEST.length} ITEMS`} />
+        <Ledger />
+
+        <Section title="DOCTRINE" />
+        <div style={{ ...base, padding: '6px 1ch', borderBottom: T.rule }}>
+          {DOCTRINE.map((line) => (
+            <div key={line}>{line}</div>
+          ))}
+        </div>
+
+        {publicMode && (
+          <div style={{ ...base, padding: '6px 1ch', borderBottom: T.rule }}>
+            UPGRADE FROM USERSHIP. <a href="/" style={{ ...base, textDecoration: 'underline' }}>REPORT TO LOT</a>
+          </div>
         )}
 
-        {/* ── MANIFEST LEDGER (Month 1) ────────────────────────────────── */}
-        <SectionHeader>LOAD / {RATION_MANIFEST.length} ITEMS / CADENCE</SectionHeader>
-        <ManifestTable />
-
-        <SectionHeader>DOCTRINE</SectionHeader>
-        <Doctrine />
-
-        <StatusLine state={subState} />
+        <StatusLine status={status.replace('_', ' ')} next={sub?.nextIssueDate ?? firstOfNextMonth()} />
       </div>
     </div>
   )

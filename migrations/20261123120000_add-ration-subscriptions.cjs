@@ -34,7 +34,7 @@ module.exports = {
       shippingZip:   { type: DataTypes.STRING(20),  allowNull: false },
       clothingSize:  { type: DataTypes.STRING(10),  allowNull: false },
       // Billing
-      stripeSubscriptionItemId: { type: DataTypes.STRING(255), allowNull: true },
+      billingRef: { type: DataTypes.STRING(255), allowNull: true },
       // Issue tracking
       issueCount:    { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       lastIssueDate: { type: DataTypes.DATEONLY, allowNull: true },

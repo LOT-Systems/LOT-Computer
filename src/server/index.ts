@@ -37,6 +37,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import basicsApiRoutes from './routes/basics-api.js'
 
 const CWD = process.cwd()
 
@@ -48,7 +49,7 @@ const fastify = Fastify({
   bodyLimit: 1_048_576,
 })
 
-const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
+const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log', '/basics']
 
 // ==============================================================================
 // SECURITY PLUGINS
@@ -320,6 +321,7 @@ fastify.register(async (fastify: FastifyInstance) => {
         }
       })
       fastify.register(apiRoutes, { prefix: '/api' })
+      fastify.register(basicsApiRoutes, { prefix: '/api/basics' })
     })
 
     // Admin API (accessible by Usership members only)
@@ -350,6 +352,14 @@ fastify.register(async (fastify: FastifyInstance) => {
           if (req.user) {
             return reply.view('generic-spa', {
               scriptName: 'app',
+              scriptNonce: reply.cspNonce.script,
+              styleNonce: reply.cspNonce.style,
+            })
+          }
+          // LOT-FM-001: /basics is the public OPEN TAB — strangers read the ledger.
+          if (route === '/basics') {
+            return reply.view('generic-spa', {
+              scriptName: 'basics',
               scriptNonce: reply.cspNonce.script,
               styleNonce: reply.cspNonce.style,
             })

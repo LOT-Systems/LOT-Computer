@@ -20,7 +20,7 @@ export type RationSubscriptionRecord = {
   shippingState: string
   shippingZip: string
   clothingSize: string
-  stripeSubscriptionItemId: string | null
+  billingRef: string | null
   issueCount: number
   lastIssueDate: string | null
   nextIssueDate: string | null
@@ -43,7 +43,7 @@ export class RationSubscription
   declare shippingState: string
   declare shippingZip: string
   declare clothingSize: string
-  declare stripeSubscriptionItemId: string | null
+  declare billingRef: string | null
   declare issueCount: number
   declare lastIssueDate: string | null
   declare nextIssueDate: string | null
@@ -68,7 +68,7 @@ RationSubscription.init(
     shippingState: { type: DataTypes.STRING(10),  allowNull: false },
     shippingZip:   { type: DataTypes.STRING(20),  allowNull: false },
     clothingSize:  { type: DataTypes.STRING(10),  allowNull: false },
-    stripeSubscriptionItemId: { type: DataTypes.STRING(255), allowNull: true },
+    billingRef: { type: DataTypes.STRING(255), allowNull: true },
     issueCount:    { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     lastIssueDate: { type: DataTypes.DATEONLY, allowNull: true },
     nextIssueDate: { type: DataTypes.DATEONLY, allowNull: true },

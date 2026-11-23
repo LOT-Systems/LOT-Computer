@@ -10,33 +10,13 @@
  */
 
 import * as React from 'react'
-import { RationStatus } from './types'
-
-const T = {
-  ink:  '#000000',
-  bg:   '#ffffff',
-  rule: '2px solid #000000',
-  ruleHalf: '1px solid #000000',
-  font: "'Liberation Mono', 'Lucida Console', 'Courier New', Courier, monospace",
-  size: '13px',
-  lineH: '1.5',
-} as const
-
-const base: React.CSSProperties = {
-  fontFamily:    T.font,
-  fontSize:      T.size,
-  lineHeight:    T.lineH,
-  color:         T.ink,
-  background:    T.bg,
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.03em',
-  borderRadius:  0,
-}
-
-const inv: React.CSSProperties = { ...base, background: T.ink, color: T.bg }
+import { RationViewStatus } from './types'
+import { T, base, inv, row, button } from './tokens'
 
 type Props = {
-  status: RationStatus | 'OPEN_TAB'
+  status: RationViewStatus
+  eligible: boolean
+  billing: 'NONE' | 'AWAITING_PROVIDER' | 'ACTIVE'
   nextIssueDate: string | null
   issueCount: number
   subscribedAt: string | null
@@ -46,107 +26,92 @@ type Props = {
   loading: boolean
 }
 
-const STATUS_LABELS: Record<RationStatus | 'OPEN_TAB', string> = {
-  OPEN_TAB:     'OPEN TAB — NOT SUBSCRIBED',
-  PENDING:      'PENDING — FIRST ISSUE IN QUEUE',
-  ON_STRENGTH:  'ON STRENGTH',
+export const STATUS_LABELS: Record<RationViewStatus, string> = {
+  OPEN_TAB: 'USERSHIP / AI — NOT ON STRENGTH',
+  PENDING: 'PENDING — FIRST ISSUE IN QUEUE',
+  ON_STRENGTH: 'ON STRENGTH',
   STEADY_STATE: 'ON STRENGTH / STEADY STATE',
-  STAND_DOWN:   'STOOD DOWN — RATION INACTIVE',
+  STAND_DOWN: 'STOOD DOWN — RATION DROPPED, AI RETAINED',
 }
 
-export function StatusBadge({ status }: { status: RationStatus | 'OPEN_TAB' }) {
-  const isActive = status === 'ON_STRENGTH' || status === 'STEADY_STATE'
-  const isPending = status === 'PENDING'
+const PIPELINE: RationViewStatus[] = ['OPEN_TAB', 'PENDING', 'ON_STRENGTH', 'STEADY_STATE']
+const PIPELINE_LABEL: Record<string, string> = {
+  OPEN_TAB: 'USERSHIP/AI',
+  PENDING: 'PENDING',
+  ON_STRENGTH: 'ON STRENGTH',
+  STEADY_STATE: 'STEADY STATE',
+}
 
+function StateRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{
-      ...base,
-      display: 'inline-block',
-      padding: '3px 10px',
-      border: T.rule,
-      fontWeight: 700,
-      letterSpacing: '0.08em',
-      background: isActive ? T.ink : T.bg,
-      color: isActive ? T.bg : T.ink,
-      opacity: status === 'STAND_DOWN' ? 0.45 : 1,
-    }}>
-      {isPending && <span style={{ marginRight: '8px', animation: 'none' }}>▪</span>}
-      {STATUS_LABELS[status]}
+    <div style={row}>
+      <span style={{ minWidth: T.labelCh, flexShrink: 0 }}>{label}</span>
+      <span>{value ?? '—'}</span>
     </div>
   )
 }
 
-type StateRowProps = { label: string; value: React.ReactNode; dim?: boolean }
-function StateRow({ label, value, dim }: StateRowProps) {
-  return (
-    <div style={{ ...base, display: 'flex', gap: '24px', padding: '4px 12px', borderBottom: T.ruleHalf, opacity: dim ? 0.45 : 1 }}>
-      <span style={{ minWidth: '168px', flexShrink: 0 }}>{label}</span>
-      <span style={{ fontWeight: 700 }}>{value ?? '—'}</span>
-    </div>
-  )
-}
-
-export function UpgradeControl({ status, nextIssueDate, issueCount, subscribedAt, standDownAt, onSubscribe, onStandDown, loading }: Props) {
-  const canSubscribe = status === 'OPEN_TAB' || status === 'STAND_DOWN'
+export function UpgradeControl({
+  status,
+  eligible,
+  billing,
+  nextIssueDate,
+  issueCount,
+  subscribedAt,
+  standDownAt,
+  onSubscribe,
+  onStandDown,
+  loading,
+}: Props) {
+  const canSubscribe = eligible && (status === 'OPEN_TAB' || status === 'STAND_DOWN')
   const canStandDown = status === 'ON_STRENGTH' || status === 'STEADY_STATE' || status === 'PENDING'
+  const stage = status === 'STAND_DOWN' ? 'OPEN_TAB' : status
 
   return (
-    <div style={{ ...base }}>
-      {/* Current state header */}
-      <div style={{ ...base, padding: '6px 12px', borderBottom: T.rule }}>
-        <StatusBadge status={status} />
-      </div>
-
-      {/* State fields */}
-      <StateRow label="SUBSCRIPTION STATUS" value={STATUS_LABELS[status]} />
-      {nextIssueDate && <StateRow label="NEXT ISSUE DATE" value={nextIssueDate} />}
-      {issueCount > 0 && <StateRow label="ISSUES RECEIVED" value={String(issueCount)} />}
-      {subscribedAt && <StateRow label="SUBSCRIBED" value={new Date(subscribedAt).toISOString().slice(0, 10)} dim />}
-      {standDownAt && <StateRow label="STOOD DOWN" value={new Date(standDownAt).toISOString().slice(0, 10)} dim />}
-
-      {/* Controls */}
-      <div style={{ display: 'flex', gap: '12px', padding: '10px 12px', borderTop: T.rule, flexWrap: 'wrap' }}>
-        {canSubscribe && (
-          <button
-            onClick={onSubscribe}
-            disabled={loading}
+    <div style={base}>
+      {/* Pipeline: current stage inverted, all others plain. */}
+      <div style={{ ...base, display: 'flex', flexWrap: 'wrap', borderBottom: T.rule }}>
+        {PIPELINE.map((s, i) => (
+          <span
+            key={s}
             style={{
-              ...inv,
-              padding: '7px 20px',
-              border: T.rule,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontWeight: 700,
-              opacity: loading ? 0.5 : 1,
-              letterSpacing: '0.08em',
+              ...(s === stage ? inv : base),
+              padding: '4px 1ch',
+              borderRight: i < PIPELINE.length - 1 ? T.rule : 'none',
             }}
           >
-            {loading ? 'PROCESSING...' : (status === 'STAND_DOWN' ? '↑ RE-SUBSCRIBE' : '↑ JOIN STRENGTH — USD 100/MO')}
+            {PIPELINE_LABEL[s]}
+          </span>
+        ))}
+      </div>
+
+      <StateRow label="STATE" value={STATUS_LABELS[status]} />
+      {nextIssueDate && <StateRow label="NEXT ISSUE" value={nextIssueDate} />}
+      {issueCount > 0 && <StateRow label="ISSUES RECEIVED" value={String(issueCount).padStart(3, '0')} />}
+      {subscribedAt && <StateRow label="ON ROSTER SINCE" value={subscribedAt.slice(0, 10)} />}
+      {standDownAt && <StateRow label="STOOD DOWN" value={standDownAt.slice(0, 10)} />}
+      {canStandDown && (
+        <StateRow
+          label="BILLING"
+          value={billing === 'ACTIVE' ? 'USD 100.00 / MO — ADDITIVE' : 'AWAITING BILLING PROVIDER — NOT CHARGED'}
+        />
+      )}
+
+      <div style={{ ...base, display: 'flex', gap: '2ch', padding: '8px 1ch', borderBottom: T.rule, flexWrap: 'wrap' }}>
+        {canSubscribe && (
+          <button onClick={onSubscribe} disabled={loading} style={button(true, loading)}>
+            {loading ? 'PROCESSING' : status === 'STAND_DOWN' ? 'UPGRADE — RETURN TO STRENGTH' : 'UPGRADE — GO ON STRENGTH / USD 100/MO'}
           </button>
         )}
         {canStandDown && (
-          <button
-            onClick={onStandDown}
-            disabled={loading}
-            style={{
-              ...base,
-              padding: '7px 20px',
-              border: T.rule,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontWeight: 400,
-              opacity: loading ? 0.5 : 0.6,
-              letterSpacing: '0.06em',
-            }}
-          >
-            {loading ? 'PROCESSING...' : '↓ STAND DOWN'}
+          <button onClick={onStandDown} disabled={loading} style={button(false, loading)}>
+            {loading ? 'PROCESSING' : 'STAND DOWN'}
           </button>
         )}
+        {!eligible && !canStandDown && (
+          <span>UPGRADE REQUIRES USERSHIP (AI PLAN). LEDGER IS OPEN TO ALL.</span>
+        )}
       </div>
-
-      {status === 'PENDING' && (
-        <div style={{ ...base, padding: '6px 12px', borderTop: T.ruleHalf, opacity: 0.5, fontSize: '11px' }}>
-          RATION IS BEING PREPARED FOR FIRST ISSUE. NO ACTION REQUIRED.
-        </div>
-      )}
     </div>
   )
 }
