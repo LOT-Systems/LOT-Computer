@@ -16,6 +16,7 @@ import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
 import { Log, LogSettingsChangeMetadata } from '#shared/types'
 import { cn } from '#client/utils'
+import { entryRef } from '#client/utils/calendar'
 import { atom, map } from 'nanostores'
 import {
   COUNTRY_BY_ALPHA3,
@@ -2079,11 +2080,64 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{entryType || 'ENTRY'}</span>
+                  <span className="opacity-30">{entryRef(log.id)}</span>
+                </div>
+                {text && <div className="mt-8">{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">
+                    {date}{time ? ` · ${time}` : ' · --:--'}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const phase = (log.metadata?.phase as string | undefined) || 'T-0'
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const ref = (log.metadata?.ref as string | undefined) || ''
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-ALRT:" blockView>
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span className="flex items-baseline gap-8">
+                    <span className="inline-block w-[0.6em] h-[0.6em] bg-acc" />
+                    <span>{phase === 'T-0' ? 'ALERT' : 'WARN'} · {phase}</span>
+                  </span>
+                  <span className="opacity-30">{ref}</span>
+                </div>
+                {text && <div className="mt-8">{text}</div>}
+                <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">
+                  {entryType || 'ENTRY'}{date ? ` · ${date}` : ''}{time ? ` · ${time}` : ''}
+                </div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_done' || log.event === 'calendar_cancel') {
+          const isDone = log.event === 'calendar_done'
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const ref = (log.metadata?.ref as string | undefined) || ''
+          const onTime = log.metadata?.onTime as boolean | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={isDone ? 'CAL-CMPL:' : 'CAL-SCRB:'} blockView>
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{entryType || 'ENTRY'} · {isDone ? (onTime === false ? 'CLOSED LATE' : 'CLOSED') : 'SCRUBBED'}</span>
+                  <span className="opacity-30">{ref}</span>
+                </div>
+                {text && <div className={cn('mt-8', !isDone && 'line-through opacity-60')}>{text}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}</div>}
               </Block>
             </LogContainer>
           )

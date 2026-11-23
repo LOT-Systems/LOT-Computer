@@ -136,6 +136,20 @@ export const useLogs = createQuery<Log[]>('/api/logs', {
   staleTime: 5 * 60 * 1000, // Cache for 5 minutes — /api/logs has no LIMIT so keep fetches infrequent
 })
 
+export type CalendarFeedLog = {
+  id: string
+  event: string
+  text: string | null
+  metadata: Record<string, any> | null
+  createdAt: string
+}
+
+// Calendar v2 — dedicated calendar event feed (not bound by /api/logs window or hideActivityLogs)
+export const useCalendarFeed = createQuery<CalendarFeedLog[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  staleTime: 60 * 1000,
+})
+
 export const useCreateLog = createMutation<{ text: string; event?: string; metadata?: Record<string, any> }, Log>(
   'post',
   '/api/logs'

@@ -1213,6 +1213,10 @@ export default async (fastify: FastifyInstance) => {
       'quantum_presence_crystallization',
       'total_field_coherence',
       'recovery_intelligence_arc',
+      // Calendar v2: completion · cancellation · military alerts
+      'calendar_done',
+      'calendar_cancel',
+      'calendar_alert',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {
@@ -1247,6 +1251,28 @@ export default async (fastify: FastifyInstance) => {
 
     // Already have an empty log at top, just return existing logs
     return logs
+  })
+
+  // Calendar v2 — dedicated feed of calendar events.
+  // Independent of the /logs 500-row window and of hideActivityLogs, so entries
+  // created months ahead never fall out of the widget.
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_done', 'calendar_cancel', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 2000,
+    })
+    return logs.map((l: any) => ({
+      id: l.id,
+      event: l.event,
+      text: l.text,
+      metadata: l.metadata,
+      createdAt: l.createdAt,
+    }))
   })
 
   // Diagnostic endpoint to manually cleanup empty logs
