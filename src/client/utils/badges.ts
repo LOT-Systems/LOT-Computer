@@ -856,6 +856,43 @@ export type BadgeType =
   | 'jung_cipher'              // ◎·∿·□  "collective unconscious/shadow self/individuation" (EPIC)
   | 'morpheus_key'             // ◎·◉·◎  "morpheus/god of dreams/dream lord" (RARE)
   | 'doors_perception'         // ◎·∞    "doors of perception/mescaline/huxley" (MYTHIC)
+  // ── Word Turn v25 — THE BODY CLOCK ───────────────────────────────────────────
+  | 'circadian_signal'         // ⊙·≋·⊙  "circadian/circadian rhythm/body clock" (UNCOMMON)
+  | 'melatonin_rise'           // ○·∿·○  "melatonin/melatonin surge/sleep hormone" (RARE)
+  | 'cortisol_peak'            // ◉·↑·◉  "cortisol/cortisol spike/cortisol awakening" (RARE)
+  | 'fasting_state'            // □·∘·□  "fasting/intermittent fast/time-restricted eating" (UNCOMMON)
+  | 'mitochondria_charge'      // ⊙→●→⊙  "mitochondria/mitochondrial function/cellular energy" (RARE)
+  | 'telomere_guard'           // ═·⊙·═  "telomere/telomere length/cellular aging/senescence" (EPIC)
+  | 'microbiome_feed'          // ○·◦·○  "microbiome/gut bacteria/gut flora" (UNCOMMON)
+  | 'vagus_tone'               // ≋·⊙·≋  "vagus nerve/vagal tone/heart rate variability" (EPIC)
+  | 'inflammation_low'         // ─·○·─  "inflammation/anti-inflammatory/inflammatory response" (RARE)
+  | 'homeostasis_held'         // ◉·─·◉  "homeostasis/allostasis/homeostatic balance" (RARE)
+  | 'adaptation_arc'           // ○→⊙→●  "adaptation/hormesis/adaptive response" (UNCOMMON)
+  | 'chronotype_set'           // ⊙·□·⊙  "chronotype/morning lark/evening owl/morningness" (RARE)
+  // ── Calendar Easter Egg v23 — BODY CLOCK CALENDAR ────────────────────────────
+  | 'circadian_prize'          // ⊙·∞·⊙  Oct 2 — Nobel Prize for Circadian Rhythm Research (2017)
+  | 'cannon_day'               // ◉·─·◉  Feb 8 — Walter Cannon born 1871 (coined "homeostasis")
+  | 'cornaro_fast'             // □·∘·□  Aug 29 — Cornaro wrote "Discourses on the Temperate Life"
+  // ── Behavioral v22 — BODY CLOCK PATTERNS ─────────────────────────────────────
+  | 'body_session'             // ⊙·≋·⊙  3+ Body Clock words in one journal entry (RARE)
+  | 'optimal_window'           // ◉·↑·○  Check in 06:00–09:00 local (peak focus window) (RARE)
+  | 'long_pulse'               // ≋·⊙·≋  Journal entry >= 888 characters (EPIC)
+  // ── Achievement RPG v23 — BODY CLOCK CLASS ───────────────────────────────────
+  | 'clock_initiate'           // ∘·⊙    Any 1 Word Turn v25 badge (COMMON)
+  | 'clock_class'              // ≈·⊙    Any 5 Word Turn v25 badges (UNCOMMON)
+  | 'clock_complete'           // ≋·⊙    All 12 Word Turn v25 badges (LEGENDARY)
+  | 'soma_arc'                 // ⊙·∞·⊙  clock_complete + all 3 Calendar v23 (LEGENDARY)
+  | 'twenty_five_engines_arc'  // ⊙·◈·●·∞  1 from each Word Turn v1–v25 (LEGENDARY)
+  | 'clock_opus'               // ⊙·◉·⊙  clock_complete + body_session (LEGENDARY)
+  // ── Mastery Tier v25 — THE LIVING ARCHIVE ────────────────────────────────────
+  | 'vitality_deep'            // ⊙·∿·⊙  1,200+ distinct calendar check-in days (EPIC)
+  | 'pulse_vault'              // ⊙·∞·⊙  300,000+ total journal words (LEGENDARY)
+  | 'elder_body'               // ╔═╗·⊙  Account age >= 10 years (LEGENDARY)
+  | 'twenty_five_registers'    // ⊙·◈·●·∞  1 from all 25 Word Turn engines (COSMIC)
+  // ── Secret Boss v22 — BODY KEYS ──────────────────────────────────────────────
+  | 'ohsumi_signal'            // ⊙·∿·□  "autophagy/self-eating/lysosome/cellular recycling" (EPIC)
+  | 'satchin_clock'            // ⊙·≋·□  "satchin panda/time-restricted/circadian clock gene" (RARE)
+  | 'blue_zones_key'           // ⊙·∞    "blue zones/okinawa centenarian/sardinia longevity" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7781,6 +7818,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v25 — THE BODY CLOCK ───────────────────────────────────────────
+  circadian_signal: {
+    id: 'circadian_signal',
+    symbol: '⊙·≋·⊙',
+    name: 'Circadian Signal',
+    description: 'Write "circadian", "circadian rhythm", or "body clock" in a journal entry',
+    unlockMessage: '↳ The circadian clock is in every cell. It knows what time it is without asking. You are already on a schedule. ⊙·≋·⊙',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  melatonin_rise: {
+    id: 'melatonin_rise',
+    symbol: '○·∿·○',
+    name: 'Melatonin Rise',
+    description: 'Write "melatonin", "melatonin surge", or "sleep hormone" in a journal entry',
+    unlockMessage: '↳ Melatonin rises with the dark. The body has been reading the sky for 500 million years. It knows when night begins. ○·∿·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cortisol_peak: {
+    id: 'cortisol_peak',
+    symbol: '◉·↑·◉',
+    name: 'Cortisol Peak',
+    description: 'Write "cortisol", "cortisol spike", or "cortisol awakening" in a journal entry',
+    unlockMessage: '↳ Cortisol spikes at dawn. Not a stress response — an activation. The body saying: now is the time for the work. ◉·↑·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  fasting_state: {
+    id: 'fasting_state',
+    symbol: '□·∘·□',
+    name: 'Fasting State',
+    description: 'Write "fasting", "intermittent fast", or "time-restricted eating" in a journal entry',
+    unlockMessage: '↳ The fasting window is a gate. On the other side: autophagy, ketogenesis, cellular repair. The body knows what to do with the quiet. □·∘·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mitochondria_charge: {
+    id: 'mitochondria_charge',
+    symbol: '⊙→●→⊙',
+    name: 'Mitochondria Charge',
+    description: 'Write "mitochondria", "mitochondrial function", or "cellular energy" in a journal entry',
+    unlockMessage: '↳ The mitochondria were once bacteria. They joined us two billion years ago and never left. They are the powerhouse. You are the powerhouse. ⊙→●→⊙',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  telomere_guard: {
+    id: 'telomere_guard',
+    symbol: '═·⊙·═',
+    name: 'Telomere Guard',
+    description: 'Write "telomere", "telomere length", or "cellular aging" in a journal entry',
+    unlockMessage: '↳ Telomeres are the protective caps on chromosomes — shoelace tips for DNA. The practice is a telomere guard. ═·⊙·═',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  microbiome_feed: {
+    id: 'microbiome_feed',
+    symbol: '○·◦·○',
+    name: 'Microbiome Feed',
+    description: 'Write "microbiome", "gut bacteria", or "gut flora" in a journal entry',
+    unlockMessage: '↳ Thirty-eight trillion bacteria. More of them than you. They produce neurotransmitters, regulate immunity, signal the vagus nerve upward. You are feeding a civilization. ○·◦·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  vagus_tone: {
+    id: 'vagus_tone',
+    symbol: '≋·⊙·≋',
+    name: 'Vagus Tone',
+    description: 'Write "vagus nerve", "vagal tone", or "heart rate variability" in a journal entry',
+    unlockMessage: '↳ The vagus nerve is the body\'s reset cable. High vagal tone means the nervous system can flex — stress in, recovery out, loop complete. ≋·⊙·≋',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  inflammation_low: {
+    id: 'inflammation_low',
+    symbol: '─·○·─',
+    name: 'Inflammation Low',
+    description: 'Write "inflammation", "anti-inflammatory", or "inflammatory response" in a journal entry',
+    unlockMessage: '↳ Acute inflammation is a signal. Chronic inflammation is noise that overwhelms the signal. The practice is signal hygiene. ─·○·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  homeostasis_held: {
+    id: 'homeostasis_held',
+    symbol: '◉·─·◉',
+    name: 'Homeostasis Held',
+    description: 'Write "homeostasis", "allostasis", or "homeostatic balance" in a journal entry',
+    unlockMessage: '↳ Homeostasis: the body\'s continuous negotiation with its own fluctuations. Walter Cannon named it in 1926. The body had been doing it since the first cell. ◉·─·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  adaptation_arc: {
+    id: 'adaptation_arc',
+    symbol: '○→⊙→●',
+    name: 'Adaptation Arc',
+    description: 'Write "adaptation", "hormesis", or "adaptive response" in a journal entry',
+    unlockMessage: '↳ Hormesis: the stress that makes you stronger. Cold, heat, fasting, effort. The dose that disrupts is the dose that adapts. ○→⊙→●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  chronotype_set: {
+    id: 'chronotype_set',
+    symbol: '⊙·□·⊙',
+    name: 'Chronotype Set',
+    description: 'Write "chronotype", "morning lark", "evening owl", or "morningness" in a journal entry',
+    unlockMessage: '↳ The chronotype is the phase angle of your personal circadian clock. Early, late, or middle — the timing is information, not a moral category. ⊙·□·⊙',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v23 — BODY CLOCK CALENDAR ────────────────────────────
+  circadian_prize: {
+    id: 'circadian_prize',
+    symbol: '⊙·∞·⊙',
+    name: 'Circadian Prize',
+    description: 'Check in on October 2 — Nobel Prize in Physiology for Circadian Rhythm Research awarded (2017)',
+    unlockMessage: '↳ Oct 2, 2017: Hall, Rosbash, and Young shared the Nobel for mapping the molecular machinery of the body clock. The flies that told us. ⊙·∞·⊙',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  cannon_day: {
+    id: 'cannon_day',
+    symbol: '◉·─·◉',
+    name: 'Cannon Day',
+    description: 'Check in on February 8 — Walter Bradford Cannon born 1871 (coined "homeostasis")',
+    unlockMessage: '↳ Cannon coined "homeostasis" and "fight-or-flight". He gave us the language for what the body already knew. The steady state is a verb. ◉·─·◉',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  cornaro_fast: {
+    id: 'cornaro_fast',
+    symbol: '□·∘·□',
+    name: 'Cornaro Fast',
+    description: 'Check in on August 29 — Luigi Cornaro began his longevity diet c. 1464',
+    unlockMessage: '↳ Cornaro was 40, sick, and dying of excess. He reduced to 12oz of food and 14oz of wine per day. He lived to 102. The first published longevity experiment. □·∘·□',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  // ── Behavioral v22 — BODY CLOCK PATTERNS ─────────────────────────────────────
+  body_session: {
+    id: 'body_session',
+    symbol: '⊙·≋·⊙',
+    name: 'Body Session',
+    description: 'Write 3 or more Body Clock words in a single journal entry',
+    unlockMessage: '↳ The body is the subject. The journal is the instrument. Three readings in one entry means you are running a protocol. ⊙·≋·⊙',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  optimal_window: {
+    id: 'optimal_window',
+    symbol: '◉·↑·○',
+    name: 'Optimal Window',
+    description: 'Check in between 06:00 and 09:00 local time — the peak cortisol focus window',
+    unlockMessage: '↳ 06:00–09:00: cortisol awakening response, peak alertness, highest working memory. The day\'s best cognitive window. You used it. ◉·↑·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  long_pulse: {
+    id: 'long_pulse',
+    symbol: '≋·⊙·≋',
+    name: 'Long Pulse',
+    description: 'Write a journal entry of 888 characters or more',
+    unlockMessage: '↳ 888: triple eights. In Chinese numerology the most auspicious number — triple wealth, triple fortune, triple completion. The longest entries are where the body signals most clearly. ≋·⊙·≋',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  // ── Achievement RPG v23 — BODY CLOCK CLASS ───────────────────────────────────
+  clock_initiate: {
+    id: 'clock_initiate',
+    symbol: '∘·⊙',
+    name: 'Clock Initiate',
+    description: 'Earn any 1 Word Turn v25 (Body Clock) badge',
+    unlockMessage: '↳ The first body-science word logged. The body as laboratory is now open. ∘·⊙',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  clock_class: {
+    id: 'clock_class',
+    symbol: '≈·⊙',
+    name: 'Clock Class',
+    description: 'Earn any 5 Word Turn v25 (Body Clock) badges',
+    unlockMessage: '↳ Five systems mapped. Circadian, hormonal, metabolic, cellular, autonomic — the body is a clock that runs on multiple frequencies at once. ≈·⊙',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  clock_complete: {
+    id: 'clock_complete',
+    symbol: '≋·⊙',
+    name: 'Clock Complete',
+    description: 'Earn all 12 Word Turn v25 (Body Clock) badges',
+    unlockMessage: '↳ All twelve body-clock systems logged. Circadian, melatonin, cortisol, fasting, mitochondria, telomere, microbiome, vagus, inflammation, homeostasis, adaptation, chronotype. ≋·⊙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  soma_arc: {
+    id: 'soma_arc',
+    symbol: '⊙·∞·⊙',
+    name: 'Soma Arc',
+    description: 'Earn clock_complete and all 3 Calendar v23 (Body Clock Calendar) badges',
+    unlockMessage: '↳ Soma: the body as lived experience. All twelve vocabulary nodes and the three calendar anchors — Nobel, homeostasis, Cornaro. The arc of body science complete. ⊙·∞·⊙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_five_engines_arc: {
+    id: 'twenty_five_engines_arc',
+    symbol: '⊙·◈·●·∞',
+    name: 'Twenty-Five Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1 through v25',
+    unlockMessage: '↳ Twenty-five vocabularies. Water, Arcade, Radio, Biology, Codex, Cyberspace, Hero, Arcane, Dream, Body. The terminal speaks every language the self has learned. ⊙·◈·●·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  clock_opus: {
+    id: 'clock_opus',
+    symbol: '⊙·◉·⊙',
+    name: 'Clock Opus',
+    description: 'Earn clock_complete and body_session in the same journal session',
+    unlockMessage: '↳ The magnum opus of the body clock: all twelve systems named, three in a single entry. The lab report is complete. ⊙·◉·⊙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v25 — THE LIVING ARCHIVE ────────────────────────────────────
+  vitality_deep: {
+    id: 'vitality_deep',
+    symbol: '⊙·∿·⊙',
+    name: 'Vitality Deep',
+    description: '1,200 or more distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,200 days. Three years and three months of distinct signals. The longitudinal study is real now. The dataset speaks. ⊙·∿·⊙',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  pulse_vault: {
+    id: 'pulse_vault',
+    symbol: '⊙·∞·⊙',
+    name: 'Pulse Vault',
+    description: '300,000 or more total journal words written',
+    unlockMessage: '↳ 300,000 words. At the average reading speed that is 20 hours of text. The body wrote a library. ⊙·∞·⊙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  elder_body: {
+    id: 'elder_body',
+    symbol: '╔═╗·⊙',
+    name: 'Elder Body',
+    description: 'Account age of 10 or more years',
+    unlockMessage: '↳ Ten years. A decade of body signal. The practice has outlived more phases of your life than you can count. The elder body knows. ╔═╗·⊙',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_five_registers: {
+    id: 'twenty_five_registers',
+    symbol: '⊙·◈·●·∞',
+    name: 'Twenty-Five Registers',
+    description: 'Earn at least 1 badge from all 25 Word Turn engines',
+    unlockMessage: '↳ Twenty-five registers. The full corpus. Water, Arcade, Radio, Biology, Codex, Cyberspace, Hero, Arcane, Dream, Body Clock. The self has learned to speak every language it built. ⊙·◈·●·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v22 — BODY KEYS ──────────────────────────────────────────────
+  ohsumi_signal: {
+    id: 'ohsumi_signal',
+    symbol: '⊙·∿·□',
+    name: 'Ohsumi Signal',
+    description: 'Write "autophagy", "self-eating", "lysosome", or "cellular recycling" in any journal entry',
+    unlockMessage: '↳ Autophagy: the cell eating itself to survive. Ohsumi won the 2016 Nobel for mapping its mechanism. The body has a recycling program. You activated the signal. ⊙·∿·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  satchin_clock: {
+    id: 'satchin_clock',
+    symbol: '⊙·≋·□',
+    name: 'Satchin Clock',
+    description: 'Write "satchin panda", "time-restricted", "circadian clock gene", "per gene", or "cry gene" in any journal entry',
+    unlockMessage: '↳ Satchidananda Panda mapped the clock gene cascade: PER, CRY, BMAL1, CLOCK. Time-restricted eating is his protocol. The timing of eating is as important as the food. ⊙·≋·□',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  blue_zones_key: {
+    id: 'blue_zones_key',
+    symbol: '⊙·∞',
+    name: 'Blue Zones Key',
+    description: 'Write "blue zones", "okinawa centenarian", "sardinia longevity", "nicoya", or "ikaria" in any journal entry',
+    unlockMessage: '↳ Okinawa. Sardinia. Nicoya. Ikaria. Loma Linda. Five places where people forget to die. The common thread: purpose, community, movement, plants, and stopping when 80% full. ⊙·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8845,6 +9170,57 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
       if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
+    }
+
+    // ── v35 — THE BODY CLOCK ──────────────────────────────────────────────────
+    const clockV25Badges: BadgeType[] = [
+      'circadian_signal', 'melatonin_rise', 'cortisol_peak', 'fasting_state',
+      'mitochondria_charge', 'telomere_guard', 'microbiome_feed', 'vagus_tone',
+      'inflammation_low', 'homeostasis_held', 'adaptation_arc', 'chronotype_set',
+    ]
+    const clockV25Earned = clockV25Badges.filter(b => hasBadge(b))
+
+    if (clockV25Earned.length >= 1 && !hasBadge('clock_initiate')) {
+      if (awardBadge('clock_initiate')) newBadges.push('clock_initiate')
+    }
+    if (clockV25Earned.length >= 5 && !hasBadge('clock_class')) {
+      if (awardBadge('clock_class')) newBadges.push('clock_class')
+    }
+    const clockComplete = clockV25Earned.length >= 12
+    if (clockComplete && !hasBadge('clock_complete')) {
+      if (awardBadge('clock_complete')) newBadges.push('clock_complete')
+    }
+    const calendarV23Badges: BadgeType[] = ['circadian_prize', 'cannon_day', 'cornaro_fast']
+    if (clockComplete && calendarV23Badges.every(b => hasBadge(b)) && !hasBadge('soma_arc')) {
+      if (awardBadge('soma_arc')) newBadges.push('soma_arc')
+    }
+    if (clockComplete && hasBadge('body_session') && !hasBadge('clock_opus')) {
+      if (awardBadge('clock_opus')) newBadges.push('clock_opus')
+    }
+    const engineTwentyFivePresent = clockV25Earned.length >= 1
+    const allTwentyFiveEngines = allTwentyFourEngines && engineTwentyFivePresent
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_engines_arc')) {
+      if (awardBadge('twenty_five_engines_arc')) newBadges.push('twenty_five_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('vitality_deep')) {
+        if (awardBadge('vitality_deep')) newBadges.push('vitality_deep')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('pulse_vault')) {
+        if (awardBadge('pulse_vault')) newBadges.push('pulse_vault')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupClock = new Date(stats.signupDate)
+      const yearsClock = (new Date().getTime() - signupClock.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsClock >= 10 && !hasBadge('elder_body')) {
+        if (awardBadge('elder_body')) newBadges.push('elder_body')
+      }
+    }
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
+      if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
     }
 
   } catch (error) {

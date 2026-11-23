@@ -904,6 +904,22 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awardBadge('perchance')
     awarded.push('perchance')
   }
+  // ── Calendar v23 — BODY CLOCK CALENDAR ───────────────────────────────────────
+  // Circadian Prize: October 2 — Nobel Prize for Circadian Rhythm Research (2017)
+  if (!hasBadge('circadian_prize') && month === 10 && day === 2) {
+    awardBadge('circadian_prize')
+    awarded.push('circadian_prize')
+  }
+  // Cannon Day: February 8 — Walter Cannon born 1871 (coined "homeostasis")
+  if (!hasBadge('cannon_day') && month === 2 && day === 8) {
+    awardBadge('cannon_day')
+    awarded.push('cannon_day')
+  }
+  // Cornaro Fast: August 29 — Luigi Cornaro began his longevity diet c. 1464
+  if (!hasBadge('cornaro_fast') && month === 8 && day === 29) {
+    awardBadge('cornaro_fast')
+    awarded.push('cornaro_fast')
+  }
 
   return awarded
 }
@@ -1551,6 +1567,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /\bcollective[\s-]?unconscious\b|\bshadow[\s-]?self\b|\bindividuation\b/i,          badge: 'jung_cipher' },
   { patterns: /\bmorpheus\b|\bgod[\s-]?of[\s-]?dreams\b|\bdream[\s-]?lord\b/i,                    badge: 'morpheus_key' },
   { patterns: /\bdoors[\s-]?of[\s-]?perception\b|\bmescaline\b|\bopening[\s-]?the[\s-]?doors\b/i, badge: 'doors_perception' },
+  // ── v25 Word Turns — THE BODY CLOCK ─────────────────────────────────────────
+  { patterns: /\bcircadian\b|\bcircadian[\s-]?rhythm\b|\bbody[\s-]?clock\b|\bbiological[\s-]?clock\b/i, badge: 'circadian_signal' },
+  { patterns: /\bmelatonin\b|\bmelatonin[\s-]?surge\b|\bsleep[\s-]?hormone\b/i,                  badge: 'melatonin_rise' },
+  { patterns: /\bcortisol\b|\bcortisol[\s-]?spike\b|\bcortisol[\s-]?awakening\b/i,               badge: 'cortisol_peak' },
+  { patterns: /\bfasting\b|\bintermittent[\s-]?fast(?:ing)?\b|\btime[\s-]?restricted[\s-]?eating\b|\bfasted[\s-]?state\b/i, badge: 'fasting_state' },
+  { patterns: /\bmitochondria\b|\bmitochondrial[\s-]?function\b|\bcellular[\s-]?energy\b/i,       badge: 'mitochondria_charge' },
+  { patterns: /\btelomere\b|\btelomere[\s-]?length\b|\bcellular[\s-]?aging\b|\bsenescence\b/i,    badge: 'telomere_guard' },
+  { patterns: /\bmicrobiome\b|\bgut[\s-]?bacteria\b|\bgut[\s-]?flora\b|\bintestinal[\s-]?flora\b/i, badge: 'microbiome_feed' },
+  { patterns: /\bvagus[\s-]?nerve\b|\bvagal[\s-]?tone\b|\bheart[\s-]?rate[\s-]?variability\b|\bhrv\b/i, badge: 'vagus_tone' },
+  { patterns: /\binflammation\b|\banti[\s-]?inflammatory\b|\binflammatory[\s-]?response\b/i,      badge: 'inflammation_low' },
+  { patterns: /\bhomeostasis\b|\ballostasis\b|\bhomeostatic[\s-]?balance\b|\bhormetic\b/i,        badge: 'homeostasis_held' },
+  { patterns: /\bhormesis\b|\badaptive[\s-]?response\b|\bstress[\s-]?adaptation\b|\badaptation[\s-]?arc\b/i, badge: 'adaptation_arc' },
+  { patterns: /\bchronotype\b|\bmorning[\s-]?lark\b|\bevening[\s-]?owl\b|\bmorningness\b/i,       badge: 'chronotype_set' },
+  // ── v25 Secret Boss — BODY KEYS word triggers ────────────────────────────────
+  { patterns: /\bautophagy\b|\bself[\s-]?eating\b|\blysosome\b|\bcellular[\s-]?recycling\b/i,     badge: 'ohsumi_signal' },
+  { patterns: /\bsatchin[\s-]?panda\b|\btime[\s-]?restricted\b|\bcircadian[\s-]?clock[\s-]?gene\b|\bper[\s-]?gene\b|\bcry[\s-]?gene\b/i, badge: 'satchin_clock' },
+  { patterns: /\bblue[\s-]?zones\b|\bokinawa[\s-]?centenarian\b|\bsardinia[\s-]?longevity\b|\bnicoya\b|\bikaria\b/i, badge: 'blue_zones_key' },
 ]
 
 /**
@@ -2873,6 +2906,53 @@ export function checkLongVision(journalText: string): BadgeType | null {
   if (journalText.length >= 777) {
     awardBadge('long_vision')
     return 'long_vision'
+  }
+  return null
+}
+
+// ── v35 — THE BODY CLOCK — behavioral triggers ───────────────────────────────
+
+const BODY_WORDS_V25 = [
+  /\bcircadian\b|\bcircadian[\s-]?rhythm\b|\bbody[\s-]?clock\b/i,
+  /\bmelatonin\b|\bsleep[\s-]?hormone\b/i,
+  /\bcortisol\b|\bcortisol[\s-]?spike\b/i,
+  /\bfasting\b|\bintermittent[\s-]?fast(?:ing)?\b/i,
+  /\bmitochondria\b|\bmitochondrial\b/i,
+  /\btelomere\b|\btelomere[\s-]?length\b/i,
+  /\bmicrobiome\b|\bgut[\s-]?bacteria\b/i,
+  /\bvagus[\s-]?nerve\b|\bvagal[\s-]?tone\b/i,
+  /\binflammation\b|\banti[\s-]?inflammatory\b/i,
+  /\bhomeostasis\b|\ballostasis\b/i,
+  /\bhormesis\b|\badaptive[\s-]?response\b/i,
+  /\bchronotype\b|\bmorning[\s-]?lark\b|\bevening[\s-]?owl\b/i,
+]
+
+export function checkBodySession(journalText: string): BadgeType | null {
+  if (hasBadge('body_session')) return null
+  const count = BODY_WORDS_V25.filter(re => re.test(journalText)).length
+  if (count >= 3) {
+    awardBadge('body_session')
+    return 'body_session'
+  }
+  return null
+}
+
+export function checkOptimalWindow(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('optimal_window')) return null
+  const hour = new Date().getHours()
+  if (hour >= 6 && hour <= 8) {
+    awardBadge('optimal_window')
+    return 'optimal_window'
+  }
+  return null
+}
+
+export function checkLongPulse(journalText: string): BadgeType | null {
+  if (hasBadge('long_pulse')) return null
+  if (journalText.length >= 888) {
+    awardBadge('long_pulse')
+    return 'long_pulse'
   }
   return null
 }
