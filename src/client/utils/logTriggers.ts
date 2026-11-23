@@ -115,3 +115,46 @@ export function detectNewTriggers(
   current.forEach(t => { if (!prior.has(t)) fresh.push(t) })
   return fresh
 }
+
+/**
+ * LOT® Email command parser.
+ *
+ *   /email to Hitomi: Tea at 5?
+ *   /email to Hitomi K.
+ *   Lines after the command become the body.
+ *
+ * Returns null when no command is present. `body` may be empty while
+ * the user is still composing — the call site decides when to send.
+ */
+export interface EmailCommand {
+  to: string
+  body: string
+}
+
+export function parseEmailCommand(text: string): EmailCommand | null {
+  if (!text) return null
+  const lines = text.split('\n')
+  const idx = lines.findIndex(l => /^\s*\/email\s+to\s+\S/i.test(l))
+  if (idx === -1) return null
+  const m = lines[idx].match(/^\s*\/email\s+to\s+(.+)$/i)
+  if (!m) return null
+  let head = m[1].trim()
+  let inline = ''
+  const colon = head.indexOf(':')
+  if (colon > -1) {
+    inline = head.slice(colon + 1).trim()
+    head = head.slice(0, colon).trim()
+  } else {
+    // No colon: name is first word (+ optional "X." initial), rest is body
+    const nm = head.match(/^(\S+)(\s+[A-Za-z]\.)?\s*(.*)$/)
+    if (nm) {
+      inline = (nm[3] || '').trim()
+      head = (nm[1] + (nm[2] || '')).trim()
+    }
+  }
+  const to = head.replace(/[,;]+$/, '').trim()
+  if (!to) return null
+  const after = lines.slice(idx + 1).join('\n').trim()
+  const body = [inline, after].filter(Boolean).join('\n').trim()
+  return { to, body }
+}

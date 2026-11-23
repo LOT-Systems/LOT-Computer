@@ -28,13 +28,14 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, parseEmailCommand, type LogTrigger } from '#client/utils/logTriggers'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
-import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
+import { recordSignal, recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, useSendEmail } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
+import { $emailDraftTo } from '#client/stores/lotEmail'
 import { getFastingState } from '#client/utils/fasting'
 
 const localStore = {
@@ -3713,6 +3714,45 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email — "/email to Hitomi: message" composes; SEND delivers to Sync
+  const emailCmd = React.useMemo(() => parseEmailCommand(value), [value])
+  const [emailStatus, setEmailStatus] = React.useState<string | null>(null)
+  const { mutate: sendEmail, isLoading: emailSending } = useSendEmail({
+    onSuccess: (data) => {
+      const name = `${data.to.firstName || ''}${data.to.lastName ? ' ' + data.to.lastName.charAt(0) + '.' : ''}`.trim()
+      const t = dayjs().format('HH:mm')
+      setEmailStatus(`SENT            ${name.toUpperCase()} · ${t}`)
+      // Disarm the command in-place so it persists as a record, not a draft
+      const current = valueRef.current
+      const updated = current.replace(/^(\s*)\/email\s+to\s+[^\n]*/im, (line) =>
+        line.replace(/\/email\s+to\s+/i, '✉ Email to ')
+      )
+      setValue(updated)
+      valueRef.current = updated
+      onChangeRef.current(updated)
+      setIsSaved(true)
+      try { recordSignal('log', 'direct_message_sent', { channel: 'lot_email', hour: new Date().getHours() }) } catch {}
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error || 'DELIVERY FAILED'
+      setEmailStatus(`ERROR           ${String(msg).toUpperCase()}`)
+    },
+  })
+  // Seed a draft handed off from Cohort / Sync ("Email" buttons)
+  const emailDraftTo = useStore($emailDraftTo)
+  React.useEffect(() => {
+    if (!primary || !emailDraftTo) return
+    $emailDraftTo.set(null)
+    const current = valueRef.current || ''
+    if (parseEmailCommand(current)) return
+    const sep = current.trim() ? '\n\n' : ''
+    const updated = current + sep + `/email to ${emailDraftTo}: `
+    setValue(updated)
+    valueRef.current = updated
+  }, [emailDraftTo, primary])
+  React.useEffect(() => {
+    if (emailCmd) setEmailStatus((s) => (s && s.startsWith('SENT') ? s : null))
+  }, [emailCmd?.to])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -4132,6 +4172,7 @@ const NoteEditor = ({
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
           '/fast         Orthodox fasting calendar',
+          '/email to Hitomi: text   LOT Email — delivered to Sync',
           '/breathe      4-2-6 breathing exercise',
           '/freeze       Pause and reflect protocol',
           '/silent       Signal silence check',
@@ -4384,6 +4425,33 @@ const NoteEditor = ({
           <div className="mt-8">
             <Block label="PHYS:" blockView>
               <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{physResult}</div>
+            </Block>
+          </div>
+        )}
+        {(emailCmd || emailStatus) && (
+          <div className="mt-8">
+            <Block label="EMAIL:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {emailCmd && (
+                  <>
+                    {`TO              ${emailCmd.to.toUpperCase()}\n`}
+                    {`BODY            ${emailCmd.body ? emailCmd.body.length + ' CHARS' : 'WRITE BELOW THE COMMAND'}\n`}
+                    {`CHANNEL         LOT COMMUNITY · SYNC`}
+                  </>
+                )}
+                {emailStatus && <div>{emailStatus}</div>}
+              </div>
+              {emailCmd && (
+                <div className="mt-8">
+                  <Button
+                    size="small"
+                    disabled={!emailCmd.body || emailSending}
+                    onClick={() => sendEmail({ to: emailCmd.to, message: emailCmd.body })}
+                  >
+                    {emailSending ? 'Sending…' : 'Send'}
+                  </Button>
+                </div>
+              )}
             </Block>
           </div>
         )}

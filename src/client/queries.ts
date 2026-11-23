@@ -120,6 +120,28 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+export interface LotEmailRecord {
+  id: string
+  senderId: string
+  senderName: string
+  message: string
+  createdAt: string
+}
+
+export const useEmailInbox = createQuery<LotEmailRecord[]>('/api/email/inbox', {
+  refetchOnWindowFocus: true,
+})
+
+export const useSendEmail = createMutation<
+  { to: string; message: string },
+  {
+    id: string
+    to: { id: string; firstName: string | null; lastName: string | null; city: string | null }
+    alternatives: number
+    createdAt: string
+  }
+>('post', '/api/email')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })
