@@ -8745,6 +8745,108 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
     }
 
+    // ── v33 — THE ARCANE TERMINAL ──────────────────────────────────────────────
+    const arcaneV23Badges: BadgeType[] = [
+      'arcane_signal', 'grimoire_deep', 'incantation_cast', 'ward_placed',
+      'transmute_active', 'sigil_carved', 'familiar_bound', 'sanctum_found',
+      'alchemy_process', 'cipher_broken', 'rune_inscribed', 'nexus_activated',
+    ]
+    const arcaneV23Earned = arcaneV23Badges.filter(b => hasBadge(b))
+
+    if (arcaneV23Earned.length >= 1 && !hasBadge('arcane_adept')) {
+      if (awardBadge('arcane_adept')) newBadges.push('arcane_adept')
+    }
+    if (arcaneV23Earned.length >= 5 && !hasBadge('arcane_apprentice')) {
+      if (awardBadge('arcane_apprentice')) newBadges.push('arcane_apprentice')
+    }
+    const arcaneComplete = arcaneV23Earned.length >= 12
+    if (arcaneComplete && !hasBadge('arcane_complete')) {
+      if (awardBadge('arcane_complete')) newBadges.push('arcane_complete')
+    }
+    const calendarV21Badges: BadgeType[] = ['alchemy_day', 'newton_stone', 'dee_day']
+    if (arcaneComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('alchemy_arc')) {
+      if (awardBadge('alchemy_arc')) newBadges.push('alchemy_arc')
+    }
+    if (arcaneComplete && hasBadge('arcane_session') && !hasBadge('arcane_opus')) {
+      if (awardBadge('arcane_opus')) newBadges.push('arcane_opus')
+    }
+    const engineTwentyThreePresent = arcaneV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1000 && !hasBadge('archive_deep')) {
+        if (awardBadge('archive_deep')) newBadges.push('archive_deep')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('tome_of_ages')) {
+        if (awardBadge('tome_of_ages')) newBadges.push('tome_of_ages')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAncient = new Date(stats.signupDate)
+      const yearsAncient = (new Date().getTime() - signupAncient.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAncient >= 8 && !hasBadge('ancient_one')) {
+        if (awardBadge('ancient_one')) newBadges.push('ancient_one')
+      }
+    }
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // ── v34 — THE DREAM LABORATORY ────────────────────────────────────────────
+    const dreamV24Badges: BadgeType[] = [
+      'lucid_dreamer', 'hypnagogic_state', 'rem_signal', 'theta_wave',
+      'delta_deep', 'somatic_check', 'vision_logged', 'subconscious_map',
+      'dream_symbol', 'sleep_gate', 'night_journal', 'dreamscape',
+    ]
+    const dreamV24Earned = dreamV24Badges.filter(b => hasBadge(b))
+
+    if (dreamV24Earned.length >= 1 && !hasBadge('dream_initiate')) {
+      if (awardBadge('dream_initiate')) newBadges.push('dream_initiate')
+    }
+    if (dreamV24Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV24Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+    const calendarV22Badges: BadgeType[] = ['jung_birthday', 'freud_day', 'perchance']
+    if (dreamComplete && calendarV22Badges.every(b => hasBadge(b)) && !hasBadge('somnium_arc')) {
+      if (awardBadge('somnium_arc')) newBadges.push('somnium_arc')
+    }
+    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+    const engineTwentyFourPresent = dreamV24Earned.length >= 1
+    const allTwentyFourEngines = allTwentyThreeEngines && engineTwentyFourPresent
+    if (allTwentyFourEngines && !hasBadge('twenty_four_engines_arc')) {
+      if (awardBadge('twenty_four_engines_arc')) newBadges.push('twenty_four_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('sleep_log_deep')) {
+        if (awardBadge('sleep_log_deep')) newBadges.push('sleep_log_deep')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('word_vault')) {
+        if (awardBadge('word_vault')) newBadges.push('word_vault')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDreamer = new Date(stats.signupDate)
+      const yearsDreamer = (new Date().getTime() - signupDreamer.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDreamer >= 9 && !hasBadge('dreamer_elder')) {
+        if (awardBadge('dreamer_elder')) newBadges.push('dreamer_elder')
+      }
+    }
+    if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
+      if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
+    }
+
   } catch (error) {
     console.warn('Badge check failed:', error)
   }

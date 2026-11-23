@@ -871,6 +871,40 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE ARCANE CALENDAR ───────────────────────────────────────
+  // Alchemy Day: September 25 — Paracelsus born 1493
+  if (!hasBadge('alchemy_day') && month === 9 && day === 25) {
+    awardBadge('alchemy_day')
+    awarded.push('alchemy_day')
+  }
+  // Newton Stone: January 4 — Isaac Newton born 1643
+  if (!hasBadge('newton_stone') && month === 1 && day === 4) {
+    awardBadge('newton_stone')
+    awarded.push('newton_stone')
+  }
+  // Dee Day: July 13 — John Dee born 1527
+  if (!hasBadge('dee_day') && month === 7 && day === 13) {
+    awardBadge('dee_day')
+    awarded.push('dee_day')
+  }
+
+  // ── Calendar v22 — THE DREAM CALENDAR ────────────────────────────────────────
+  // Jung Birthday: July 26 — Carl Jung born 1875
+  if (!hasBadge('jung_birthday') && month === 7 && day === 26) {
+    awardBadge('jung_birthday')
+    awarded.push('jung_birthday')
+  }
+  // Freud Day: May 6 — Sigmund Freud born 1856
+  if (!hasBadge('freud_day') && month === 5 && day === 6) {
+    awardBadge('freud_day')
+    awarded.push('freud_day')
+  }
+  // Perchance: November 2 — Día de los Muertos, dreams of ancestors
+  if (!hasBadge('perchance') && month === 11 && day === 2) {
+    awardBadge('perchance')
+    awarded.push('perchance')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1517,40 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCANE TERMINAL ─────────────────────────────────────────────────
+  { patterns: /\barcane\b|\barcane[\s-]?arts\b|\barcane[\s-]?knowledge\b/i,                       badge: 'arcane_signal' },
+  { patterns: /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b/i,                  badge: 'grimoire_deep' },
+  { patterns: /\bincantation\b|\bsacred[\s-]?words\b|\bspoken[\s-]?into[\s-]?being\b/i,           badge: 'incantation_cast' },
+  { patterns: /\bwarding\b|\bprotective[\s-]?ward\b|\bward[\s-]?placed\b/i,                        badge: 'ward_placed' },
+  { patterns: /\btransmute\b|\btransmutation\b|\bbase[\s-]?into[\s-]?gold\b/i,                    badge: 'transmute_active' },
+  { patterns: /\bsigils?\b|\bsacred[\s-]?symbol\b|\bthe[\s-]?sigil\b/i,                           badge: 'sigil_carved' },
+  { patterns: /\bspirit[\s-]?animal\b|\bcompanion[\s-]?spirit\b|\bmy[\s-]?familiar\b/i,           badge: 'familiar_bound' },
+  { patterns: /\bsanctum\b|\binner[\s-]?sanctum\b|\bsanctuary\b|\bsacred[\s-]?space\b/i,          badge: 'sanctum_found' },
+  { patterns: /\balchemic(al)?\b|\bthe[\s-]?great[\s-]?work\b|\balchemist'?s?\b/i,               badge: 'alchemy_process' },
+  { patterns: /\bdecipher\b|\bencoded\b|\bthe[\s-]?code[\s-]?beneath\b|\bbreak[\s-]?the[\s-]?cipher\b/i, badge: 'cipher_broken' },
+  { patterns: /\brunic\b|\bancient[\s-]?marks\b|\bcarved[\s-]?in[\s-]?stone\b|\bthe[\s-]?runes\b/i, badge: 'rune_inscribed' },
+  { patterns: /\bpower[\s-]?nexus\b|\bconvergence[\s-]?point\b|\bthe[\s-]?nexus\b/i,             badge: 'nexus_activated' },
+  // ── v23 Secret Boss — THE HIDDEN CODEX word triggers ─────────────────────────
+  { patterns: /\bparacelsus\b|\bquinta[\s-]?essentia\b|\bsulfur[\s-]?mercury\b/i,                 badge: 'paracelsus_key' },
+  { patterns: /\bjohn[\s-]?dee\b|\benochian\b|\bangelic[\s-]?language\b|\bscrying[\s-]?mirror\b/i, badge: 'dee_cipher' },
+  { patterns: /\bemerald[\s-]?tablet\b|\bhermes[\s-]?trismegistus\b|\bas[\s-]?above[\s-]?so[\s-]?below\b/i, badge: 'emerald_tablet' },
+  // ── v24 — THE DREAM LABORATORY ───────────────────────────────────────────────
+  { patterns: /\blucid[\s-]?dream(?:ing)?\b|\bwake[\s-]?in[\s-]?the[\s-]?dream\b/i,              badge: 'lucid_dreamer' },
+  { patterns: /\bhypnagog(?:ic|ia)\b|\bthe[\s-]?edge[\s-]?of[\s-]?sleep\b/i,                      badge: 'hypnagogic_state' },
+  { patterns: /\brem[\s-]?sleep\b|\brapid[\s-]?eye[\s-]?movement\b|\bdream[\s-]?cycle\b/i,        badge: 'rem_signal' },
+  { patterns: /\btheta[\s-]?waves?\b|\btheta[\s-]?state\b|\btheta[\s-]?rhythm\b/i,               badge: 'theta_wave' },
+  { patterns: /\bdelta[\s-]?sleep\b|\bdelta[\s-]?waves?\b|\bdeepest[\s-]?sleep\b/i,              badge: 'delta_deep' },
+  { patterns: /\bsomatic\b|\bbody[\s-]?held\b|\bfelt[\s-]?sense\b|\bbody[\s-]?knows\b/i,         badge: 'somatic_check' },
+  { patterns: /\binner[\s-]?vision\b|\bwaking[\s-]?vision\b|\bvisionary\b/i,                      badge: 'vision_logged' },
+  { patterns: /\bsubconscious[\s-]?mind\b|\bbeneath[\s-]?the[\s-]?surface\b|\bshadow[\s-]?layer\b/i, badge: 'subconscious_map' },
+  { patterns: /\bdream[\s-]?symbols?\b|\brecurring[\s-]?dream\b|\bthe[\s-]?dream[\s-]?showed\b/i, badge: 'dream_symbol' },
+  { patterns: /\bsleep[\s-]?hygiene\b|\bsleep[\s-]?ritual\b|\bentering[\s-]?sleep\b|\bsleep[\s-]?gate\b/i, badge: 'sleep_gate' },
+  { patterns: /\bdream[\s-]?journal\b|\bmorning[\s-]?pages\b|\bwrote[\s-]?at[\s-]?dawn\b/i,      badge: 'night_journal' },
+  { patterns: /\bdreamscape\b|\bthe[\s-]?dreaming\b|\bdream[\s-]?world\b/i,                        badge: 'dreamscape' },
+  // ── v24 Secret Boss — DREAM KEYS word triggers ───────────────────────────────
+  { patterns: /\bcollective[\s-]?unconscious\b|\bshadow[\s-]?self\b|\bindividuation\b/i,          badge: 'jung_cipher' },
+  { patterns: /\bmorpheus\b|\bgod[\s-]?of[\s-]?dreams\b|\bdream[\s-]?lord\b/i,                    badge: 'morpheus_key' },
+  { patterns: /\bdoors[\s-]?of[\s-]?perception\b|\bmescaline\b|\bopening[\s-]?the[\s-]?doors\b/i, badge: 'doors_perception' },
 ]
 
 /**
@@ -2711,6 +2779,100 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Arcane Terminal v23 behavioral checks ─────────────────────────────────────
+
+const ARCANE_WORDS_V23 = [
+  /\barcane\b|\barcane[\s-]?arts\b/i,
+  /\bgrimoire\b|\bspell[\s-]?book\b|\bbook[\s-]?of[\s-]?shadows\b/i,
+  /\bincantation\b|\bsacred[\s-]?words\b/i,
+  /\bwarding\b|\bprotective[\s-]?ward\b/i,
+  /\btransmute\b|\btransmutation\b/i,
+  /\bsigils?\b|\bsacred[\s-]?symbol\b/i,
+  /\bspirit[\s-]?animal\b|\bcompanion[\s-]?spirit\b/i,
+  /\bsanctum\b|\binner[\s-]?sanctum\b/i,
+  /\balchemic(al)?\b|\bthe[\s-]?great[\s-]?work\b/i,
+  /\bdecipher\b|\bencoded\b|\bthe[\s-]?code[\s-]?beneath\b/i,
+  /\brunic\b|\bancient[\s-]?marks\b/i,
+  /\bpower[\s-]?nexus\b|\bconvergence[\s-]?point\b/i,
+]
+
+export function checkArcaneSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcane_session')) return null
+  const matchCount = ARCANE_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('arcane_session')
+    return 'arcane_session'
+  }
+  return null
+}
+
+export function checkMidnightRitual(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_ritual')) return null
+  const now = new Date()
+  if (now.getHours() === 0 && now.getMinutes() >= 1) {
+    awardBadge('midnight_ritual')
+    return 'midnight_ritual'
+  }
+  return null
+}
+
+export function checkLongSpell(journalText: string): BadgeType | null {
+  if (hasBadge('long_spell')) return null
+  if (journalText.length >= 666) {
+    awardBadge('long_spell')
+    return 'long_spell'
+  }
+  return null
+}
+
+// ── Dream Laboratory v24 behavioral checks ────────────────────────────────────
+
+const DREAM_WORDS_V24 = [
+  /\blucid[\s-]?dream(?:ing)?\b|\bwake[\s-]?in[\s-]?the[\s-]?dream\b/i,
+  /\bhypnagog(?:ic|ia)\b|\bthe[\s-]?edge[\s-]?of[\s-]?sleep\b/i,
+  /\brem[\s-]?sleep\b|\brapid[\s-]?eye[\s-]?movement\b|\bdream[\s-]?cycle\b/i,
+  /\btheta[\s-]?waves?\b|\btheta[\s-]?state\b/i,
+  /\bdelta[\s-]?sleep\b|\bdelta[\s-]?waves?\b|\bdeepest[\s-]?sleep\b/i,
+  /\bsomatic\b|\bbody[\s-]?held\b|\bfelt[\s-]?sense\b/i,
+  /\binner[\s-]?vision\b|\bwaking[\s-]?vision\b|\bvisionary\b/i,
+  /\bsubconscious[\s-]?mind\b|\bbeneath[\s-]?the[\s-]?surface\b/i,
+  /\bdream[\s-]?symbols?\b|\brecurring[\s-]?dream\b/i,
+  /\bsleep[\s-]?hygiene\b|\bsleep[\s-]?ritual\b|\bentering[\s-]?sleep\b/i,
+  /\bdream[\s-]?journal\b|\bmorning[\s-]?pages\b/i,
+  /\bdreamscape\b|\bthe[\s-]?dreaming\b|\bdream[\s-]?world\b/i,
+]
+
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (hasBadge('dream_session')) return null
+  const matchCount = DREAM_WORDS_V24.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+export function checkDawnDreamer(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_dreamer')) return null
+  const hour = new Date().getHours()
+  if (hour >= 4 && hour < 6) {
+    awardBadge('dawn_dreamer')
+    return 'dawn_dreamer'
+  }
+  return null
+}
+
+export function checkLongVision(journalText: string): BadgeType | null {
+  if (hasBadge('long_vision')) return null
+  if (journalText.length >= 777) {
+    awardBadge('long_vision')
+    return 'long_vision'
   }
   return null
 }
