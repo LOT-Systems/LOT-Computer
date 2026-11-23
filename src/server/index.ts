@@ -37,6 +37,7 @@ import authRoutes from './routes/auth.js'
 import apiRoutes from './routes/api.js'
 import adminApiRoutes from './routes/admin-api.js'
 import publicApiRoutes from './routes/public-api.js'
+import { deviceApiRoutes, deviceUserRoutes } from './routes/device-api.js'
 
 const CWD = process.cwd()
 
@@ -311,6 +312,11 @@ fastify.register(async (fastify: FastifyInstance) => {
     // Public API
     fastify.register(authRoutes, { prefix: '/auth' })
 
+    // LOT·01 device API (bearer-token auth, outside the session-only /api group)
+    if (config.devices.enabled) {
+      fastify.register(deviceApiRoutes, { prefix: '/device-api/v1' })
+    }
+
     // User API
     fastify.register(async (fastify) => {
       fastify.addHook('onRequest', async (req, reply) => {
@@ -320,6 +326,9 @@ fastify.register(async (fastify: FastifyInstance) => {
         }
       })
       fastify.register(apiRoutes, { prefix: '/api' })
+      if (config.devices.enabled) {
+        fastify.register(deviceUserRoutes, { prefix: '/api' })
+      }
     })
 
     // Admin API (accessible by Usership members only)

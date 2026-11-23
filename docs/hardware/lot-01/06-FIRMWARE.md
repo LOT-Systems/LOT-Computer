@@ -55,3 +55,11 @@ pio run -e lot01 -t upload  # flash devkit (P1: ESP32-S3-DevKitC-1)
 pio device monitor
 ```
 For P1, set `LOT_API_BASE` in `config.h` to the simulator (`node ../connector/lot-device-sim.mjs --serve`) or to staging.
+
+
+## Native test (S02): firmware client ↔ real server, no ESP32 toolchain needed
+`firmware/test/native/` compiles the **unmodified** `src/lot_api.cpp` on Linux with g++ and the real ArduinoJson 7.2.1. It uses small shims (`Arduino.h` String/Stream, `HTTPClient` backed by curl, `WiFi`), then runs the full protocol against `connector/device-api.itest.mjs --serve`: pair → claim → token → empty inbox → "Coffee time!" → ack → since-cursor → Copy → Log row → telemetry → bad-token rejection. **Result: 12/12 pass.** The production TLS path (`setCACert`) also compiles.
+
+Not yet covered: `main.cpp` and `hw.cpp`, which need the ESP32 core plus the BSEC2, SharpMem and MAX1704x libraries. Those need `pio run -e lot01-p1` on a machine that can reach `dl.platformio.org`. This session's network blocked it.
+
+**TLS roots (S02):** `lot_api.cpp` now embeds ISRG Root X1 + X2 (Let's Encrypt) in place of the placeholder. Verify the live chain of lot-systems.com before PVT. If the edge uses Google Trust Services, add GTS Root R1/R4.

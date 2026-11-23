@@ -24,6 +24,26 @@ interface JobResult {
   signalsCreated?: number
 }
 
+/**
+ * LOT·01 hardware pager: queue short AI nudges ("Coffee time!") for paired devices.
+ * Guarded by config.devices.enabled; failures never block the other jobs.
+ */
+async function executeDeviceNudgeJob(): Promise<void> {
+  try {
+    const { default: config } = await import('#server/config')
+    if (!config.devices.enabled) return
+    const { sequelize } = await import('#server/utils/db')
+    const { aiEngineManager } = await import('#server/utils/ai-engines')
+    const { runDeviceNudgeJob } = await import('#server/utils/device-nudges')
+    const queued = await runDeviceNudgeJob(sequelize, (prompt) =>
+      aiEngineManager.getEngine('auto').generateCompletion(prompt, 40)
+    )
+    if (queued) console.log(`📟 LOT·01 device nudges queued: ${queued}`)
+  } catch (error: any) {
+    console.error('LOT·01 device nudge job failed:', error.message)
+  }
+}
+
 let isMonthlyEmailJobRunning = false
 let lastMonthlyEmailRun: Date | null = null
 
@@ -1539,6 +1559,9 @@ async function executeDailySystemicReadinessCheck(): Promise<JobResult> {
  * Called periodically by the scheduler
  */
 export async function checkAndRunScheduledJobs(): Promise<void> {
+  // LOT·01 device nudges (hourly, only when LOT_DEVICES_ENABLED=true)
+  await executeDeviceNudgeJob()
+
   // Check monthly email job
   if (shouldRunMonthlyEmailJob()) {
     await executeMonthlyEmailJob()

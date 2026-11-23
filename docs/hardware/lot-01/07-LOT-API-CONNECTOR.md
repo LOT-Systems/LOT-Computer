@@ -2,7 +2,13 @@
 
 The device talks to the LOT server over HTTPS + JSON under a new prefix, **`/device-api/v1`**. It sits *outside* `/api`, because `/api` requires a browser session cookie (`server.ts` → `onRequest` → `req.user`). Device calls carry a bearer token instead.
 
-Reference implementation (draft, not wired in): `connector/device-api.draft.ts` and `connector/migration.draft.sql`. Simulator: `connector/lot-device-sim.mjs`.
+**Status (S02, 2026-11-23): wired into the server behind `LOT_DEVICES_ENABLED=true` (default off).**
+- Routes: `src/server/routes/device-api.ts` → `/device-api/v1/*` (bearer token) and `/api/devices/*` (session: `claim`, list, `DELETE /:id` revoke, `test`)
+- Registration: `src/server/index.ts` (outside the session-only `/api` hook; device routes are registered only when the flag is on)
+- Migration: `migrations/20261123120000_add-lot-devices.cjs` (additive: `devices`, `device_pairings`, `device_notifications`; needs Postgres ≥ 13 for `gen_random_uuid()`)
+- AI nudge job: `src/server/utils/device-nudges.ts`, called hourly from `scheduled-jobs.ts`. At most 4 AI nudges per 24 h, ≥ 3 h apart, local 08:00–21:00 only, ASCII ≤ 64 chars, with a static fallback when no AI engine is available
+- Tests: `connector/device-api.itest.mjs` (27 checks against real Postgres) · `firmware/test/native/run.sh` (12 checks: the real firmware client against the real routes)
+- Simulator (no deps): `connector/lot-device-sim.mjs`
 
 ## 1. Pairing (device-code flow, like a TV app)
 
@@ -62,3 +68,17 @@ Example output: `"Coffee time!"`, `"Rain at 16:00 — take the umbrella."`, `"Lo
 - Rate limit per device: 120 req/h. `/pair/*` is limited per IP.
 - TLS 1.2+, with the server CA bundle pinned in firmware (ISRG Root X1 + backup root).
 - The device never receives other users' data; inbox scope is `device.userId`.
+
+
+## Session endpoints for Settings → Devices (S02)
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| POST | `/api/devices/claim` | `{user_code}` (`LOT-` prefix and case optional) | `{ok, serial}` or 404 |
+| GET | `/api/devices` | — | `{devices:[{id, serial, hw, fw, name, last_seen_at, telemetry, created_at}]}` |
+| DELETE | `/api/devices/:id` | — | `{ok}`. Revokes the token immediately (the device gets 401 on its next poll) |
+| POST | `/api/devices/test` | `{t?}` | Queues `t` (default "Coffee time!") for delivery on the next poll |
+
+## Enabling on staging
+1. Deploy the branch. `production:run` applies the migration automatically.
+2. Set `LOT_DEVICES_ENABLED=true` on staging only, then restart.
+3. Run `firmware/test/native/run.sh` locally, or point a P1 devkit at `https://<staging>/device-api/v1`.

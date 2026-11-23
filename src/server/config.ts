@@ -53,6 +53,11 @@ const config = {
   anthropic: {
     apiKey: process.env.ANTHROPIC_API_KEY || '',
   },
+
+  // LOT·01 hardware pager (docs/hardware/lot-01). Off unless explicitly enabled.
+  devices: {
+    enabled: process.env.LOT_DEVICES_ENABLED === 'true',
+  },
 }
 
 validateConfig()

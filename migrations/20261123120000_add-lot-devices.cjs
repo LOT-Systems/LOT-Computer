@@ -1,5 +1,5 @@
 'use strict'
-// DRAFT — copy into /migrations when P2 starts. Creates the LOT·01 device tables.
+// LOT·01 hardware pager tables (docs/hardware/lot-01). Additive only; unused unless LOT_DEVICES_ENABLED=true.
 module.exports = {
   async up({ context: queryInterface }) {
     await queryInterface.sequelize.query(`

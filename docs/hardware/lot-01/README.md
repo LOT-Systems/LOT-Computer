@@ -16,14 +16,17 @@ A **40 × 40 × 5 mm two-part stainless-steel square**. One side is a polished m
 | 8 | [`08-CHARGER.md`](08-CHARGER.md) | Qi charging approach, v1 pad, v2 LOT puck |
 | 9 | [`09-USER-MANUAL.md`](09-USER-MANUAL.md) | End-user manual |
 | 10 | [`10-MANUFACTURING-100.md`](10-MANUFACTURING-100.md) | 100-unit PVT flow, QC, shipping |
+| 11 | [`11-P1-BENCH-ORDER.md`](11-P1-BENCH-ORDER.md) | P1 bench buying list with links, PCBWay quote request text, long-lead items |
 
 ## Code
 | Path | What | Verified |
 |---|---|---|
-| `firmware/` | PlatformIO project (ESP32-S3): `main.cpp` state machine, `lot_api` client, `hw` drivers | Not compiled: no toolchain in this environment |
-| `connector/device-api.draft.ts` | Fastify plugin for the server (not wired in) | Not type-checked: repo deps not installed in this environment |
-| `connector/20261122120000_create-lot-devices.draft.cjs` | DB migration draft | Not run |
-| `connector/lot-device-sim.mjs` | Zero-dependency mock server + device simulator | ✅ `node connector/lot-device-sim.mjs --selftest` passes 10/10 checks |
+| `src/server/routes/device-api.ts` (repo) | **Live server routes** behind `LOT_DEVICES_ENABLED` | ✅ tsc + server build green · ✅ 27/27 `connector/device-api.itest.mjs` on Postgres 16 |
+| `src/server/utils/device-nudges.ts` (repo) | Hourly AI "Coffee time!" job | ✅ in the itest (caps, gap, quiet hours, AI-down fallback) |
+| `migrations/20261123120000_add-lot-devices.cjs` (repo) | Device tables | ✅ applied with all repo migrations on Postgres 16 |
+| `firmware/` | PlatformIO project (ESP32-S3) | ✅ `lot_api.cpp` 12/12 native test against the real routes · ❌ full `pio run` blocked (no toolchain network) |
+| `firmware/test/native/` | Host shims + test driver | `run.sh` |
+| `connector/lot-device-sim.mjs` | Zero-dependency mock + simulator | ✅ selftest |
 
 ## PDF manuals → [`pdf/`](pdf/)
 `LOT-01_User-Manual.pdf` · `LOT-01_Firmware-Manual.pdf` · `LOT-01_LOT-API-Connector.pdf` · `LOT-01_Manufacturing-Manual.pdf` · `LOT-01_Plan-BOM-Roadmap.pdf`
