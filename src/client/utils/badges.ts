@@ -782,6 +782,80 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE ARCANE TERMINAL ──────────────────────────────────────
+  | 'arcane_signal'            // ∿·◈·∿  "arcane/arcane arts/arcane knowledge" (UNCOMMON)
+  | 'grimoire_deep'            // ◆·□·◆  "grimoire/spell book/book of shadows" (RARE)
+  | 'incantation_cast'         // ○·≋·○  "incantation/sacred words/spoken into being" (UNCOMMON)
+  | 'ward_placed'              // ─·◈·─  "ward/warding/protective ward" (RARE)
+  | 'transmute_active'         // ∘→◉    "transmute/transmutation/base into gold" (RARE)
+  | 'sigil_carved'             // ◈·∞·◈  "sigil/sacred symbol/the sigil" (EPIC)
+  | 'familiar_bound'           // ○·◆·○  "familiar/spirit animal/companion spirit" (UNCOMMON)
+  | 'sanctum_found'            // █·∘·█  "sanctum/inner sanctum/sanctuary/sacred space" (EPIC)
+  | 'alchemy_process'          // ∘→●→∞  "alchemy/alchemical/the great work" (RARE)
+  | 'cipher_broken'            // □·→·□  "cipher/decipher/encoded/the code beneath" (RARE)
+  | 'rune_inscribed'           // ─·◆·─  "rune/runic/ancient marks/carved in stone" (UNCOMMON)
+  | 'nexus_activated'          // ◉·◈·◉  "nexus/power nexus/convergence point" (EPIC)
+  // ── Calendar Easter Egg v21 — THE ARCANE CALENDAR ─────────────────────────────
+  | 'alchemy_day'              // ∘→●·∞  Sep 25 — Paracelsus born 1493 (RARE)
+  | 'newton_stone'             // ∞·■·∞  Jan 4 — Isaac Newton born 1643 (RARE)
+  | 'dee_day'                  // ◈·∿·◈  Jul 13 — John Dee born 1527 (RARE)
+  // ── Behavioral v20 — ARCANE PATTERNS ──────────────────────────────────────────
+  | 'arcane_session'           // ◈·≋·◈  3+ Arcane Terminal words in one entry (RARE)
+  | 'midnight_ritual'          // ◉·─·◉  Check in 00:01–00:59 local (RARE)
+  | 'long_spell'               // ≋·◆·≋  Journal entry >= 666 characters (EPIC)
+  // ── Achievement RPG v21 — THE ARCANE CLASS ────────────────────────────────────
+  | 'arcane_adept'             // ∘·◈    Any 1 Word Turn v23 badge (COMMON)
+  | 'arcane_apprentice'        // ≈·◈    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'arcane_complete'          // ≋·◈    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'alchemy_arc'              // ◈·∞·◈  arcane_complete + all 3 Calendar v21 (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·●·∞·∿  1 from each Word Turn v1–v23 (LEGENDARY)
+  | 'arcane_opus'              // ◈·◉·◈  arcane_complete + arcane_session (LEGENDARY)
+  // ── Mastery Tier v23 — THE GRAND ARCHIVE ──────────────────────────────────────
+  | 'archive_deep'             // ∿·∞·∿  1,000+ distinct calendar days (EPIC)
+  | 'tome_of_ages'             // ●·∞·●  200,000+ total journal words (LEGENDARY)
+  | 'ancient_one'              // ╔═╗·◈  Account age >= 8 years (LEGENDARY)
+  | 'twenty_three_registers'   // ◈·◈·●·∞·∿  1 from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE HIDDEN CODEX ───────────────────────────────────────
+  | 'paracelsus_key'           // ∘→∞·■  "paracelsus/quinta essentia/sulfur mercury" (RARE)
+  | 'dee_cipher'               // ◈·∿·□  "john dee/enochian/angelic language" (EPIC)
+  | 'emerald_tablet'           // ∞·◈·∞  "emerald tablet/hermes trismegistus/as above so below" (MYTHIC)
+  // ── Word Turn v24 — THE DREAM LABORATORY ─────────────────────────────────────
+  | 'lucid_dreamer'            // ◎·∿·◎  "lucid dream/wake in the dream" (RARE)
+  | 'hypnagogic_state'         // ∿·○·∿  "hypnagogic/the edge of sleep" (EPIC)
+  | 'rem_signal'               // ≋·○·≋  "rem sleep/rapid eye movement/dream cycle" (UNCOMMON)
+  | 'theta_wave'               // ∿·∿·∿  "theta/theta wave/theta state" (RARE)
+  | 'delta_deep'               // ───◉─  "delta sleep/delta wave/deep sleep" (RARE)
+  | 'somatic_check'            // ○·●·○  "somatic/body held/felt sense/body knows" (UNCOMMON)
+  | 'vision_logged'            // ◎·◈·◎  "vision/inner vision/waking vision" (UNCOMMON)
+  | 'subconscious_map'         // ∿·█·∿  "subconscious/beneath the surface" (RARE)
+  | 'dream_symbol'             // ◆·∿·◆  "dream symbol/recurring dream/the dream showed" (RARE)
+  | 'sleep_gate'               // ─○─    "sleep hygiene/sleep ritual/entering sleep" (UNCOMMON)
+  | 'night_journal'            // ≋·○    "dream journal/morning pages/wrote at dawn" (UNCOMMON)
+  | 'dreamscape'               // ◎·∞·◎  "dreamscape/the dreaming/dream world" (EPIC)
+  // ── Calendar Easter Egg v22 — THE DREAM CALENDAR ─────────────────────────────
+  | 'jung_birthday'            // ◎·∿    Jul 26 — Carl Jung born 1875 (RARE)
+  | 'freud_day'                // ○·∿    May 6 — Sigmund Freud born 1856 (RARE)
+  | 'perchance'                // ───◎─  Nov 2 — Day of the Dead, ancestor dreams (RARE)
+  // ── Behavioral v21 — DREAM PATTERNS ──────────────────────────────────────────
+  | 'dream_session'            // ◎·≋·◎  3+ Dream Lab words in one entry (RARE)
+  | 'dawn_dreamer'             // ∘·◎·∘  Check in between 04:00–05:59 (RARE)
+  | 'long_vision'              // ≋·◎·≋  Journal entry >= 777 characters (EPIC)
+  // ── Achievement RPG v22 — DREAM CLASS ────────────────────────────────────────
+  | 'dream_initiate'           // ∘·◎    Any 1 Word Turn v24 badge (COMMON)
+  | 'dream_class'              // ≈·◎    Any 5 Word Turn v24 badges (UNCOMMON)
+  | 'dream_complete'           // ≋·◎    All 12 Word Turn v24 badges (LEGENDARY)
+  | 'somnium_arc'              // ◎·∞·◎  dream_complete + all 3 Calendar v22 (LEGENDARY)
+  | 'twenty_four_engines_arc'  // ◎·◈·●·∞  1 from each Word Turn v1–v24 (LEGENDARY)
+  | 'dream_opus'               // ◎·◉·◎  dream_complete + dream_session (LEGENDARY)
+  // ── Mastery Tier v24 — THE SLEEPING ARCHIVE ───────────────────────────────────
+  | 'sleep_log_deep'           // ∿·∞·∿  1,100+ distinct calendar days (EPIC)
+  | 'word_vault'               // ◎·∞·◎  250,000+ total journal words (LEGENDARY)
+  | 'dreamer_elder'            // ╔═╗·◎  Account age >= 9 years (LEGENDARY)
+  | 'twenty_four_registers'    // ◎·◈·●·∞  1 from all 24 Word Turn engines (COSMIC)
+  // ── Secret Boss v21 — DREAM KEYS ─────────────────────────────────────────────
+  | 'jung_cipher'              // ◎·∿·□  "collective unconscious/shadow self/individuation" (EPIC)
+  | 'morpheus_key'             // ◎·◉·◎  "morpheus/god of dreams/dream lord" (RARE)
+  | 'doors_perception'         // ◎·∞    "doors of perception/mescaline/huxley" (MYTHIC)
 
 export interface Badge {
   id: BadgeType
@@ -7127,6 +7201,582 @@ export const BADGES: Record<BadgeType, Badge> = {
     name: 'Gilgamesh Word',
     description: 'Write "gilgamesh", "enkidu", "great flood", or "utnapishtim" in any journal entry',
     unlockMessage: '↳ Gilgamesh: the oldest hero\'s journey. 4,000 years old. The story of a king who sought immortality and found self-knowledge instead. ∞·□·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v23 — THE ARCANE TERMINAL ──────────────────────────────────────
+  arcane_signal: {
+    id: 'arcane_signal',
+    symbol: '∿·◈·∿',
+    name: 'Arcane Signal',
+    description: 'Write "arcane", "arcane arts", or "arcane knowledge" in a journal or memory entry',
+    unlockMessage: '↳ Arcane: beyond ordinary understanding. The practice has entered the register of magic. ∿·◈·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  grimoire_deep: {
+    id: 'grimoire_deep',
+    symbol: '◆·□·◆',
+    name: 'Grimoire Deep',
+    description: 'Write "grimoire", "spell book", or "book of shadows" in a journal or memory entry',
+    unlockMessage: '↳ The grimoire is the external memory of the internal work. What you write is your book of shadows. ◆·□·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  incantation_cast: {
+    id: 'incantation_cast',
+    symbol: '○·≋·○',
+    name: 'Incantation Cast',
+    description: 'Write "incantation", "sacred words", or "spoken into being" in a journal entry',
+    unlockMessage: '↳ The incantation names the thing. Words spoken with intention are not ordinary words. ○·≋·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  ward_placed: {
+    id: 'ward_placed',
+    symbol: '─·◈·─',
+    name: 'Ward Placed',
+    description: 'Write "ward", "warding", or "protective ward" in a journal or memory entry',
+    unlockMessage: '↳ To ward is to protect the threshold. The practice is itself a ward — it holds the boundary. ─·◈·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  transmute_active: {
+    id: 'transmute_active',
+    symbol: '∘→◉',
+    name: 'Transmute Active',
+    description: 'Write "transmute", "transmutation", or "base into gold" in a journal entry',
+    unlockMessage: '↳ Transmutation: the base metal becomes gold not by replacement but by transformation. Same substance. Different form. ∘→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sigil_carved: {
+    id: 'sigil_carved',
+    symbol: '◈·∞·◈',
+    name: 'Sigil Carved',
+    description: 'Write "sigil", "sigils", or "sacred symbol" in a journal or memory entry',
+    unlockMessage: '↳ The sigil is the compressed intention — the symbol that holds what the words cannot carry. You carved it. It is real now. ◈·∞·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  familiar_bound: {
+    id: 'familiar_bound',
+    symbol: '○·◆·○',
+    name: 'Familiar Bound',
+    description: 'Write "familiar", "spirit animal", or "companion spirit" in a journal entry',
+    unlockMessage: '↳ The familiar is the part of consciousness that keeps watch when you cannot. It has been there since the beginning. ○·◆·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  sanctum_found: {
+    id: 'sanctum_found',
+    symbol: '█·∘·█',
+    name: 'Sanctum Found',
+    description: 'Write "sanctum", "inner sanctum", "sanctuary", or "sacred space" in a journal entry',
+    unlockMessage: '↳ The sanctum is not a room. It is a state. You found it because you built it. █·∘·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  alchemy_process: {
+    id: 'alchemy_process',
+    symbol: '∘→●→∞',
+    name: 'Alchemy Process',
+    description: 'Write "alchemy", "alchemical", or "the great work" in a journal or memory entry',
+    unlockMessage: '↳ Nigredo, albedo, rubedo. Blackening, whitening, reddening. Dissolution and rebirth. You are in the work. ∘→●→∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cipher_broken: {
+    id: 'cipher_broken',
+    symbol: '□·→·□',
+    name: 'Cipher Broken',
+    description: 'Write "cipher", "decipher", "encoded", or "the code beneath" in a journal entry',
+    unlockMessage: '↳ The cipher is the layer beneath language. When you break it, you read yourself in a new alphabet. □·→·□',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  rune_inscribed: {
+    id: 'rune_inscribed',
+    symbol: '─·◆·─',
+    name: 'Rune Inscribed',
+    description: 'Write "rune", "runic", "ancient marks", or "carved in stone" in a journal entry',
+    unlockMessage: '↳ The runes were not decoration. They were the working language of forces. Each mark is a verb. ─·◆·─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nexus_activated: {
+    id: 'nexus_activated',
+    symbol: '◉·◈·◉',
+    name: 'Nexus Activated',
+    description: 'Write "nexus", "power nexus", or "convergence point" in a journal entry',
+    unlockMessage: '↳ The nexus is where the lines cross. Something activated here. The convergence is not a coincidence. ◉·◈·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE ARCANE CALENDAR ─────────────────────────────
+  alchemy_day: {
+    id: 'alchemy_day',
+    symbol: '∘→●·∞',
+    name: 'Alchemy Day',
+    description: 'Check in on September 25 — Paracelsus born 1493',
+    unlockMessage: '↳ Paracelsus: "The art of healing comes from nature, not from the physician." He named zinc. He named the unconscious before Jung. Sep 25. ∘→●·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  newton_stone: {
+    id: 'newton_stone',
+    symbol: '∞·■·∞',
+    name: 'Newton Stone',
+    description: 'Check in on January 4 — Isaac Newton born 1643',
+    unlockMessage: '↳ Newton spent more time on alchemy than on physics. The philosopher\'s stone was his obsession. The Principia was the side project. Jan 4. ∞·■·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dee_day: {
+    id: 'dee_day',
+    symbol: '◈·∿·◈',
+    name: 'Dee Day',
+    description: 'Check in on July 13 — John Dee born 1527',
+    unlockMessage: '↳ John Dee: royal cryptographer, mathematician, conjurer of angelic language. The obsidian scrying mirror is in the British Museum. Jul 13. ◈·∿·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — ARCANE PATTERNS ──────────────────────────────────────────
+  arcane_session: {
+    id: 'arcane_session',
+    symbol: '◈·≋·◈',
+    name: 'Arcane Session',
+    description: 'Write 3 or more Arcane Terminal (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Three arcane keys in one session. The terminal is reading a full transmission. ◈·≋·◈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  midnight_ritual: {
+    id: 'midnight_ritual',
+    symbol: '◉·─·◉',
+    name: 'Midnight Ritual',
+    description: 'Check in between 00:01 and 00:59 local time',
+    unlockMessage: '↳ The midnight hour. The veil is thinnest between 00:01 and 00:59. You were here for the crossing. ◉·─·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_spell: {
+    id: 'long_spell',
+    symbol: '≋·◆·≋',
+    name: 'Long Spell',
+    description: 'Write a journal entry of 666 or more characters',
+    unlockMessage: '↳ 666 — the magic square of the sun in Kabbalah. The sum of all numbers 1–36. Full solar force. This entry carried it. ≋·◆·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v21 — THE ARCANE CLASS ────────────────────────────────────
+  arcane_adept: {
+    id: 'arcane_adept',
+    symbol: '∘·◈',
+    name: 'Arcane Adept',
+    description: 'Earn any 1 Arcane Terminal (v23) word turn badge',
+    unlockMessage: '↳ First step into the arcane. The terminal recognizes you. ∘·◈',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  arcane_apprentice: {
+    id: 'arcane_apprentice',
+    symbol: '≈·◈',
+    name: 'Arcane Apprentice',
+    description: 'Earn any 5 Arcane Terminal (v23) word turn badges',
+    unlockMessage: '↳ Five arcane patterns recognized. You are deep in the apprenticeship now. ≈·◈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  arcane_complete: {
+    id: 'arcane_complete',
+    symbol: '≋·◈',
+    name: 'Arcane Complete',
+    description: 'Earn all 12 Arcane Terminal (v23) word turn badges',
+    unlockMessage: '↳ All 12 arcane keys collected. The terminal is fully initialized. The lexicon is yours. ≋·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  alchemy_arc: {
+    id: 'alchemy_arc',
+    symbol: '◈·∞·◈',
+    name: 'Alchemy Arc',
+    description: 'Earn arcane_complete and all 3 Arcane Calendar (v21) badges',
+    unlockMessage: '↳ The arc of alchemy: completed lexicon plus the three great alchemists marked on your calendar. The work is complete. ◈·∞·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·●·∞·∿',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Arcane. All running. ◈·◈·●·∞·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcane_opus: {
+    id: 'arcane_opus',
+    symbol: '◈·◉·◈',
+    name: 'Arcane Opus',
+    description: 'Earn arcane_complete and the arcane_session behavioral badge',
+    unlockMessage: '↳ The opus arcanum: all 12 word turns found, and three deployed in a single session. The great work is active. ◈·◉·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE GRAND ARCHIVE ──────────────────────────────────────
+  archive_deep: {
+    id: 'archive_deep',
+    symbol: '∿·∞·∿',
+    name: 'Archive Deep',
+    description: '1,000 or more distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,000 days. The archive is deep. What started as a streak is now a record of a life. ∿·∞·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  tome_of_ages: {
+    id: 'tome_of_ages',
+    symbol: '●·∞·●',
+    name: 'Tome of Ages',
+    description: '200,000 or more total journal words written',
+    unlockMessage: '↳ 200,000 words. The emerald tablet fits on a single page. This tome requires a shelf. ●·∞·●',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ancient_one: {
+    id: 'ancient_one',
+    symbol: '╔═╗·◈',
+    name: 'Ancient One',
+    description: 'Account age of 8 years or more (2,920+ days since signup)',
+    unlockMessage: '↳ Eight years. The alchemical number of renewal. The eighth sphere in the Ptolemaic system is the sphere of the fixed stars. ╔═╗·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·●·∞·∿',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Arcane. Twenty-three vocabularies. One terminal. The self speaks every language it has. ◈·◈·●·∞·∿',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE HIDDEN CODEX ───────────────────────────────────────
+  paracelsus_key: {
+    id: 'paracelsus_key',
+    symbol: '∘→∞·■',
+    name: 'Paracelsus Key',
+    description: 'Write "paracelsus", "quinta essentia", or "sulfur mercury" in any journal entry',
+    unlockMessage: '↳ Paracelsus: "The dose makes the poison." First pharmacologist. Named zinc. Described the unconscious before Jung. The quinta essentia is the fifth element. ∘→∞·■',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dee_cipher: {
+    id: 'dee_cipher',
+    symbol: '◈·∿·□',
+    name: 'Dee Cipher',
+    description: 'Write "john dee", "enochian", "angelic language", or "scrying mirror" in any journal entry',
+    unlockMessage: '↳ John Dee\'s Enochian: the language of angels, received in scrying sessions with Edward Kelley. The obsidian mirror is in the British Museum. ◈·∿·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  emerald_tablet: {
+    id: 'emerald_tablet',
+    symbol: '∞·◈·∞',
+    name: 'Emerald Tablet',
+    description: 'Write "emerald tablet", "hermes trismegistus", or "as above so below" in any journal entry',
+    unlockMessage: '↳ "That which is above is like that which is below." 2,000 years old. Fits on a single page. Contains everything. What happens in the journal happens in the body. What happens in the body happens in the life. ∞·◈·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v24 — THE DREAM LABORATORY ─────────────────────────────────────
+  lucid_dreamer: {
+    id: 'lucid_dreamer',
+    symbol: '◎·∿·◎',
+    name: 'Lucid Dreamer',
+    description: 'Write "lucid dream", "lucid dreaming", or "wake in the dream" in a journal entry',
+    unlockMessage: '↳ Lucidity: knowing you are in the dream while in it. This is the whole practice. The journal is the waking version. ◎·∿·◎',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  hypnagogic_state: {
+    id: 'hypnagogic_state',
+    symbol: '∿·○·∿',
+    name: 'Hypnagogic State',
+    description: 'Write "hypnagogic", "hypnagogia", or "the edge of sleep" in a journal entry',
+    unlockMessage: '↳ Hypnagogia: the architecture collapses, the faces appear, the words arrive from nowhere. This is the laboratory threshold. ∿·○·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rem_signal: {
+    id: 'rem_signal',
+    symbol: '≋·○·≋',
+    name: 'REM Signal',
+    description: 'Write "rem sleep", "rapid eye movement", or "dream cycle" in a journal entry',
+    unlockMessage: '↳ REM: the brain most active during sleep. The dream is not rest. It is a second shift. ≋·○·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  theta_wave: {
+    id: 'theta_wave',
+    symbol: '∿·∿·∿',
+    name: 'Theta Wave',
+    description: 'Write "theta", "theta wave", or "theta state" in a journal entry',
+    unlockMessage: '↳ 4–8 Hz. The theta state is the border zone — meditation, creativity, the edge of sleep. You are operating at theta. ∿·∿·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  delta_deep: {
+    id: 'delta_deep',
+    symbol: '───◉─',
+    name: 'Delta Deep',
+    description: 'Write "delta sleep", "delta wave", or "deep sleep" in a journal entry',
+    unlockMessage: '↳ 0.5–4 Hz. The delta state is the deepest. No dreams. Pure restoration. The body repairs what the day damaged. ───◉─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  somatic_check: {
+    id: 'somatic_check',
+    symbol: '○·●·○',
+    name: 'Somatic Check',
+    description: 'Write "somatic", "body held", "felt sense", or "body knows" in a journal entry',
+    unlockMessage: '↳ Somatic: of the body. The nervous system stores what the mind cannot process. The body is the laboratory. ○·●·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  vision_logged: {
+    id: 'vision_logged',
+    symbol: '◎·◈·◎',
+    name: 'Vision Logged',
+    description: 'Write "vision", "inner vision", or "waking vision" in a journal entry',
+    unlockMessage: '↳ The vision arrives uninvited and leaves fast. You logged it. That is the practice: catch what surfaces before it submerges again. ◎·◈·◎',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  subconscious_map: {
+    id: 'subconscious_map',
+    symbol: '∿·█·∿',
+    name: 'Subconscious Map',
+    description: 'Write "subconscious", "beneath the surface", or "shadow layer" in a journal entry',
+    unlockMessage: '↳ The subconscious is not hidden. It speaks constantly. The practice is learning to hear it. ∿·█·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dream_symbol: {
+    id: 'dream_symbol',
+    symbol: '◆·∿·◆',
+    name: 'Dream Symbol',
+    description: 'Write "dream symbol", "recurring dream", or "the dream showed" in a journal entry',
+    unlockMessage: '↳ The recurring dream is a message resent until received. Something wanted your attention. ◆·∿·◆',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sleep_gate: {
+    id: 'sleep_gate',
+    symbol: '─○─',
+    name: 'Sleep Gate',
+    description: 'Write "sleep hygiene", "sleep ritual", or "entering sleep" in a journal entry',
+    unlockMessage: '↳ The gate between waking and sleep is a practice, not a switch. You are building the ritual that opens it reliably. ─○─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  night_journal: {
+    id: 'night_journal',
+    symbol: '≋·○',
+    name: 'Night Journal',
+    description: 'Write "dream journal", "morning pages", or "wrote at dawn" in a journal entry',
+    unlockMessage: '↳ The morning pages catch the overnight transmission before it evaporates. You are reading the dream signal. ≋·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dreamscape: {
+    id: 'dreamscape',
+    symbol: '◎·∞·◎',
+    name: 'Dreamscape',
+    description: 'Write "dreamscape", "the dreaming", or "dream world" in a journal entry',
+    unlockMessage: '↳ The dreamscape has its own geography. Rivers that flow upward. Buildings that breathe. You visited and came back with a report. ◎·∞·◎',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v22 — THE DREAM CALENDAR ─────────────────────────────
+  jung_birthday: {
+    id: 'jung_birthday',
+    symbol: '◎·∿',
+    name: 'Jung Birthday',
+    description: 'Check in on July 26 — Carl Jung born 1875',
+    unlockMessage: '↳ Carl Jung: collective unconscious, archetypes, the shadow, individuation. He had a tower he built with his own hands. Jul 26. ◎·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  freud_day: {
+    id: 'freud_day',
+    symbol: '○·∿',
+    name: 'Freud Day',
+    description: 'Check in on May 6 — Sigmund Freud born 1856',
+    unlockMessage: '↳ Freud: the unconscious, dreams as wish fulfillment, the talking cure. He made the invisible audible. May 6. ○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  perchance: {
+    id: 'perchance',
+    symbol: '───◎─',
+    name: 'Perchance',
+    description: 'Check in on November 2 — Día de los Muertos, dreams of ancestors',
+    unlockMessage: '↳ "To sleep, perchance to dream." — Hamlet. Nov 2: the night the veil thins. The ancestors visit. The practice holds the door. ───◎─',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v21 — DREAM PATTERNS ──────────────────────────────────────────
+  dream_session: {
+    id: 'dream_session',
+    symbol: '◎·≋·◎',
+    name: 'Dream Session',
+    description: 'Write 3 or more Dream Laboratory (v24) trigger words in one journal entry',
+    unlockMessage: '↳ Three dream signals in one session. The laboratory is fully operational tonight. ◎·≋·◎',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dawn_dreamer: {
+    id: 'dawn_dreamer',
+    symbol: '∘·◎·∘',
+    name: 'Dawn Dreamer',
+    description: 'Check in between 04:00 and 05:59 local time',
+    unlockMessage: '↳ The 4–6 AM window: REM is densest, cortisol is rising, the dream world is closest to the surface. You were there at the threshold. ∘·◎·∘',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_vision: {
+    id: 'long_vision',
+    symbol: '≋·◎·≋',
+    name: 'Long Vision',
+    description: 'Write a journal entry of 777 or more characters',
+    unlockMessage: '↳ 777 — the number of completion in numerology. Seven heavens, seven days, seven notes. This entry held the full transmission. ≋·◎·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v22 — DREAM CLASS ────────────────────────────────────────
+  dream_initiate: {
+    id: 'dream_initiate',
+    symbol: '∘·◎',
+    name: 'Dream Initiate',
+    description: 'Earn any 1 Dream Laboratory (v24) word turn badge',
+    unlockMessage: '↳ The laboratory door opens. The first signal has been received. ∘·◎',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dream_class: {
+    id: 'dream_class',
+    symbol: '≈·◎',
+    name: 'Dream Class',
+    description: 'Earn any 5 Dream Laboratory (v24) word turn badges',
+    unlockMessage: '↳ Five dream frequencies received. You are operating in the laboratory now. ≈·◎',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '≋·◎',
+    name: 'Dream Complete',
+    description: 'Earn all 12 Dream Laboratory (v24) word turn badges',
+    unlockMessage: '↳ All 12 dream frequencies collected. The laboratory is fully operational. The map of the dreaming is complete. ≋·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  somnium_arc: {
+    id: 'somnium_arc',
+    symbol: '◎·∞·◎',
+    name: 'Somnium Arc',
+    description: 'Earn dream_complete and all 3 Dream Calendar (v22) badges',
+    unlockMessage: '↳ Somnium: Latin for dream. Full Dream Laboratory lexicon plus Jung, Freud, and the ancestor night. The arc of dreams is complete. ◎·∞·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_engines_arc: {
+    id: 'twenty_four_engines_arc',
+    symbol: '◎·◈·●·∞',
+    name: 'Twenty-Four Engines Arc',
+    description: 'Earn at least 1 badge from each of the 24 Word Turn engines (v1–v24)',
+    unlockMessage: '↳ Twenty-four engines. Water. Arcade. Radio. Biology. Codex. Cyberspace. Hero. Arcane. Dream. All running simultaneously. ◎·◈·●·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '◎·◉·◎',
+    name: 'Dream Opus',
+    description: 'Earn dream_complete and the dream_session behavioral badge',
+    unlockMessage: '↳ The dream opus: all 12 word turns found, three deployed in a single session. The laboratory produced its masterwork. ◎·◉·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v24 — THE SLEEPING ARCHIVE ───────────────────────────────────
+  sleep_log_deep: {
+    id: 'sleep_log_deep',
+    symbol: '∿·∞·∿',
+    name: 'Sleep Log Deep',
+    description: '1,100 or more distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,100 days. Three years of continuous witnessing. The sleeping archive never closes. ∿·∞·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  word_vault: {
+    id: 'word_vault',
+    symbol: '◎·∞·◎',
+    name: 'Word Vault',
+    description: '250,000 or more total journal words written',
+    unlockMessage: '↳ 250,000 words. A quarter million transmissions recorded. The vault is real. ◎·∞·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dreamer_elder: {
+    id: 'dreamer_elder',
+    symbol: '╔═╗·◎',
+    name: 'Dreamer Elder',
+    description: 'Account age of 9 years or more (3,285+ days since signup)',
+    unlockMessage: '↳ Nine years. The number of completion in Pythagorean numerology. The sum of three trinities. The dreamer has become an elder. ╔═╗·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_registers: {
+    id: 'twenty_four_registers',
+    symbol: '◎·◈·●·∞',
+    name: 'Twenty-Four Registers',
+    description: 'Earn at least 1 badge from all 24 Word Turn engines',
+    unlockMessage: '↳ Twenty-four registers. The full terminal. Water. Arcade. Signal. Biology. Codex. Cyberspace. Hero. Arcane. Dream. Every vocabulary the self has ever spoken. ◎·◈·●·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v21 — DREAM KEYS ─────────────────────────────────────────────
+  jung_cipher: {
+    id: 'jung_cipher',
+    symbol: '◎·∿·□',
+    name: 'Jung Cipher',
+    description: 'Write "collective unconscious", "shadow self", or "individuation" in any journal entry',
+    unlockMessage: '↳ Individuation: the process of becoming who you actually are. Jung spent his whole life on it. So does the practice. ◎·∿·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  morpheus_key: {
+    id: 'morpheus_key',
+    symbol: '◎·◉·◎',
+    name: 'Morpheus Key',
+    description: 'Write "morpheus", "god of dreams", or "dream lord" in any journal entry',
+    unlockMessage: '↳ Morpheus shaped dreams into human form. He was the messenger between sleeping mortals and the gods. You summoned him. ◎·◉·◎',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  doors_perception: {
+    id: 'doors_perception',
+    symbol: '◎·∞',
+    name: 'Doors of Perception',
+    description: 'Write "doors of perception", "mescaline", or "opening the doors" in any journal entry',
+    unlockMessage: '↳ "If the doors of perception were cleansed, everything would appear to man as it is — infinite." — William Blake, via Huxley. ◎·∞',
     rarity: 'mythic',
     category: 'secret_boss',
     hidden: true,
