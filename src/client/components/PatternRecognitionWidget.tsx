@@ -215,6 +215,7 @@ export function PatternRecognitionWidget() {
       'temporal-sovereignty-arc':           'Temporal sovereignty arc — all four temporal anchors active within 24h + overall ≥ 85, full operative day sovereignty (P188)',
       'fifth-cycle-deepening':              'Fifth cycle deepening — fifth-cycle-resonance active + 21d compound arc, all dims ≥ 72 + overall ≥ 93, Level 23 — FCDEP (P189)',
       'fifth-cycle-integration':            'Fifth cycle integration — fifth-cycle-deepening active + 28d compound arc, all dims ≥ 75 + overall ≥ 95, Level 24 — FCINT (P190)',
+      'fifth-cycle-sovereign':              'Fifth cycle sovereign — fifth-cycle-integration active + 35d compound arc, all dims ≥ 78 + overall ≥ 97, Level 25 — FCSOV (P191)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -577,6 +578,13 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'resilience-cascade') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Resilience cascade. Recovery + knowledge arc closed.
+                </div>
+              )}
+
+              {/* Fifth cycle sovereign — P191 */}
+              {patterns.some(p => p.pattern === 'fifth-cycle-sovereign') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Fifth cycle sovereign. The arc governs.
                 </div>
               )}
 

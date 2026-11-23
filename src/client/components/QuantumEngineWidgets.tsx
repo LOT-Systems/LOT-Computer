@@ -146,6 +146,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'fifth-cycle-resonance':                'FCRES',
   'fifth-cycle-deepening':                'FCDEP',
   'fifth-cycle-integration':              'FCINT',
+  'fifth-cycle-sovereign':                'FCSOV',
   'temporal-sovereignty-arc':             'TSOV',
 }
 
@@ -580,6 +581,7 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
+                  { pattern: 'fifth-cycle-sovereign',    label: 'L25 · FIFTH CYCLE SOVEREIGN',     urgent: true },
                   { pattern: 'fifth-cycle-integration',  label: 'L24 · FIFTH CYCLE INTEGRATION',   urgent: true },
                   { pattern: 'fifth-cycle-deepening',    label: 'L23 · FIFTH CYCLE DEEPENING',     urgent: true },
                   { pattern: 'fifth-cycle-resonance',    label: 'L22 · FIFTH CYCLE RESONANCE',     urgent: true },

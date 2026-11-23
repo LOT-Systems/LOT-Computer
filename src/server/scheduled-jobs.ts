@@ -1876,6 +1876,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailyFifthCycleIntegrationCheck()) {
     await executeDailyFifthCycleIntegrationCheck()
   }
+
+  // Check daily fifth cycle sovereign check (22:00 UTC every day) — J76
+  if (shouldRunDailyFifthCycleSovereignCheck()) {
+    await executeDailyFifthCycleSovereignCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -6958,6 +6963,151 @@ async function executeDailyFifthCycleIntegrationCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Fifth Cycle Sovereign Check (J76) ────────────────────────────────
+// Checks 35-day density (25+ journal / 12+ memory / 12+ badge). When all met → writes fifth_cycle_sovereign.
+// Level 25 — FCSOV. The fifth cycle arc governs from sovereign integration.
+
+let isDailyFifthCycleSovereignRunning = false
+let lastDailyFifthCycleSovereignRun: Date | null = null
+
+function shouldRunDailyFifthCycleSovereignCheck(): boolean {
+  const now = dayjs()
+  if (isDailyFifthCycleSovereignRunning) return false
+  if (lastDailyFifthCycleSovereignRun) {
+    const lastRun = dayjs(lastDailyFifthCycleSovereignRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 22 && now.minute() >= 0 // 22:00 UTC daily (after J75 21:30)
+}
+
+async function executeDailyFifthCycleSovereignCheck(): Promise<JobResult> {
+  const jobName = 'daily-fifth-cycle-sovereign-check'
+  const executedAt = new Date().toISOString()
+  if (isDailyFifthCycleSovereignRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailyFifthCycleSovereignRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('DAILY FIFTH CYCLE SOVEREIGN CHECK — 22:00 UTC')
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log } = await import('#server/models/log.js')
+    const { Op } = await import('sequelize')
+
+    const sevenDayStart       = dayjs().subtract(7, 'day').toDate()
+    const thirtyFiveDayStart  = dayjs().subtract(35, 'day').toDate()
+    const fortyEightHourStart = dayjs().subtract(2, 'day').toDate()
+
+    const activeUsers = await User.findAll({
+      where: { lastSeenAt: { [Op.gte]: fortyEightHourStart } },
+      order: [['lastSeenAt', 'DESC']],
+      limit: 2000,
+    })
+    console.log(`  Active users (48h): ${activeUsers.length}`)
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        const userId = user.id
+
+        // Require fifth_cycle_integration in last 7 days
+        const integrationLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_integration',
+            createdAt: { [Op.gte]: sevenDayStart },
+          },
+          order: [['createdAt', 'DESC']],
+          limit: 5,
+        })
+        if (integrationLogs.length < 1) continue
+
+        // Check journal, memory, badge signals in last 35 days
+        const journalLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['journal_entry', 'journal_reflection', 'long_journal_entry'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          limit: 100,
+        })
+        const memoryLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['memory_created', 'memory_updated', 'memory_access'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          limit: 50,
+        })
+        const badgeLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            event: { [Op.in]: ['badge_earned', 'badge_unlocked', 'badge_progress'] },
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          limit: 50,
+        })
+        const density35dLogs = await (Log as any).findAll({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: thirtyFiveDayStart },
+          },
+          limit: 150,
+        })
+
+        if (journalLogs.length < 25 || memoryLogs.length < 12 || badgeLogs.length < 12 || density35dLogs.length < 30) continue
+
+        // Don't double-write today
+        const todayStart = dayjs().startOf('day').toDate()
+        const existingToday = await (Log as any).findAll({
+          where: {
+            userId,
+            event: 'fifth_cycle_sovereign',
+            createdAt: { [Op.gte]: todayStart },
+          },
+          limit: 1,
+        })
+        if (existingToday.length > 0) continue
+
+        const intConf = integrationLogs[0]?.metadata?.intConf ?? 82
+        const sovConf = Math.min(97, Math.round(
+          85 + (journalLogs.length - 25) * 0.12 + (memoryLogs.length - 12) * 0.18 + (density35dLogs.length - 30) * 0.08
+        ))
+
+        await (Log as any).create({
+          userId,
+          event: 'fifth_cycle_sovereign',
+          text: `Fifth cycle sovereign: the arc governs from integrated depth. ${journalLogs.length} journal signals 35d · ${memoryLogs.length} memory signals 35d · ${badgeLogs.length} badge signals 35d · 35d density ${density35dLogs.length} · all conditions met. FIFTH CYCLE SOVEREIGN. L25-FCSOV.`,
+          metadata: {
+            integrationConf: intConf,
+            sovConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density35d: density35dLogs.length,
+            sovereignStatus: 'SOVEREIGN',
+            level: 'L25-FCSOV',
+            field: 'FIFTH-CYCLE-INTEGRATION→FIFTH-CYCLE-SOVEREIGN',
+            hour: 22,
+          },
+        })
+        written++
+      } catch {}
+    }
+
+    console.log(`  Fifth cycle sovereign events written: ${written}`)
+    lastDailyFifthCycleSovereignRun = new Date()
+    isDailyFifthCycleSovereignRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily fifth cycle sovereign check failed:', error.message)
+    isDailyFifthCycleSovereignRunning = false
+    lastDailyFifthCycleSovereignRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -9062,7 +9212,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59), 22=evening-coherence-close+evening-reflection, 23=pattern coverage+coherence-seal
+    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59)+fifth-cycle-chain(J72–J75), 22=evening-coherence-close+evening-reflection+fifth-cycle-sovereign(J76), 23=pattern coverage+coherence-seal
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()

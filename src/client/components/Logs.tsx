@@ -5258,6 +5258,54 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'fifth_cycle_sovereign') {
+          const integrationConf = log.metadata?.integrationConf as number | undefined
+          const journalCount    = log.metadata?.journalCount    as number | undefined
+          const memoryCount     = log.metadata?.memoryCount     as number | undefined
+          const badgeCount      = log.metadata?.badgeCount      as number | undefined
+          const indexScore      = log.metadata?.indexScore      as number | undefined
+          const level           = log.metadata?.level           as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE SOVEREIGN</div>
+                {integrationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGRATION CONF</span>
+                    <span className="tabular-nums">{integrationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 35D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 35D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 35D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGN · FIFTH ARC GOVERNS</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event === 'temporal_sovereignty_arc') {
           const indexScore       = log.metadata?.indexScore       as number | undefined
           const temporalAnchors  = log.metadata?.temporalAnchors  as string | undefined

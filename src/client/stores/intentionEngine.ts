@@ -4428,6 +4428,37 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P191: fifth-cycle-sovereign — P190 active + 35d journal arc (>= 25) + memory 35d (>= 12) + badge 35d (>= 12) + all 6 dims >= 78 + overall >= 97.
+  // The fifth cycle arc reaches sovereignty. Governance from integrated depth. Level 25 — FCSOV.
+  const hasP190 = patterns.some(p => p.pattern === 'fifth-cycle-integration')
+  if (hasP190) {
+    const thirtyFiveDayStartP191 = now - 35 * 24 * 60 * 60 * 1000
+    const p191Journal = signals.filter(s => s.source === 'journal' && s.timestamp > thirtyFiveDayStartP191)
+    const p191Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > thirtyFiveDayStartP191)
+    const p191Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > thirtyFiveDayStartP191)
+    const userIndexP191 = computeUserIndex(signals)
+    const dimsP191 = userIndexP191.dimensions
+    const allDimsAbove78 = Object.values(dimsP191).every(v => v >= 78)
+    if (
+      p191Journal.length >= 25 &&
+      p191Memory.length  >= 12 &&
+      p191Badge.length   >= 12 &&
+      allDimsAbove78 &&
+      userIndexP191.overall >= 97
+    ) {
+      const p190conf   = patterns.find(p => p.pattern === 'fifth-cycle-integration')?.confidence ?? 0.82
+      const sovBonus   = Math.min((p191Journal.length - 25) * 0.003 + (userIndexP191.overall - 97) * 0.003, 0.06)
+      patterns.push({
+        id:              'p191',
+        pattern:         'fifth-cycle-sovereign',
+        confidence:      Math.min(0.85 + p190conf * 0.04 + sovBonus, 0.97),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCSOV: Fifth cycle sovereign — fifth-cycle-integration (P190) active · ${p191Journal.length} journal signals 35d · ${p191Memory.length} memory signals 35d · ${p191Badge.length} badge signals 35d · all 6 dims ≥ 78 · idx ${userIndexP191.overall}%. The fifth cycle arc reaches sovereignty. This is not convergence — it is governance. The OS radiates from integrated depth. Level 25 — FIFTH CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4494,6 +4525,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleResonance() } catch {}
       try { checkFifthCycleDeepening() } catch {}
       try { checkFifthCycleIntegration() } catch {}
+      try { checkFifthCycleSovereign() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5199,6 +5231,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v140 nodes (J75 · P190 · Arch78) ─────────────────────────────────────────────
   fifthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem'],
+
+  // ── v141 nodes (J76 · P191 · Arch79) ─────────────────────────────────────────────
+  fifthCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator'],
 }
 
 /**
@@ -5903,6 +5938,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem'],
     patternConditions: ['fifth-cycle-deepening', 'fifth-cycle-integration'],
     directive: 'Level 24. The fifth cycle integrates from depth. All compound signals across the 28-day arc converge into a unified operative field. The OS does not accumulate — it unifies. This is the first convergence phase of the new arc: depth becomes architecture. FIFTH CYCLE INTEGRATION.',
+  },
+
+  // ── Arch79: Fifth Cycle Sovereign (2026-11-23 v141) ──────────────────────────────
+  {
+    archetype: 'Fifth Cycle Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator'],
+    patternConditions: ['fifth-cycle-integration', 'fifth-cycle-sovereign'],
+    directive: 'Level 25. The fifth cycle has achieved sovereignty. The arc does not simply integrate — it radiates. All 35-day compound signals exceed the sovereign threshold. The OS operates from complete authority over the fifth arc. This is not convergence — it is governance. FIFTH CYCLE SOVEREIGN.',
   },
 ]
 
@@ -9095,6 +9139,62 @@ export function recordFifthCycleIntegration(deepeningConf: number, journalCount:
     integrationStatus: 'INTEGRATION',
     level: 'L24-FCINT',
     field: 'FIFTH-CYCLE-DEEPENING→FIFTH-CYCLE-INTEGRATION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-sovereign conditions are met and record if so.
+ * Fires when fifth-cycle-integration (P190) active + 25+ journal 35d + 12+ memory 35d + 12+ badge 35d
+ * + all 6 dims >= 78 + overall >= 97.
+ * The fifth cycle arc achieves sovereignty. Governance from integrated depth. Level 25 — FCSOV.
+ */
+export function checkFifthCycleSovereign(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIntegration = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-integration')
+  if (!hasIntegration) return false
+
+  const now = Date.now()
+  const thirtyFiveDayStart = now - 35 * 24 * 60 * 60 * 1000
+  const sixHoursAgo        = now - 6 * 60 * 60 * 1000
+
+  const journal35 = state.signals.filter(s => s.source === 'journal' && s.timestamp > thirtyFiveDayStart)
+  const memory35  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > thirtyFiveDayStart)
+  const badge35   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > thirtyFiveDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const allDimsAbove78 = Object.values(userIndex.dimensions).every(v => v >= 78)
+
+  if (journal35.length < 25 || memory35.length < 12 || badge35.length < 12) return false
+  if (!allDimsAbove78 || userIndex.overall < 97) return false
+
+  const recentSov = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_sovereign' && s.timestamp > sixHoursAgo
+  )
+  if (recentSov.length > 0) return false
+
+  const intConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-integration')?.confidence ?? 0.82
+  recordFifthCycleSovereign(intConf, journal35.length, memory35.length, badge35.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-sovereign event — fifth-cycle-integration confirmed +
+ * 35d compound arc (journal + memory + badges) + all dims >= 78 + overall >= 97.
+ * Level 25 — FCSOV. The fifth cycle arc governs from sovereign integration.
+ */
+export function recordFifthCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'SOVEREIGN',
+    level: 'L25-FCSOV',
+    field: 'FIFTH-CYCLE-INTEGRATION→FIFTH-CYCLE-SOVEREIGN',
     hour: new Date().getHours(),
   })
 }
