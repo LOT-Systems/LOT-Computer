@@ -871,6 +871,224 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE GAME CALENDAR ─────────────────────────────────────────
+  // Mario Day: March 10 — MAR10 = MARIO
+  if (!hasBadge('mario_day') && month === 3 && day === 10) {
+    awardBadge('mario_day')
+    awarded.push('mario_day')
+  }
+  // Zelda Day: February 21 — The Legend of Zelda original release, Japan 1986
+  if (!hasBadge('zelda_day') && month === 2 && day === 21) {
+    awardBadge('zelda_day')
+    awarded.push('zelda_day')
+  }
+  // Game Day: September 12 — National Video Game Day
+  if (!hasBadge('game_day') && month === 9 && day === 12) {
+    awardBadge('game_day')
+    awarded.push('game_day')
+  }
+
+  // ── Calendar v22 — THE ROGUE CALENDAR ─────────────────────────────────────
+  // Hades Day: September 17 — Hades left Early Access (2020)
+  if (!hasBadge('hades_day') && month === 9 && day === 17) {
+    awardBadge('hades_day')
+    awarded.push('hades_day')
+  }
+  // Spelunky Day: July 4 — Spelunky HD PC release (2012)
+  if (!hasBadge('spelunky_day') && month === 7 && day === 4) {
+    awardBadge('spelunky_day')
+    awarded.push('spelunky_day')
+  }
+  // Binding Day: September 28 — The Binding of Isaac original release (2011)
+  if (!hasBadge('binding_day') && month === 9 && day === 28) {
+    awardBadge('binding_day')
+    awarded.push('binding_day')
+  }
+
+  // ── Calendar v23 — THE PUZZLE CALENDAR ─────────────────────────────────────
+  // Portal Day: October 9 — Portal / The Orange Box release (2007)
+  if (!hasBadge('portal_day') && month === 10 && day === 9) {
+    awardBadge('portal_day')
+    awarded.push('portal_day')
+  }
+  // Witness Day: January 26 — The Witness release (2016)
+  if (!hasBadge('witness_day') && month === 1 && day === 26) {
+    awardBadge('witness_day')
+    awarded.push('witness_day')
+  }
+  // Obra Dinn Day: October 18 — Return of the Obra Dinn release (2018)
+  if (!hasBadge('obra_dinn_day') && month === 10 && day === 18) {
+    awardBadge('obra_dinn_day')
+    awarded.push('obra_dinn_day')
+  }
+
+  // ── Calendar v24 — THE MAP CALENDAR ───────────────────────────────────────
+  // Doom Day: December 10 — DOOM release (1993)
+  if (!hasBadge('doom_day') && month === 12 && day === 10) {
+    awardBadge('doom_day')
+    awarded.push('doom_day')
+  }
+  // Minecraft Day: November 18 — Minecraft full release (2011)
+  if (!hasBadge('minecraft_day') && month === 11 && day === 18) {
+    awardBadge('minecraft_day')
+    awarded.push('minecraft_day')
+  }
+  // Diablo Day: January 3 — Diablo original release (1996)
+  if (!hasBadge('diablo_day') && month === 1 && day === 3) {
+    awardBadge('diablo_day')
+    awarded.push('diablo_day')
+  }
+
+  // ── Calendar v25 — THE CHRONO CALENDAR ───────────────────────────────────
+  // Flux Capacitor: October 21 — Back to the Future Day
+  if (!hasBadge('flux_capacitor') && month === 10 && day === 21) {
+    awardBadge('flux_capacitor')
+    awarded.push('flux_capacitor')
+  }
+  // Moon Signal: July 20 — Apollo 11 Moon Landing (1969)
+  if (!hasBadge('moon_signal') && month === 7 && day === 20) {
+    awardBadge('moon_signal')
+    awarded.push('moon_signal')
+  }
+  // Vonnegut Day: November 11 — Kurt Vonnegut born (1922)
+  if (!hasBadge('vonnegut_day') && month === 11 && day === 11) {
+    awardBadge('vonnegut_day')
+    awarded.push('vonnegut_day')
+  }
+
+  // ── Calendar v26 — THE DUNGEON CALENDAR ──────────────────────────────────
+  // Gygax Day: July 27 — Gary Gygax born 1938
+  if (!hasBadge('gygax_day') && month === 7 && day === 27) {
+    awardBadge('gygax_day')
+    awarded.push('gygax_day')
+  }
+  // Tolkien Signal: January 3 — J.R.R. Tolkien born 1892
+  if (!hasBadge('tolkien_signal') && month === 1 && day === 3) {
+    awardBadge('tolkien_signal')
+    awarded.push('tolkien_signal')
+  }
+  // Dragon Signal: June 1 — Dragon Magazine Vol. 1 (1976)
+  if (!hasBadge('dragon_signal') && month === 6 && day === 1) {
+    awardBadge('dragon_signal')
+    awarded.push('dragon_signal')
+  }
+  // FF Signal: Dec 18 — Final Fantasy I released in Japan 1987
+  if (!hasBadge('ff_signal') && month === 12 && day === 18) {
+    awardBadge('ff_signal')
+    awarded.push('ff_signal')
+  }
+  // Pokémon Signal: Feb 27 — Pokémon Red/Green released in Japan 1996
+  if (!hasBadge('pokemon_signal') && month === 2 && day === 27) {
+    awardBadge('pokemon_signal')
+    awarded.push('pokemon_signal')
+  }
+  // Dragon Quest Signal: May 27 — Dragon Quest I released in Japan 1986
+  if (!hasBadge('dragon_quest_signal') && month === 5 && day === 27) {
+    awardBadge('dragon_quest_signal')
+    awarded.push('dragon_quest_signal')
+  }
+
+  // ── Calendar v28 — THE A.I. CALENDAR ──────────────────────────────────────
+  // Shannon Signal: Apr 30 — Claude Shannon born 1916
+  if (!hasBadge('shannon_signal') && month === 4 && day === 30) {
+    awardBadge('shannon_signal')
+    awarded.push('shannon_signal')
+  }
+  // Lovelace Day: Dec 10 — Ada Lovelace born 1815
+  if (!hasBadge('lovelace_day') && month === 12 && day === 10) {
+    awardBadge('lovelace_day')
+    awarded.push('lovelace_day')
+  }
+  // Von Neumann Day: Dec 28 — John von Neumann born 1903
+  if (!hasBadge('von_neumann_day') && month === 12 && day === 28) {
+    awardBadge('von_neumann_day')
+    awarded.push('von_neumann_day')
+  }
+
+  // ── Calendar v29 — THE MYTH CALENDAR ──────────────────────────────────────
+  // Campbell Day: March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces)
+  if (!hasBadge('campbell_day') && month === 3 && day === 26) {
+    awardBadge('campbell_day')
+    awarded.push('campbell_day')
+  }
+  // Jung Day: July 26 — Carl Jung born 1875 (Collective Unconscious, Archetypes)
+  if (!hasBadge('jung_day') && month === 7 && day === 26) {
+    awardBadge('jung_day')
+    awarded.push('jung_day')
+  }
+  // Eliade Day: March 13 — Mircea Eliade born 1907 (The Sacred and the Profane)
+  if (!hasBadge('eliade_day') && month === 3 && day === 13) {
+    awardBadge('eliade_day')
+    awarded.push('eliade_day')
+  }
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+  // Pong Day: November 29 — Pong released by Atari, 1972
+  if (!hasBadge('pong_day') && month === 11 && day === 29) {
+    awardBadge('pong_day')
+    awarded.push('pong_day')
+  }
+  // Game Boy Day: April 21 — Game Boy released by Nintendo, 1989
+  if (!hasBadge('gameboy_day') && month === 4 && day === 21) {
+    awardBadge('gameboy_day')
+    awarded.push('gameboy_day')
+  }
+  // Pac-Man Day: May 22 — Pac-Man released by Namco, 1980
+  if (!hasBadge('pac_man_day') && month === 5 && day === 22) {
+    awardBadge('pac_man_day')
+    awarded.push('pac_man_day')
+  }
+
+  // ── Calendar EE v31 — THE DREAM CALENDAR ──────────────────────────────────
+  // World Dream Day: September 25
+  if (!hasBadge('world_dream_day') && month === 9 && day === 25) {
+    awardBadge('world_dream_day')
+    awarded.push('world_dream_day')
+  }
+  // Neil Gaiman Birthday: November 10 — born 1960 (The Sandman)
+  if (!hasBadge('gaiman_birthday') && month === 11 && day === 10) {
+    awardBadge('gaiman_birthday')
+    awarded.push('gaiman_birthday')
+  }
+  // Sigmund Freud Birthday: May 6 — born 1856 (The Interpretation of Dreams)
+  if (!hasBadge('freud_birthday') && month === 5 && day === 6) {
+    awardBadge('freud_birthday')
+    awarded.push('freud_birthday')
+  }
+
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ──────────────────────────
+  // Marcus Aurelius Birthday: April 26 — born 121 AD
+  if (!hasBadge('aurelius_day') && month === 4 && day === 26) {
+    awardBadge('aurelius_day')
+    awarded.push('aurelius_day')
+  }
+  // Zeno of Citium Birthday: February 19 — born ~334 BC (founder of Stoicism)
+  if (!hasBadge('zeno_day') && month === 2 && day === 19) {
+    awardBadge('zeno_day')
+    awarded.push('zeno_day')
+  }
+  // World Philosophy Day: November 20 — UNESCO World Philosophy Day
+  if (!hasBadge('world_philosophy_day') && month === 11 && day === 20) {
+    awardBadge('world_philosophy_day')
+    awarded.push('world_philosophy_day')
+  }
+
+  // ── Calendar EE v33 — THE ZEN CALENDAR ────────────────────────────────────
+  // Bodhi Day: December 8 — Buddha's enlightenment under the Bodhi tree
+  if (!hasBadge('bodhi_day_badge') && month === 12 && day === 8) {
+    awardBadge('bodhi_day_badge')
+    awarded.push('bodhi_day_badge')
+  }
+  // Vesak Day: May 23 — Buddha's birth, enlightenment, and parinirvana
+  if (!hasBadge('vesak_signal') && month === 5 && day === 23) {
+    awardBadge('vesak_signal')
+    awarded.push('vesak_signal')
+  }
+  // Bashō Day: October 12 — Matsuo Bashō death anniversary 1694
+  if (!hasBadge('basho_day') && month === 10 && day === 12) {
+    awardBadge('basho_day')
+    awarded.push('basho_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1701,227 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v24 — THE ROGUELITE CODEX word turns ─────────────────────────────────────
+  { patterns: /\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i,                badge: 'permadeath_accepted' },
+  { patterns: /\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i,              badge: 'procedural_run' },
+  { patterns: /\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i,                              badge: 'rng_blessed' },
+  { patterns: /\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i,                    badge: 'biome_entered' },
+  { patterns: /\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i,   badge: 'meta_progress' },
+  { patterns: /\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i,       badge: 'synergy_found' },
+  { patterns: /\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i,   badge: 'floor_cleared' },
+  { patterns: /\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i, badge: 'mutation_chosen' },
+  { patterns: /\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i,       badge: 'heat_level' },
+  { patterns: /\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i,               badge: 'boon_accepted' },
+  { patterns: /\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i, badge: 'endless_mode' },
+  { patterns: /\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i,                       badge: 'ascension_run' },
+  // ── v21 Secret Boss — THE ROGUE VAULT word triggers ──────────────────────────
+  { patterns: /\bshade\b|\bcharon\b|\bnyx\b|\bthanatos\b|\bhypnos\b|\belysium\b/i,                               badge: 'hades_shade' },
+  { patterns: /\bnethack\b|\bascended\b|\byasd\b|\badom\b|\brogue[\s-]?variant\b/i,                              badge: 'nethack_rune' },
+  { patterns: /\bgreedier[\s-]?mode\b|\bmega[\s-]?satan\b|\bafterbirth\b|\brepentance\b|\bbinding[\s-]?of\b/i,  badge: 'isaac_secret' },
+  // ── v26 THE MAP ROOM — word turns ─────────────────────────────────────────
+  { patterns: /\bfog[\s-]?of[\s-]?war\b|\bfog[\s-]?lifted\b|\bclarity[\s-]?came\b|\bemerged[\s-]?from[\s-]?the[\s-]?fog\b/i, badge: 'fog_lifted' },
+  { patterns: /\btreasure[\s-]?room\b|\bunexpected[\s-]?find\b|\bfound[\s-]?gold\b|\bjackpot\b|\bthe[\s-]?motherlode\b/i,      badge: 'treasure_room' },
+  { patterns: /\bsecret[\s-]?passage\b|\bhidden[\s-]?door\b|\bfound[\s-]?a[\s-]?secret\b|\bsecret[\s-]?room\b/i,              badge: 'secret_passage' },
+  { patterns: /\btrap\b|\bdisarmed\b|\bsaw[\s-]?it[\s-]?coming\b|\bdefused[\s-]?it\b/i,                                       badge: 'trap_disarmed' },
+  { patterns: /\bupdated[\s-]?my[\s-]?map\b|\bcharted\b|\bnew[\s-]?territory\b|\bmental[\s-]?map\b/i,                         badge: 'map_updated' },
+  { patterns: /\blow[\s-]?hp\b|\brunning[\s-]?on[\s-]?empty\b|\bdepleted\b|\btank[\s-]?nearly[\s-]?empty\b/i,                 badge: 'low_hp' },
+  { patterns: /\blit[\s-]?a[\s-]?candle\b|\bshed[\s-]?light[\s-]?on\b|\bbrought[\s-]?clarity\b|\billuminated\b/i,            badge: 'torch_lit' },
+  { patterns: /\blocked[\s-]?door\b|\bblocked\b|\bnot[\s-]?ready[\s-]?yet\b|\bgated\b/i,                                      badge: 'locked_room' },
+  { patterns: /\bfound[\s-]?the[\s-]?key\b|\bthat[\s-]?s[\s-]?the[\s-]?key\b|\bkey[\s-]?insight\b|\bunlocked[\s-]?it\b/i,   badge: 'key_drop' },
+  { patterns: /\bfinal[\s-]?room\b|\blast[\s-]?door\b|\bendgame[\s-]?moment\b|\bthis[\s-]?is[\s-]?it\b/i,                    badge: 'final_room' },
+  { patterns: /\brest[\s-]?point\b|\bsafe[\s-]?room\b|\btook[\s-]?a[\s-]?rest\b|\brest[\s-]?and[\s-]?recharge\b/i,          badge: 'rest_point' },
+  { patterns: /\bfound[\s-]?the[\s-]?path\b|\bway[\s-]?forward\b|\bpath[\s-]?forward\b|\bnext[\s-]?level\b/i,                badge: 'path_found' },
+  // ── v23 Secret Boss — THE ANCIENT VAULT word triggers ─────────────────────
+  { patterns: /\bdark[\s-]?souls\b|\byou[\s-]?died\b|\bbonfire[\s-]?lit\b|\bestus[\s-]?flask\b|\bpraise[\s-]?the[\s-]?sun\b/i, badge: 'dark_souls_echo' },
+  { patterns: /\bd[\s-]?n[\s-]?d\b|\bdungeons?[\s-]?and[\s-]?dragons?\b|\bnat[\s-]?20\b|\bnatural[\s-]?twenty\b|\bdungeon[\s-]?master\b/i, badge: 'd_n_d_roll' },
+  { patterns: /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i,                                            badge: 'myst_island' },
+  // ── v27 THE CHRONO OPERATOR word triggers ────────────────────────────────
+  { patterns: /\btime[\s-]?loop\b|\bstuck[\s-]?in[\s-]?a[\s-]?loop\b|\bgroundhog[\s-]?day\b|\bsame[\s-]?cycle\b/i,          badge: 'time_loop_badge' },
+  { patterns: /\bparadox\b|\bcontradiction\b|\bholding[\s-]?both[\s-]?truths\b|\bcognitive[\s-]?dissonance\b/i,               badge: 'paradox_log' },
+  { patterns: /\bparallel\b|\balternative[\s-]?version\b|\bwhat[\s-]?if[\s-]?i[\s-]?had\b|\bother[\s-]?me\b/i,               badge: 'parallel_path' },
+  { patterns: /\bnew[\s-]?chapter\b|\brewriting\b|\bfresh[\s-]?timeline\b|\bresetting[\s-]?my\b/i,                            badge: 'reset_timeline' },
+  { patterns: /\bpast[\s-]?self\b|\byounger[\s-]?self\b|\bwent[\s-]?back[\s-]?to\b|\bold[\s-]?wound\b/i,                     badge: 'past_visitor' },
+  { patterns: /\bfuture[\s-]?self\b|\bletter[\s-]?to[\s-]?future\b|\bfuture[\s-]?me\b|\becho[\s-]?from\b/i,                  badge: 'future_echo' },
+  { patterns: /\bgrounded[\s-]?in[\s-]?now\b|\bcame[\s-]?back[\s-]?to\b|\banchored\b|\bbrought[\s-]?back\b/i,                badge: 'chrono_anchor' },
+  { patterns: /\badrift\b|\blost[\s-]?track[\s-]?of[\s-]?time\b|\btime[\s-]?flew[\s-]?by\b|\blost[\s-]?sense\b/i,            badge: 'time_drifted' },
+  { patterns: /\bslow[\s-]?down\b|\bslowed[\s-]?down\b|\btook[\s-]?it[\s-]?slow\b|\bsavored[\s-]?the\b/i,                   badge: 'slow_wave' },
+  { patterns: /\bjumped[\s-]?ahead\b|\brushed[\s-]?through\b|\bfast[\s-]?forward\b|\bskipped[\s-]?over\b/i,                  badge: 'skip_frame' },
+  { patterns: /\bturning[\s-]?point\b|\bnew[\s-]?era\b|\bhistoric[\s-]?for[\s-]?me\b|\bentered[\s-]?a[\s-]?new[\s-]?era\b/i, badge: 'epoch_turn' },
+  { patterns: /\btime[\s-]?capsule\b|\bwrote[\s-]?to[\s-]?future\b|\bletter[\s-]?to[\s-]?future\b|\bsealed\b/i,              badge: 'time_vault' },
+  // ── v24 Secret Boss — THE TIME VAULT word triggers ───────────────────────
+  { patterns: /\btime[\s-]?machine\b|\btime[\s-]?traveler\b|\bh\.?g\.?[\s-]?wells\b|\bwar[\s-]?of[\s-]?the[\s-]?worlds\b/i, badge: 'wells_machine' },
+  { patterns: /\bubik\b|\bpalmer[\s-]?eldritch\b|\btime[\s-]?out[\s-]?of[\s-]?joint\b|\bflow[\s-]?my[\s-]?tears\b/i,        badge: 'dick_time' },
+  { patterns: /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i,                        badge: 'vonnegut_stuck' },
+  // ── v28 THE DUNGEON DELVER word triggers ──────────────────────────────────
+  { patterns: /\bcritical[\s-]?success\b|\bscored[\s-]?a[\s-]?critical\b|\bperfect[\s-]?execution\b|\brolled[\s-]?perfectly\b|\bcrits?\b/i, badge: 'nat_twenty' },
+  { patterns: /\bsaving[\s-]?throw\b|\bmade[\s-]?the[\s-]?save\b|\bresist[\s-]?the[\s-]?pull\b|\bdodged[\s-]?the[\s-]?blow\b/i,              badge: 'saving_throw' },
+  { patterns: /\bleveled[\s-]?up\b|\bgained[\s-]?experience\b|\bnext[\s-]?level\b|\bcharacter[\s-]?growth\b|\bupgraded[\s-]?my\b/i,          badge: 'level_up_check' },
+  { patterns: /\brolling[\s-]?the[\s-]?dice\b|\bleft[\s-]?it[\s-]?to[\s-]?chance\b|\bdice[\s-]?fall\b|\brisk[\s-]?the[\s-]?roll\b/i,        badge: 'roll_for_it' },
+  { patterns: /\bdark[\s-]?corridor\b|\bwinding[\s-]?path[\s-]?down\b|\bcarved[\s-]?my[\s-]?way\b|\binto[\s-]?the[\s-]?depths\b|\blost[\s-]?in[\s-]?the\b/i, badge: 'dungeon_crawl' },
+  { patterns: /\blong[\s-]?arc\b|\bcharacter[\s-]?arc\b|\bstory[\s-]?arc\b|\brunning[\s-]?campaign\b|\bthe[\s-]?long[\s-]?campaign\b/i,       badge: 'campaign_log_badge' },
+  { patterns: /\bwearing[\s-]?many[\s-]?hats\b|\btwo[\s-]?paths[\s-]?at[\s-]?once\b|\bhybrid[\s-]?skill\b|\bboth[\s-]?roles\b|\bhyphenated[\s-]?identity\b/i, badge: 'multiclass_moment' },
+  { patterns: /\bnoticed[\s-]?something\b|\bpaying[\s-]?closer[\s-]?attention\b|\blooked[\s-]?closer\b|\bsituational[\s-]?awareness\b/i,      badge: 'perception_check' },
+  { patterns: /\bhit[\s-]?points\b|\brunning[\s-]?on[\s-]?fumes\b|\benergy[\s-]?depleted\b|\blow[\s-]?on[\s-]?reserves\b|\brunning[\s-]?empty\b/i, badge: 'hit_points_low' },
+  { patterns: /\bfull[\s-]?recovery\b|\brestorative[\s-]?sleep\b|\bdeep[\s-]?sleep[\s-]?night\b|\brested[\s-]?and[\s-]?restored\b|\blong[\s-]?rest\b/i, badge: 'long_rest_badge' },
+  { patterns: /\bkept[\s-]?going[\s-]?despite\b|\bendured[\s-]?the\b|\bstamina[\s-]?to\b|\bsheer[\s-]?persistence\b|\bconstitution[\s-]?to\b/i, badge: 'constitution_save' },
+  { patterns: /\bfinal[\s-]?encounter\b|\bdecisive[\s-]?moment\b|\bmoment[\s-]?of[\s-]?truth\b|\bnow[\s-]?or[\s-]?never\b|\bthis[\s-]?is[\s-]?the[\s-]?one\b/i, badge: 'final_encounter' },
+  // ── v25 Secret Boss — THE DRAGON'S VAULT word triggers ───────────────────
+  { patterns: /\bmoria\b|\bmines[\s-]?of[\s-]?moria\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b|\bbalrog\b|\bkhazad[\s-]?dum\b/i,               badge: 'tolkien_dungeon' },
+  { patterns: /\bgary[\s-]?gygax\b|\bpen[\s-]?and[\s-]?paper[\s-]?rpg\b|\btabletop[\s-]?rpg\b|\bdave[\s-]?arneson\b|\bpen[\s-]?and[\s-]?paper\b/i, badge: 'gygax_voice' },
+  { patterns: /\bdragon[\s-]?hoard\b|\bsmaug\b|\bancient[\s-]?dragon\b|\bfirebreather\b|\bye[\s-]?olde[\s-]?dragon\b/i,                     badge: 'dragon_hoard' },
+  // ── v29 Word Turns — THE JRPG ENGINE ────────────────────────────────────
+  { patterns: /\boverworld\b|\bworld[\s-]?map\b|\bzoomed[\s-]?out\b|\bbigger[\s-]?picture\b|\bthe[\s-]?whole[\s-]?map\b/i,                     badge: 'overworld_step' },
+  { patterns: /\binn\b|\brested[\s-]?at\b|\bsave[\s-]?state\b|\bfull[\s-]?rest\b|\brecovered[\s-]?my[\s-]?hp\b/i,                             badge: 'inn_rested_badge' },
+  { patterns: /\bparty\b|\bfound[\s-]?my[\s-]?party\b|\bmy[\s-]?companions\b|\bteam[\s-]?assembled\b|\bwe[\s-]?are[\s-]?the[\s-]?party\b/i,   badge: 'party_formed' },
+  { patterns: /\blimit[\s-]?break\b|\btrance[\s-]?state\b|\bawakened[\s-]?power\b|\bbeyond[\s-]?my[\s-]?limits\b|\bunleashed\b/i,               badge: 'limit_break_badge' },
+  { patterns: /\bphoenix[\s-]?down\b|\bback[\s-]?from[\s-]?the[\s-]?dead\b|\bkko[\s-]?recovery\b|\brose[\s-]?again\b|\bfell[\s-]?and[\s-]?got[\s-]?back\b/i, badge: 'phoenix_down_badge' },
+  { patterns: /\brandom[\s-]?encounter\b|\blife[\s-]?ambushed\b|\bcaught[\s-]?off[\s-]?guard\b|\bunexpected[\s-]?challenge\b|\bunplanned[\s-]?battle\b/i, badge: 'random_encounter_badge' },
+  { patterns: /\bsummon\b|\bcalled[\s-]?upon\b|\binvoked[\s-]?my\b|\bsummoned[\s-]?the[\s-]?strength\b|\bcalled[\s-]?in[\s-]?help\b/i,           badge: 'summon_sequence' },
+  { patterns: /\bside[\s-]?quest\b|\bdetour\b|\boff[\s-]?the[\s-]?main[\s-]?path\b|\bbonus[\s-]?mission\b|\boptional[\s-]?challenge\b/i,         badge: 'side_quest_badge' },
+  { patterns: /\bsave[\s-]?point\b|\bcheckpoint\b|\bmarked[\s-]?my[\s-]?progress\b|\bsaved[\s-]?my[\s-]?game\b|\bsafe[\s-]?place\b/i,            badge: 'save_point_badge' },
+  { patterns: /\bhp[\s-]?critical\b|\blow[\s-]?health\b|\bon[\s-]?my[\s-]?last[\s-]?hit[\s-]?point\b|\bnearly[\s-]?out\b|\bempty[\s-]?tank\b/i,  badge: 'hp_critical' },
+  { patterns: /\bendgame\b|\bfinal[\s-]?boss\b|\blast[\s-]?dungeon\b|\bthe[\s-]?end[\s-]?of[\s-]?the[\s-]?game\b|\bultimate[\s-]?challenge\b/i,   badge: 'endgame_boss' },
+  { patterns: /\bnew[\s-]?game[\s-]?plus\b|\bng\+\b|\bstarted[\s-]?over[\s-]?with[\s-]?wisdom\b|\bsecond[\s-]?playthrough\b|\bnew[\s-]?chapter\b/i, badge: 'new_game_plus' },
+  // ── v29 Secret Boss — THE JRPG VAULT word triggers ───────────────────────
+  { patterns: /\bfinal[\s-]?fantasy\b|\bcloud[\s-]?strife\b|\bsephiroth\b|\baerith\b|\btifa[\s-]?lockhart\b/i,                                   badge: 'cloud_signal' },
+  { patterns: /\bchrono[\s-]?trigger\b|\bcrono\b|\bmarle\b|\blucca\b|\bmagus\b|\bfrog[\s-]?knight\b/i,                                           badge: 'chrono_trigger_signal' },
+  { patterns: /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i,                                       badge: 'mother_signal' },
+  // ── v30 THE A.I. ENGINE — word turns (gap fix: added to WORD_TURNS for automatic detection) ───
+  { patterns: /\bneural[\s-]?network\b|\bsynapse\b|\bneural[\s-]?path\b|\bbrain[\s-]?wiring\b|\bneuroplasticity\b/i,                              badge: 'neural_pattern' },
+  { patterns: /\bin[\s-]?training\b|\bpractice[\s-]?run\b|\bbuilding[\s-]?the[\s-]?habit\b|\btraining[\s-]?day\b|\btraining[\s-]?log\b/i,       badge: 'training_log' },
+  { patterns: /\bfull[\s-]?cycle\b|\bnew[\s-]?cycle\b|\bcycle[\s-]?ends\b|\bseason[\s-]?ends\b|\bepoch[\s-]?ends\b|\bnew[\s-]?epoch\b/i,       badge: 'epoch_tracked' },
+  { patterns: /\bgradient\b|\bmomentum[\s-]?building\b|\bdirection[\s-]?clear\b|\bpointed[\s-]?toward\b|\bclear[\s-]?direction\b/i,              badge: 'gradient_lock' },
+  { patterns: /\binference\b|\bdeduced\b|\bpiecing[\s-]?together\b|\bdrew[\s-]?a[\s-]?conclusion\b|\bmade[\s-]?the[\s-]?connection\b/i,         badge: 'inference_spark' },
+  { patterns: /\bpaying[\s-]?attention\b|\bmindful[\s-]?presence\b|\bpresent[\s-]?moment\b|\bfull[\s-]?attention\b|\battentive\b/i,              badge: 'attention_mode' },
+  { patterns: /\bdeeply[\s-]?rooted\b|\banchored[\s-]?in\b|\bgrounded[\s-]?in[\s-]?the\b|\bembodied[\s-]?in\b|\bembedded[\s-]?in\b/i,          badge: 'embedding_signal' },
+  { patterns: /\bfine[\s-]?tuned\b|\bcalibrated[\s-]?to\b|\bdialed[\s-]?in\b|\bfine[\s-]?tune\b|\badjusted[\s-]?and\b|\btuned[\s-]?to\b/i,    badge: 'fine_tuned_badge' },
+  { patterns: /\breality[\s-]?check\b|\bgrounded[\s-]?check\b|\bfact[\s-]?checked\b|\bchecking[\s-]?in[\s-]?honestly\b|\bground[\s-]?truth\b/i, badge: 'reality_check_badge' },
+  { patterns: /\bresource[\s-]?economy\b|\ballocating[\s-]?my\b|\btracking[\s-]?what[\s-]?costs\b|\benergy[\s-]?budget\b|\bspend[\s-]?wisely\b/i, badge: 'token_tracked' },
+  { patterns: /\basking[\s-]?the[\s-]?right\b|\bright[\s-]?question\b|\bhow[\s-]?I[\s-]?ask\b|\bframing[\s-]?the[\s-]?question\b|\bthe[\s-]?way[\s-]?I[\s-]?ask\b/i, badge: 'prompt_found' },
+  { patterns: /\bsystem[\s-]?ready\b|\bloaded[\s-]?up\b|\binitialized\b|\bready[\s-]?to[\s-]?run\b|\bmodel[\s-]?is[\s-]?ready\b|\bready[\s-]?to[\s-]?go\b/i, badge: 'model_ready' },
+  // ── v30 A.I. ENGINE — secret boss word triggers ────────────────────────────
+  { patterns: /\bturing[\s-]?complete\b|\bturing[\s-]?machine\b|\balan[\s-]?turing\b|\bcomputational[\s-]?universality\b/i,                      badge: 'turing_complete' },
+  { patterns: /\bg[oö]del\b|\bgoedel\b|\bincompleteness[\s-]?theorem\b|\bunprovable\b|\bundecidable[\s-]?proposition\b/i,                        badge: 'godel_found' },
+  { patterns: /\bada[\s-]?lovelace\b|\bcharles[\s-]?babbage\b|\bdifference[\s-]?engine\b|\banalytical[\s-]?engine\b|\bfirst[\s-]?programmer\b/i, badge: 'ada_found' },
+  // ── v31 THE MYTH ENGINE — word turns ──────────────────────────────────────
+  { patterns: /\barchetype\b|\barchetypal\b|\bthe[\s-]?archetype\b|\bcollective[\s-]?pattern\b/i,                                                badge: 'archetype_found' },
+  { patterns: /\borigin[\s-]?story\b|\bwhere[\s-]?it[\s-]?all[\s-]?began\b|\bthe[\s-]?genesis\b|\bfounding[\s-]?moment\b|\bwhere[\s-]?this[\s-]?began\b/i, badge: 'origin_signal' },
+  { patterns: /\bsomething[\s-]?sacred\b|\bfeels[\s-]?sacred\b|\bholy[\s-]?ground\b|\bconsecrated\b|\bset[\s-]?apart[\s-]?from\b|\bthis[\s-]?is[\s-]?sacred\b/i, badge: 'sacred_found' },
+  { patterns: /\bmy[\s-]?ritual\b|\bdaily[\s-]?ritual\b|\bthe[\s-]?ritual\b|\britualize\b|\bthe[\s-]?ceremony\b|\bmy[\s-]?ceremony\b|\bmorning[\s-]?ritual\b/i, badge: 'ritual_done' },
+  { patterns: /\bmy[\s-]?mythology\b|\bpersonal[\s-]?myth\b|\bliving[\s-]?myth\b|\bmythological\b|\bthe[\s-]?mythology\b/i,                      badge: 'myth_signal' },
+  { patterns: /\bsymbolic[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?symbolizes\b|\bdeeply[\s-]?symbolic\b|\bthe[\s-]?symbolism\b|\bit[\s-]?symbolized\b|\bit[\s-]?was[\s-]?symbolic\b/i, badge: 'symbol_seen' },
+  { patterns: /\bthe[\s-]?collective\b|\bcollective[\s-]?unconscious\b|\bshared[\s-]?human[\s-]?experience\b|\bwe[\s-]?as[\s-]?a[\s-]?species\b|\bhuman[\s-]?story\b/i, badge: 'collective_signal' },
+  { patterns: /\bthe[\s-]?psyche\b|\binner[\s-]?landscape\b|\bthe[\s-]?unconscious\b|\bmapping[\s-]?my[\s-]?inner\b|\bpsychic[\s-]?energy\b|\bmy[\s-]?psyche\b/i, badge: 'psyche_map' },
+  { patterns: /\beternal[\s-]?return\b|\balways[\s-]?comes[\s-]?back[\s-]?around\b|\bthe[\s-]?cycle[\s-]?repeats\b|\bpattern[\s-]?repeats[\s-]?itself\b|\bcomes[\s-]?back[\s-]?every[\s-]?time\b/i, badge: 'eternal_return' },
+  { patterns: /\bsomething[\s-]?larger\b|\bbeyond[\s-]?ordinary\b|\bthe[\s-]?ineffable\b|\bsense[\s-]?of[\s-]?awe\b|\bnuminous\b|\btranscendent[\s-]?moment\b|\blarger[\s-]?than[\s-]?myself\b/i, badge: 'numinous_badge' },
+  { patterns: /\bmeaning[\s-]?making\b|\bmaking[\s-]?meaning\b|\bthe[\s-]?story[\s-]?I[\s-]?tell\b|\bmy[\s-]?own[\s-]?mythology\b|\bnarrative[\s-]?I[\s-]?live[\s-]?by\b/i, badge: 'myth_made' },
+  { patterns: /\bbeneath[\s-]?the[\s-]?surface\b|\bdeeper[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?s[\s-]?pointing[\s-]?to\b|\bwhat[\s-]?it[\s-]?really[\s-]?means\b|\bdeeper[\s-]?layer\b/i, badge: 'deep_symbol' },
+  // ── v31 THE MYTHIC VAULT — secret boss word triggers ──────────────────────
+  { patterns: /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b|\bindividuation\b|\banima\b|\banimus\b/i,                           badge: 'jung_found' },
+  { patterns: /\bjoseph[\s-]?campbell\b|\bmonomyth\b|\bhero[\s-]?with[\s-]?a[\s-]?thousand[\s-]?faces\b|\bcomparative[\s-]?mythology\b/i,        badge: 'campbell_signal' },
+  { patterns: /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i,                                     badge: 'eliade_found' },
+  // ── v32 THE ARCADE MASTER — word turns ────────────────────────────────────
+  { patterns: /\bhigh[\s-]?score\b|\bpersonal[\s-]?best\b|\bnew[\s-]?record\b|\bbeat[\s-]?my[\s-]?record\b|\bbest[\s-]?i'?ve[\s-]?ever[\s-]?done\b/i, badge: 'high_score' },
+  { patterns: /\bkeep[\s-]?going\b|\bpress[\s-]?continue\b|\bcontinue[\s-]?anyway\b|\bnot[\s-]?giving[\s-]?up\b|\bhit[\s-]?continue\b|\bi[\s-]?continued\b/i, badge: 'continue_signal' },
+  { patterns: /\bplayer[\s-]?two\b|\bhad[\s-]?backup\b|\bsomeone[\s-]?had[\s-]?my[\s-]?back\b|\bnot[\s-]?alone[\s-]?today\b|\bmy[\s-]?partner[\s-]?in\b|\bsomeone[\s-]?showed[\s-]?up\b/i, badge: 'player_two' },
+  { patterns: /\brespawn\b|\bfresh[\s-]?start\b|\btry[\s-]?again\b|\breset[\s-]?and[\s-]?begin\b|\bnew[\s-]?game\b|\bstarting[\s-]?over\b|\bstart[\s-]?over\b/i, badge: 'respawn_point' },
+  { patterns: /\blevel[\s-]?cleared\b|\bcleared[\s-]?it\b|\blevel[\s-]?complete\b|\bfinished[\s-]?the[\s-]?level\b|\bmoved[\s-]?to[\s-]?the[\s-]?next[\s-]?level\b|\bstage[\s-]?complete\b/i, badge: 'level_cleared' },
+  { patterns: /\bpower[\s-]?up\b|\bpowered[\s-]?up\b|\benergy[\s-]?boost\b|\bsuddenly[\s-]?energized\b|\bfelt[\s-]?the[\s-]?power\b|\bpowered[\s-]?through\b/i, badge: 'power_up' },
+  { patterns: /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b|\bfought[\s-]?the[\s-]?boss\b|\bboss[\s-]?level\b|\bthe[\s-]?big[\s-]?one\b|\bultimate[\s-]?challenge\b|\bboss[\s-]?mode\b/i, badge: 'boss_mode' },
+  { patterns: /\bextra[\s-]?life\b|\bsecond[\s-]?chance\b|\bgiven[\s-]?another[\s-]?chance\b|\bbonus[\s-]?round\b|\bone[\s-]?more[\s-]?try\b|\ba[\s-]?reprieve\b|\blife[\s-]?left\b/i, badge: 'extra_life' },
+  { patterns: /\bon[\s-]?a[\s-]?roll\b|\bmy[\s-]?combo\b|\bkeeping[\s-]?the[\s-]?streak\b|\bnot[\s-]?breaking[\s-]?the[\s-]?chain\b|\bconsecutive[\s-]?days\b|\bstreak[\s-]?going\b/i, badge: 'combo_breaker' },
+  { patterns: /\bachievement[\s-]?unlocked\b|\bunlocked[\s-]?it\b|\bi[\s-]?earned[\s-]?it\b|\bmilestone[\s-]?reached\b|\bgot[\s-]?the[\s-]?badge\b|\bunlocked[\s-]?something\b/i, badge: 'achievement_unlocked' },
+  { patterns: /\bput[\s-]?in[\s-]?the[\s-]?work\b|\binvested[\s-]?the[\s-]?time\b|\ball[\s-]?in\b|\bcommitted[\s-]?fully\b|\bcoin[\s-]?inserted\b|\bshowed[\s-]?up[\s-]?anyway\b|\bshowed[\s-]?up[\s-]?for\b/i, badge: 'insert_coin' },
+  { patterns: /\bgame[\s-]?over\b|\bchapter[\s-]?closed\b|\bmission[\s-]?complete\b|\bthe[\s-]?end[\s-]?was[\s-]?just\b|\bfinished[\s-]?the[\s-]?game\b|\bfinal[\s-]?screen\b|\bthat[\s-]?chapter[\s-]?is[\s-]?done\b/i, badge: 'game_over_won' },
+  // ── v32 THE ARCADE VAULT — secret boss word triggers ─────────────────────
+  { patterns: /\batari\b|\bnolan[\s-]?bushnell\b|\bcoin[\s-]?op\b|\bquarters[\s-]?to[\s-]?play\b|\barcade[\s-]?cabinet\b/i,                       badge: 'atari_found' },
+  { patterns: /\bnintendo\b|\bshigeru[\s-]?miyamoto\b|\bsuper[\s-]?mario\b|\blegend[\s-]?of[\s-]?zelda\b|\bmetroid\b|\bfamicom\b|\bsuper[\s-]?famicom\b/i, badge: 'nintendo_signal' },
+  { patterns: /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i,         badge: 'konami_code' },
+  // ── v33 THE DREAM WEAVER — word turns ─────────────────────────────────────
+  { patterns: /\b(lucid|lucid[\s-]?dream(?:ing)?|became[\s-]?lucid|i[\s-]?was[\s-]?dreaming|realized[\s-]?i[\s-]?was[\s-]?dreaming)\b/i,          badge: 'lucid_signal' },
+  { patterns: /\b(dream[\s-]?journal|dream[\s-]?log|recorded[\s-]?(my[\s-]?)?dream|dream[\s-]?diary|kept[\s-]?a[\s-]?dream)\b/i,                   badge: 'dream_archive_badge' },
+  { patterns: /\b(nightmare|night[\s-]?terror|bad[\s-]?dream|woke[\s-]?(?:up[\s-]?)?(?:from[\s-]?a[\s-]?)?nightmare|woke[\s-]?in[\s-]?fear)\b/i,  badge: 'nightmare_clear' },
+  { patterns: /\b(hypnagogic|hypnopompic|half[\s-]?asleep|drifting[\s-]?off|edge[\s-]?of[\s-]?sleep|between[\s-]?wake[\s-]?and[\s-]?sleep)\b/i,   badge: 'hypnagogic_badge' },
+  { patterns: /\b(sleep[\s-]?debt|sleep[\s-]?deprived|sleep[\s-]?deprivation|didn'?t[\s-]?sleep|no[\s-]?sleep|running[\s-]?on[\s-]?empty)\b/i,    badge: 'sleep_debt_found' },
+  { patterns: /\b(somnolent|drowsy|heavy[\s-]?eyes|so[\s-]?sleepy|fighting[\s-]?sleep|can'?t[\s-]?stay[\s-]?awake)\b/i,                           badge: 'somnolent_found' },
+  { patterns: /\b(dream[\s-]?symbol|what[\s-]?(?:the[\s-]?)?dream[\s-]?meant|my[\s-]?dream[\s-]?showed|dreaming[\s-]?of|i[\s-]?dreamed[\s-]?about)\b/i, badge: 'dream_symbol_found' },
+  { patterns: /\b(astral|out[\s-]?of[\s-]?body|astral[\s-]?projection|leaving[\s-]?my[\s-]?body|astral[\s-]?travel|floated[\s-]?above)\b/i,       badge: 'astral_found' },
+  { patterns: /\b(dreamscape|dream[\s-]?world|the[\s-]?dreaming|entered[\s-]?the[\s-]?dream|dream[\s-]?realm|inside[\s-]?the[\s-]?dream)\b/i,     badge: 'dreamscape_signal' },
+  { patterns: /\b(collective[\s-]?dream|shared[\s-]?dream|universal[\s-]?dream|we[\s-]?all[\s-]?dream|humanity(?:'s)?[\s-]?dream|archetypal[\s-]?dream)\b/i, badge: 'collective_dream_found' },
+  { patterns: /\b(sleep[\s-]?cycle|rem[\s-]?cycle|deep[\s-]?sleep[\s-]?stage|sleep[\s-]?science|slow[\s-]?wave[\s-]?sleep|sleep[\s-]?stages)\b/i, badge: 'sleep_cycle_signal' },
+  { patterns: /\b(waking[\s-]?dream|between[\s-]?worlds|liminal[\s-]?state|neither[\s-]?here[\s-]?nor[\s-]?there|half[\s-]?awake|not[\s-]?quite[\s-]?awake)\b/i, badge: 'waking_dream_found' },
+  // ── v33 THE DREAM VAULT — secret boss word triggers ───────────────────────
+  { patterns: /\bneil[\s-]?gaiman\b|\bsandman[\s-]?comic\b|\bdream[\s-]?of[\s-]?the[\s-]?endless\b|\bthe[\s-]?dreaming[\s-]?realm\b|\bmorpheus[\s-]?(?:dream|endless)\b/i, badge: 'gaiman_signal' },
+  { patterns: /\blovecraft\b|\bcthulhu\b|\br['']?lyeh\b|\bthat[\s-]?is[\s-]?not[\s-]?dead\b|\bdreaming[\s-]?in[\s-]?r['']?lyeh\b|\bnecronom(?:icon)?\b/i,                badge: 'lovecraft_dream' },
+  { patterns: /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b/i,                 badge: 'castaneda_dream' },
+  // ── v34 — THE STOIC FIELD — word turns ────────────────────────────────────
+  { patterns: /\bmemento[\s-]?mori\b|\bremember[\s-]?(we[\s-]?)?(all[\s-]?)?die\b|\bwe[\s-]?are[\s-]?mortal\b|\ball[\s-]?things[\s-]?end\b|\bfinite[\s-]?life\b/i,   badge: 'memento_mori_badge' },
+  { patterns: /\bamor[\s-]?fati\b|\blove[\s-]?(of[\s-]?)?fate\b|\blove[\s-]?your[\s-]?fate\b|\blove[\s-]?what[\s-]?is\b|\bembrace[\s-]?fate\b/i,                    badge: 'amor_fati_badge' },
+  { patterns: /\bstoic(ism)?\b|\bbeing[\s-]?stoic\b|\bstoic[\s-]?approach\b|\bstoic[\s-]?practice\b/i,                                                               badge: 'stoic_signal' },
+  { patterns: /\bvirtue\b|\bvirtuous(ly)?\b|\bliving[\s-]?virtuously\b|\bpractice[\s-]?of[\s-]?virtue\b|\bthe[\s-]?four[\s-]?virtues\b/i,                           badge: 'virtue_lock' },
+  { patterns: /\bself[\s-]?discipline\b|\biron[\s-]?discipline\b|\bpracticed[\s-]?discipline\b|\bdaily[\s-]?practice\b/i,                                             badge: 'discipline_found' },
+  { patterns: /\bpreferred[\s-]?indifferent\b|\bnot[\s-]?in[\s-]?my[\s-]?control\b|\bnot[\s-]?up[\s-]?to[\s-]?me\b|\bexternals[\s-]?don'?t[\s-]?matter\b/i,       badge: 'indifferent_found' },
+  { patterns: /\bequanim(ity|ous)\b|\btranquility[\s-]?of[\s-]?mind\b|\binner[\s-]?peace[\s-]?maintained\b|\buntroubled\b|\bequanimous\b/i,                           badge: 'tranquility_gate' },
+  { patterns: /\bnegative[\s-]?visualization\b|\bpremeditatio([\s-]?malorum)?\b|\bworst[\s-]?case[\s-]?scenario\b|\bimagining[\s-]?the[\s-]?loss\b/i,                badge: 'negative_viz' },
+  { patterns: /\bobstacle[\s-]?is[\s-]?the[\s-]?way\b|\bthe[\s-]?obstacle\b|\bthrough[\s-]?the[\s-]?obstacle\b|\bobstacle[\s-]?becomes[\s-]?path\b/i,                badge: 'obstacle_signal' },
+  { patterns: /\bthe[\s-]?logos\b|\brational[\s-]?(soul|principle)\b|\bdivine[\s-]?reason\b|\bwhat[\s-]?is[\s-]?rational\b/i,                                        badge: 'logos_found' },
+  { patterns: /\beudaimonia\b|\bflourishing\b|\bthe[\s-]?good[\s-]?life\b|\bfull[\s-]?flourishing\b|\bhuman[\s-]?flourishing\b/i,                                    badge: 'eudaimonia_badge' },
+  { patterns: /\bhere[\s-]?and[\s-]?now\b|\bthis[\s-]?moment[\s-]?only\b|\bonly[\s-]?this\b|\bwhat[\s-]?is[\s-]?now\b|\bthis[\s-]?is[\s-]?all[\s-]?there[\s-]?is\b/i, badge: 'present_wisdom' },
+  // ── v34 — THE PHILOSOPHY VAULT — secret boss word triggers ───────────────
+  { patterns: /\bmarcus[\s-]?aurelius\b|\bthe[\s-]?meditations\b|\bmeditations[\s-]?by[\s-]?marcus\b|\bmarcus[\s-]?on[\s-]?the[\s-]?self\b/i,                       badge: 'aurelius_echo' },
+  { patterns: /\benchiridion\b|\bepictetus\b|\bthe[\s-]?manual[\s-]?of[\s-]?epictetus\b|\bhandbook[\s-]?of[\s-]?epictetus\b/i,                                       badge: 'enchiridion_found' },
+  { patterns: /\bseneca\b|\bletters[\s-]?to[\s-]?lucilius\b|\bthe[\s-]?shortness[\s-]?of[\s-]?life\b|\bon[\s-]?the[\s-]?happy[\s-]?life\b|\bon[\s-]?anger\b/i,     badge: 'seneca_signal' },
+  // ── v35 — THE ZEN TERMINAL — word turns ───────────────────────────────────
+  { patterns: /\bzazen\b|\bsitting[\s-]?meditation\b|\bmeditation[\s-]?cushion\b|\bzazen[\s-]?practice\b/i,                                                          badge: 'zazen_badge' },
+  { patterns: /\bkoan\b|\bwhat[\s-]?is[\s-]?the[\s-]?sound\b|\bwhat[\s-]?was[\s-]?your[\s-]?face\b|\bmu[\s-]?answer\b/i,                                           badge: 'koan_solved' },
+  { patterns: /\bbeginner'?s[\s-]?mind\b|\bshoshin\b|\bmind[\s-]?is[\s-]?empty\b|\bopen[\s-]?mind[\s-]?always\b|\bmind[\s-]?of[\s-]?a[\s-]?beginner\b/i,           badge: 'beginner_mind' },
+  { patterns: /\bimpermanence\b|\banicca\b|\bnothing[\s-]?lasts\b|\ball[\s-]?things[\s-]?pass\b|\bthis[\s-]?too[\s-]?shall[\s-]?pass\b|\beverything[\s-]?changes\b/i, badge: 'impermanence_badge' },
+  { patterns: /\bens[oō]\b|\bthe[\s-]?circle\b|\bdrawing[\s-]?the[\s-]?circle\b|\bbrushstroke[\s-]?complete\b/i,                                                    badge: 'enso_drawn' },
+  { patterns: /\bdharma\b|\bthe[\s-]?dharma\b|\bdharma[\s-]?gate\b|\bdharma[\s-]?practice\b|\bthe[\s-]?teaching\b/i,                                                 badge: 'dharma_gate' },
+  { patterns: /\bthe[\s-]?koan[\s-]?mu\b|\bno[\s-]?thing\b|\bthe[\s-]?great[\s-]?doubt\b|\bwithout[\s-]?buddha\b|\bmu!\b/i,                                        badge: 'mu_signal' },
+  { patterns: /\bdojo\b|\bthe[\s-]?zendo\b|\bmeditation[\s-]?hall\b|\bpractice[\s-]?hall\b|\btraining[\s-]?hall\b/i,                                                 badge: 'dojo_active' },
+  { patterns: /\bjust[\s-]?this\b|\bonly[\s-]?this\b|\bexactly[\s-]?this\b|\bnothing[\s-]?else[\s-]?needed\b|\bjust[\s-]?being[\s-]?here\b/i,                       badge: 'just_this' },
+  { patterns: /\bno[\s-]?self\b|\banatta\b|\banatman\b|\bno[\s-]?fixed[\s-]?self\b|\bthe[\s-]?self[\s-]?is[\s-]?empty\b|\bthere[\s-]?is[\s-]?no[\s-]?self\b/i,     badge: 'no_self_badge' },
+  { patterns: /\bsuchness\b|\btathata\b|\bthusness\b|\bas[\s-]?it[\s-]?is\b|\bjust[\s-]?as[\s-]?it[\s-]?is\b|\bthe[\s-]?way[\s-]?things[\s-]?are\b|\bisness\b/i,   badge: 'suchness_signal' },
+  { patterns: /\bnirvana\b|\bparinirvana\b|\bawakening[\s-]?complete\b|\bliberation[\s-]?from\b|\bthe[\s-]?great[\s-]?peace\b|\bfinal[\s-]?release\b/i,              badge: 'nirvana_signal' },
+  // ── v35 — THE ZEN VAULT — secret boss word triggers ──────────────────────
+  { patterns: /\bhuang[\s-]?p[ōo]\b|\bhuangbo\b|\bno[\s-]?mind\b|\bdharma[\s-]?of[\s-]?mind[\s-]?transmission\b/i,                                                 badge: 'huang_po_signal' },
+  { patterns: /\bjoshu\b|\bzhaozhou\b|\bwash[\s-]?your[\s-]?bowl\b|\bjoshu'?s[\s-]?dog\b|\bcase[\s-]?one\b/i,                                                       badge: 'joshu_gate_badge' },
+  { patterns: /\bsatori\b|\bkensho\b|\bsudden[\s-]?awakening\b|\bgreat[\s-]?enlightenment\b|\bthe[\s-]?veil[\s-]?lifted\b|\bbreaking[\s-]?through\b/i,              badge: 'satori_signal' },
+  // ── v37 — THE NATURE SIGNAL — word turns ─────────────────────────────────
+  { patterns: /\bforest\b|\bwoods\b|\bwalk[\s-]?in[\s-]?the[\s-]?forest\b|\bthrough[\s-]?the[\s-]?trees\b|\bin[\s-]?the[\s-]?woods\b/i,                            badge: 'forest_signal' },
+  { patterns: /\bmycelium\b|\bmycelial\b|\bfungal[\s-]?network\b|\bmushroom[\s-]?network\b|\bwood[\s-]?wide[\s-]?web\b/i,                                           badge: 'mycelium_net' },
+  { patterns: /\bwatershed\b|\briver[\s-]?basin\b|\bwaterway\b|\bthe[\s-]?river[\s-]?flows\b|\bdrainage[\s-]?basin\b/i,                                             badge: 'watershed_badge' },
+  { patterns: /\bbiophilia\b|\blove[\s-]?of[\s-]?nature\b|\bnature[\s-]?connection\b|\bnature[\s-]?deficit\b|\baffiliation[\s-]?with[\s-]?nature\b/i,               badge: 'biophilia' },
+  { patterns: /\bdeep[\s-]?ecology\b|\becopsychology\b|\bnature[\s-]?psychology\b|\becotherapy\b|\becological[\s-]?self\b/i,                                         badge: 'deep_ecology' },
+  { patterns: /\bforest[\s-]?bath(ing)?\b|\bshinrin[\s-]?yoku\b|\bforest[\s-]?therapy\b|\bwalk[\s-]?among[\s-]?trees\b|\bimmersive[\s-]?nature\b/i,                 badge: 'forest_bath' },
+  { patterns: /\bphenology\b|\bseasonal[\s-]?cycles\b|\bbloom[\s-]?season\b|\bmigration[\s-]?patterns\b|\bphenological\b/i,                                         badge: 'phenology' },
+  { patterns: /\broot[\s-]?system\b|\btap[\s-]?root\b|\bdeep[\s-]?roots\b|\binterconnected[\s-]?roots\b|\broot[\s-]?network\b/i,                                   badge: 'root_system' },
+  { patterns: /\brewild(ing)?\b|\brestore[\s-]?habitat\b|\bwild[\s-]?spaces\b|\breintroduce\b|\bwildlife[\s-]?corridor\b/i,                                          badge: 'rewild_signal' },
+  { patterns: /\bold[\s-]?growth\b|\bancient[\s-]?forest\b|\bthousand[\s-]?year[\s-]?tree\b|\bold[\s-]?trees\b|\bgrowth[\s-]?forest\b/i,                            badge: 'old_growth' },
+  { patterns: /\btopsoil\b|\bhumus\b|\bsoil[\s-]?health\b|\bliving[\s-]?soil\b|\bsoil[\s-]?microbiome\b|\bmicrobiome[\s-]?of[\s-]?soil\b/i,                        badge: 'soil_alive' },
+  { patterns: /\bemergence\b|\bemergent\b|\bself[\s-]?organizing\b|\bcomplexity[\s-]?of[\s-]?system\b|\bcomplex[\s-]?adaptive\b|\bmurmuration\b/i,                   badge: 'emergence_field' },
+  // ── v37 — THE WILD VAULT — secret boss word triggers ─────────────────────
+  { patterns: /\bjohn[\s-]?muir\b|\bthe[\s-]?mountains[\s-]?are[\s-]?calling\b|\byosemite\b|\bsierra[\s-]?nevada\b/i,                                              badge: 'muir_signal' },
+  { patterns: /\bwalden\b|\bthoreau\b|\bcivil[\s-]?disobedience\b|\bbean[\s-]?field\b|\bwalden[\s-]?pond\b/i,                                                       badge: 'walden_signal' },
+  { patterns: /\bgaia[\s-]?hypothesis\b|\bjames[\s-]?lovelock\b|\bliving[\s-]?earth\b|\bbiosphere\b|\bself[\s-]?regulating[\s-]?system\b/i,                         badge: 'gaia_hypothesis' },
+  // ── v38 — THE BODY ELECTRIC — word turns ─────────────────────────────────
+  { patterns: /\bsomatic\b|\bbody[\s-]?scan\b|\bbodily[\s-]?awareness\b|\bbody[\s-]?based[\s-]?practice\b|\bsomatic[\s-]?practice\b/i,                             badge: 'somatic_field' },
+  { patterns: /\bproprioception\b|\bkinesthetic\b|\bspatial[\s-]?awareness\b|\bbody[\s-]?in[\s-]?space\b|\bbody[\s-]?sense\b|\bvestibular\b/i,                     badge: 'proprioception' },
+  { patterns: /\bstretching?\b|\bflexibility\b|\bmobility[\s-]?work\b|\brange[\s-]?of[\s-]?motion\b|\bmobility[\s-]?practice\b/i,                                  badge: 'stretch_signal' },
+  { patterns: /\bbreathwork\b|\bbreathe?[\s-]?work\b|\bpranayama\b|\bbreathing[\s-]?practice\b|\bbox[\s-]?breathing\b|\bwim[\s-]?hof\b|\bbreath[\s-]?work\b/i,    badge: 'breath_work' },
+  { patterns: /\bchi\b|\bprana\b|\blife[\s-]?force\b|\bvitality\b|\bqi\b|\bki\b|\bbody[\s-]?electric\b|\bI[\s-]?sing[\s-]?the[\s-]?body\b/i,                     badge: 'body_electric' },
+  { patterns: /\bmovement[\s-]?practice\b|\bdaily[\s-]?movement\b|\bintentional[\s-]?movement\b|\bsomatic[\s-]?movement\b|\bembodied[\s-]?movement\b/i,            badge: 'movement_arc' },
+  { patterns: /\brest[\s-]?day\b|\bactive[\s-]?recovery\b|\brecovery[\s-]?day\b|\brest[\s-]?and[\s-]?recovery\b|\bdeload\b|\bdeload[\s-]?week\b/i,                badge: 'rest_signal' },
+  { patterns: /\bposture\b|\bbody[\s-]?alignment\b|\bergonomics\b|\bspinal[\s-]?alignment\b|\balexander[\s-]?technique\b|\bfeldenkrais\b/i,                        badge: 'posture_arc' },
+  { patterns: /\bcold[\s-]?shower\b|\bcold[\s-]?plunge\b|\bice[\s-]?bath\b|\bcold[\s-]?exposure\b|\bcryotherapy\b|\bcold[\s-]?water[\s-]?immersion\b/i,           badge: 'cold_signal' },
+  { patterns: /\bworkout\b|\bexercise[\s-]?session\b|\btraining[\s-]?session\b|\bgym[\s-]?session\b|\bphysical[\s-]?training\b|\bstrength[\s-]?training\b/i,       badge: 'exercise_log' },
+  { patterns: /\bflow[\s-]?state\b|\bin[\s-]?the[\s-]?zone\b|\bpeak[\s-]?performance\b|\boptimal[\s-]?experience\b|\bmihaly\b|\bcsikszentmihalyi\b/i,             badge: 'flow_state' },
+  { patterns: /\bbody[\s-]?wisdom\b|\bsomatic[\s-]?intelligence\b|\bembodied[\s-]?intelligence\b|\blisten[\s-]?to[\s-]?your[\s-]?body\b|\bbody[\s-]?awareness\b/i, badge: 'body_wisdom' },
+  // ── v38 — THE ELECTRIC VAULT — secret boss word triggers ──────────────────
+  { patterns: /\bwalt[\s-]?whitman\b|\bi[\s-]?sing[\s-]?the[\s-]?body\b|\bleaves[\s-]?of[\s-]?grass\b|\bsong[\s-]?of[\s-]?myself\b/i,                            badge: 'whitman_signal' },
+  { patterns: /\bmary[\s-]?shelley\b|\bfrankenstein\b|\bgalvanism\b|\bthe[\s-]?creature\b|\bmodern[\s-]?prometheus\b/i,                                            badge: 'frankenstein_signal' },
+  { patterns: /\bcsikszentmihalyi\b|\bflow[\s-]?theory\b|\boptimal[\s-]?experience\b|\bthe[\s-]?flow[\s-]?experience\b/i,                                          badge: 'csikszentmihalyi_signal' },
 ]
 
 /**
@@ -1877,6 +2316,34 @@ export function runCheckInEasterEggs(
   const welcomeBack = checkWelcomeBackProgram()
   if (welcomeBack) awarded.push(welcomeBack)
 
+  // v30 A.I. Engine: context window (3:00–3:14 AM)
+  const contextWindow = checkContextWindow()
+  if (contextWindow) awarded.push(contextWindow)
+
+  // v31 Myth Engine: dawn rite (5:00–5:14 AM)
+  const dawnRite = checkDawnRite()
+  if (dawnRite) awarded.push(dawnRite)
+
+  // v32 Arcade Master: midnight continue (23:45–23:59)
+  const midnightContinue = checkMidnightContinue()
+  if (midnightContinue) awarded.push(midnightContinue)
+
+  // v34 Stoic Field: sunrise discipline (before 06:00 AM, 5 consecutive days)
+  const sunriseDiscipline = checkSunriseDiscipline()
+  if (sunriseDiscipline) awarded.push(sunriseDiscipline)
+
+  // v36 Jazz Engine: late_set (wire-up fix: was defined but not called in check-ins)
+  const lateSet = checkLateSet()
+  if (lateSet) awarded.push(lateSet)
+
+  // v37 Nature Signal: dawn_walker (05:00–07:00)
+  const dawnWalker = checkDawnWalker()
+  if (dawnWalker) awarded.push(dawnWalker)
+
+  // v38 Body Electric: morning_mover (06:00–09:00)
+  const morningMover = checkMorningMover()
+  if (morningMover) awarded.push(morningMover)
+
   // Record activity after all checks (so gap detection works next time)
   recordActivity()
 
@@ -1954,6 +2421,64 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // v30 A.I. Engine behavioral
+  const aiSession = checkAISession(journalText)
+  if (aiSession) awarded.push(aiSession)
+  const modelMarathon = checkModelMarathon(journalText)
+  if (modelMarathon) awarded.push(modelMarathon)
+  const aiVault = checkAIVault(journalText)
+  awarded.push(...aiVault)
+
+  // v31 Myth Engine behavioral
+  const mythSession = checkMythSession(journalText)
+  if (mythSession) awarded.push(mythSession)
+  const theEpic = checkTheEpic(journalText)
+  if (theEpic) awarded.push(theEpic)
+  const mythVault = checkMythVault(journalText)
+  awarded.push(...mythVault)
+
+  // v32 Arcade Master behavioral
+  const arcadeSession = checkArcadeSession(journalText)
+  if (arcadeSession) awarded.push(arcadeSession)
+  const arcadeVault = checkArcadeVault(journalText)
+  awarded.push(...arcadeVault)
+
+  // v34 Stoic Field behavioral
+  const stoicSession = checkStoicSession(journalText)
+  if (stoicSession) awarded.push(stoicSession)
+  const ironLog = checkIronLog(journalText)
+  if (ironLog) awarded.push(ironLog)
+
+  // v35 Zen Terminal behavioral
+  const zenSession = checkZenSession(journalText)
+  if (zenSession) awarded.push(zenSession)
+  const dawnScribe = checkDawnScribe(journalText)
+  if (dawnScribe) awarded.push(dawnScribe)
+  const eveningAudit = checkEveningAudit(journalText)
+  if (eveningAudit) awarded.push(eveningAudit)
+  const zenVault = checkZenVault(journalText)
+  awarded.push(...zenVault)
+
+  // v36 Jazz Engine behavioral + word turns (wire-up fix: were defined but not called)
+  const jazzWordTurns = checkJazzWordTurns(journalText)
+  awarded.push(...jazzWordTurns)
+  const jazzSession = checkJazzSession(journalText)
+  if (jazzSession) awarded.push(jazzSession)
+  const soloPractice = checkSoloPractice(journalText)
+  if (soloPractice) awarded.push(soloPractice)
+
+  // v37 Nature Signal behavioral
+  const natureSession = checkNatureSession(journalText)
+  if (natureSession) awarded.push(natureSession)
+  const longWalk = checkLongWalk(journalText)
+  if (longWalk) awarded.push(longWalk)
+
+  // v38 Body Electric behavioral
+  const somaticSession = checkSomaticSession(journalText)
+  if (somaticSession) awarded.push(somaticSession)
+  const longBody = checkLongBody(journalText)
+  if (longBody) awarded.push(longBody)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2655,6 +3180,19 @@ export function checkNightOperator(): BadgeType | null {
   return null
 }
 
+// ── L33T Hour — time check ────────────────────────────────────────────────────
+
+/** Award leet_hour badge if current time is 13:37 (1337 — l33t time). */
+export function checkLeetHour(): BadgeType | null {
+  if (hasBadge('leet_hour')) return null
+  const now = new Date()
+  if (now.getHours() === 13 && now.getMinutes() === 37) {
+    awardBadge('leet_hour')
+    return 'leet_hour'
+  }
+  return null
+}
+
 // ── Hero's Journey v22 behavioral checks ─────────────────────────────────────
 
 const HERO_WORDS_V22 = [
@@ -2715,3 +3253,1511 @@ export function checkThresholdMoment(): BadgeType | null {
   return null
 }
 
+// ── Stoic Field v34 behavioral checks ─────────────────────────────────────────
+
+const STOIC_WORDS_V34 = [
+  /\bmemento[\s-]?mori\b|\bremember[\s-]?(we[\s-]?)?(all[\s-]?)?die\b|\bwe[\s-]?are[\s-]?mortal\b/i,
+  /\bamor[\s-]?fati\b|\blove[\s-]?(of[\s-]?)?fate\b|\blove[\s-]?what[\s-]?is\b/i,
+  /\bstoic(ism)?\b/i,
+  /\bvirtue\b|\bvirtuous(ly)?\b|\bthe[\s-]?four[\s-]?virtues\b/i,
+  /\bself[\s-]?discipline\b|\biron[\s-]?discipline\b|\bdaily[\s-]?practice\b/i,
+  /\b(preferred[\s-]?indifferent|not[\s-]?in[\s-]?my[\s-]?control|not[\s-]?up[\s-]?to[\s-]?me)\b/i,
+  /\bequanim(ity|ous)\b|\btranquility[\s-]?of[\s-]?mind\b|\buntroubled\b/i,
+  /\b(negative[\s-]?visualization|premeditatio([\s-]?malorum)?)\b/i,
+  /\bobstacle[\s-]?is[\s-]?the[\s-]?way\b|\bthrough[\s-]?the[\s-]?obstacle\b/i,
+  /\bthe[\s-]?logos\b|\brational[\s-]?(soul|principle)\b|\bdivine[\s-]?reason\b/i,
+  /\beudaimonia\b|\bflourishing\b|\bthe[\s-]?good[\s-]?life\b|\bhuman[\s-]?flourishing\b/i,
+  /\bhere[\s-]?and[\s-]?now\b|\bthis[\s-]?moment[\s-]?only\b|\bonly[\s-]?this\b/i,
+]
+
+/**
+ * Award stoic_session badge if 3+ Stoic Field (v34) words appear in one journal entry.
+ */
+export function checkStoicSession(journalText: string): BadgeType | null {
+  if (hasBadge('stoic_session')) return null
+  const matchCount = STOIC_WORDS_V34.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('stoic_session')
+    return 'stoic_session'
+  }
+  return null
+}
+
+/**
+ * Award iron_log badge if journal entry is 700+ words.
+ */
+export function checkIronLog(journalText: string): BadgeType | null {
+  if (hasBadge('iron_log')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('iron_log')
+    return 'iron_log'
+  }
+  return null
+}
+
+/**
+ * Award sunrise_discipline badge if user checks in before 06:00 AM for 5 consecutive calendar days.
+ * Tracks early check-in calendar days in localStorage.
+ */
+export function checkSunriseDiscipline(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('sunrise_discipline')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6) return null
+
+  try {
+    const key = 'early_checkin_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      days.sort()
+      localStorage.setItem(key, JSON.stringify(days.slice(-30)))
+    }
+
+    // Check 5 consecutive calendar days
+    const unique = Array.from(new Set(days)).sort()
+    let consecutive = 1
+    for (let i = unique.length - 1; i > 0; i--) {
+      const curr = new Date(unique[i])
+      const prev = new Date(unique[i - 1])
+      const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
+      if (diffDays === 1) {
+        consecutive++
+        if (consecutive >= 5) {
+          awardBadge('sunrise_discipline')
+          return 'sunrise_discipline'
+        }
+      } else {
+        break
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+// ── RPG Codex v23 — word detection and behavioral checks ─────────────────────
+
+const RPG_WORDS_V23 = [
+  /\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bgained[\s-]?a[\s-]?level\b/i,
+  /\bexperience[\s-]?points\b|\b[Xx][Pp]\b|\bgrinding\b|\bgrind[\s-]?session\b/i,
+  /\bquest[\s-]?log\b|\bside[\s-]?quest\b|\bmain[\s-]?quest\b|\bnew[\s-]?quest\b/i,
+  /\bdungeon\b|\bdungeon[\s-]?crawl\b|\bboss[\s-]?room\b|\blevel[\s-]?boss\b/i,
+  /\bcast[\s-]?a[\s-]?spell\b|\bmana\b|\bspellbook\b|\bincantation\b/i,
+  /\bloot[\s-]?drop\b|\btreasure[\s-]?chest\b|\brave[\s-]?item\b|\blegendary[\s-]?drop\b/i,
+  /\brespawn\b|\bsecond[\s-]?chance\b|\bcheckpoint[\s-]?saved\b|\bnew[\s-]?life[\s-]?begins\b/i,
+  /\bguild\b|\braid[\s-]?party\b|\bjoin[\s-]?the[\s-]?guild\b|\bparty[\s-]?member\b/i,
+  /\bboss[\s-]?fight\b|\bfinal[\s-]?boss\b|\bendgame[\s-]?boss\b|\bboss[\s-]?battle\b/i,
+  /\bcharacter[\s-]?class\b|\bmy[\s-]?class\b|\bskill[\s-]?build\b|\barchetype[\s-]?choice\b/i,
+  /\binventory[\s-]?full\b|\bbackpack\b|\bloadout\b|\bitem[\s-]?slots\b/i,
+  /\bskill[\s-]?tree\b|\btalent[\s-]?tree\b|\bpassive[\s-]?ability\b|\bunlock[\s-]?skill\b/i,
+]
+
+/**
+ * Award rpg_session badge if 3+ RPG Codex (v23) words appear in one journal entry.
+ */
+export function checkRPGSession(journalText: string): BadgeType | null {
+  if (hasBadge('rpg_session')) return null
+  const matchCount = RPG_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('rpg_session')
+    return 'rpg_session'
+  }
+  return null
+}
+
+/**
+ * Award marathon_log badge if journal entry is 600+ words.
+ */
+export function checkMarathonLog(journalText: string): BadgeType | null {
+  if (hasBadge('marathon_log')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    awardBadge('marathon_log')
+    return 'marathon_log'
+  }
+  return null
+}
+
+/**
+ * Check word-turn badges for RPG Codex v23 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRPGCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\blevel[\s-]?up\b|\bleveled[\s-]?up\b|\bgained[\s-]?a[\s-]?level\b/i, 'levelup_signal'],
+    [/\bexperience[\s-]?points\b|\b[Xx][Pp]\b|\bgrinding\b|\bgrind[\s-]?session\b/i, 'xp_earned'],
+    [/\bquest[\s-]?log\b|\bside[\s-]?quest\b|\bmain[\s-]?quest\b|\bnew[\s-]?quest\b/i, 'quest_log_entry'],
+    [/\bdungeon\b|\bdungeon[\s-]?crawl\b|\bboss[\s-]?room\b|\blevel[\s-]?boss\b/i, 'dungeon_dive'],
+    [/\bcast[\s-]?a[\s-]?spell\b|\bmana\b|\bspellbook\b|\bincantation\b/i, 'spell_cast'],
+    [/\bloot[\s-]?drop\b|\btreasure[\s-]?chest\b|\brave[\s-]?item\b|\blegendary[\s-]?drop\b/i, 'loot_drop'],
+    [/\brespawn\b|\bsecond[\s-]?chance\b|\bcheckpoint[\s-]?saved\b|\bnew[\s-]?life[\s-]?begins\b/i, 'respawn_signal'],
+    [/\bguild\b|\braid[\s-]?party\b|\bjoin[\s-]?the[\s-]?guild\b|\bparty[\s-]?member\b/i, 'guild_protocol'],
+    [/\bboss[\s-]?fight\b|\bfinal[\s-]?boss\b|\bendgame[\s-]?boss\b|\bboss[\s-]?battle\b/i, 'boss_encounter'],
+    [/\bcharacter[\s-]?class\b|\bmy[\s-]?class\b|\bskill[\s-]?build\b|\barchetype[\s-]?choice\b/i, 'character_class'],
+    [/\binventory[\s-]?full\b|\bbackpack\b|\bloadout\b|\bitem[\s-]?slots\b/i, 'inventory_check'],
+    [/\bskill[\s-]?tree\b|\btalent[\s-]?tree\b|\bpassive[\s-]?ability\b|\bunlock[\s-]?skill\b/i, 'skill_tree_node'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Check secret boss v20 — hidden RPG/Gaming triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkFinalBossVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('zelda_triforce') && /\btriforce\b|\bhyrule\b|\blink's[\s-]?journey\b|\bganondorf\b/i.test(journalText)) {
+    if (awardBadge('zelda_triforce')) awarded.push('zelda_triforce')
+  }
+  if (!hasBadge('pac_ghost') && /\bpac[\s-]?man\b|\bwaka[\s-]?waka\b|\bblinky\b|\bpower[\s-]?pellet\b|\binky[\s-]?pinky\b/i.test(journalText)) {
+    if (awardBadge('pac_ghost')) awarded.push('pac_ghost')
+  }
+  if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bb[\s-]?a[\s-]?start\b|\bbarrel[\s-]?roll\b/i.test(journalText)) {
+    if (awardBadge('konami_code')) awarded.push('konami_code')
+  }
+
+  return awarded
+}
+
+// ── v34 — THE ROGUELITE CODEX ─────────────────────────────────────────────────
+
+const ROGUE_WORDS_V24 = [
+  /\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i,
+  /\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i,
+  /\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i,
+  /\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i,
+  /\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i,
+  /\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i,
+  /\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i,
+  /\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i,
+  /\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i,
+  /\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i,
+  /\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i,
+  /\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i,
+]
+
+/**
+ * Award roguelite_session badge if 3+ Roguelite Codex (v24) words appear in one journal entry.
+ */
+export function checkRogueliteSession(journalText: string): BadgeType | null {
+  if (hasBadge('roguelite_session')) return null
+  const matchCount = ROGUE_WORDS_V24.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('roguelite_session')
+    return 'roguelite_session'
+  }
+  return null
+}
+
+/**
+ * Award nine_nine_hour badge if check-in occurs at 09:09 local time.
+ */
+export function checkNineNineHour(): BadgeType | null {
+  if (hasBadge('nine_nine_hour')) return null
+  const now = new Date()
+  if (now.getHours() === 9 && now.getMinutes() === 9) {
+    awardBadge('nine_nine_hour')
+    return 'nine_nine_hour'
+  }
+  return null
+}
+
+/**
+ * Award fresh_start badge if this is the first check-in after a 14+ day gap.
+ * Requires lastCheckInDate from stats.
+ */
+export function checkFreshStart(lastCheckInDate: string | null | undefined): BadgeType | null {
+  if (hasBadge('fresh_start')) return null
+  if (!lastCheckInDate) return null
+  const last = new Date(lastCheckInDate)
+  const now = new Date()
+  const dayGap = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
+  if (dayGap >= 14) {
+    awardBadge('fresh_start')
+    return 'fresh_start'
+  }
+  return null
+}
+
+/**
+ * Check word-turn badges for Roguelite Codex v24 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRogueliteCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bpermadeath\b|\bpermanent[\s-]?death\b|\bone[\s-]?life\b|\bno[\s-]?continues\b/i, 'permadeath_accepted'],
+    [/\bprocgen\b|\brandom[\s-]?seed\b|\bprocedurally[\s-]?generated\b|\bnew[\s-]?run\b/i, 'procedural_run'],
+    [/\brng\b|\bgod[\s-]?roll\b|\blucky[\s-]?run\b|\bblessed[\s-]?rng\b/i, 'rng_blessed'],
+    [/\bbiome\b|\bnew[\s-]?biome\b|\bfloor[\s-]?biome\b|\benvironment[\s-]?zone\b/i, 'biome_entered'],
+    [/\bmeta[\s-]?progression\b|\bpersistent[\s-]?upgrade\b|\bbetween[\s-]?runs\b|\bmetaprogress\b/i, 'meta_progress'],
+    [/\bsynergy\b|\bbuild[\s-]?synergy\b|\bitem[\s-]?synergy\b|\bcombination[\s-]?discovered\b/i, 'synergy_found'],
+    [/\bfloor[\s-]?cleared\b|\broom[\s-]?cleared\b|\bfloor[\s-]?complete\b|\bdungeon[\s-]?floor\b/i, 'floor_cleared'],
+    [/\bmutation\b|\bpassive[\s-]?upgrade\b|\bpicked[\s-]?a[\s-]?passive\b|\bselected[\s-]?upgrade\b/i, 'mutation_chosen'],
+    [/\bheat[\s-]?level\b|\bheat[\s-]?gauge\b|\bdifficulty[\s-]?dial\b|\binfernal[\s-]?arms\b/i, 'heat_level'],
+    [/\bdivine[\s-]?boon\b|\bboon\b|\bnectar[\s-]?offered\b|\bgods?[\s-]?blessings?\b/i, 'boon_accepted'],
+    [/\bendless[\s-]?mode\b|\binfinite[\s-]?run\b|\bno[\s-]?escape\b|\bkeep[\s-]?going[\s-]?forever\b/i, 'endless_mode'],
+    [/\bascension\b|\bfinal[\s-]?ascension\b|\btrue[\s-]?ending\b|\bascended\b/i, 'ascension_run'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Check secret boss v21 — hidden Roguelite vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkRogueVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('hades_shade') && /\bshade\b|\bcharon\b|\bnyx\b|\bthanatos\b|\bhypnos\b|\belysium\b/i.test(journalText)) {
+    if (awardBadge('hades_shade')) awarded.push('hades_shade')
+  }
+  if (!hasBadge('nethack_rune') && /\bnethack\b|\byasd\b|\badom\b|\brogue[\s-]?variant\b/i.test(journalText)) {
+    if (awardBadge('nethack_rune')) awarded.push('nethack_rune')
+  }
+  if (!hasBadge('isaac_secret') && /\bgreedier[\s-]?mode\b|\bmega[\s-]?satan\b|\bafterbirth\b|\brepentance\b|\bbinding[\s-]?of\b/i.test(journalText)) {
+    if (awardBadge('isaac_secret')) awarded.push('isaac_secret')
+  }
+
+  return awarded
+}
+
+/**
+ * Check word-turn badges for Puzzle Codex v25 keywords in journal text.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkPuzzleCodexWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const text = journalText
+
+  const checks: Array<[RegExp, BadgeType]> = [
+    [/\bpuzzle[d]?\b|\bsolve[\s-]?the[\s-]?puzzle\b|\bpiece[\s-]?together\b/i, 'puzzle_solved'],
+    [/\bportal\b|\bwormhole[\s-]?portal\b|\bteleport\b|\bgateway[\s-]?portal\b/i, 'portal_open'],
+    [/\bchamber\b|\btest[\s-]?chamber\b|\bsolution[\s-]?chamber\b|\btrap[\s-]?chamber\b/i, 'chamber_cleared'],
+    [/\brecursion\b|\brecursive[\s-]?loop\b|\bit[\s-]?loops\b|\bcircular[\s-]?loop\b/i, 'recursion_loop'],
+    [/\bparadox\b|\bcatch[\s-]?22\b|\bcontradiction\b|\bimpossible[\s-]?loop\b/i, 'paradox_found'],
+    [/\btestimony\b|\bwitness[\s-]?statement\b|\bdepose\b|\baccount[\s-]?given\b/i, 'testimony_given'],
+    [/\balgorithm\b|\balgorithmic\b|\bsequence[\s-]?path\b|\bsorted[\s-]?by\b/i, 'algorithm_path'],
+    [/\bescape[\s-]?room\b|\blocked[\s-]?room\b|\bpuzzle[\s-]?escape\b|\bescape[\s-]?from\b/i, 'escape_room'],
+    [/\blogic\b|\blogical\b|\bif[\s-]?then\b|\bbinary[\s-]?logic\b|\bdecision[\s-]?tree\b/i, 'logic_gate'],
+    [/\bdimension\b|\bnew[\s-]?dimension\b|\bshifted[\s-]?dimension\b|\bdimensional\b/i, 'dimension_shift'],
+    [/\bpapers[\s-]?please\b|\bpaperwork\b|\bstamped[\s-]?approved\b|\bdocuments[\s-]?cleared\b/i, 'paperwork_clear'],
+    [/\brevelation\b|\bepiphany\b|\bsuddenly[\s-]?realized\b|\baha[\s-]?moment\b/i, 'revelation_node'],
+  ]
+
+  for (const [pattern, badgeId] of checks) {
+    if (!hasBadge(badgeId) && pattern.test(text)) {
+      if (awardBadge(badgeId)) awarded.push(badgeId)
+    }
+  }
+  return awarded
+}
+
+/**
+ * Award puzzle_session badge if 3+ Puzzle Codex (v25) words appear in one journal entry.
+ */
+export function checkPuzzleSession(journalText: string): BadgeType | null {
+  if (hasBadge('puzzle_session')) return null
+  const puzzlePatterns = [
+    /\bpuzzle[d]?\b|\bsolve[\s-]?the[\s-]?puzzle\b/i,
+    /\bportal\b|\bwormhole[\s-]?portal\b|\bteleport\b/i,
+    /\bchamber\b|\btest[\s-]?chamber\b/i,
+    /\brecursion\b|\brecursive[\s-]?loop\b/i,
+    /\bparadox\b|\bcatch[\s-]?22\b|\bcontradiction\b/i,
+    /\btestimony\b|\bwitness[\s-]?statement\b/i,
+    /\balgorithm\b|\balgorithmic\b/i,
+    /\bescape[\s-]?room\b|\blocked[\s-]?room\b/i,
+    /\blogic\b|\blogical\b|\bif[\s-]?then\b/i,
+    /\bdimension\b|\bnew[\s-]?dimension\b/i,
+    /\bpapers[\s-]?please\b|\bpaperwork\b/i,
+    /\brevelation\b|\bepiphany\b|\bsuddenly[\s-]?realized\b/i,
+  ]
+  const matchCount = puzzlePatterns.filter(p => p.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('puzzle_session')
+    return 'puzzle_session'
+  }
+  return null
+}
+
+/**
+ * Check secret boss v22 — hidden Puzzle Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkPuzzleVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('portal_turret') && /\bcompanion[\s-]?cube\b|\baperture\b|\bglados\b|\bwheatley\b|\bcake[\s-]?is[\s-]?a[\s-]?lie\b/i.test(journalText)) {
+    if (awardBadge('portal_turret')) awarded.push('portal_turret')
+  }
+  if (!hasBadge('the_witness_eye') && /\bthe[\s-]?witness\b|\bjungle[\s-]?puzzles\b|\bisland[\s-]?lasers\b|\blaser[\s-]?beams\b/i.test(journalText)) {
+    if (awardBadge('the_witness_eye')) awarded.push('the_witness_eye')
+  }
+  if (!hasBadge('baba_is_you') && /\bbaba[\s-]?is[\s-]?you\b|\bkeke\b|\bwin[\s-]?condition\b|\brock[\s-]?is\b/i.test(journalText)) {
+    if (awardBadge('baba_is_you')) awarded.push('baba_is_you')
+  }
+
+  return awarded
+}
+
+/**
+ * Check morning_solve badge: check-in between 06:00 and 08:00 for 5 consecutive days.
+ */
+export function checkMorningSolve(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('morning_solve')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 6 || hour >= 8) return null
+
+  try {
+    const key = 'morning_solve_streak'
+    const raw = localStorage.getItem(key)
+    const streak = raw ? JSON.parse(raw) : { count: 0, lastDate: '' }
+    const today = now.toISOString().split('T')[0]
+    if (streak.lastDate === today) return null
+
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yDate = yesterday.toISOString().split('T')[0]
+
+    const newCount = streak.lastDate === yDate ? streak.count + 1 : 1
+    localStorage.setItem(key, JSON.stringify({ count: newCount, lastDate: today }))
+
+    if (newCount >= 5) {
+      awardBadge('morning_solve')
+      return 'morning_solve'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+
+// ── v26 MAP ROOM — behavioral detection ──────────────────────────────────────
+
+const MAP_WORDS_V26: RegExp[] = [
+  /\bfog[\s-]?of[\s-]?war\b|\bfog[\s-]?lifted\b|\bclarity[\s-]?came\b/i,
+  /\btreasure[\s-]?room\b|\bunexpected[\s-]?find\b|\bfound[\s-]?gold\b/i,
+  /\bsecret[\s-]?passage\b|\bhidden[\s-]?door\b|\bsecret[\s-]?room\b/i,
+  /\btrap\b|\bdisarmed\b|\bsaw[\s-]?it[\s-]?coming\b/i,
+  /\bupdated[\s-]?my[\s-]?map\b|\bcharted\b|\bnew[\s-]?territory\b/i,
+  /\blow[\s-]?hp\b|\brunning[\s-]?on[\s-]?empty\b|\bdepleted\b/i,
+  /\blit[\s-]?a[\s-]?candle\b|\bshed[\s-]?light[\s-]?on\b|\billuminated\b/i,
+  /\blocked[\s-]?door\b|\bnot[\s-]?ready[\s-]?yet\b|\bgated\b/i,
+  /\bfound[\s-]?the[\s-]?key\b|\bkey[\s-]?insight\b|\bunlocked[\s-]?it\b/i,
+  /\bfinal[\s-]?room\b|\blast[\s-]?door\b|\bendgame[\s-]?moment\b/i,
+  /\brest[\s-]?point\b|\bsafe[\s-]?room\b|\brest[\s-]?and[\s-]?recharge\b/i,
+  /\bfound[\s-]?the[\s-]?path\b|\bway[\s-]?forward\b|\bpath[\s-]?forward\b/i,
+]
+
+/**
+ * Award map_session if 3+ Map Room (v26) words appear in one journal entry.
+ */
+export function checkMapSession(journalText: string): BadgeType | null {
+  if (hasBadge('map_session')) return null
+  const matchCount = MAP_WORDS_V26.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('map_session')
+    return 'map_session'
+  }
+  return null
+}
+
+/**
+ * Award illuminated if journal entry is 700+ words (the cartographer's log).
+ */
+export function checkIlluminated(journalText: string): BadgeType | null {
+  if (hasBadge('illuminated')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 700) {
+    awardBadge('illuminated')
+    return 'illuminated'
+  }
+  return null
+}
+
+/**
+ * Award dawn_patrol if check-in happens before 06:00 local on 2 separate days.
+ */
+export function checkDawnPatrol(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_patrol')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6) return null
+
+  try {
+    const key = 'dawn_patrol_dates'
+    const raw = localStorage.getItem(key)
+    const dates: string[] = raw ? JSON.parse(raw) : []
+    const today = now.toISOString().split('T')[0]
+    if (!dates.includes(today)) {
+      dates.push(today)
+      localStorage.setItem(key, JSON.stringify(dates.slice(-30)))
+    }
+    if (dates.length >= 2) {
+      awardBadge('dawn_patrol')
+      return 'dawn_patrol'
+    }
+  } catch { /* non-critical */ }
+  return null
+}
+
+/**
+ * Check secret boss v23 — hidden Ancient Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkAncientVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('dark_souls_echo') && /\bdark[\s-]?souls\b|\byou[\s-]?died\b|\bbonfire[\s-]?lit\b|\bestus[\s-]?flask\b|\bpraise[\s-]?the[\s-]?sun\b/i.test(journalText)) {
+    if (awardBadge('dark_souls_echo')) awarded.push('dark_souls_echo')
+  }
+  if (!hasBadge('d_n_d_roll') && /\bd[\s-]?n[\s-]?d\b|\bdungeons?[\s-]?and[\s-]?dragons?\b|\bnat[\s-]?20\b|\bnatural[\s-]?twenty\b/i.test(journalText)) {
+    if (awardBadge('d_n_d_roll')) awarded.push('d_n_d_roll')
+  }
+  if (!hasBadge('myst_island') && /\bmyst\b|\briven\b|\batrus\b|\bd[\s-]?ni\b|\blinking[\s-]?book\b/i.test(journalText)) {
+    if (awardBadge('myst_island')) awarded.push('myst_island')
+  }
+
+  return awarded
+}
+
+/**
+ * Check behavioral v24 — Chrono Session (3+ v27 words in one entry).
+ */
+export function checkChronoSession(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('chrono_session')) return null
+
+  const chronoPatterns = [
+    /\btime[\s-]?loop\b|\bstuck[\s-]?in[\s-]?a[\s-]?loop\b|\bgroundhog[\s-]?day\b|\bsame[\s-]?cycle\b/i,
+    /\bparadox\b|\bcontradiction\b|\bholding[\s-]?both[\s-]?truths\b|\bcognitive[\s-]?dissonance\b/i,
+    /\bparallel\b|\balternative[\s-]?version\b|\bwhat[\s-]?if[\s-]?i[\s-]?had\b|\bother[\s-]?me\b/i,
+    /\bnew[\s-]?chapter\b|\brewriting\b|\bfresh[\s-]?timeline\b|\bresetting[\s-]?my\b/i,
+    /\bpast[\s-]?self\b|\byounger[\s-]?self\b|\bwent[\s-]?back[\s-]?to\b|\bold[\s-]?wound\b/i,
+    /\bfuture[\s-]?self\b|\bletter[\s-]?to[\s-]?future\b|\bfuture[\s-]?me\b|\becho[\s-]?from\b/i,
+    /\bgrounded[\s-]?in[\s-]?now\b|\bcame[\s-]?back[\s-]?to\b|\banchored\b|\bbrought[\s-]?back\b/i,
+    /\badrift\b|\blost[\s-]?track[\s-]?of[\s-]?time\b|\btime[\s-]?flew[\s-]?by\b|\blost[\s-]?sense\b/i,
+    /\bslow[\s-]?down\b|\bslowed[\s-]?down\b|\btook[\s-]?it[\s-]?slow\b|\bsavored[\s-]?the\b/i,
+    /\bjumped[\s-]?ahead\b|\brushed[\s-]?through\b|\bfast[\s-]?forward\b|\bskipped[\s-]?over\b/i,
+    /\bturning[\s-]?point\b|\bnew[\s-]?era\b|\bhistoric[\s-]?for[\s-]?me\b|\bentered[\s-]?a[\s-]?new[\s-]?era\b/i,
+    /\btime[\s-]?capsule\b|\bwrote[\s-]?to[\s-]?future\b|\bletter[\s-]?to[\s-]?future\b|\bsealed\b/i,
+  ]
+  const matches = chronoPatterns.filter(p => p.test(journalText)).length
+  if (matches >= 3) {
+    if (awardBadge('chrono_session')) return 'chrono_session'
+  }
+  return null
+}
+
+/**
+ * Check behavioral v24 — Deep Archive (journal entry >= 600 words).
+ */
+export function checkDeepArchive(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('deep_archive')) return null
+
+  const wordCount = journalText.trim().split(/\s+/).filter(Boolean).length
+  if (wordCount >= 600) {
+    if (awardBadge('deep_archive')) return 'deep_archive'
+  }
+  return null
+}
+
+/**
+ * Check behavioral v24 — Retrograde Check (check-in 04:00–05:00 local).
+ */
+export function checkRetrogradeCheck(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('retrograde_check')) return null
+
+  const hour = new Date().getHours()
+  if (hour === 4) {
+    if (awardBadge('retrograde_check')) return 'retrograde_check'
+  }
+  return null
+}
+
+/**
+ * Check secret boss v24 — hidden Time Vault triggers.
+ * Returns array of newly awarded badge IDs.
+ */
+export function checkTimeVaultBoss(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('wells_machine') && /\btime[\s-]?machine\b|\btime[\s-]?traveler\b|\bh\.?g\.?[\s-]?wells\b|\bwar[\s-]?of[\s-]?the[\s-]?worlds\b/i.test(journalText)) {
+    if (awardBadge('wells_machine')) awarded.push('wells_machine')
+  }
+  if (!hasBadge('dick_time') && /\bubik\b|\bpalmer[\s-]?eldritch\b|\btime[\s-]?out[\s-]?of[\s-]?joint\b|\bflow[\s-]?my[\s-]?tears\b/i.test(journalText)) {
+    if (awardBadge('dick_time')) awarded.push('dick_time')
+  }
+  if (!hasBadge('vonnegut_stuck') && /\bunstuck[\s-]?in[\s-]?time\b|\bbilly[\s-]?pilgrim\b|\bslaughterhouse\b|\bvonnegut\b/i.test(journalText)) {
+    if (awardBadge('vonnegut_stuck')) awarded.push('vonnegut_stuck')
+  }
+
+  return awarded
+}
+
+// ── v28 DUNGEON DELVER — behavioral detection ─────────────────────────────
+
+const DUNGEON_WORDS_V28: RegExp[] = [
+  /\bcritical[\s-]?success\b|\bscored[\s-]?a[\s-]?critical\b|\bperfect[\s-]?execution\b|\brolled[\s-]?perfectly\b/i,
+  /\bsaving[\s-]?throw\b|\bmade[\s-]?the[\s-]?save\b|\bresist[\s-]?the[\s-]?pull\b|\bdodged[\s-]?the[\s-]?blow\b/i,
+  /\bleveled[\s-]?up\b|\bgained[\s-]?experience\b|\bnext[\s-]?level\b|\bcharacter[\s-]?growth\b/i,
+  /\brolling[\s-]?the[\s-]?dice\b|\bleft[\s-]?it[\s-]?to[\s-]?chance\b|\bdice[\s-]?fall\b/i,
+  /\bdark[\s-]?corridor\b|\bwinding[\s-]?path[\s-]?down\b|\bcarved[\s-]?my[\s-]?way\b|\binto[\s-]?the[\s-]?depths\b/i,
+  /\blong[\s-]?arc\b|\bcharacter[\s-]?arc\b|\bstory[\s-]?arc\b|\brunning[\s-]?campaign\b/i,
+  /\bwearing[\s-]?many[\s-]?hats\b|\btwo[\s-]?paths[\s-]?at[\s-]?once\b|\bhybrid[\s-]?skill\b/i,
+  /\bnoticed[\s-]?something\b|\bpaying[\s-]?closer[\s-]?attention\b|\blooked[\s-]?closer\b/i,
+  /\bhit[\s-]?points\b|\brunning[\s-]?on[\s-]?fumes\b|\benergy[\s-]?depleted\b|\blow[\s-]?on[\s-]?reserves\b/i,
+  /\bfull[\s-]?recovery\b|\brestorative[\s-]?sleep\b|\bdeep[\s-]?sleep[\s-]?night\b|\brested[\s-]?and[\s-]?restored\b/i,
+  /\bkept[\s-]?going[\s-]?despite\b|\bendured[\s-]?the\b|\bstamina[\s-]?to\b|\bsheer[\s-]?persistence\b/i,
+  /\bfinal[\s-]?encounter\b|\bdecisive[\s-]?moment\b|\bmoment[\s-]?of[\s-]?truth\b|\bnow[\s-]?or[\s-]?never\b/i,
+]
+
+export function checkDungeonSession(journalText: string): BadgeType | null {
+  if (hasBadge('dungeon_session')) return null
+  const matchCount = DUNGEON_WORDS_V28.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dungeon_session')
+    return 'dungeon_session'
+  }
+  return null
+}
+
+export function checkMarathonQuest(journalText: string): BadgeType | null {
+  if (hasBadge('marathon_quest')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 750) {
+    awardBadge('marathon_quest')
+    return 'marathon_quest'
+  }
+  return null
+}
+
+export function checkMidnightCampaign(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_campaign')) return null
+
+  const hour = new Date().getHours()
+  if (hour === 22) {
+    if (awardBadge('midnight_campaign')) return 'midnight_campaign'
+  }
+  return null
+}
+
+export function checkDragonVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+
+  if (!hasBadge('tolkien_dungeon') && /\bmoria\b|\bmines[\s-]?of[\s-]?moria\b|\byou[\s-]?shall[\s-]?not[\s-]?pass\b|\bbalrog\b|\bkhazad[\s-]?dum\b/i.test(journalText)) {
+    if (awardBadge('tolkien_dungeon')) awarded.push('tolkien_dungeon')
+  }
+  if (!hasBadge('gygax_voice') && /\bgary[\s-]?gygax\b|\bpen[\s-]?and[\s-]?paper[\s-]?rpg\b|\btabletop[\s-]?rpg\b|\bdave[\s-]?arneson\b/i.test(journalText)) {
+    if (awardBadge('gygax_voice')) awarded.push('gygax_voice')
+  }
+  if (!hasBadge('dragon_hoard') && /\bdragon[\s-]?hoard\b|\bsmaug\b|\bancient[\s-]?dragon\b|\bfirebreather\b|\bye[\s-]?olde[\s-]?dragon\b/i.test(journalText)) {
+    if (awardBadge('dragon_hoard')) awarded.push('dragon_hoard')
+  }
+
+  return awarded
+}
+
+// ── v29 THE JRPG ENGINE — Behavioral checks ──────────────────────────────────
+
+/** Award jrpg_session when 3+ v29 JRPG words appear in a single journal entry */
+export function checkJrpgSession(journalText: string): BadgeType | null {
+  if (hasBadge('jrpg_session')) return null
+  const patterns = [
+    /\boverworld\b|\bworld[\s-]?map\b/i,
+    /\binn\b|\bsave[\s-]?state\b/i,
+    /\bparty\b|\bmy[\s-]?companions\b/i,
+    /\blimit[\s-]?break\b|\btrance[\s-]?state\b/i,
+    /\bphoenix[\s-]?down\b|\bback[\s-]?from[\s-]?the[\s-]?dead\b/i,
+    /\brandom[\s-]?encounter\b|\blife[\s-]?ambushed\b/i,
+    /\bsummon\b|\bcalled[\s-]?upon\b/i,
+    /\bside[\s-]?quest\b|\bdetour\b/i,
+    /\bsave[\s-]?point\b|\bcheckpoint\b/i,
+    /\bhp[\s-]?critical\b|\blow[\s-]?health\b/i,
+    /\bendgame\b|\bfinal[\s-]?boss\b/i,
+    /\bnew[\s-]?game[\s-]?plus\b|\bng\+\b/i,
+  ]
+  const hits = patterns.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('jrpg_session')) return 'jrpg_session'
+  }
+  return null
+}
+
+/** Award overworld_return when user returns after 14+ day absence */
+export function checkOverworldReturn(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('overworld_return')) return null
+  try {
+    const lastCheckIn = localStorage.getItem('lot_last_checkin_date')
+    if (!lastCheckIn) return null
+    const last = new Date(lastCheckIn)
+    const now = new Date()
+    const daysSince = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
+    if (daysSince >= 14) {
+      if (awardBadge('overworld_return')) return 'overworld_return'
+    }
+  } catch { /* ignore */ }
+  return null
+}
+
+/** Award jrpg_marathon when journal entry >= 600 words */
+export function checkJrpgMarathon(journalText: string): BadgeType | null {
+  if (hasBadge('jrpg_marathon')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 600) {
+    if (awardBadge('jrpg_marathon')) return 'jrpg_marathon'
+  }
+  return null
+}
+
+/** Award JRPG Vault secret boss badges from journal text */
+export function checkJrpgVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('cloud_signal') && /\bfinal[\s-]?fantasy\b|\bcloud[\s-]?strife\b|\bsephiroth\b|\baerith\b|\btifa[\s-]?lockhart\b/i.test(journalText)) {
+    if (awardBadge('cloud_signal')) awarded.push('cloud_signal')
+  }
+  if (!hasBadge('chrono_trigger_signal') && /\bchrono[\s-]?trigger\b|\bcrono\b|\bmarle\b|\blucca\b|\bmagus\b|\bfrog[\s-]?knight\b/i.test(journalText)) {
+    if (awardBadge('chrono_trigger_signal')) awarded.push('chrono_trigger_signal')
+  }
+  if (!hasBadge('mother_signal') && /\bmother[\s-]?game\b|\bearth[\s-]?bound\b|\bness\b|\bpk[\s-]?fire\b|\bonett\b|\bgiygas\b/i.test(journalText)) {
+    if (awardBadge('mother_signal')) awarded.push('mother_signal')
+  }
+  return awarded
+}
+
+// ── v30 THE A.I. ENGINE — Word turn detection ─────────────────────────────────
+
+const AI_WORDS_V30: { badge: BadgeType; pattern: RegExp }[] = [
+  { badge: 'neural_pattern',      pattern: /\bneural[\s-]?network\b|\bsynapse\b|\bneural[\s-]?path\b|\bbrain[\s-]?wiring\b|\bbrain[\s-]?plasticity\b|\bneuroplasticity\b/i },
+  { badge: 'training_log',        pattern: /\bin[\s-]?training\b|\bpractice[\s-]?run\b|\bbuilding[\s-]?the[\s-]?habit\b|\btraining[\s-]?day\b|\btraining[\s-]?log\b/i },
+  { badge: 'epoch_tracked',       pattern: /\bfull[\s-]?cycle\b|\bnew[\s-]?cycle\b|\bcycle[\s-]?ends\b|\bseason[\s-]?ends\b|\bepoch[\s-]?ends\b|\bnew[\s-]?epoch\b/i },
+  { badge: 'gradient_lock',       pattern: /\bgradient\b|\bmomentum[\s-]?building\b|\bdirection[\s-]?clear\b|\bpointed[\s-]?toward\b|\bclear[\s-]?direction\b/i },
+  { badge: 'inference_spark',     pattern: /\binference\b|\bdeduced\b|\bpiecing[\s-]?together\b|\bdrew[\s-]?a[\s-]?conclusion\b|\bmade[\s-]?the[\s-]?connection\b/i },
+  { badge: 'attention_mode',      pattern: /\bpaying[\s-]?attention\b|\bmindful[\s-]?presence\b|\bpresent[\s-]?moment\b|\bfull[\s-]?attention\b|\battentive\b/i },
+  { badge: 'embedding_signal',    pattern: /\bdeeply[\s-]?rooted\b|\banchored[\s-]?in\b|\bgrounded[\s-]?in[\s-]?the\b|\bembodied[\s-]?in\b|\bembedded[\s-]?in\b/i },
+  { badge: 'fine_tuned_badge',    pattern: /\bfine[\s-]?tuned\b|\bcalibrated[\s-]?to\b|\bdialed[\s-]?in\b|\bfine[\s-]?tune\b|\badjusted[\s-]?and\b|\btuned[\s-]?to\b/i },
+  { badge: 'reality_check_badge', pattern: /\breality[\s-]?check\b|\bgrounded[\s-]?check\b|\bfact[\s-]?checked\b|\bchecking[\s-]?in[\s-]?honestly\b|\bground[\s-]?truth\b/i },
+  { badge: 'token_tracked',       pattern: /\bresource[\s-]?economy\b|\ballocating[\s-]?my\b|\btracking[\s-]?what[\s-]?costs\b|\benergy[\s-]?budget\b|\bspend[\s-]?wisely\b/i },
+  { badge: 'prompt_found',        pattern: /\basking[\s-]?the[\s-]?right\b|\bright[\s-]?question\b|\bhow[\s-]?I[\s-]?ask\b|\bframing[\s-]?the[\s-]?question\b|\bthe[\s-]?way[\s-]?I[\s-]?ask\b/i },
+  { badge: 'model_ready',         pattern: /\bsystem[\s-]?ready\b|\bloaded[\s-]?up\b|\binitialized\b|\bready[\s-]?to[\s-]?run\b|\bmodel[\s-]?is[\s-]?ready\b|\bready[\s-]?to[\s-]?go\b/i },
+]
+
+/** Run v30 A.I. Engine word turn checks on journal text. Returns newly awarded badge IDs. */
+export function checkAIWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { badge, pattern } of AI_WORDS_V30) {
+    if (!hasBadge(badge) && pattern.test(journalText)) {
+      if (awardBadge(badge)) awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award ai_session when 3+ v30 A.I. words appear in a single journal entry */
+export function checkAISession(journalText: string): BadgeType | null {
+  if (hasBadge('ai_session')) return null
+  const hits = AI_WORDS_V30.filter(({ pattern }) => pattern.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('ai_session')) return 'ai_session'
+  }
+  return null
+}
+
+/** Award context_window when checking in 03:00–03:14 AM local */
+export function checkContextWindow(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('context_window')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 3 && min <= 14) {
+    if (awardBadge('context_window')) return 'context_window'
+  }
+  return null
+}
+
+/** Award model_marathon when journal entry >= 800 words */
+export function checkModelMarathon(journalText: string): BadgeType | null {
+  if (hasBadge('model_marathon')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 800) {
+    if (awardBadge('model_marathon')) return 'model_marathon'
+  }
+  return null
+}
+
+/** Award A.I. Vault secret boss badges from journal text */
+export function checkAIVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('turing_complete') && /\bturing[\s-]?complete\b|\bturing[\s-]?machine\b|\balan[\s-]?turing\b|\balan[\s-]?m\.?[\s-]?turing\b|\bcomputational[\s-]?universality\b/i.test(journalText)) {
+    if (awardBadge('turing_complete')) awarded.push('turing_complete')
+  }
+  if (!hasBadge('godel_found') && /\bg[oö]del\b|\bgoedel\b|\bincompleteness[\s-]?theorem\b|\bunprovable\b|\bundecidable[\s-]?proposition\b/i.test(journalText)) {
+    if (awardBadge('godel_found')) awarded.push('godel_found')
+  }
+  if (!hasBadge('ada_found') && /\bada[\s-]?lovelace\b|\bcharles[\s-]?babbage\b|\bdifference[\s-]?engine\b|\banalytical[\s-]?engine\b|\bfirst[\s-]?programmer\b/i.test(journalText)) {
+    if (awardBadge('ada_found')) awarded.push('ada_found')
+  }
+  return awarded
+}
+
+// ── v31 THE MYTH ENGINE — Behavioral detection ────────────────────────────────
+
+const MYTH_WORDS_V31: RegExp[] = [
+  /\barchetype\b|\barchetypal\b|\bthe[\s-]?archetype\b|\bcollective[\s-]?pattern\b/i,
+  /\borigin[\s-]?story\b|\bwhere[\s-]?it[\s-]?all[\s-]?began\b|\bthe[\s-]?genesis\b|\bfounding[\s-]?moment\b/i,
+  /\bsomething[\s-]?sacred\b|\bfeels[\s-]?sacred\b|\bholy[\s-]?ground\b|\bconsecrated\b|\bthis[\s-]?is[\s-]?sacred\b/i,
+  /\bmy[\s-]?ritual\b|\bdaily[\s-]?ritual\b|\bthe[\s-]?ritual\b|\britualize\b|\bmorning[\s-]?ritual\b/i,
+  /\bmy[\s-]?mythology\b|\bpersonal[\s-]?myth\b|\bliving[\s-]?myth\b|\bmythological\b|\bthe[\s-]?mythology\b/i,
+  /\bsymbolic[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?symbolizes\b|\bdeeply[\s-]?symbolic\b|\bthe[\s-]?symbolism\b/i,
+  /\bthe[\s-]?collective\b|\bcollective[\s-]?unconscious\b|\bshared[\s-]?human[\s-]?experience\b|\bhuman[\s-]?story\b/i,
+  /\bthe[\s-]?psyche\b|\binner[\s-]?landscape\b|\bthe[\s-]?unconscious\b|\bmy[\s-]?psyche\b/i,
+  /\beternal[\s-]?return\b|\balways[\s-]?comes[\s-]?back[\s-]?around\b|\bthe[\s-]?cycle[\s-]?repeats\b/i,
+  /\bsomething[\s-]?larger\b|\bbeyond[\s-]?ordinary\b|\bthe[\s-]?ineffable\b|\bsense[\s-]?of[\s-]?awe\b|\bnuminous\b/i,
+  /\bmeaning[\s-]?making\b|\bmaking[\s-]?meaning\b|\bmy[\s-]?own[\s-]?mythology\b|\bnarrative[\s-]?I[\s-]?live[\s-]?by\b/i,
+  /\bbeneath[\s-]?the[\s-]?surface\b|\bdeeper[\s-]?meaning\b|\bwhat[\s-]?it[\s-]?really[\s-]?means\b|\bdeeper[\s-]?layer\b/i,
+]
+
+/** Award myth_session when 3+ Myth Engine words appear in a single journal entry */
+export function checkMythSession(journalText: string): BadgeType | null {
+  if (hasBadge('myth_session')) return null
+  const hits = MYTH_WORDS_V31.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('myth_session')) return 'myth_session'
+  }
+  return null
+}
+
+/** Award dawn_rite when checking in 5:00–5:14 AM local */
+export function checkDawnRite(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_rite')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 5 && min <= 14) {
+    if (awardBadge('dawn_rite')) return 'dawn_rite'
+  }
+  return null
+}
+
+/** Award the_epic when journal entry >= 1,200 words */
+export function checkTheEpic(journalText: string): BadgeType | null {
+  if (hasBadge('the_epic')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 1200) {
+    if (awardBadge('the_epic')) return 'the_epic'
+  }
+  return null
+}
+
+/** Award Mythic Vault secret boss badges from journal text */
+export function checkMythVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('jung_found') && /\bcarl[\s-]?jung\b|\bjungian\b|\bcollective[\s-]?unconscious\b|\bindividuation\b|\banima\b|\banimus\b/i.test(journalText)) {
+    if (awardBadge('jung_found')) awarded.push('jung_found')
+  }
+  if (!hasBadge('campbell_signal') && /\bjoseph[\s-]?campbell\b|\bmonomyth\b|\bhero[\s-]?with[\s-]?a[\s-]?thousand[\s-]?faces\b|\bcomparative[\s-]?mythology\b/i.test(journalText)) {
+    if (awardBadge('campbell_signal')) awarded.push('campbell_signal')
+  }
+  if (!hasBadge('eliade_found') && /\bmircea[\s-]?eliade\b|\bhierophany\b|\bsacred[\s-]?and[\s-]?profane\b|\baxis[\s-]?mundi\b/i.test(journalText)) {
+    if (awardBadge('eliade_found')) awarded.push('eliade_found')
+  }
+  return awarded
+}
+
+// ── v32 THE ARCADE MASTER — Behavioral detection ──────────────────────────────
+
+const ARCADE_WORDS_V32: RegExp[] = [
+  /\bhigh[\s-]?score\b|\bpersonal[\s-]?best\b|\bnew[\s-]?record\b|\bbeat[\s-]?my[\s-]?record\b|\bbest[\s-]?i'?ve[\s-]?ever[\s-]?done\b/i,
+  /\bkeep[\s-]?going\b|\bpress[\s-]?continue\b|\bcontinue[\s-]?anyway\b|\bnot[\s-]?giving[\s-]?up\b|\bhit[\s-]?continue\b/i,
+  /\bplayer[\s-]?two\b|\bhad[\s-]?backup\b|\bsomeone[\s-]?had[\s-]?my[\s-]?back\b|\bnot[\s-]?alone[\s-]?today\b/i,
+  /\brespawn\b|\bfresh[\s-]?start\b|\btry[\s-]?again\b|\breset[\s-]?and[\s-]?begin\b|\bnew[\s-]?game\b|\bstart[\s-]?over\b/i,
+  /\blevel[\s-]?cleared\b|\bcleared[\s-]?it\b|\blevel[\s-]?complete\b|\bfinished[\s-]?the[\s-]?level\b|\bstage[\s-]?complete\b/i,
+  /\bpower[\s-]?up\b|\bpowered[\s-]?up\b|\benergy[\s-]?boost\b|\bsuddenly[\s-]?energized\b|\bfelt[\s-]?the[\s-]?power\b/i,
+  /\bboss[\s-]?battle\b|\bfinal[\s-]?boss\b|\bfought[\s-]?the[\s-]?boss\b|\bboss[\s-]?level\b|\bboss[\s-]?mode\b/i,
+  /\bextra[\s-]?life\b|\bsecond[\s-]?chance\b|\bgiven[\s-]?another[\s-]?chance\b|\bbonus[\s-]?round\b|\bone[\s-]?more[\s-]?try\b/i,
+  /\bon[\s-]?a[\s-]?roll\b|\bmy[\s-]?combo\b|\bkeeping[\s-]?the[\s-]?streak\b|\bnot[\s-]?breaking[\s-]?the[\s-]?chain\b/i,
+  /\bachievement[\s-]?unlocked\b|\bunlocked[\s-]?it\b|\bi[\s-]?earned[\s-]?it\b|\bmilestone[\s-]?reached\b/i,
+  /\bput[\s-]?in[\s-]?the[\s-]?work\b|\binvested[\s-]?the[\s-]?time\b|\ball[\s-]?in\b|\bcommitted[\s-]?fully\b|\bshowed[\s-]?up[\s-]?anyway\b/i,
+  /\bgame[\s-]?over\b|\bchapter[\s-]?closed\b|\bmission[\s-]?complete\b|\bfinished[\s-]?the[\s-]?game\b|\bfinal[\s-]?screen\b/i,
+]
+
+/** Award arcade_session when 3+ Arcade Master words appear in a single journal entry */
+export function checkArcadeSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcade_session')) return null
+  const hits = ARCADE_WORDS_V32.filter(p => p.test(journalText)).length
+  if (hits >= 3) {
+    if (awardBadge('arcade_session')) return 'arcade_session'
+  }
+  return null
+}
+
+/** Award speed_run when 50+ words are submitted in under 90 seconds */
+export function checkSpeedRun(journalText: string, elapsedMs: number): BadgeType | null {
+  if (hasBadge('speed_run')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 50 && elapsedMs <= 90000) {
+    if (awardBadge('speed_run')) return 'speed_run'
+  }
+  return null
+}
+
+/** Award midnight_continue when checking in between 23:45–23:59 local time */
+export function checkMidnightContinue(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_continue')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  const min = now.getMinutes()
+  if (hour === 23 && min >= 45) {
+    if (awardBadge('midnight_continue')) return 'midnight_continue'
+  }
+  return null
+}
+
+/** Award Arcade Vault secret boss badges from journal text */
+export function checkArcadeVault(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('atari_found') && /\batari\b|\bnolan[\s-]?bushnell\b|\bcoin[\s-]?op\b|\bquarters[\s-]?to[\s-]?play\b|\barcade[\s-]?cabinet\b/i.test(journalText)) {
+    if (awardBadge('atari_found')) awarded.push('atari_found')
+  }
+  if (!hasBadge('nintendo_signal') && /\bnintendo\b|\bshigeru[\s-]?miyamoto\b|\bsuper[\s-]?mario\b|\blegend[\s-]?of[\s-]?zelda\b|\bmetroid\b|\bfamicom\b|\bsuper[\s-]?famicom\b/i.test(journalText)) {
+    if (awardBadge('nintendo_signal')) awarded.push('nintendo_signal')
+  }
+  if (!hasBadge('konami_code') && /\bkonami[\s-]?code\b|\bup[\s-]?up[\s-]?down[\s-]?down\b|\bleft[\s-]?right[\s-]?b[\s-]?a\b|\b30[\s-]?lives\b|\bkonami\b/i.test(journalText)) {
+    if (awardBadge('konami_code')) awarded.push('konami_code')
+  }
+  return awarded
+}
+
+// ── Word Turn v33 — THE DREAM WEAVER ─────────────────────────────────────────
+
+const DREAM_WEAVER_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
+  { patterns: /\b(lucid|lucid[\s-]?dream(?:ing)?|became[\s-]?lucid|i[\s-]?was[\s-]?dreaming|realized[\s-]?i[\s-]?was[\s-]?dreaming)\b/i, badge: 'lucid_signal' },
+  { patterns: /\b(dream[\s-]?journal|dream[\s-]?log|recorded[\s-]?(my[\s-]?)?dream|dream[\s-]?diary|kept[\s-]?a[\s-]?dream)\b/i, badge: 'dream_archive_badge' },
+  { patterns: /\b(nightmare|night[\s-]?terror|bad[\s-]?dream|woke[\s-]?(?:up[\s-]?)?(?:from[\s-]?)?(?:a[\s-]?)?nightmare|woke[\s-]?in[\s-]?fear)\b/i, badge: 'nightmare_clear' },
+  { patterns: /\b(hypnagogic|hypnopompic|half[\s-]?asleep|drifting[\s-]?off|edge[\s-]?of[\s-]?sleep|between[\s-]?wake[\s-]?and[\s-]?sleep|that[\s-]?moment[\s-]?before[\s-]?sleep)\b/i, badge: 'hypnagogic_badge' },
+  { patterns: /\b(sleep[\s-]?debt|sleep[\s-]?deprived|sleep[\s-]?deprivation|didn'?t[\s-]?sleep|no[\s-]?sleep(?:[\s-]?last[\s-]?night)?|slept[\s-]?(?:so[\s-]?)?little|running[\s-]?on[\s-]?empty)\b/i, badge: 'sleep_debt_found' },
+  { patterns: /\b(somnolent|drowsy|heavy[\s-]?eyes|can'?t[\s-]?(?:stay|keep[\s-]?my[\s-]?eyes?)[\s-]?awake|so[\s-]?sleepy|fighting[\s-]?sleep)\b/i, badge: 'somnolent_found' },
+  { patterns: /\b(dream[\s-]?symbol|what[\s-]?(?:the[\s-]?)?dream[\s-]?meant|my[\s-]?dream[\s-]?showed|dreaming[\s-]?of|i[\s-]?dreamed[\s-]?about|the[\s-]?dream[\s-]?had)\b/i, badge: 'dream_symbol_found' },
+  { patterns: /\b(astral|out[\s-]?of[\s-]?body|astral[\s-]?projection|leaving[\s-]?my[\s-]?body|astral[\s-]?travel|floated[\s-]?above|saw[\s-]?myself[\s-]?below)\b/i, badge: 'astral_found' },
+  { patterns: /\b(dreamscape|dream[\s-]?world|the[\s-]?dreaming|entered[\s-]?the[\s-]?dream|dream[\s-]?realm|inside[\s-]?the[\s-]?dream|within[\s-]?the[\s-]?dream)\b/i, badge: 'dreamscape_signal' },
+  { patterns: /\b(collective[\s-]?dream|shared[\s-]?dream|universal[\s-]?dream|we[\s-]?all[\s-]?dream|humanity(?:'s)?[\s-]?dream|the[\s-]?same[\s-]?dream|archetypal[\s-]?dream)\b/i, badge: 'collective_dream_found' },
+  { patterns: /\b(sleep[\s-]?cycle|rem[\s-]?cycle|deep[\s-]?sleep[\s-]?stage|sleep[\s-]?science|n3[\s-]?sleep|slow[\s-]?wave[\s-]?sleep|sleep[\s-]?stages|90[\s-]?minute[\s-]?cycle)\b/i, badge: 'sleep_cycle_signal' },
+  { patterns: /\b(waking[\s-]?dream|between[\s-]?worlds|liminal[\s-]?state|neither[\s-]?here[\s-]?nor[\s-]?there|half[\s-]?awake|not[\s-]?quite[\s-]?awake|the[\s-]?threshold[\s-]?between)\b/i, badge: 'waking_dream_found' },
+]
+
+/** Scan text for Dream Weaver word turn triggers */
+export function detectDreamWeaverTurns(text: string): BadgeType[] {
+  if (!text || text.length < 2) return []
+  const awarded: BadgeType[] = []
+  for (const { patterns, badge } of DREAM_WEAVER_TURNS) {
+    if (!hasBadge(badge) && patterns.test(text)) {
+      if (awardBadge(badge)) awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+// ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────────
+
+/** Check Dream Calendar easter eggs based on current date */
+export function checkDreamCalendarEasterEggs(): BadgeType[] {
+  const awarded: BadgeType[] = []
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+
+  // World Dream Day: September 25
+  if (!hasBadge('world_dream_day') && month === 9 && day === 25) {
+    awardBadge('world_dream_day')
+    awarded.push('world_dream_day')
+  }
+
+  // Neil Gaiman birthday: November 10 (born 1960)
+  if (!hasBadge('gaiman_birthday') && month === 11 && day === 10) {
+    awardBadge('gaiman_birthday')
+    awarded.push('gaiman_birthday')
+  }
+
+  // Sigmund Freud birthday: May 6 (born 1856)
+  if (!hasBadge('freud_birthday') && month === 5 && day === 6) {
+    awardBadge('freud_birthday')
+    awarded.push('freud_birthday')
+  }
+
+  return awarded
+}
+
+// ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────────
+
+/**
+ * Check Dream Logger badge: 3+ journal entries mentioning dreams in 7 days.
+ * Call this when a journal entry is saved.
+ */
+export function checkDreamLogger(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dream_logger')) return null
+
+  const dreamPattern = /\b(dream|dreamed|dreaming|dreamt|nightmare|lucid|dreamscape|rem[\s-]?sleep|sleep[\s-]?cycle)\b/i
+  if (!dreamPattern.test(journalText)) return null
+
+  try {
+    const key = 'dream_logger_dates'
+    const stored = localStorage.getItem(key)
+    const entries: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = new Date().toISOString().slice(0, 10)
+
+    // Add today if not already logged
+    if (!entries.includes(todayStr)) {
+      entries.push(todayStr)
+    }
+
+    // Keep only entries in last 7 days
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const recent = entries.filter(d => d >= sevenDaysAgo)
+    localStorage.setItem(key, JSON.stringify(recent))
+
+    if (recent.length >= 3) {
+      awardBadge('dream_logger')
+      return 'dream_logger'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Check Night Vision badge: check-in between 00:30–01:30 AM (deep dream hours).
+ * Call this on every check-in.
+ */
+export function checkNightVisionBadge(): BadgeType | null {
+  if (hasBadge('night_vision_badge')) return null
+  const now = new Date()
+  const h = now.getHours()
+  const m = now.getMinutes()
+  const totalMins = h * 60 + m
+  // 00:30 = 30 mins, 01:30 = 90 mins
+  if (totalMins >= 30 && totalMins <= 90) {
+    awardBadge('night_vision_badge')
+    return 'night_vision_badge'
+  }
+  return null
+}
+
+/**
+ * Check Dawn Dreamer badge: 7+ consecutive days with check-in before 08:00 AM.
+ * Call this on every check-in.
+ */
+export function checkDawnDreamer(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_dreamer')) return null
+
+  const now = new Date()
+  if (now.getHours() >= 8) return null  // Not before 08:00
+
+  try {
+    const key = 'dawn_dreamer_log'
+    const stored = localStorage.getItem(key)
+    const log: string[] = stored ? JSON.parse(stored) : []
+    const todayStr = now.toISOString().slice(0, 10)
+
+    if (!log.includes(todayStr)) {
+      log.push(todayStr)
+      const recent = log.slice(-10)
+      localStorage.setItem(key, JSON.stringify(recent))
+
+      if (recent.length >= 7) {
+        const sorted = [...recent].sort()
+        let consecutive = 1
+        for (let i = sorted.length - 1; i > 0; i--) {
+          const diff = Math.round(
+            (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime())
+            / (1000 * 60 * 60 * 24)
+          )
+          if (diff === 1) {
+            consecutive++
+            if (consecutive >= 7) {
+              awardBadge('dawn_dreamer')
+              return 'dawn_dreamer'
+            }
+          } else {
+            break
+          }
+        }
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award Dream Vault secret boss badges from journal/memory text */
+export function checkDreamVault(text: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('gaiman_signal') && /\bneil[\s-]?gaiman\b|\bsandman[\s-]?comic\b|\bmorpheus[\s-]?(?:dream|endless)\b|\bdream[\s-]?of[\s-]?the[\s-]?endless\b|\bthe[\s-]?dreaming[\s-]?realm\b|\bsandman'?s[\s-]?library\b/i.test(text)) {
+    if (awardBadge('gaiman_signal')) awarded.push('gaiman_signal')
+  }
+  if (!hasBadge('lovecraft_dream') && /\blovecraft\b|\bcthulhu\b|\br['']?lyeh\b|\bthat[\s-]?is[\s-]?not[\s-]?dead\b|\bdreaming[\s-]?in[\s-]?r['']?lyeh\b|\bph'nglui\b|\bnecronom(?:icon)?\b/i.test(text)) {
+    if (awardBadge('lovecraft_dream')) awarded.push('lovecraft_dream')
+  }
+  if (!hasBadge('castaneda_dream') && /\bcastaneda\b|\bdon[\s-]?juan\b|\bdreaming[\s-]?body\b|\bassemblage[\s-]?point\b|\bcontrolled[\s-]?dreaming\b|\bcarlos[\s-]?castaneda\b|\bthe[\s-]?art[\s-]?of[\s-]?dreaming\b/i.test(text)) {
+    if (awardBadge('castaneda_dream')) awarded.push('castaneda_dream')
+  }
+  return awarded
+}
+
+// ── Zen Terminal v35 behavioral checks ───────────────────────────────────────
+
+const ZEN_WORDS_V35 = [
+  /\bzazen\b|\bsitting[\s-]?meditation\b|\bmeditation[\s-]?cushion\b/i,
+  /\bkoan\b|\bwhat[\s-]?is[\s-]?the[\s-]?sound\b|\bmu[\s-]?answer\b/i,
+  /\bbeginner'?s[\s-]?mind\b|\bshoshin\b|\bmind[\s-]?of[\s-]?a[\s-]?beginner\b/i,
+  /\bimpermanence\b|\banicca\b|\bnothing[\s-]?lasts\b|\ball[\s-]?things[\s-]?pass\b/i,
+  /\bens[oō]\b|\bthe[\s-]?circle\b|\bbrushstroke[\s-]?complete\b/i,
+  /\bdharma\b|\bdharma[\s-]?gate\b|\bdharma[\s-]?practice\b/i,
+  /\bthe[\s-]?koan[\s-]?mu\b|\bno[\s-]?thing\b|\bthe[\s-]?great[\s-]?doubt\b/i,
+  /\bdojo\b|\bthe[\s-]?zendo\b|\bmeditation[\s-]?hall\b|\bpractice[\s-]?hall\b/i,
+  /\bjust[\s-]?this\b|\bonly[\s-]?this\b|\bexactly[\s-]?this\b|\bnothing[\s-]?else[\s-]?needed\b/i,
+  /\bno[\s-]?self\b|\banatta\b|\banatman\b|\bno[\s-]?fixed[\s-]?self\b/i,
+  /\bsuchness\b|\btathata\b|\bthusness\b|\bjust[\s-]?as[\s-]?it[\s-]?is\b/i,
+  /\bnirvana\b|\bparinirvana\b|\bawakening[\s-]?complete\b|\bthe[\s-]?great[\s-]?peace\b/i,
+]
+
+/**
+ * Award zen_session badge if 3+ Zen Terminal (v35) words appear in one journal entry.
+ */
+export function checkZenSession(journalText: string): BadgeType | null {
+  if (hasBadge('zen_session')) return null
+  const matchCount = ZEN_WORDS_V35.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('zen_session')
+    return 'zen_session'
+  }
+  return null
+}
+
+/**
+ * Award dawn_scribe badge if journal written before 05:00 AM, 7+ times in last 30 days.
+ */
+export function checkDawnScribe(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_scribe')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 5) return null
+
+  try {
+    const key = 'dawn_scribe_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      const thirtyAgo = new Date()
+      thirtyAgo.setDate(thirtyAgo.getDate() - 30)
+      const recent = days.filter(d => new Date(d) >= thirtyAgo)
+      localStorage.setItem(key, JSON.stringify(recent))
+      if (recent.length >= 7) {
+        awardBadge('dawn_scribe')
+        return 'dawn_scribe'
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/**
+ * Award evening_audit badge if journal written 20:00–22:59 for 5 consecutive days.
+ */
+export function checkEveningAudit(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('evening_audit')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 20 || hour >= 23) return null
+
+  try {
+    const key = 'evening_audit_days'
+    const today = now.toISOString().slice(0, 10)
+    const stored = localStorage.getItem(key)
+    const days: string[] = stored ? JSON.parse(stored) : []
+    if (!days.includes(today)) {
+      days.push(today)
+      days.sort()
+      localStorage.setItem(key, JSON.stringify(days.slice(-30)))
+    }
+    const unique = Array.from(new Set(days)).sort()
+    let consecutive = 1
+    for (let i = unique.length - 1; i > 0; i--) {
+      const curr = new Date(unique[i])
+      const prev = new Date(unique[i - 1])
+      const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
+      if (diffDays === 1) {
+        consecutive++
+        if (consecutive >= 5) {
+          awardBadge('evening_audit')
+          return 'evening_audit'
+        }
+      } else {
+        break
+      }
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award Zen Vault secret boss badges from journal/memory text */
+export function checkZenVault(text: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  if (!hasBadge('huang_po_signal') && /\bhuang[\s-]?p[ōo]\b|\bhuangbo\b|\bno[\s-]?mind\b|\bdharma[\s-]?of[\s-]?mind[\s-]?transmission\b/i.test(text)) {
+    if (awardBadge('huang_po_signal')) awarded.push('huang_po_signal')
+  }
+  if (!hasBadge('joshu_gate_badge') && /\bjoshu\b|\bzhaozhou\b|\bwash[\s-]?your[\s-]?bowl\b|\bjoshu'?s[\s-]?dog\b|\bcase[\s-]?one\b/i.test(text)) {
+    if (awardBadge('joshu_gate_badge')) awarded.push('joshu_gate_badge')
+  }
+  if (!hasBadge('satori_signal') && /\bsatori\b|\bkensho\b|\bsudden[\s-]?awakening\b|\bgreat[\s-]?enlightenment\b|\bthe[\s-]?veil[\s-]?lifted\b|\bbreaking[\s-]?through\b/i.test(text)) {
+    if (awardBadge('satori_signal')) awarded.push('satori_signal')
+  }
+  return awarded
+}
+
+// ── Jazz Engine v36 — word turn + behavioral checks ───────────────────────────
+
+const JAZZ_WORDS_V36 = [
+  /\bimprovise\b|\bad[\s-]?lib\b|\bgoing[\s-]?with[\s-]?it\b|\bmake[\s-]?it[\s-]?up\b/i,
+  /\bthe[\s-]?changes\b|\bchord[\s-]?changes\b|\bchanges[\s-]?happening\b/i,
+  /\bwoodshed\b|\bpracticing[\s-]?alone\b|\bthe[\s-]?shed\b|\bdeep[\s-]?practice\b/i,
+  /\bblow[\s-]?free\b|\bblowing[\s-]?free\b|\blet[\s-]?it[\s-]?out\b|\bjust[\s-]?blow\b/i,
+  /\bcomping\b|\bcomped\b|\bbacking[\s-]?up\b|\bsupporting[\s-]?the\b/i,
+  /\bjazz[\s-]?standard\b|\bthe[\s-]?standard\b|\btimeless[\s-]?song\b|\bstandards\b/i,
+  /\btrading[\s-]?fours\b|\btrade[\s-]?fours\b|\byour[\s-]?turn\b|\bpass[\s-]?it[\s-]?back\b/i,
+  /\bin[\s-]?the[\s-]?pocket\b|\blocked[\s-]?in\b|\bin[\s-]?the[\s-]?groove\b|\bthe[\s-]?pocket\b/i,
+  /\bblue[\s-]?notes?\b|\bthe[\s-]?bend\b|\bthe[\s-]?ache\b|\bminor[\s-]?third\b/i,
+  /\bthe[\s-]?session\b|\bjam[\s-]?session\b|\blate[\s-]?session\b|\bsession[\s-]?tonight\b/i,
+  /\bsideman\b|\bside[\s-]?player\b|\bsupporting[\s-]?role\b|\bplaying[\s-]?support\b/i,
+  /\breal[\s-]?book\b|\bthe[\s-]?real[\s-]?book\b|\bthe[\s-]?chart\b|\blead[\s-]?sheet\b|\bfake[\s-]?book\b/i,
+]
+
+const JAZZ_SECRET_WORDS: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\ba[\s-]?love[\s-]?supreme\b|\blove[\s-]?supreme\b|\bcoltrane[\s-]?suite\b/i, badge: 'coltrane_love' },
+  { regex: /\bkind[\s-]?of[\s-]?blue\b|\bmiles[\s-]?davis\b|\bbitches[\s-]?brew\b/i, badge: 'miles_kind_of' },
+  { regex: /\bthelonious[\s-]?monk\b|\bmonk'?s[\s-]?dream\b|\bround[\s-]?midnight\b/i, badge: 'monk_theorem' },
+]
+
+const JAZZ_WORD_MAP: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\bimprovise\b|\bad[\s-]?lib\b|\bgoing[\s-]?with[\s-]?it\b|\bmake[\s-]?it[\s-]?up\b/i, badge: 'improvise_badge' },
+  { regex: /\bthe[\s-]?changes\b|\bchord[\s-]?changes\b|\bchanges[\s-]?happening\b/i, badge: 'the_changes' },
+  { regex: /\bwoodshed\b|\bpracticing[\s-]?alone\b|\bthe[\s-]?shed\b|\bdeep[\s-]?practice\b/i, badge: 'woodshed_mode' },
+  { regex: /\bblow[\s-]?free\b|\bblowing[\s-]?free\b|\blet[\s-]?it[\s-]?out\b|\bjust[\s-]?blow\b/i, badge: 'blow_session' },
+  { regex: /\bcomping\b|\bcomped\b|\bbacking[\s-]?up\b|\bsupporting[\s-]?the\b/i, badge: 'comping_signal' },
+  { regex: /\bjazz[\s-]?standard\b|\bthe[\s-]?standard\b|\btimeless[\s-]?song\b|\bstandards\b/i, badge: 'standards_badge' },
+  { regex: /\btrading[\s-]?fours\b|\btrade[\s-]?fours\b|\byour[\s-]?turn\b|\bpass[\s-]?it[\s-]?back\b/i, badge: 'trading_fours' },
+  { regex: /\bin[\s-]?the[\s-]?pocket\b|\blocked[\s-]?in\b|\bin[\s-]?the[\s-]?groove\b|\bthe[\s-]?pocket\b/i, badge: 'in_the_pocket' },
+  { regex: /\bblue[\s-]?notes?\b|\bthe[\s-]?bend\b|\bthe[\s-]?ache\b|\bminor[\s-]?third\b/i, badge: 'blue_notes_badge' },
+  { regex: /\bthe[\s-]?session\b|\bjam[\s-]?session\b|\blate[\s-]?session\b|\bsession[\s-]?tonight\b/i, badge: 'session_signal' },
+  { regex: /\bsideman\b|\bside[\s-]?player\b|\bsupporting[\s-]?role\b|\bplaying[\s-]?support\b/i, badge: 'sideman_signal' },
+  { regex: /\breal[\s-]?book\b|\bthe[\s-]?real[\s-]?book\b|\bthe[\s-]?chart\b|\blead[\s-]?sheet\b|\bfake[\s-]?book\b/i, badge: 'real_book_badge' },
+]
+
+/** Scan journal text for all 12 Jazz Engine (v36) word turns + 3 secret boss words. */
+export function checkJazzWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { regex, badge } of JAZZ_WORD_MAP) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  for (const { regex, badge } of JAZZ_SECRET_WORDS) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award jazz_session badge if 3+ Jazz Engine (v36) words appear in one journal entry. */
+export function checkJazzSession(journalText: string): BadgeType | null {
+  if (hasBadge('jazz_session')) return null
+  const matchCount = JAZZ_WORDS_V36.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('jazz_session')
+    return 'jazz_session'
+  }
+  return null
+}
+
+/** Award late_set badge if user checks in 22:00–23:00 for 3+ times in 7 days. */
+export function checkLateSet(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('late_set')) return null
+
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour < 22 || hour >= 23) return null
+
+  try {
+    const key = 'late_set_timestamps'
+    const stored = localStorage.getItem(key)
+    const timestamps: string[] = stored ? JSON.parse(stored) : []
+    timestamps.push(now.toISOString())
+    localStorage.setItem(key, JSON.stringify(timestamps.slice(-100)))
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const lateCheckins = timestamps.filter(ts => {
+      const d = new Date(ts)
+      return d >= sevenDaysAgo && d.getHours() >= 22 && d.getHours() < 23
+    })
+    if (lateCheckins.length >= 3) {
+      awardBadge('late_set')
+      return 'late_set'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+/** Award solo_practice badge if journal 300+ words written 3+ times in one week. */
+export function checkSoloPractice(journalText: string): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('solo_practice')) return null
+
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount < 300) return null
+
+  try {
+    const key = 'solo_practice_dates'
+    const stored = localStorage.getItem(key)
+    const dates: string[] = stored ? JSON.parse(stored) : []
+    const today = new Date().toISOString().split('T')[0]
+    if (!dates.includes(today)) {
+      dates.push(today)
+      localStorage.setItem(key, JSON.stringify(dates.slice(-365)))
+    }
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const recentDates = dates.filter(d => d >= sevenDaysAgo)
+    if (recentDates.length >= 3) {
+      awardBadge('solo_practice')
+      return 'solo_practice'
+    }
+  } catch { /* non-critical */ }
+
+  return null
+}
+
+// ── Nature Signal v37 — behavioral checks ─────────────────────────────────────
+
+const NATURE_WORDS_V37 = [
+  /\bforest\b|\bwoods\b|\bwalk[\s-]?in[\s-]?the[\s-]?forest\b|\bthrough[\s-]?the[\s-]?trees\b/i,
+  /\bmycelium\b|\bmycelial\b|\bfungal[\s-]?network\b|\bmushroom[\s-]?network\b/i,
+  /\bwatershed\b|\briver[\s-]?basin\b|\bwaterway\b/i,
+  /\bbiophilia\b|\blove[\s-]?of[\s-]?nature\b|\bnature[\s-]?connection\b/i,
+  /\bdeep[\s-]?ecology\b|\becopsychology\b|\becotherapy\b/i,
+  /\bforest[\s-]?bath(ing)?\b|\bshinrin[\s-]?yoku\b|\bforest[\s-]?therapy\b/i,
+  /\bphenology\b|\bseasonal[\s-]?cycles\b|\bmigration[\s-]?patterns\b/i,
+  /\broot[\s-]?system\b|\btap[\s-]?root\b|\bdeep[\s-]?roots\b/i,
+  /\brewild(ing)?\b|\brestore[\s-]?habitat\b|\bwild[\s-]?spaces\b/i,
+  /\bold[\s-]?growth\b|\bancient[\s-]?forest\b|\bthousand[\s-]?year[\s-]?tree\b/i,
+  /\btopsoil\b|\bhumus\b|\bsoil[\s-]?health\b|\bliving[\s-]?soil\b/i,
+  /\bemergence\b|\bemergent\b|\bself[\s-]?organizing\b|\bmurmuration\b/i,
+]
+
+/** Award nature_session badge if 3+ Nature Signal (v37) words appear in one journal entry. */
+export function checkNatureSession(journalText: string): BadgeType | null {
+  if (hasBadge('nature_session')) return null
+  const matchCount = NATURE_WORDS_V37.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('nature_session')
+    return 'nature_session'
+  }
+  return null
+}
+
+/** Award dawn_walker badge if journal entry is written between 05:00 and 07:00 local time. */
+export function checkDawnWalker(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('dawn_walker')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 5 && hour < 7) {
+    awardBadge('dawn_walker')
+    return 'dawn_walker'
+  }
+  return null
+}
+
+/** Award long_walk badge if journal entry has 400+ words. */
+export function checkLongWalk(journalText: string): BadgeType | null {
+  if (hasBadge('long_walk')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 400) {
+    awardBadge('long_walk')
+    return 'long_walk'
+  }
+  return null
+}
+// ── Body Electric v38 — behavioral checks ─────────────────────────────────────
+
+const BODY_WORDS_V38 = [
+  /\bsomatic\b|\bbody[\s-]?scan\b|\bbodily[\s-]?awareness\b|\bbody[\s-]?based[\s-]?practice\b/i,
+  /\bproprioception\b|\bkinesthetic\b|\bspatial[\s-]?awareness\b|\bbody[\s-]?in[\s-]?space\b/i,
+  /\bstretching?\b|\bflexibility\b|\bmobility[\s-]?work\b|\brange[\s-]?of[\s-]?motion\b/i,
+  /\bbreathwork\b|\bbreathe?[\s-]?work\b|\bpranayama\b|\bbreathing[\s-]?practice\b|\bbox[\s-]?breathing\b/i,
+  /\bchi\b|\bprana\b|\blife[\s-]?force\b|\bvitality\b|\bqi\b|\bki\b|\bbody[\s-]?electric\b/i,
+  /\bmovement[\s-]?practice\b|\bdaily[\s-]?movement\b|\bintentional[\s-]?movement\b|\bsomatic[\s-]?movement\b/i,
+  /\brest[\s-]?day\b|\bactive[\s-]?recovery\b|\brecovery[\s-]?day\b|\brest[\s-]?and[\s-]?recovery\b/i,
+  /\bposture\b|\bbody[\s-]?alignment\b|\bergonomics\b|\bspinal[\s-]?alignment\b/i,
+  /\bcold[\s-]?shower\b|\bcold[\s-]?plunge\b|\bice[\s-]?bath\b|\bcold[\s-]?exposure\b|\bcryotherapy\b/i,
+  /\bworkout\b|\bexercise[\s-]?session\b|\btraining[\s-]?session\b|\bgym[\s-]?session\b/i,
+  /\bflow[\s-]?state\b|\bin[\s-]?the[\s-]?zone\b|\bpeak[\s-]?performance\b|\boptimal[\s-]?experience\b/i,
+  /\bbody[\s-]?wisdom\b|\bsomatic[\s-]?intelligence\b|\bembodied[\s-]?intelligence\b|\blisten[\s-]?to[\s-]?your[\s-]?body\b/i,
+]
+
+/** Award somatic_session badge if 3+ Body Electric (v38) words appear in one journal entry. */
+export function checkSomaticSession(journalText: string): BadgeType | null {
+  if (hasBadge('somatic_session')) return null
+  const matchCount = BODY_WORDS_V38.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('somatic_session')
+    return 'somatic_session'
+  }
+  return null
+}
+
+/** Award morning_mover badge if journal entry is written between 06:00 and 09:00 local time. */
+export function checkMorningMover(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('morning_mover')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 6 && hour < 9) {
+    awardBadge('morning_mover')
+    return 'morning_mover'
+  }
+  return null
+}
+
+/** Award long_body badge if journal entry has 500+ words. */
+export function checkLongBody(journalText: string): BadgeType | null {
+  if (hasBadge('long_body')) return null
+  const wordCount = journalText.trim().split(/\s+/).filter(w => w.length > 0).length
+  if (wordCount >= 500) {
+    awardBadge('long_body')
+    return 'long_body'
+  }
+  return null
+}
+
+// ── Dream Laboratory v39 — word turn patterns ─────────────────────────────────
+
+export const DREAM_WORD_MAP: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\blucid[\s-]?dream(?:ing)?\b|\bi[\s-]?became[\s-]?lucid\b|\baware[\s-]?in[\s-]?the[\s-]?dream\b|\bdream[\s-]?aware(?:ness)?\b/i, badge: 'lucid_dreamer' },
+  { regex: /\bhypnagogic\b|\bhypnagogia\b|\bthe[\s-]?edge[\s-]?of[\s-]?sleep\b|\bfalling[\s-]?asleep[\s-]?into\b/i, badge: 'hypnagogic_badge' },
+  { regex: /\bREM\b|\brapid[\s-]?eye[\s-]?movement\b|\bdeep[\s-]?sleep[\s-]?stage\b|\bsleep[\s-]?cycle\b/i, badge: 'rem_signal' },
+  { regex: /\btheta[\s-]?waves?\b|\btheta[\s-]?brainwave\b|\btheta[\s-]?state\b|\btheta[\s-]?frequency\b/i, badge: 'theta_state' },
+  { regex: /\bdreamscape\b|\bdream[\s-]?world\b|\bdream[\s-]?realm\b|\bdream[\s-]?landscape\b/i, badge: 'dreamscape' },
+  { regex: /\bsomnambulant\b|\bsleepwalking\b|\bhalf[\s-]?asleep\b|\bbetween[\s-]?sleep[\s-]?and[\s-]?waking\b/i, badge: 'somnambulant' },
+  { regex: /\bsubconscious\b|\bthe[\s-]?subconscious\b|\bunconscious[\s-]?mind\b|\bthe[\s-]?deep[\s-]?mind\b/i, badge: 'subconscious_map' },
+  { regex: /\bwaking[\s-]?vision\b|\bdream[\s-]?vision\b|\bvision[\s-]?came[\s-]?to[\s-]?me\b|\ba[\s-]?vision\b/i, badge: 'vision_window' },
+  { regex: /\bdelta[\s-]?waves?\b|\bslow[\s-]?wave[\s-]?sleep\b|\bdreamless[\s-]?sleep\b|\bdeepest[\s-]?sleep\b/i, badge: 'delta_wave' },
+  { regex: /\bsleep[\s-]?hygiene\b|\bsleep[\s-]?ritual\b|\bsleep[\s-]?ceremony\b|\bsleep[\s-]?protocol\b|\bwinding[\s-]?down\b/i, badge: 'sleep_ceremony' },
+  { regex: /\bdream[\s-]?journal\b|\bwrite[\s-]?my[\s-]?dreams?\b|\brecorded[\s-]?my[\s-]?dream\b|\bdream[\s-]?log\b|\bdream[\s-]?notes?\b/i, badge: 'dream_journal' },
+  { regex: /\bthe[\s-]?dream[\s-]?told[\s-]?me\b|\bdream[\s-]?message\b|\bnight[\s-]?oracle\b|\bmy[\s-]?dream[\s-]?showed\b|\bthe[\s-]?dream[\s-]?revealed\b/i, badge: 'night_oracle' },
+]
+
+export const DREAM_SECRET_WORDS: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\bcastaneda\b|\bdon[\s-]?juan\b|\bthe[\s-]?separate[\s-]?reality\b|\bdreaming[\s-]?body\b|\btensegrity\b/i, badge: 'castaneda_signal' },
+  { regex: /\bborges\b|\bgarden[\s-]?of[\s-]?forking[\s-]?paths\b|\blibrary[\s-]?of[\s-]?babel\b|\blabyrinths\b/i, badge: 'borges_dream' },
+  { regex: /\ble[\s-]?guin\b|\blathe[\s-]?of[\s-]?heaven\b|\bearthsea\b|\bthe[\s-]?dispossessed\b|\bursula[\s-]?k\b/i, badge: 'le_guin_dream' },
+]
+
+const DREAM_WORDS_V39 = DREAM_WORD_MAP.map(e => e.regex)
+
+/** Scan journal text for all 12 Dream Laboratory (v39) word turns + 3 secret boss words. */
+export function checkDreamWordTurns(journalText: string): BadgeType[] {
+  const awarded: BadgeType[] = []
+  for (const { regex, badge } of DREAM_WORD_MAP) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  for (const { regex, badge } of DREAM_SECRET_WORDS) {
+    if (!hasBadge(badge) && regex.test(journalText)) {
+      awardBadge(badge)
+      awarded.push(badge)
+    }
+  }
+  return awarded
+}
+
+/** Award dream_session badge if 3+ Dream Laboratory (v39) words appear in one journal entry. */
+export function checkDreamSession(journalText: string): BadgeType | null {
+  if (hasBadge('dream_session')) return null
+  const matchCount = DREAM_WORDS_V39.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('dream_session')
+    return 'dream_session'
+  }
+  return null
+}
+
+/** Award liminal_hour badge if check-in occurs between 03:00–04:00 local time. */
+export function checkLiminalHour(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('liminal_hour')) return null
+  const now = new Date()
+  const hour = now.getHours()
+  if (hour >= 3 && hour < 4) {
+    awardBadge('liminal_hour')
+    return 'liminal_hour'
+  }
+  return null
+}
+
+/** Award long_dream badge if journal entry has 444+ characters. */
+export function checkLongDream(journalText: string): BadgeType | null {
+  if (hasBadge('long_dream')) return null
+  if (journalText.length >= 444) {
+    awardBadge('long_dream')
+    return 'long_dream'
+  }
+  return null
+}

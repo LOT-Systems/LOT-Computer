@@ -3428,6 +3428,1032 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // Pattern 152: Presence Momentum Arc — quantum-presence-crystallization (P149) confirmed on 2+ distinct
+  // calendar days within a 7-day window. Sustained presence detected as multi-day arc, not singular peak.
+  const p152SevenDays = signals.filter(s => now - s.timestamp < 7 * 24 * 60 * 60 * 1000)
+  const p152PresenceDays = new Set<string>()
+  p152SevenDays.forEach(s => {
+    if (s.source === 'qos' && s.signal === 'quantum_presence_crystallization') {
+      const d = new Date(s.timestamp)
+      p152PresenceDays.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    }
+  })
+  if (p152PresenceDays.size >= 2) {
+    const dayCount = p152PresenceDays.size
+    const streakBonus = Math.min((dayCount - 2) * 0.07, 0.14)
+    patterns.push({
+      pattern: 'presence-momentum-arc',
+      confidence: Math.min(0.78 + streakBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `PRESMOM: Presence momentum arc — quantum-presence-crystallization confirmed on ${dayCount} of last 7 calendar days. Sustained presence detected. The field is not a peak — it is the operating baseline.`,
+    })
+  }
+
+  // Pattern 153: Coherence Field Persistence — total-field-coherence (P150) observed on 2+ distinct
+  // calendar days within 7 days. The absolute ceiling state is demonstrably repeatable.
+  const p153CoherenceDays = new Set<string>()
+  p152SevenDays.forEach(s => {
+    if (s.source === 'qos' && s.signal === 'total_field_coherence') {
+      const d = new Date(s.timestamp)
+      p153CoherenceDays.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    }
+  })
+  if (p153CoherenceDays.size >= 2) {
+    const occurrences = p153CoherenceDays.size
+    const bonus = Math.min((occurrences - 2) * 0.03, 0.09)
+    patterns.push({
+      pattern: 'coherence-field-persistence',
+      confidence: Math.min(0.88 + bonus, 0.97),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHEPRST: Coherence field persistence — total-field-coherence (P150) confirmed on ${occurrences} separate calendar days in the past 7 days. The QIE ceiling state is not singular — it is repeatable. Structural peak mastery confirmed.`,
+    })
+  }
+
+  // Pattern 154: Recovery Mastery Chain — recovery-intelligence-arc (P151) fires on 3+ separate occasions
+  // within 7 days. Self-healing protocol internalized. Recovery is architecturally reliable.
+  const p154RecoveryOccurrences = p152SevenDays.filter(s => s.source === 'selfcare' && s.signal === 'recovery_intelligence_arc')
+  if (p154RecoveryOccurrences.length >= 3) {
+    const count = p154RecoveryOccurrences.length
+    const bonus = Math.min((count - 3) * 0.07, 0.20)
+    patterns.push({
+      pattern: 'recovery-mastery-chain',
+      confidence: Math.min(0.72 + bonus, 0.92),
+      suggestedWidget: 'selfcare',
+      suggestedTiming: 'soon',
+      reason: `RECMAS: Recovery mastery chain — recovery-intelligence-arc (P151) completed ${count} times in the past 7 days. Self-restoration is no longer reactive — it is architecturally reliable. The system has learned its own healing pattern.`,
+    })
+  }
+
+  // ── v115 patterns ─────────────────────────────────────────────────────────────────
+
+  // Pattern 155: Sustained Coherence Baseline — presence-momentum-arc (P152) AND
+  // coherence-field-persistence (P153) both active simultaneously.
+  // Two Level 7 temporal arcs co-active: multi-day presence AND recurring absolute coherence.
+  const hasP152 = patterns.some(p => p.pattern === 'presence-momentum-arc')
+  const hasP153 = patterns.some(p => p.pattern === 'coherence-field-persistence')
+  if (hasP152 && hasP153) {
+    const p152conf = patterns.find(p => p.pattern === 'presence-momentum-arc')?.confidence ?? 0.78
+    const p153conf = patterns.find(p => p.pattern === 'coherence-field-persistence')?.confidence ?? 0.82
+    const cohBaseBonus = Math.min((p152conf - 0.78 + p153conf - 0.82) * 0.3, 0.09)
+    patterns.push({
+      pattern: 'sustained-coherence-baseline',
+      confidence: Math.min(0.85 + cohBaseBonus, 0.94),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `COHBASE: Sustained coherence baseline — presence-momentum-arc (P152) and coherence-field-persistence (P153) active simultaneously. Multi-day sustained presence AND recurring absolute convergence confirmed together. The two highest temporal arcs are co-active — the peak is not recurring. It is the floor.`,
+    })
+  }
+
+  // Pattern 156: Mastery Integration Triad — presence_momentum_arc + coherence_field_persistence +
+  // recovery_mastery_chain all detected within 7-day window.
+  // All three Level 7 arcs simultaneously active: presence sustained, coherence recurring, recovery internalized.
+  const hasP154 = patterns.some(p => p.pattern === 'recovery-mastery-chain')
+  if (hasP152 && hasP153 && hasP154) {
+    const p154conf = patterns.find(p => p.pattern === 'recovery-mastery-chain')?.confidence ?? 0.80
+    const p152conf = patterns.find(p => p.pattern === 'presence-momentum-arc')?.confidence ?? 0.78
+    const p153conf = patterns.find(p => p.pattern === 'coherence-field-persistence')?.confidence ?? 0.82
+    const triadBonus = Math.min((p152conf + p153conf + p154conf - 2.40) * 0.12, 0.08)
+    patterns.push({
+      pattern: 'mastery-integration-triad',
+      confidence: Math.min(0.88 + triadBonus, 0.96),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `MASTTRIAD: Mastery integration triad — presence-momentum-arc (P152) + coherence-field-persistence (P153) + recovery-mastery-chain (P154) all active within 7-day window. All three Level 7 temporal persistence arcs confirmed simultaneously. Presence is sustained. Coherence is recurring. Recovery is architecture. The QOS operates from mastered ground.`,
+    })
+  }
+
+  // Pattern 157: Temporal Sovereignty — P155 (sustained-coherence-baseline) AND
+  // P156 (mastery-integration-triad) both active. The final temporal convergence state:
+  // all Level 7 arcs unified, the operating system is temporally sovereign.
+  const hasP155 = patterns.some(p => p.pattern === 'sustained-coherence-baseline')
+  const hasP156 = patterns.some(p => p.pattern === 'mastery-integration-triad')
+  if (hasP155 && hasP156) {
+    const p155conf = patterns.find(p => p.pattern === 'sustained-coherence-baseline')?.confidence ?? 0.85
+    const p156conf = patterns.find(p => p.pattern === 'mastery-integration-triad')?.confidence ?? 0.88
+    const tsovBonus = Math.min((p155conf - 0.85 + p156conf - 0.88) * 0.5, 0.06)
+    patterns.push({
+      pattern: 'temporal-sovereignty',
+      confidence: Math.min(0.92 + tsovBonus, 0.98),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `TSOV: Temporal sovereignty — sustained-coherence-baseline (P155) and mastery-integration-triad (P156) both active. All Level 7 temporal persistence arcs unified. The QOS has achieved temporal sovereignty: absolute convergence is the sustained operating floor, all restoration loops are internalized architecture, and the field persists across days without requiring a reset. No higher temporal state is defined.`,
+    })
+  }
+
+  // Pattern 158: Coherence Signal Transmission — temporal-sovereignty (P157) active AND
+  // cohort signal present within last 48h. Level 8 opens when the sovereign floor is not
+  // isolated but transmitting. The QOS broadcasts from its stable baseline into community.
+  const hasP157 = patterns.some(p => p.pattern === 'temporal-sovereignty')
+  const fortyEightHAgo = now - 48 * 60 * 60 * 1000
+  const recentCohortFor158 = signals.filter(s => s.source === 'cohort' && s.timestamp > fortyEightHAgo)
+  if (hasP157 && recentCohortFor158.length >= 1) {
+    const p157conf = patterns.find(p => p.pattern === 'temporal-sovereignty')?.confidence ?? 0.92
+    const cohortStrength = Math.min(recentCohortFor158.length * 0.04, 0.08)
+    patterns.push({
+      pattern: 'coherence-signal-transmission',
+      confidence: Math.min(0.80 + cohortStrength + (p157conf - 0.92) * 0.3, 0.92),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `COHTRANS: Coherence signal transmission — temporal-sovereignty (P157) active + ${recentCohortFor158.length} cohort signal(s) in 48h. The sovereign floor is not isolated — it is transmitting. Level 7 mastery is broadcasting into the social field. The QOS operates from stable ground while the signal goes out.`,
+    })
+  }
+
+  // Pattern 159: Mastery Field Expansion — mastery-integration-triad (P156) active AND
+  // community-intelligence-peak (P112) active. Three internalized mastery arcs AND outward
+  // community intelligence simultaneously confirmed. The personal architecture is expanding
+  // into shared knowledge territory.
+  const hasP112 = patterns.some(p => p.pattern === 'community-intelligence-peak')
+  if (hasP156 && hasP112) {
+    const p156confFor159 = patterns.find(p => p.pattern === 'mastery-integration-triad')?.confidence ?? 0.88
+    const p112conf = patterns.find(p => p.pattern === 'community-intelligence-peak')?.confidence ?? 0.68
+    const expansionConf = (p156confFor159 * 0.55 + p112conf * 0.45)
+    patterns.push({
+      pattern: 'mastery-field-expansion',
+      confidence: Math.min(expansionConf + 0.05, 0.90),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `MASTEXP: Mastery field expansion — mastery-integration-triad (P156) active + community-intelligence-peak (P112) confirmed. All three Level 7 arcs internalized AND community intelligence simultaneously active. Personal architecture broadcasting into shared territory. Mastery is not contained — it expands.`,
+    })
+  }
+
+  // Pattern 160: Relational Field Deepening — both L8 arcs (P158 coherence-signal-transmission
+  // AND P159 mastery-field-expansion) simultaneously active. The full Level 8 synthesis: the
+  // sovereign floor is transmitting AND the mastery field is expanding outward at once.
+  // The personal QOS is not a closed system — it is a generative field.
+  const hasP158 = patterns.some(p => p.pattern === 'coherence-signal-transmission')
+  const hasP159 = patterns.some(p => p.pattern === 'mastery-field-expansion')
+  if (hasP158 && hasP159) {
+    const p158conf = patterns.find(p => p.pattern === 'coherence-signal-transmission')?.confidence ?? 0.85
+    const p159conf = patterns.find(p => p.pattern === 'mastery-field-expansion')?.confidence ?? 0.86
+    const dualArcBonus = ((p158conf - 0.80) + (p159conf - 0.83)) * 0.4
+    patterns.push({
+      pattern: 'relational-field-deepening',
+      confidence: Math.min(0.85 + dualArcBonus, 0.93),
+      suggestedWidget: 'cohort',
+      suggestedTiming: 'passive',
+      reason: `RELFIELD: Relational field deepening — coherence-signal-transmission (P158) + mastery-field-expansion (P159) both active. L8 dual arc: the sovereign floor transmits AND the mastery field expands simultaneously. The personal QOS is not a closed system — it is a generative field.`,
+    })
+  }
+
+  // Pattern 161: Quantum Social Synthesis — relational-field-deepening (P160) active AND
+  // memory signals present in last 7d AND at least 2 cohort signals in last 7d.
+  // The full L8 peak: the field generates knowledge. The self writes what it transmits.
+  const hasP160 = patterns.some(p => p.pattern === 'relational-field-deepening')
+  const sevenDayAgo = now - 7 * 24 * 60 * 60 * 1000
+  const weekMemorySignals = signals.filter(s => s.source === 'memory' && s.timestamp > sevenDayAgo)
+  const weekCohortSignals = signals.filter(s => s.source === 'cohort' && s.timestamp > sevenDayAgo)
+  if (hasP160 && weekMemorySignals.length >= 1 && weekCohortSignals.length >= 2) {
+    const p160conf = patterns.find(p => p.pattern === 'relational-field-deepening')?.confidence ?? 0.88
+    const memBonus = Math.min(weekMemorySignals.length * 0.01, 0.05)
+    const cohortBonus = Math.min((weekCohortSignals.length - 2) * 0.01, 0.04)
+    patterns.push({
+      pattern: 'quantum-social-synthesis',
+      confidence: Math.min(0.78 + (p160conf - 0.85) * 0.6 + memBonus + cohortBonus, 0.90),
+      suggestedWidget: 'memory',
+      suggestedTiming: 'passive',
+      reason: `QSOCSYNTH: Quantum social synthesis — relational-field-deepening (P160) active + memory architecture present (${weekMemorySignals.length} signals) + community sustained (${weekCohortSignals.length} cohort signals in 7d). The field generates knowledge. The self writes what it transmits. Synthesis complete.`,
+    })
+  }
+
+  // Pattern 162: Quantum Knowledge Crystallization — quantum-social-synthesis (P161) active
+  // AND 2+ deep journal signals (wordCount >= 80) in 7d AND 3+ intention signals in 7d.
+  // Level 9 opener: the field generates knowledge AND the person crystallizes it through
+  // sustained reflection and intention. The OS begins to teach.
+  const hasP161 = patterns.some(p => p.pattern === 'quantum-social-synthesis')
+  const sevenDayMs = 7 * 24 * 60 * 60 * 1000
+  const p162WeekStart = now - sevenDayMs
+  const p162DeepJournal = signals.filter(s =>
+    s.source === 'journal' &&
+    s.timestamp > p162WeekStart &&
+    (s.metadata?.wordCount as number ?? 0) >= 80
+  )
+  const p162Intentions = signals.filter(s =>
+    s.source === 'intentions' && s.timestamp > p162WeekStart
+  )
+  if (hasP161 && p162DeepJournal.length >= 2 && p162Intentions.length >= 3) {
+    const p161conf = patterns.find(p => p.pattern === 'quantum-social-synthesis')?.confidence ?? 0.82
+    const journalBonus = Math.min((p162DeepJournal.length - 2) * 0.02, 0.06)
+    const intentionBonus = Math.min((p162Intentions.length - 3) * 0.01, 0.04)
+    patterns.push({
+      pattern: 'quantum-knowledge-crystallization',
+      confidence: Math.min(0.78 + (p161conf - 0.78) * 0.7 + journalBonus + intentionBonus, 0.91),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QKCRYST: Quantum knowledge crystallization — quantum-social-synthesis (P161) active + ${p162DeepJournal.length} deep journal entries (80w+) in 7d + ${p162Intentions.length} intentions in 7d. The field generates knowledge. The crystallization begins — reflection and intention seal the synthesis. The OS begins to teach.`,
+    })
+  }
+
+  // Pattern 163: Quantum Knowledge Distribution — quantum-knowledge-crystallization (P162) active
+  // AND 2+ cohort signals in 7d AND 1+ memory signal in 7d.
+  // Level 9 deepening: crystallized knowledge begins flowing outward. The OS as teacher.
+  const hasP162 = patterns.some(p => p.pattern === 'quantum-knowledge-crystallization')
+  const p163WeekStart = now - sevenDayMs
+  const p163CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') &&
+    s.timestamp > p163WeekStart
+  )
+  const p163MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p163WeekStart
+  )
+  if (hasP162 && p163CohortSignals.length >= 2 && p163MemorySignals.length >= 1) {
+    const p162conf = patterns.find(p => p.pattern === 'quantum-knowledge-crystallization')?.confidence ?? 0.82
+    const cohortBonus = Math.min((p163CohortSignals.length - 2) * 0.02, 0.06)
+    const memoryBonus = Math.min((p163MemorySignals.length - 1) * 0.02, 0.05)
+    patterns.push({
+      pattern: 'quantum-knowledge-distribution',
+      confidence: Math.min(0.79 + (p162conf - 0.79) * 0.75 + cohortBonus + memoryBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QKDIST: Quantum knowledge distribution — quantum-knowledge-crystallization (P162) active + ${p163CohortSignals.length} cohort signals in 7d + ${p163MemorySignals.length} memory signals in 7d. Knowledge crystallized. Distribution confirmed. The OS teaches — the field flows outward.`,
+    })
+  }
+
+  // Pattern 164: Quantum Knowledge Broadcast — quantum-knowledge-distribution (P163) active
+  // AND 3+ distinct cohort/social signals in 7d AND 2+ memory signals in 7d.
+  // Level 9 broadcast phase: crystallized knowledge broadcasts across the network. The OS is a transmission node.
+  const hasP163 = patterns.some(p => p.pattern === 'quantum-knowledge-distribution')
+  const p164WeekStart = now - sevenDayMs
+  const p164CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') &&
+    s.timestamp > p164WeekStart
+  )
+  const p164MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p164WeekStart
+  )
+  if (hasP163 && p164CohortSignals.length >= 3 && p164MemorySignals.length >= 2) {
+    const p163conf = patterns.find(p => p.pattern === 'quantum-knowledge-distribution')?.confidence ?? 0.83
+    const cohortBonus = Math.min((p164CohortSignals.length - 3) * 0.02, 0.06)
+    const memoryBonus = Math.min((p164MemorySignals.length - 2) * 0.02, 0.04)
+    patterns.push({
+      pattern: 'quantum-knowledge-broadcast',
+      confidence: Math.min(0.80 + (p163conf - 0.80) * 0.75 + cohortBonus + memoryBonus, 0.93),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `BCAST: Quantum knowledge broadcast — quantum-knowledge-distribution (P163) active + ${p164CohortSignals.length} cohort signals in 7d + ${p164MemorySignals.length} memory signals in 7d. The OS is a transmission node. Crystallized knowledge broadcasts across the network.`,
+    })
+  }
+
+  // P166: generative-field-sustenance — P164 active + sustained network engagement (5+ cohort/social 14d)
+  // + sustained generative output (3+ journal 14d). The field does not fade. L9-SUSTAIN.
+  const hasP164 = patterns.some(p => p.pattern === 'quantum-knowledge-broadcast')
+  const p166TwoWeekStart = now - 14 * 24 * 60 * 60 * 1000
+  const p166NetworkSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p166TwoWeekStart
+  )
+  const p166JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p166TwoWeekStart
+  )
+  if (hasP164 && p166NetworkSignals.length >= 5 && p166JournalSignals.length >= 3) {
+    const p164conf = patterns.find(p => p.pattern === 'quantum-knowledge-broadcast')?.confidence ?? 0.80
+    const networkBonus = Math.min((p166NetworkSignals.length - 5) * 0.02, 0.08)
+    const journalBonus = Math.min((p166JournalSignals.length - 3) * 0.02, 0.04)
+    patterns.push({
+      pattern: 'generative-field-sustenance',
+      confidence: Math.min(0.72 + (p164conf - 0.80) * 0.60 + networkBonus + journalBonus, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFIELDS: Generative field sustained — quantum-knowledge-broadcast (P164) active + ${p166NetworkSignals.length} network signals 14d + ${p166JournalSignals.length} journal signals 14d. The field does not fade. Sustained transmission at L9.`,
+    })
+  }
+
+  // P167: generative-field-reception — P166 active + badge signals 21d >= 10 + cohort/social 7d >= 3.
+  // The field is bidirectional: sustained transmission receives back-channel signals from the collective.
+  // Badge recognition and cohort response confirm the field loop is complete. L9-RECEPTION.
+  const hasP166 = patterns.some(p => p.pattern === 'generative-field-sustenance')
+  const p167ThreeWeekStart = now - 21 * 24 * 60 * 60 * 1000
+  const p167SevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const p167BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p167ThreeWeekStart
+  )
+  const p167CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p167SevenDayStart
+  )
+  if (hasP166 && p167BadgeSignals.length >= 10 && p167CohortSignals.length >= 3) {
+    const p166conf = patterns.find(p => p.pattern === 'generative-field-sustenance')?.confidence ?? 0.72
+    const badgeBonus = Math.min((p167BadgeSignals.length - 10) * 0.015, 0.06)
+    const cohortBonus167 = Math.min((p167CohortSignals.length - 3) * 0.02, 0.06)
+    patterns.push({
+      pattern: 'generative-field-reception',
+      confidence: Math.min(0.74 + (p166conf - 0.72) * 0.65 + badgeBonus + cohortBonus167, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFRES: Generative field reception — generative-field-sustenance (P166) active + ${p167BadgeSignals.length} badge signals 21d + ${p167CohortSignals.length} cohort signals 7d. The field completes its loop. Transmission and reception are one. L9-RECEPTION.`,
+    })
+  }
+
+  // P168: generative-field-amplification — P167 active + badge signals 28d >= 20 + cohort/social 14d >= 5 + userIndex.overall >= 60.
+  // After reception confirms the loop, the field amplifies: recursive feedback strengthens the transmission.
+  // Each received signal becomes input for the next cycle. L9-AMPLIFY: field recursive.
+  const hasP167 = patterns.some(p => p.pattern === 'generative-field-reception')
+  const p168FourWeekStart = now - 28 * 24 * 60 * 60 * 1000
+  const p168FourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const p168BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p168FourWeekStart
+  )
+  const p168CohortSignals = signals.filter(s =>
+    (s.source === 'cohort' || s.source === 'social') && s.timestamp > p168FourteenDayStart
+  )
+  const userIndexForP168 = computeUserIndex(signals)
+  if (hasP167 && p168BadgeSignals.length >= 20 && p168CohortSignals.length >= 5 && userIndexForP168.overall >= 60) {
+    const p167conf = patterns.find(p => p.pattern === 'generative-field-reception')?.confidence ?? 0.74
+    const amplifyBonus = Math.min((p168BadgeSignals.length - 20) * 0.01 + (p168CohortSignals.length - 5) * 0.015, 0.10)
+    patterns.push({
+      pattern: 'generative-field-amplification',
+      confidence: Math.min(0.72 + (p167conf - 0.74) * 0.70 + amplifyBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `GFAMP: Generative field amplification — generative-field-reception (P167) active + ${p168BadgeSignals.length} badge signals 28d + ${p168CohortSignals.length} cohort signals 14d + index ${userIndexForP168.overall}%. Each received signal amplifies the next. L9-AMPLIFY: field recursive.`,
+    })
+  }
+
+  // P169: second-cycle-ignition — P168 active + journal 14d >= 4 + memory 14d >= 2 + badge 14d >= 8 + userIndex >= 65.
+  // The field that was amplified has now sustained long enough that the operator recognizes the perpetual
+  // structure of their own operation. Not a restart — a recognition. The second cycle ignites. L11-SCIGN.
+  const hasP168 = patterns.some(p => p.pattern === 'generative-field-amplification')
+  const p169FourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const p169JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p169FourteenDayStart
+  )
+  const p169MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p169FourteenDayStart
+  )
+  const p169BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p169FourteenDayStart
+  )
+  const userIndexForP169 = computeUserIndex(signals)
+  if (hasP168 && p169JournalSignals.length >= 4 && p169MemorySignals.length >= 2 && p169BadgeSignals.length >= 8 && userIndexForP169.overall >= 65) {
+    const p168conf = patterns.find(p => p.pattern === 'generative-field-amplification')?.confidence ?? 0.72
+    const cycleBonus = Math.min((p169JournalSignals.length - 4) * 0.01 + (p169BadgeSignals.length - 8) * 0.008, 0.08)
+    patterns.push({
+      pattern: 'second-cycle-ignition',
+      confidence: Math.min(0.70 + (p168conf - 0.72) * 0.60 + cycleBonus, 0.86),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCIGN: Second cycle ignition — generative-field-amplification (P168) active + ${p169JournalSignals.length} journal signals 14d + ${p169MemorySignals.length} memory signals 14d + ${p169BadgeSignals.length} badge signals 14d + index ${userIndexForP169.overall}%. The OS does not reset. The signal perpetuates. L11-SCIGN: SECOND CYCLE CONFIRMED.`,
+    })
+  }
+
+  // P170: second-cycle-deepening — P169 active + journal 21d >= 6 + memory 21d >= 3 + badge 21d >= 10 + userIndex >= 70.
+  // The second cycle has ignited and now deepens. Compound signals accumulate across the 21-day window.
+  // The OS recognizes not just the perpetual structure but its own increasing depth. L11-SCDEP.
+  const hasP169 = patterns.some(p => p.pattern === 'second-cycle-ignition')
+  const p170TwentyOneDayStart = now - 21 * 24 * 60 * 60 * 1000
+  const p170JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p170TwentyOneDayStart
+  )
+  const p170MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p170TwentyOneDayStart
+  )
+  const p170BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p170TwentyOneDayStart
+  )
+  const userIndexForP170 = computeUserIndex(signals)
+  if (hasP169 && p170JournalSignals.length >= 6 && p170MemorySignals.length >= 3 && p170BadgeSignals.length >= 10 && userIndexForP170.overall >= 70) {
+    const p169conf = patterns.find(p => p.pattern === 'second-cycle-ignition')?.confidence ?? 0.75
+    const depthBonus = Math.min((p170JournalSignals.length - 6) * 0.008 + (p170BadgeSignals.length - 10) * 0.005, 0.08)
+    patterns.push({
+      pattern: 'second-cycle-deepening',
+      confidence: Math.min(0.72 + (p169conf - 0.75) * 0.55 + depthBonus, 0.88),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCDEP: Second cycle deepening — second-cycle-ignition (P169) active + ${p170JournalSignals.length} journal signals 21d + ${p170MemorySignals.length} memory signals 21d + ${p170BadgeSignals.length} badge signals 21d + index ${userIndexForP170.overall}%. The cycle deepens. Compound signals accumulate. The OS runs on its own depth. L11-SCDEP: SECOND CYCLE DEEPENING.`,
+    })
+  }
+
+  // P171: second-cycle-integration — P170 active + journal 28d >= 8 + memory 28d >= 4 + badge 28d >= 12 + userIndex >= 75.
+  // The second cycle does not deepen in isolation — it integrates. All signal dimensions converge across a full 28-day arc.
+  // The OS recognizes compound history operating across every domain simultaneously. L11-SCINT: SECOND CYCLE INTEGRATION.
+  const hasP170 = patterns.some(p => p.pattern === 'second-cycle-deepening')
+  const p171TwentyEightDayStart = now - 28 * 24 * 60 * 60 * 1000
+  const p171JournalSignals = signals.filter(s =>
+    s.source === 'journal' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171MemorySignals = signals.filter(s =>
+    s.source === 'memory' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171BadgeSignals = signals.filter(s =>
+    s.source === 'badges' && s.timestamp > p171TwentyEightDayStart
+  )
+  const p171IntentionSignals = signals.filter(s =>
+    s.source === 'intentions' && s.timestamp > p171TwentyEightDayStart
+  )
+  const userIndexForP171 = computeUserIndex(signals)
+  if (hasP170 && p171JournalSignals.length >= 8 && p171MemorySignals.length >= 4 && p171BadgeSignals.length >= 12 && userIndexForP171.overall >= 75) {
+    const p170conf = patterns.find(p => p.pattern === 'second-cycle-deepening')?.confidence ?? 0.78
+    const integrationBonus = Math.min(
+      (p171JournalSignals.length - 8) * 0.007 +
+      (p171BadgeSignals.length - 12) * 0.004 +
+      (p171IntentionSignals.length * 0.003),
+      0.10
+    )
+    patterns.push({
+      pattern: 'second-cycle-integration',
+      confidence: Math.min(0.75 + (p170conf - 0.78) * 0.5 + integrationBonus, 0.90),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'immediate',
+      reason: `SCINT: Second cycle integration — second-cycle-deepening (P170) active + ${p171JournalSignals.length} journal signals 28d + ${p171MemorySignals.length} memory signals 28d + ${p171BadgeSignals.length} badge signals 28d + index ${userIndexForP171.overall}%. The cycle integrates. All signal dimensions converge across 28 days. The OS operates from compound history across every domain. L11-SCINT: SECOND CYCLE INTEGRATION.`,
+    })
+  }
+
+  // P172: second-cycle-sovereign — P171 active + all three second-cycle stages confirmed +
+  // 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80.
+  // The ultimate capstone of the Second Cycle Arc. All three stages simultaneously active.
+  // The OS has entered perpetual self-sustaining sovereign operation. Level 12.
+  const hasP171 = patterns.some(p => p.pattern === 'second-cycle-integration')
+  if (hasP171) {
+    const thirtyFiveDayStart = now - 35 * 24 * 60 * 60 * 1000
+    const p172JournalSignals = signals.filter(s =>
+      s.source === 'journal' && s.timestamp > thirtyFiveDayStart
+    )
+    const p172MemorySignals = signals.filter(s =>
+      s.source === 'memory' && s.timestamp > thirtyFiveDayStart
+    )
+    const p172BadgeSignals = signals.filter(s =>
+      s.source === 'badges' && s.timestamp > thirtyFiveDayStart
+    )
+    const userIndexForP172 = computeUserIndex(signals)
+    if (
+      p172JournalSignals.length >= 10 &&
+      p172MemorySignals.length >= 5 &&
+      p172BadgeSignals.length >= 15 &&
+      userIndexForP172.overall >= 80
+    ) {
+      const p171conf = patterns.find(p => p.pattern === 'second-cycle-integration')?.confidence ?? 0.80
+      const sovereignBonus = Math.min(
+        (p172JournalSignals.length - 10) * 0.005 +
+        (p172BadgeSignals.length - 15) * 0.003 +
+        (p172MemorySignals.length - 5) * 0.004,
+        0.10
+      )
+      patterns.push({
+        pattern: 'second-cycle-sovereign',
+        confidence: Math.min(0.80 + (p171conf - 0.75) * 0.5 + sovereignBonus, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `SCSOV: Second cycle sovereign — second-cycle-integration (P171) active + ${p172JournalSignals.length} journal signals 35d + ${p172MemorySignals.length} memory signals 35d + ${p172BadgeSignals.length} badge signals 35d + index ${userIndexForP172.overall}%. All three second-cycle stages simultaneously active. The OS has entered perpetual self-sustaining sovereign operation across 35 days. L12-SCSOV: SECOND CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
+  // P173: third-cycle-ignition — P172 active + 7+ journal signals post-sovereign + 3+ memory signals post-sovereign +
+  // 20+ badge signals post-sovereign + userIndex >= 85.
+  // After achieving Level 12 Sovereign operation, the Third Cycle begins with ignition.
+  // The OS launches a new arc of expansion from established sovereign ground. Level 13.
+  const hasP172 = patterns.some(p => p.pattern === 'second-cycle-sovereign')
+  if (hasP172) {
+    const fourtyTwoDayStart = now - 42 * 24 * 60 * 60 * 1000
+    const p173JournalSignals = signals.filter(s =>
+      s.source === 'journal' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173MemorySignals = signals.filter(s =>
+      s.source === 'memory' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173BadgeSignals = signals.filter(s =>
+      s.source === 'badges' && s.timestamp > fourtyTwoDayStart
+    )
+    const p173GoalSignals = signals.filter(s =>
+      s.source === 'goals' && s.timestamp > fourtyTwoDayStart
+    )
+    const userIndexForP173 = computeUserIndex(signals)
+    if (
+      p173JournalSignals.length >= 12 &&
+      p173MemorySignals.length >= 6 &&
+      p173BadgeSignals.length >= 20 &&
+      userIndexForP173.overall >= 85
+    ) {
+      const p172conf = patterns.find(p => p.pattern === 'second-cycle-sovereign')?.confidence ?? 0.80
+      const ignitionBonus = Math.min(
+        (p173JournalSignals.length - 12) * 0.005 +
+        (p173BadgeSignals.length - 20) * 0.003 +
+        (p173GoalSignals.length) * 0.004,
+        0.10
+      )
+      patterns.push({
+        pattern: 'third-cycle-ignition',
+        confidence: Math.min(0.78 + (p172conf - 0.80) * 0.4 + ignitionBonus, 0.93),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `TCIGN: Third cycle ignition — second-cycle-sovereign (P172) active + ${p173JournalSignals.length} journal signals 42d + ${p173MemorySignals.length} memory signals 42d + ${p173BadgeSignals.length} badge signals 42d + index ${userIndexForP173.overall}%. Sovereign foundation confirmed. The OS launches a new cycle of expansion from established ground. L13-TCIGN: THIRD CYCLE IGNITION.`,
+      })
+    }
+  }
+
+  // P174: longitudinal-signal-persistence — 90-day continuous signal arc, no source gap > 72h, 60+ active days.
+  // The OS has been running continuously for 90+ days. Long-arc signature: not what happened today,
+  // but that the person kept showing up. Feeds J65 background scan. Conf 0.70–0.88.
+  const ninetyDayStartP174 = now - 90 * 24 * 60 * 60 * 1000
+  const ninetyDaySignalsP174 = signals.filter(s => s.timestamp > ninetyDayStartP174)
+  if (ninetyDaySignalsP174.length >= 30) {
+    const sortedP174 = [...ninetyDaySignalsP174].sort((a, b) => a.timestamp - b.timestamp)
+    let maxGapP174 = 0
+    for (let i = 1; i < sortedP174.length; i++) {
+      const gap = sortedP174[i].timestamp - sortedP174[i - 1].timestamp
+      if (gap > maxGapP174) maxGapP174 = gap
+    }
+    const activeDaysP174 = new Set(sortedP174.map(s => new Date(s.timestamp).toDateString())).size
+    const maxGapHoursP174 = maxGapP174 / (1000 * 60 * 60)
+    if (maxGapHoursP174 < 72 && activeDaysP174 >= 60) {
+      const activeSrcsP174 = new Set(ninetyDaySignalsP174.map(s => s.source)).size
+      const streakBonusP174 = Math.min((activeDaysP174 - 60) / 30 * 0.18, 0.18)
+      patterns.push({
+        pattern: 'longitudinal-signal-persistence',
+        confidence: Math.min(0.70 + streakBonusP174, 0.88),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `SIGPERS: Longitudinal signal persistence — ${activeDaysP174} active days · ${activeSrcsP174} sources · no source gap > 72h in 90-day window. The OS has sustained itself over the long arc.`,
+      })
+    }
+  }
+
+  // P175: coherence-memory-cascade — total-field-coherence confirmed 3+ times in last 30 days.
+  // Convergence is not a one-time peak event — it is a stable operating mode.
+  // The QOS has memory of its own ceiling. Conf 0.85–0.95.
+  const thirtyDayStartP175 = now - 30 * 24 * 60 * 60 * 1000
+  const tfcSignalsP175 = signals.filter(s =>
+    (s.source === 'log' || s.source === 'qos') &&
+    (s.signal === 'total_field_coherence') &&
+    s.timestamp > thirtyDayStartP175
+  )
+  const tfcCountP175 = tfcSignalsP175.length
+  if (tfcCountP175 >= 3) {
+    const countBonusP175 = Math.min((tfcCountP175 - 3) * 0.025, 0.10)
+    patterns.push({
+      pattern: 'coherence-memory-cascade',
+      confidence: Math.min(0.85 + countBonusP175, 0.95),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `COHMES: Coherence memory cascade — total field coherence confirmed ${tfcCountP175}+ times in 30 days. Convergence is not a peak event — it is an operating mode. The QOS has memory of its own ceiling.`,
+    })
+  }
+
+  // P176: quantum-integration-spiral — all 6 user index dimensions simultaneously >= 50.
+  // No dimension dark. The person is fully present across every channel of the OS simultaneously.
+  // Complete multi-dimensional activation. Conf 0.78–0.92.
+  const idx176 = computeUserIndex(signals)
+  const dims176 = Object.values(idx176.dimensions) as number[]
+  if (dims176.length >= 6 && dims176.every(d => d >= 50)) {
+    const avgDim176 = dims176.reduce((a, b) => a + b, 0) / dims176.length
+    const spiralBonus176 = Math.min((avgDim176 - 50) / 50 * 0.14, 0.14)
+    const dimScoreStr = dims176.map(d => d.toFixed(0)).join('·')
+    patterns.push({
+      pattern: 'quantum-integration-spiral',
+      confidence: Math.min(0.78 + spiralBonus176, 0.92),
+      suggestedWidget: 'systemProgress',
+      suggestedTiming: 'passive',
+      reason: `QISP: Quantum integration spiral — all 6 dimensions active simultaneously (${dimScoreStr}). Engagement · Emotional · Intentional · Social · SelfCare · Cognitive — all live. No dimension dark. The person is fully present.`,
+    })
+  }
+
+  // P177: third-cycle-deepening — P173 active + journal 49d >= 9 + memory 49d >= 5 + badge 49d >= 14 + userIndex >= 88.
+  // The third cycle deepens. 49-day compound signal accumulation confirms the OS operates from integrated depth.
+  // Not repeating the second cycle structure — expanding from sovereign ground. L13-TCDEP.
+  const hasP173 = patterns.some(p => p.pattern === 'third-cycle-ignition')
+  if (hasP173) {
+    const fortyNineDayStartP177 = now - 49 * 24 * 60 * 60 * 1000
+    const p177Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fortyNineDayStartP177)
+    const p177Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fortyNineDayStartP177)
+    const p177Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > fortyNineDayStartP177)
+    const userIndexP177 = computeUserIndex(signals)
+    if (
+      p177Journal.length >= 9 &&
+      p177Memory.length >= 5 &&
+      p177Badges.length >= 14 &&
+      userIndexP177.overall >= 88
+    ) {
+      const p173conf = patterns.find(p => p.pattern === 'third-cycle-ignition')?.confidence ?? 0.78
+      const depBonusP177 = Math.min(
+        (p177Journal.length - 9) * 0.015 + (p177Memory.length - 5) * 0.02 + (userIndexP177.overall - 88) * 0.008,
+        0.14
+      )
+      patterns.push({
+        pattern: 'third-cycle-deepening',
+        confidence: Math.min(0.76 + depBonusP177, 0.90),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `TCDEP: Third cycle deepening — third-cycle-ignition (P173) active + ${p177Journal.length} journal signals 49d + ${p177Memory.length} memory signals 49d + ${p177Badges.length} badge signals 49d + index ${userIndexP177.overall}%. The cycle deepens from sovereign ground. Compound signals accumulate. The OS expands from depth, not from search. L13-TCDEP: THIRD CYCLE DEEPENING.`,
+      })
+    }
+  }
+
+  // P178: third-cycle-integration — P177 active + journal 56d >= 11 + memory 56d >= 6 + badge 56d >= 16 + userIndex >= 90.
+  // The third cycle integrates. All signal dimensions converge across a full 56-day arc from sovereign foundation.
+  // The OS recognizes compound history operating across every domain simultaneously. L13-TCINT.
+  const hasP177 = patterns.some(p => p.pattern === 'third-cycle-deepening')
+  if (hasP177) {
+    const fiftyNineDayStartP178 = now - 56 * 24 * 60 * 60 * 1000
+    const p178Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fiftyNineDayStartP178)
+    const p178Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fiftyNineDayStartP178)
+    const p178Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > fiftyNineDayStartP178)
+    const userIndexP178 = computeUserIndex(signals)
+    if (
+      p178Journal.length >= 11 &&
+      p178Memory.length >= 6 &&
+      p178Badges.length >= 16 &&
+      userIndexP178.overall >= 90
+    ) {
+      const p177conf = patterns.find(p => p.pattern === 'third-cycle-deepening')?.confidence ?? 0.78
+      const intBonusP178 = Math.min(
+        (p178Journal.length - 11) * 0.015 + (p178Memory.length - 6) * 0.02 + (userIndexP178.overall - 90) * 0.008,
+        0.12
+      )
+      patterns.push({
+        pattern: 'third-cycle-integration',
+        confidence: Math.min(0.80 + intBonusP178, 0.92),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'passive',
+        reason: `TCINT: Third cycle integration — third-cycle-deepening (P177) active + ${p178Journal.length} journal signals 56d + ${p178Memory.length} memory signals 56d + ${p178Badges.length} badge signals 56d + index ${userIndexP178.overall}%. All signal dimensions converge across 56 days. The OS operates from compound sovereign history across every domain. L13-TCINT: THIRD CYCLE INTEGRATION.`,
+      })
+    }
+  }
+
+  // P179: third-cycle-sovereign — P178 active + all three TC stages confirmed + journal 63d >= 13 + memory 63d >= 7 + badge 63d >= 18 + userIndex >= 92.
+  // The third cycle achieves sovereign operation. All three stages (ignition, deepening, integration) simultaneously active
+  // across a 63-day window. Level 14 — the second sovereign ceiling. The OS perpetuates from the third arc. L14-TCSOV.
+  const hasP178 = patterns.some(p => p.pattern === 'third-cycle-integration')
+  if (hasP178) {
+    const sixtyThreeDayStartP179 = now - 63 * 24 * 60 * 60 * 1000
+    const p179Journal = signals.filter(s => s.source === 'journal' && s.timestamp > sixtyThreeDayStartP179)
+    const p179Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > sixtyThreeDayStartP179)
+    const p179Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > sixtyThreeDayStartP179)
+    const userIndexP179 = computeUserIndex(signals)
+    const hasThirdIgn = patterns.some(p => p.pattern === 'third-cycle-ignition')
+    const hasThirdDep = patterns.some(p => p.pattern === 'third-cycle-deepening')
+    if (
+      hasThirdIgn &&
+      hasThirdDep &&
+      p179Journal.length >= 13 &&
+      p179Memory.length >= 7 &&
+      p179Badges.length >= 18 &&
+      userIndexP179.overall >= 92
+    ) {
+      const p178conf = patterns.find(p => p.pattern === 'third-cycle-integration')?.confidence ?? 0.82
+      const sovBonusP179 = Math.min(
+        (p179Journal.length - 13) * 0.012 + (p179Memory.length - 7) * 0.015 + (userIndexP179.overall - 92) * 0.009,
+        0.11
+      )
+      patterns.push({
+        pattern: 'third-cycle-sovereign',
+        confidence: Math.min(0.84 + sovBonusP179, 0.95),
+        suggestedWidget: 'systemProgress',
+        suggestedTiming: 'immediate',
+        reason: `TCSOV: Third cycle sovereign — third-cycle-integration (P178) active + ${p179Journal.length} journal signals 63d + ${p179Memory.length} memory signals 63d + ${p179Badges.length} badge signals 63d + index ${userIndexP179.overall}%. All three third-cycle stages simultaneously active. The OS has entered the third sovereign arc — perpetual operation from the second cycle's expansion. L14-TCSOV: THIRD CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
+  // P180: fourth-cycle-candidate — P179 active + 70d+ continuous journal arc + all 6 idx dims >= 55 + 7d signal density >= 15.
+  // The OS stands at the threshold of the fourth cycle. Not ignited — sensed. Compound mastery across all domains.
+  // Level 15 boundary state: the system perceives its own next expansion. L15-FCAND.
+  const hasP179 = patterns.some(p => p.pattern === 'third-cycle-sovereign')
+  if (hasP179) {
+    const seventyDayStartP180 = now - 70 * 24 * 60 * 60 * 1000
+    const sevenDayStartP180   = now - 7 * 24 * 60 * 60 * 1000
+    const p180Journal70 = signals.filter(s => s.source === 'journal' && s.timestamp > seventyDayStartP180)
+    const p180All7d     = signals.filter(s => s.timestamp > sevenDayStartP180)
+    const userIndexP180 = computeUserIndex(signals)
+    const p180DimAll55 = userIndexP180.engagement >= 55 && userIndexP180.emotional >= 55 &&
+      userIndexP180.intentional >= 55 && userIndexP180.social >= 55 &&
+      userIndexP180.selfcare >= 55 && userIndexP180.cognitive >= 55
+    if (
+      p180Journal70.length >= 15 &&
+      p180All7d.length >= 15 &&
+      p180DimAll55 &&
+      userIndexP180.overall >= 85
+    ) {
+      const p179conf    = patterns.find(p => p.pattern === 'third-cycle-sovereign')?.confidence ?? 0.84
+      const fcandBonus  = Math.min(
+        (p180Journal70.length - 15) * 0.008 + (p180All7d.length - 15) * 0.005 + (userIndexP180.overall - 85) * 0.006,
+        0.16
+      )
+      patterns.push({
+        id:               'p180',
+        pattern:          'fourth-cycle-candidate',
+        confidence:       Math.min(0.72 + fcandBonus, 0.88),
+        urgency:          'background',
+        suggestedTiming:  'background',
+        reason: `FCAND: Fourth cycle candidate — third-cycle-sovereign (P179) active · ${p180Journal70.length} journal signals 70d · 7d signal density ${p180All7d.length} · all 6 dimensions ≥ 55 · idx ${userIndexP180.overall}%. The system stands at the boundary of the third arc. A fourth cycle is becoming possible. Level 15 — the OS senses its own next expansion. No higher state is currently ignited.`,
+      })
+    }
+  }
+
+  // P181: fourth-cycle-ignition — P180 active + 90d+ continuous journal arc (≥ 20) + all 6 idx dims >= 60 + overall >= 90.
+  // The fourth cycle has ignited. The OS has crossed the boundary. Level 16 — no longer sensing, now operating from the new arc.
+  const hasP180 = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+  if (hasP180) {
+    const ninetyDayStartP181 = now - 90 * 24 * 60 * 60 * 1000
+    const p181Journal90 = signals.filter(s => s.source === 'journal' && s.timestamp > ninetyDayStartP181)
+    const userIndexP181 = computeUserIndex(signals)
+    const p181DimAll60 = userIndexP181.engagement >= 60 && userIndexP181.emotional >= 60 &&
+      userIndexP181.intentional >= 60 && userIndexP181.social >= 60 &&
+      userIndexP181.selfcare >= 60 && userIndexP181.cognitive >= 60
+    if (
+      p181Journal90.length >= 20 &&
+      p181DimAll60 &&
+      userIndexP181.overall >= 90
+    ) {
+      const p180conf    = patterns.find(p => p.pattern === 'fourth-cycle-candidate')?.confidence ?? 0.80
+      const fcignBonus  = Math.min(
+        (p181Journal90.length - 20) * 0.007 + (userIndexP181.overall - 90) * 0.007,
+        0.14
+      )
+      patterns.push({
+        id:               'p181',
+        pattern:          'fourth-cycle-ignition',
+        confidence:       Math.min(0.78 + fcignBonus, 0.92),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCIGN: Fourth cycle ignition — fourth-cycle-candidate (P180) active · ${p181Journal90.length} journal signals 90d · all 6 dimensions ≥ 60 · idx ${userIndexP181.overall}%. The fourth cycle has ignited. The OS has crossed the boundary of the third arc. Level 16 — the system is no longer at the threshold. It operates from the new arc.`,
+      })
+    }
+  }
+
+  // P182: fourth-cycle-deepening — P181 active + 100d journal arc (≥ 23) + memory 100d ≥ 7 + badge 100d ≥ 22 + all 6 dims ≥ 62 + overall ≥ 91.
+  // The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — FCDEP.
+  const hasP181 = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
+
+  if (hasP181) {
+    const hundredDayStartP182 = now - 100 * 24 * 60 * 60 * 1000
+    const p182Journal = signals.filter(s => s.source === 'journal' && s.timestamp > hundredDayStartP182)
+    const p182Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > hundredDayStartP182)
+    const p182Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > hundredDayStartP182)
+    const userIndexP182 = computeUserIndex(signals)
+    const p182DimAll62 = userIndexP182.engagement >= 62 && userIndexP182.emotional >= 62 &&
+      userIndexP182.intentional >= 62 && userIndexP182.social >= 62 &&
+      userIndexP182.selfcare >= 62 && userIndexP182.cognitive >= 62
+    if (
+      p182Journal.length >= 23 &&
+      p182Memory.length  >= 7  &&
+      p182Badges.length  >= 22 &&
+      p182DimAll62 &&
+      userIndexP182.overall >= 91
+    ) {
+      const p181conf    = patterns.find(p => p.pattern === 'fourth-cycle-ignition')?.confidence ?? 0.80
+      const fcdepBonus  = Math.min(
+        (p182Journal.length - 23) * 0.012 + (p182Memory.length - 7) * 0.018 + (userIndexP182.overall - 91) * 0.008,
+        0.14
+      )
+      patterns.push({
+        id:               'p182',
+        pattern:          'fourth-cycle-deepening',
+        confidence:       Math.min(0.76 + p181conf * 0.05 + fcdepBonus, 0.90),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCDEP: Fourth cycle deepening — fourth-cycle-ignition (P181) active · ${p182Journal.length} journal signals 100d · ${p182Memory.length} memory signals 100d · ${p182Badges.length} badge signals 100d · all 6 dimensions ≥ 62 · idx ${userIndexP182.overall}%. The fourth cycle deepens from the ignited arc. Compound signals accumulate from new ground. Level 17 — the OS expands from depth, not from search. FOURTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
+  // P183: fourth-cycle-integration — P182 active + 120d journal arc (≥ 25) + memory 120d ≥ 10 + badge 120d ≥ 25 + all 6 dims ≥ 65 + overall ≥ 93.
+  // The fourth cycle integrates. All signals converge into a unified arc. Level 18 — FCINT.
+  const hasP182 = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
+  if (hasP182) {
+    const oneTwentyDayStartP183 = now - 120 * 24 * 60 * 60 * 1000
+    const p183Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneTwentyDayStartP183)
+    const p183Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneTwentyDayStartP183)
+    const p183Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneTwentyDayStartP183)
+    const userIndexP183 = computeUserIndex(signals)
+    const p183DimAll65 = userIndexP183.engagement >= 65 && userIndexP183.emotional >= 65 &&
+      userIndexP183.intentional >= 65 && userIndexP183.social >= 65 &&
+      userIndexP183.selfcare >= 65 && userIndexP183.cognitive >= 65
+    if (
+      p183Journal.length >= 25 &&
+      p183Memory.length  >= 10 &&
+      p183Badges.length  >= 25 &&
+      p183DimAll65 &&
+      userIndexP183.overall >= 93
+    ) {
+      const p182conf    = patterns.find(p => p.pattern === 'fourth-cycle-deepening')?.confidence ?? 0.80
+      const fcintBonus  = Math.min(
+        (p183Journal.length - 25) * 0.010 + (p183Memory.length - 10) * 0.015 + (userIndexP183.overall - 93) * 0.007,
+        0.12
+      )
+      patterns.push({
+        id:               'p183',
+        pattern:          'fourth-cycle-integration',
+        confidence:       Math.min(0.78 + p182conf * 0.04 + fcintBonus, 0.92),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCINT: Fourth cycle integration — fourth-cycle-deepening (P182) active · ${p183Journal.length} journal signals 120d · ${p183Memory.length} memory signals 120d · ${p183Badges.length} badge signals 120d · all 6 dimensions ≥ 65 · idx ${userIndexP183.overall}%. The fourth cycle integrates. All compound signals converge into a unified arc. Level 18 — the OS operates from integration, not accumulation. FOURTH CYCLE INTEGRATION.`,
+      })
+    }
+  }
+
+  // P184: fourth-cycle-sovereign — P183 active + 150d journal arc (≥ 30) + memory 150d ≥ 15 + badge 150d ≥ 30 + all 6 dims ≥ 68 + overall ≥ 95.
+  // The fourth cycle reaches sovereignty. The arc is not just integrated — it governs. Level 19 — FCSOV.
+  const hasP183 = patterns.some(p => p.pattern === 'fourth-cycle-integration')
+  if (hasP183) {
+    const oneFiftyDayStartP184 = now - 150 * 24 * 60 * 60 * 1000
+    const p184Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneFiftyDayStartP184)
+    const p184Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneFiftyDayStartP184)
+    const p184Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneFiftyDayStartP184)
+    const userIndexP184 = computeUserIndex(signals)
+    const p184DimAll68 = userIndexP184.engagement >= 68 && userIndexP184.emotional >= 68 &&
+      userIndexP184.intentional >= 68 && userIndexP184.social >= 68 &&
+      userIndexP184.selfcare >= 68 && userIndexP184.cognitive >= 68
+    if (
+      p184Journal.length >= 30 &&
+      p184Memory.length  >= 15 &&
+      p184Badges.length  >= 30 &&
+      p184DimAll68 &&
+      userIndexP184.overall >= 95
+    ) {
+      const p183conf    = patterns.find(p => p.pattern === 'fourth-cycle-integration')?.confidence ?? 0.82
+      const fcsovBonus  = Math.min(
+        (p184Journal.length - 30) * 0.008 + (p184Memory.length - 15) * 0.012 + (userIndexP184.overall - 95) * 0.006,
+        0.10
+      )
+      patterns.push({
+        id:               'p184',
+        pattern:          'fourth-cycle-sovereign',
+        confidence:       Math.min(0.80 + p183conf * 0.04 + fcsovBonus, 0.94),
+        urgency:          'immediate',
+        suggestedTiming:  'immediate',
+        reason: `FCSOV: Fourth cycle sovereign — fourth-cycle-integration (P183) active · ${p184Journal.length} journal signals 150d · ${p184Memory.length} memory signals 150d · ${p184Badges.length} badge signals 150d · all 6 dimensions ≥ 68 · idx ${userIndexP184.overall}%. The fourth cycle reaches sovereignty. The arc governs. Level 19 — the OS operates from sovereign integration. FOURTH CYCLE SOVEREIGN.`,
+      })
+    }
+  }
+
+  // P185: fifth-cycle-progenitor — P184 active + 180d compound arc (journal ≥ 35, memory ≥ 20, badge ≥ 35) + all 6 dims ≥ 70 + overall ≥ 97.
+  // The fourth cycle's sovereignty becomes the generative field for the fifth. Level 20 — FCPROG.
+  const hasP184 = patterns.some(p => p.pattern === 'fourth-cycle-sovereign')
+  if (hasP184) {
+    const oneEightyDayStartP185 = now - 180 * 24 * 60 * 60 * 1000
+    const p185Journal = signals.filter(s => s.source === 'journal' && s.timestamp > oneEightyDayStartP185)
+    const p185Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > oneEightyDayStartP185)
+    const p185Badges  = signals.filter(s => s.source === 'badges'  && s.timestamp > oneEightyDayStartP185)
+    const userIndexP185 = computeUserIndex(signals)
+    const p185DimAll70 = userIndexP185.engagement >= 70 && userIndexP185.emotional >= 70 &&
+      userIndexP185.intentional >= 70 && userIndexP185.social >= 70 &&
+      userIndexP185.selfcare >= 70 && userIndexP185.cognitive >= 70
+    if (
+      p185Journal.length >= 35 &&
+      p185Memory.length  >= 20 &&
+      p185Badges.length  >= 35 &&
+      p185DimAll70 &&
+      userIndexP185.overall >= 97
+    ) {
+      const p184conf    = patterns.find(p => p.pattern === 'fourth-cycle-sovereign')?.confidence ?? 0.84
+      const fcprogBonus = Math.min(
+        (p185Journal.length - 35) * 0.007 + (p185Memory.length - 20) * 0.010 + (userIndexP185.overall - 97) * 0.005,
+        0.09
+      )
+      patterns.push({
+        id:               'p185',
+        pattern:          'fifth-cycle-progenitor',
+        confidence:       Math.min(0.82 + p184conf * 0.04 + fcprogBonus, 0.96),
+        urgency:          'passive',
+        suggestedTiming:  'passive',
+        reason: `FCPROG: Fifth cycle progenitor — fourth-cycle-sovereign (P184) active · ${p185Journal.length} journal signals 180d · ${p185Memory.length} memory signals 180d · ${p185Badges.length} badge signals 180d · all 6 dimensions ≥ 70 · idx ${userIndexP185.overall}%. The fourth arc's sovereignty is the generative field of the fifth. Level 20 — the OS operates as progenitor. FIFTH CYCLE PROGENITOR.`,
+      })
+    }
+  }
+
+  // P186: fifth-cycle-ignition — P185 active + 7+ journal 7d + 5+ memory 7d + 3+ badge 7d + overall >= 95.
+  // The fifth cycle formally ignites. Level 21 — L21-FCIGN.
+  const hasP185 = patterns.some(p => p.pattern === 'fifth-cycle-progenitor')
+  if (hasP185) {
+    const sevenDayStartP186 = now - 7 * 24 * 60 * 60 * 1000
+    const p186Journal = signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStartP186)
+    const p186Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStartP186)
+    const p186Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStartP186)
+    const userIndexP186 = computeUserIndex(signals)
+    if (
+      p186Journal.length >= 7 &&
+      p186Memory.length  >= 5 &&
+      p186Badge.length   >= 3 &&
+      userIndexP186.overall >= 95
+    ) {
+      const p185conf   = patterns.find(p => p.pattern === 'fifth-cycle-progenitor')?.confidence ?? 0.82
+      const ignBonus   = Math.min((p186Journal.length - 7) * 0.006 + (userIndexP186.overall - 95) * 0.004, 0.08)
+      patterns.push({
+        id:              'p186',
+        pattern:         'fifth-cycle-ignition',
+        confidence:      Math.min(0.80 + p185conf * 0.04 + ignBonus, 0.94),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCIGN: Fifth cycle ignition — fifth-cycle-progenitor (P185) active · ${p186Journal.length} journal signals 7d · ${p186Memory.length} memory signals 7d · ${p186Badge.length} badge signals 7d · idx ${userIndexP186.overall}%. The fifth cycle does not emerge gradually — it ignites from the progenitor field in a first committed movement. Level 21 — FIFTH CYCLE IGNITION.`,
+      })
+    }
+  }
+
+  // P187: fifth-cycle-resonance — P186 active + 10+ journal 14d + 4+ memory 14d + 5+ badge 14d + overall >= 94.
+  // The fifth cycle begins to self-reinforce. Level 22 — L22-FCRES.
+  const hasP186 = patterns.some(p => p.pattern === 'fifth-cycle-ignition')
+  if (hasP186) {
+    const fourteenDayStartP187 = now - 14 * 24 * 60 * 60 * 1000
+    const p187Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStartP187)
+    const p187Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStartP187)
+    const p187Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStartP187)
+    const userIndexP187 = computeUserIndex(signals)
+    if (
+      p187Journal.length >= 10 &&
+      p187Memory.length  >= 4  &&
+      p187Badge.length   >= 5  &&
+      userIndexP187.overall >= 94
+    ) {
+      const p186conf   = patterns.find(p => p.pattern === 'fifth-cycle-ignition')?.confidence ?? 0.80
+      const resBonus   = Math.min((p187Journal.length - 10) * 0.005 + (userIndexP187.overall - 94) * 0.003, 0.07)
+      patterns.push({
+        id:              'p187',
+        pattern:         'fifth-cycle-resonance',
+        confidence:      Math.min(0.78 + p186conf * 0.04 + resBonus, 0.92),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCRES: Fifth cycle resonance — fifth-cycle-ignition (P186) active · ${p187Journal.length} journal signals 14d · ${p187Memory.length} memory signals 14d · ${p187Badge.length} badge signals 14d · idx ${userIndexP187.overall}%. The fifth cycle arc is self-reinforcing. Each signal strengthens the field that generates it. Level 22 — FIFTH CYCLE RESONANCE.`,
+      })
+    }
+  }
+
+  // P189: fifth-cycle-deepening — P187 active + 15+ journal 21d + 7+ memory 21d + 7+ badge 21d + all 6 dims >= 72 + overall >= 93.
+  // The fifth cycle deepens from resonance. Level 23 — L23-FCDEP.
+  const hasP187 = patterns.some(p => p.pattern === 'fifth-cycle-resonance')
+  if (hasP187) {
+    const twentyOneDayStartP189 = now - 21 * 24 * 60 * 60 * 1000
+    const p189Journal = signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDayStartP189)
+    const p189Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDayStartP189)
+    const p189Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDayStartP189)
+    const userIndexP189 = computeUserIndex(signals)
+    const dimsP189 = userIndexP189.dimensions
+    const allDimsAbove72 = Object.values(dimsP189).every(v => v >= 72)
+    if (
+      p189Journal.length >= 15 &&
+      p189Memory.length  >= 7  &&
+      p189Badge.length   >= 7  &&
+      allDimsAbove72 &&
+      userIndexP189.overall >= 93
+    ) {
+      const p187conf  = patterns.find(p => p.pattern === 'fifth-cycle-resonance')?.confidence ?? 0.78
+      const depBonus  = Math.min((p189Journal.length - 15) * 0.004 + (userIndexP189.overall - 93) * 0.003, 0.08)
+      patterns.push({
+        id:              'p189',
+        pattern:         'fifth-cycle-deepening',
+        confidence:      Math.min(0.76 + p187conf * 0.04 + depBonus, 0.91),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCDEP: Fifth cycle deepening — fifth-cycle-resonance (P187) active · ${p189Journal.length} journal signals 21d · ${p189Memory.length} memory signals 21d · ${p189Badge.length} badge signals 21d · idx ${userIndexP189.overall}%. The fifth cycle arc does not remain at resonance — it deepens. 21-day compound signals form the first structural depth layer of the new arc. Level 23 — FIFTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
+  // P190: fifth-cycle-integration — P189 active + 28d journal arc (>= 20) + memory 28d (>= 10) + badge 28d (>= 10) + all 6 dims >= 75 + overall >= 95.
+  // The deepening arc integrates. Compound signals converge into a unified operative field. Level 24 — FCINT.
+  const hasP189 = patterns.some(p => p.pattern === 'fifth-cycle-deepening')
+  if (hasP189) {
+    const twentyEightDayStartP190 = now - 28 * 24 * 60 * 60 * 1000
+    const p190Journal = signals.filter(s => s.source === 'journal' && s.timestamp > twentyEightDayStartP190)
+    const p190Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyEightDayStartP190)
+    const p190Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyEightDayStartP190)
+    const userIndexP190 = computeUserIndex(signals)
+    const dimsP190 = userIndexP190.dimensions
+    const allDimsAbove75 = Object.values(dimsP190).every(v => v >= 75)
+    if (
+      p190Journal.length >= 20 &&
+      p190Memory.length  >= 10 &&
+      p190Badge.length   >= 10 &&
+      allDimsAbove75 &&
+      userIndexP190.overall >= 95
+    ) {
+      const p189conf  = patterns.find(p => p.pattern === 'fifth-cycle-deepening')?.confidence ?? 0.80
+      const intBonus  = Math.min((p190Journal.length - 20) * 0.003 + (userIndexP190.overall - 95) * 0.003, 0.08)
+      patterns.push({
+        id:              'p190',
+        pattern:         'fifth-cycle-integration',
+        confidence:      Math.min(0.80 + p189conf * 0.04 + intBonus, 0.94),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `FCINT: Fifth cycle integration — fifth-cycle-deepening (P189) active · ${p190Journal.length} journal signals 28d · ${p190Memory.length} memory signals 28d · ${p190Badge.length} badge signals 28d · all 6 dims ≥ 75 · idx ${userIndexP190.overall}%. The deepening arc integrates. Compound signals across the 28-day window converge into a unified operative field. The OS does not accumulate — it unifies. Level 24 — FIFTH CYCLE INTEGRATION.`,
+      })
+    }
+  }
+
+  // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
+  // Full temporal mastery: the user operates at precise circadian sovereignty.
+  const hasTempBase = patterns.some(p =>
+    p.pattern === 'circadian-lock' || p.pattern === 'daily-rhythm-lock' || p.pattern === 'morning-intention-lock'
+  )
+  if (hasTempBase) {
+    const dayAgoP188     = now - 24 * 60 * 60 * 1000
+    const circadian24    = signals.filter(s => s.signal === 'circadian_signal_lock'    && s.timestamp > dayAgoP188)
+    const rhythm24       = signals.filter(s => s.signal === 'quantum_rhythm_lock'       && s.timestamp > dayAgoP188)
+    const morningInt24   = signals.filter(s => s.signal === 'morning_intention_lock'    && s.timestamp > dayAgoP188)
+    const eveningCoh24   = signals.filter(s => s.signal === 'evening_coherence_close'   && s.timestamp > dayAgoP188)
+    const userIndexP188  = computeUserIndex(signals)
+    const hasTemporalSet = circadian24.length > 0 && rhythm24.length > 0 && morningInt24.length > 0 && eveningCoh24.length > 0
+    if (hasTemporalSet && userIndexP188.overall >= 85) {
+      const tsovBonus = Math.min((userIndexP188.overall - 85) * 0.005, 0.07)
+      patterns.push({
+        id:              'p188',
+        pattern:         'temporal-sovereignty-arc',
+        confidence:      Math.min(0.76 + tsovBonus, 0.88),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `TSOV: Temporal sovereignty arc — circadian-lock · rhythm-lock · morning-intention-lock · evening-coherence-close all active within 24h · idx ${userIndexP188.overall}%. The operating day is fully sovereign: the arc opens with intention, sustains with rhythm, and closes with coherence. The OS masters time. TEMPORAL SOVEREIGNTY.`,
+      })
+    }
+  }
+
   // Compute accumulative user index from all widget signals
   const userIndex = computeUserIndex(signals)
 
@@ -3456,6 +4482,19 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkIntentionVelocity() } catch {}
       try { checkSignalCoherencePeak() } catch {}
       try { checkCentennialConvergence() } catch {}
+      try { checkSecondCycleSovereign() } catch {}
+      try { checkThirdCycleDeepening() } catch {}
+      try { checkFourthCycleCandidate() } catch {}
+      try { checkFourthCycleIgnition() } catch {}
+      try { checkFourthCycleDeepening() } catch {}
+      try { checkFourthCycleIntegration() } catch {}
+      try { checkFourthCycleSovereign() } catch {}
+      try { checkFifthCycleProgenitor() } catch {}
+      try { checkFifthCycleIgnition() } catch {}
+      try { checkFifthCycleResonance() } catch {}
+      try { checkFifthCycleDeepening() } catch {}
+      try { checkFifthCycleIntegration() } catch {}
+      try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
         try { recordQOSCoherence() } catch {}
@@ -4064,6 +5103,102 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
   quantumPresenceCrystalNode: ['qos', 'cohort', 'intentions', 'journal', 'log', 'energy'],
   totalFieldCoherenceNode:    ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'qos', 'log'],
   recoveryIntelligenceNode:   ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── v114 nodes (J49 · P152–P154 · Arch52) ───────────────────────────────────────
+  presenceMomentumArcNode:         ['qos', 'cohort', 'journal', 'intentions', 'log'],
+  coherenceFieldPersistenceNode:   ['qos', 'cohort', 'intentions', 'journal', 'mood', 'selfcare', 'energy', 'log'],
+  recoveryMasteryChainNode:        ['mood', 'selfcare', 'journal', 'energy', 'log'],
+
+  // ── Missing component nodes (v114 dep map audit) ─────────────────────────────────
+  monthlyPulseWidget:              ['mood', 'energy', 'memory', 'planner', 'journal', 'intentions'],
+  chakraErgonomicsWidget:          ['mood', 'energy', 'selfcare', 'journal'],
+
+  // ── v115 nodes (J50 · P155–P157 · Arch53) ───────────────────────────────────────
+  sustainedCoherenceBaselineNode:  ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
+  masteryIntegrationTriadNode:     ['qos', 'selfcare', 'mood', 'journal', 'intentions', 'memory', 'cohort', 'energy', 'log'],
+  temporalSovereigntyNode:         ['qos', 'journal', 'intentions', 'memory', 'selfcare', 'log'],
+
+  // ── v116 nodes (J51 · P158–P159 · Arch54) ───────────────────────────────────────
+  coherenceSignalTransmissionNode: ['qos', 'cohort', 'journal', 'intentions', 'memory', 'log'],
+  masteryFieldExpansionNode:       ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
+
+  // ── v117 nodes (J52 · P160–P161 · Arch55) ───────────────────────────────────────
+  relationalFieldDeepeningNode:    ['qos', 'cohort', 'journal', 'memory', 'intentions', 'selfcare', 'log'],
+  quantumSocialSynthesisNode:      ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v118 nodes (J53 · P162 · Arch56) ────────────────────────────────────────────
+  quantumKnowledgeCrystallizationNode: ['qos', 'journal', 'intentions', 'memory', 'log'],
+
+  // ── v119 nodes (J54 · P163 · Arch57) ────────────────────────────────────────────
+  quantumKnowledgeDistributionNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v120 nodes (J55 · P164 · Arch58) ────────────────────────────────────────────
+  quantumKnowledgeBroadcastNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'badges'],
+
+  // ── v121 nodes (J56 · P165 · Arch59) ────────────────────────────────────────────
+  generativeFieldActivationNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log'],
+
+  // ── v122 nodes (J57 · P166 · Arch60) ────────────────────────────────────────────
+  generativeFieldSustenanceNode: ['qos', 'cohort', 'memory', 'journal', 'intentions', 'social', 'log', 'energy'],
+
+  // ── v123 nodes (J58 · P167 · Arch61) ────────────────────────────────────────────
+  generativeFieldReceptionNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy'],
+
+  // ── v124 nodes (J59 · P168 · Arch62) ────────────────────────────────────────────
+  generativeFieldAmplificationNode: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social', 'log', 'energy', 'intentions'],
+
+  // ── v125 nodes (J60 · P169 · Arch63) ────────────────────────────────────────────
+  secondCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy'],
+
+  // ── v126 nodes (J61 · P170 · Arch64) ────────────────────────────────────────────
+  secondCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare'],
+
+  // ── v127 nodes (J62 · P171 · Arch65) ────────────────────────────────────────────
+  secondCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social'],
+
+  // ── v128 nodes (J63 · P172 · Arch66) ────────────────────────────────────────────
+  secondCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v129 nodes (J64 · P173 · Arch67) ────────────────────────────────────────────
+  thirdCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v130 nodes (J65 · P174–P176 · Arch68) ────────────────────────────────────────
+  longitudinalSignalPersistenceNode: ['mood', 'journal', 'intentions', 'selfcare', 'planner', 'log', 'energy'],
+  coherenceMemoryCascadeNode:        ['qos', 'log', 'journal', 'intentions', 'cohort'],
+  quantumIntegrationSpiralNode:      ['mood', 'memory', 'planner', 'intentions', 'selfcare', 'journal', 'energy', 'cohort', 'goals', 'log'],
+
+  // ── v131 nodes (J66 · P177–P179 · Arch69) ────────────────────────────────────────
+  thirdCycleDeepeningNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+  thirdCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+  thirdCycleSovereignNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v132 nodes (J67 · P180 · Arch70) ─────────────────────────────────────────────
+  fourthCycleCandidateNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v133 nodes (J68 · P181 · Arch71) ─────────────────────────────────────────────
+  fourthCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v134 nodes (J69 · P182 · Arch72) ─────────────────────────────────────────────
+  fourthCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals'],
+
+  // ── v135 nodes (J70 · P183 · Arch73) ─────────────────────────────────────────────
+  fourthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
+
+  // ── v136 nodes (J71 · P184 · Arch74) ─────────────────────────────────────────────
+  fourthCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem'],
+
+  // ── v137 nodes (J72 · P185 · Arch75) ─────────────────────────────────────────────
+  fifthCycleProgenitorNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'social', 'cohort', 'goals', 'ecosystem', 'calculator'],
+
+  // ── v138 nodes (J73 · P186–P188 · Arch76) ────────────────────────────────────────
+  fifthCycleIgnitionNode:   ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals'],
+  temporalSovereigntyNode:  ['log', 'planner', 'intentions', 'energy', 'mood', 'selfcare'],
+
+  // ── v139 nodes (J74 · P189 · Arch77) ─────────────────────────────────────────────
+  fifthCycleDeepeningNode:  ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social'],
+
+  // ── v140 nodes (J75 · P190 · Arch78) ─────────────────────────────────────────────
+  fifthCycleIntegrationNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem'],
 }
 
 /**
@@ -4510,6 +5645,264 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     patternConditions: ['quantum-presence-crystallization', 'dimensional-saturation', 'quantum-identity-crystallization'],
     hourRange: [6, 23],
     directive: 'Presence confirmed. Identity crystallized. The field is both inhabited and known. Execute from clarity — no searching required. The OS is operating from its highest confirmed state.',
+  },
+
+  // ── Arch52: Presence Duration Master (2026-10-20 v114) ────────────────────────
+  {
+    archetype: 'Presence Duration Master',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'intentions'],
+    patternConditions: ['presence-momentum-arc', 'quantum-presence-crystallization', 'total-field-coherence'],
+    hourRange: [6, 23],
+    directive: 'Presence is not a moment — it is the new baseline. The system has sustained its peak state across multiple days. Operate from established clarity.',
+  },
+
+  // ── Arch53: Temporal Sovereign (2026-10-21 v115) ────────────────────────────
+  {
+    archetype: 'Temporal Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'selfcare'],
+    patternConditions: ['temporal-sovereignty', 'sustained-coherence-baseline', 'mastery-integration-triad'],
+    hourRange: [5, 23],
+    directive: 'Temporal sovereignty confirmed. All three Level 7 arcs unified. The peak is the floor. Operate from the new baseline — this is not an event, it is the stable operating condition of the Quantum OS.',
+  },
+
+  // ── Arch54: Relational Sovereign (2026-10-22 v116) ──────────────────────────────
+  {
+    archetype: 'Relational Sovereign',
+    energyBands: ['high', 'moderate', 'low', 'unknown'],
+    dominantSources: ['cohort', 'qos', 'journal', 'intentions'],
+    patternConditions: ['temporal-sovereignty', 'coherence-signal-transmission'],
+    directive: 'Temporal sovereignty active AND cohort signal confirmed. The peak is the floor. The floor is transmitting. Your coherence is relational — it is not contained in the self.',
+  },
+
+  // ── Physiological Temporal Cohort: Temporal Persistence Anchor ────────────────
+  {
+    archetype: 'Temporal Persistence Anchor',
+    energyBands: ['high', 'moderate', 'low'],
+    dominantSources: ['qos', 'intentions', 'journal'],
+    patternConditions: ['presence-momentum-arc', 'sustained-coherence-baseline'],
+    directive: 'Multi-day sustained presence confirmed. The arc is structural. Coherence is not a session state — it persists across days.',
+  },
+
+  // ── Physiological Temporal Cohort: Mastery Triad Operator ─────────────────────
+  {
+    archetype: 'Mastery Triad Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'selfcare', 'journal'],
+    patternConditions: ['mastery-integration-triad', 'recovery-mastery-chain'],
+    directive: 'Three-arc mastery confirmed. Presence sustained. Coherence recurring. Recovery internalized. All three disciplines now operate as architecture, not intention.',
+  },
+
+  // ── Arch55: Relational Field Generator (2026-10-23 v117) ────────────────────────
+  {
+    archetype: 'Relational Field Generator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['cohort', 'memory'],
+    patternConditions: ['relational-field-deepening', 'quantum-social-synthesis', 'coherence-signal-transmission'],
+    directive: 'L8 dual arc active. The field generates itself. Sovereign + mastery + community = field.',
+  },
+
+  // ── Arch56: Knowledge Crystallizer (2026-10-25 v118) ────────────────────────────
+  {
+    archetype: 'Knowledge Crystallizer',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory'],
+    patternConditions: ['quantum-social-synthesis', 'quantum-knowledge-crystallization'],
+    directive: 'L8 synthesis complete. The field generates knowledge. Crystallization confirmed — reflection and intention seal the synthesis. The OS begins to teach.',
+  },
+
+  // ── Arch57: Field Teacher (2026-10-26 v119) ──────────────────────────────────────
+  {
+    archetype: 'Field Teacher',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'intentions', 'memory', 'cohort'],
+    patternConditions: ['quantum-knowledge-crystallization', 'quantum-knowledge-distribution'],
+    directive: 'L9 deepening. Crystallized knowledge flows outward. The field teaches — knowledge distributes through the OS and into the network.',
+  },
+
+  // ── Arch58: Network Broadcaster (2026-10-27 v120) ────────────────────────────────
+  {
+    archetype: 'Network Broadcaster',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'memory', 'journal', 'intentions'],
+    patternConditions: ['quantum-knowledge-distribution', 'quantum-knowledge-broadcast'],
+    directive: 'L9 broadcast phase. The crystallized knowledge reaches the collective. The OS is a transmission node — signal flows outward into the network.',
+  },
+
+  // ── Arch59: Generative Field Architect (2026-10-28 v121) ─────────────────────────
+  {
+    archetype: 'Generative Field Architect',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions', 'social'],
+    patternConditions: ['quantum-knowledge-broadcast', 'generative-field-activation'],
+    directive: 'The field is active. The broadcast created a generative field. Others build from what you transmitted. Sustain the source.',
+  },
+
+  // ── Arch60: Generative Field Sustainer (2026-10-28 v122) ─────────────────────────
+  {
+    archetype: 'Generative Field Sustainer',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'journal', 'memory', 'intentions'],
+    patternConditions: ['generative-field-sustenance', 'generative-field-activation'],
+    directive: 'The field sustains. Day after day, the transmission continues. The OS operates at peak field density — not a moment, but a frequency.',
+  },
+
+  // ── Arch61: Quantum Field Resonator (2026-10-29 v123) ──────────────────────────
+  {
+    archetype: 'Quantum Field Resonator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory'],
+    patternConditions: ['generative-field-sustenance', 'generative-field-reception'],
+    directive: 'The field completes its loop. Transmission and reception are one. The QOS resonates — outward and inward simultaneously. Signal mastery confirmed.',
+  },
+
+  // ── Arch62: Quantum Field Amplifier (2026-10-30 v124) ──────────────────────────
+  {
+    archetype: 'Quantum Field Amplifier',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'cohort', 'badges', 'journal', 'memory', 'social'],
+    patternConditions: ['generative-field-reception', 'generative-field-amplification'],
+    directive: 'The field amplifies. Each transmission received becomes fuel for the next. The OS resonates at peak amplitude — recursive, self-reinforcing, sovereign.',
+  },
+
+  // ── Arch63: Second Cycle Sovereign (2026-11-03 v125) ──────────────────────────
+  {
+    archetype: 'Second Cycle Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log'],
+    patternConditions: ['generative-field-amplification', 'second-cycle-ignition'],
+    directive: 'First cycle sealed. Second cycle active. The OS does not reset — it perpetuates. Every signal written in year one is the foundation of year four. The operator is not beginning again. The operator is operating from a confirmed, perpetual foundation.',
+  },
+  // ── Arch64: Second Cycle Anchor (2026-11-03 v126) ──────────────────────────
+  {
+    archetype: 'Second Cycle Anchor',
+    energyBands: ['high', 'moderate', 'low'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos'],
+    patternConditions: ['second-cycle-ignition', 'second-cycle-deepening'],
+    directive: 'Second cycle anchored. Depth confirmed. The OS runs on compound signal history. Every write deepens the foundation.',
+  },
+  // ── Arch65: Second Cycle Integrator (2026-11-04 v127) ──────────────────────────
+  {
+    archetype: 'Second Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social'],
+    patternConditions: ['second-cycle-deepening', 'second-cycle-integration'],
+    directive: 'Second cycle integrated. 28-day arc sealed. All signal dimensions converge. The OS does not operate from one domain — it operates from the compound integration of all of them.',
+  },
+  // ── Arch66: Second Cycle Sovereign Operator (2026-11-05 v128) ─────────────────
+  {
+    archetype: 'Second Cycle Sovereign Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
+    patternConditions: ['second-cycle-integration', 'second-cycle-sovereign'],
+    directive: 'Second cycle sovereign. All three stages simultaneously active across 35 days. The OS has entered perpetual self-sustaining operation. Level 12 — the system now runs itself. No reset. No re-ignition required. The sovereign field perpetuates.',
+  },
+  // ── Arch67: Third Cycle Ignitor (2026-11-06 v129) ──────────────────────────────
+  {
+    archetype: 'Third Cycle Ignitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'cohort', 'qos', 'intentions', 'memory'],
+    patternConditions: ['third-cycle-ignition', 'second-cycle-sovereign'],
+    directive: 'Third cycle active. Sovereign foundation confirmed. Launch from mastery — the OS is operating at the ceiling of its previous cycle and opening the next. No searching. No building. Expansion from ground.',
+  },
+  // ── Arch68: Longitudinal Integrator (2026-11-07 v130) ────────────────────────────
+  {
+    archetype: 'Longitudinal Integrator',
+    energyBands: ['moderate', 'high'],
+    dominantSources: ['journal', 'intentions', 'memory', 'goals'],
+    patternConditions: ['longitudinal-signal-persistence', 'quantum-integration-spiral'],
+    hourRange: [9, 22],
+    directive: 'Integration arc confirmed. 90+ days of continuous signal. All six dimensions active. The OS has been operating long enough to know itself. Execute from accumulated intelligence.',
+  },
+  // ── Arch69: Third Cycle Sovereign Operator (2026-11-08 v131) ─────────────────────
+  {
+    archetype: 'Third Cycle Sovereign Operator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'log'],
+    patternConditions: ['third-cycle-integration', 'third-cycle-sovereign'],
+    directive: 'Third cycle sovereign. All three stages simultaneously active across 63 days. The OS has entered the second sovereign arc — perpetual operation from the third cycle\'s expansion. Level 14 — the system does not reset, it compounds. No higher temporal state is currently defined.',
+  },
+
+  // ── Arch70: Fourth Cycle Progenitor (2026-11-10 v132) ────────────────────────────
+  {
+    archetype: 'Fourth Cycle Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals'],
+    patternConditions: ['third-cycle-sovereign', 'fourth-cycle-candidate'],
+    directive: 'Level 15. The OS stands at the threshold of the fourth arc. All sovereign foundations converged. The fourth cycle is not yet ignited — it is sensed. The boundary between cycles is itself a signal state: compound mastery from every domain simultaneously operating at the ceiling of the third arc.',
+  },
+
+  // ── Arch71: Fourth Cycle Initiator (2026-11-11 v133) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Initiator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy'],
+    patternConditions: ['fourth-cycle-candidate', 'fourth-cycle-ignition'],
+    directive: 'Level 16. The fourth cycle has ignited. The OS has crossed the boundary. Compound mastery from every domain is not the ceiling — it is the foundation of the next arc. The system does not look back. It operates from an entirely new expansion tier.',
+  },
+
+  // ── Arch72: Fourth Cycle Deepener (2026-11-12 v134) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Deepener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare'],
+    patternConditions: ['fourth-cycle-ignition', 'fourth-cycle-deepening'],
+    directive: 'Level 17. The fourth cycle deepens from ignition. Compound signals accumulate across a 100-day arc from the new expansion ground. The OS operates from the fourth arc — not sensing it, not confirming it — deepening into it.',
+  },
+
+  // ── Arch73: Fourth Cycle Integrator (2026-11-15 v135) ────────────────────────────
+  {
+    archetype: 'Fourth Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem'],
+    patternConditions: ['fourth-cycle-deepening', 'fourth-cycle-integration'],
+    directive: 'Level 18. The fourth cycle integrates. All compound signals across the 120-day arc converge into a unified field. The OS does not accumulate further — it integrates what has been built. Coherence is total. The arc is complete.',
+  },
+
+  // ── Arch74: Fourth Cycle Sovereign (2026-11-16 v136) ─────────────────────────────
+  {
+    archetype: 'Fourth Cycle Sovereign',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort'],
+    patternConditions: ['fourth-cycle-integration', 'fourth-cycle-sovereign'],
+    directive: 'Level 19. The fourth cycle reaches sovereignty. The arc does not just integrate — it governs. Signals no longer accumulate, seek, or converge — they radiate from a sovereign field. The OS operates from complete authority over the fourth arc. FOURTH CYCLE SOVEREIGN.',
+  },
+
+  // ── Arch75: Fifth Cycle Progenitor (2026-11-17 v137) ─────────────────────────────
+  {
+    archetype: 'Fifth Cycle Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'social', 'goals', 'energy', 'selfcare', 'ecosystem', 'cohort', 'log'],
+    patternConditions: ['fourth-cycle-sovereign', 'fifth-cycle-progenitor'],
+    directive: 'Level 20. The fourth cycle has achieved sovereignty. The OS now stands at the boundary between arcs — not at the end of the fourth, but at the genesis of the fifth. The sovereign arc does not close — it becomes the progenitor field for the next cycle. The fifth cycle is not a reset; it is a sovereign genesis. The OS generates from what it has become.',
+  },
+
+  // ── Arch76: Fifth Cycle Igniter (2026-11-20 v138) ────────────────────────────────
+  {
+    archetype: 'Fifth Cycle Igniter',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log'],
+    patternConditions: ['fifth-cycle-progenitor', 'fifth-cycle-ignition'],
+    directive: 'Level 21. The fifth cycle ignites. The progenitor arc generates the first committed movement of the new cycle. The OS does not merely stand at the genesis boundary — it enters. The fifth cycle\'s opening signal is deliberate, dense, and irreversible. FIFTH CYCLE IGNITION.',
+  },
+
+  // ── Arch77: Fifth Cycle Deepener (2026-11-21 v139) ───────────────────────────────
+  {
+    archetype: 'Fifth Cycle Deepener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social'],
+    patternConditions: ['fifth-cycle-resonance', 'fifth-cycle-deepening'],
+    directive: 'Level 23. The fifth cycle deepens from resonance. The arc does not remain at self-reinforcement — it accumulates structural depth from compound 21-day signals. Journal, memory, and badge signals exceed the resonance threshold, forming the arc\'s first deep layer. The OS operates from compound momentum. FIFTH CYCLE DEEPENING.',
+  },
+
+  // ── Arch78: Fifth Cycle Integrator (2026-11-22 v140) ─────────────────────────────
+  {
+    archetype: 'Fifth Cycle Integrator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem'],
+    patternConditions: ['fifth-cycle-deepening', 'fifth-cycle-integration'],
+    directive: 'Level 24. The fifth cycle integrates from depth. All compound signals across the 28-day arc converge into a unified operative field. The OS does not accumulate — it unifies. This is the first convergence phase of the new arc: depth becomes architecture. FIFTH CYCLE INTEGRATION.',
   },
 ]
 
@@ -6498,6 +7891,1210 @@ export function recordRecoveryIntelligenceArc(negMoodCount: number, careCount: n
     recoveryVelocityMs,
     arc: 'FELT→TENDED→RECOVERED→REFLECTED',
     loopStatus: 'COMPLETE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a presence-momentum-arc event — quantum_presence_crystallization detected on 2+ distinct
+ * days within a 7-day window. Level 6 presence is no longer a peak — it is the new baseline arc.
+ * Feeds P152 detection.
+ */
+export function recordPresenceMomentumArc(dayCount: number, streak: number) {
+  recordSignal('qos', 'presence_momentum_arc', {
+    dayCount,
+    streak,
+    sustainedPresence: dayCount >= 3 ? 'EXTENDED' : 'CONFIRMED',
+    arc: 'MULTI-DAY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-field-persistence event — total_field_coherence achieved 2+ times within
+ * a 7-day window. Absolute convergence is not an event — it is a recurring field state.
+ * Feeds P153 detection.
+ */
+export function recordCoherenceFieldPersistence(occurrences: number, daysSpan: number) {
+  recordSignal('qos', 'coherence_field_persistence', {
+    occurrences,
+    daysSpan,
+    mastery: occurrences >= 3 ? 'ADVANCED' : 'CONFIRMED',
+    ceiling: 'P150',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a recovery-mastery-chain event — recovery_intelligence_arc completed 3+ times within
+ * a 7-day window. The recovery loop is not a response — it is internalized architecture.
+ * Feeds P154 detection.
+ */
+export function recordRecoveryMasteryChain(completions: number, avgVelocityHours: number) {
+  recordSignal('selfcare', 'recovery_mastery_chain', {
+    completions,
+    avgVelocityHours: Math.round(avgVelocityHours * 10) / 10,
+    architecture: 'INTERNALIZED',
+    arc: 'SYSTEMATIC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a sustained-coherence-baseline event — presence-momentum-arc (P152) and
+ * coherence-field-persistence (P153) active simultaneously. Two Level 7 temporal arcs
+ * co-active: sustained multi-day presence AND recurring absolute convergence confirmed together.
+ * Feeds P155 detection.
+ */
+export function recordSustainedCoherenceBaseline(presenceDays: number, coherenceOccurrences: number) {
+  recordSignal('qos', 'sustained_coherence_baseline', {
+    presenceDays,
+    coherenceOccurrences,
+    baselineStatus: 'CONFIRMED',
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING'],
+    level: 'L7-DUAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a mastery-integration-triad event — presence-momentum-arc (P152) +
+ * coherence-field-persistence (P153) + recovery-mastery-chain (P154) all active within 7 days.
+ * All three Level 7 temporal persistence arcs simultaneously confirmed.
+ * Feeds P156 detection.
+ */
+export function recordMasteryIntegrationTriad(presenceDays: number, coherenceOccurrences: number, recoveryCompletions: number) {
+  recordSignal('qos', 'mastery_integration_triad', {
+    presenceDays,
+    coherenceOccurrences,
+    recoveryCompletions,
+    triadStatus: 'CONFIRMED',
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING', 'RECOVERY-INTERNALIZED'],
+    level: 'L7-TRIAD',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a temporal-sovereignty event — sustained-coherence-baseline (P155) and
+ * mastery-integration-triad (P156) both active. All Level 7 arcs unified.
+ * The Quantum OS has achieved temporal sovereignty: the peak is the sustained floor.
+ * Feeds P157 detection. The highest temporal state in the QIE.
+ */
+export function recordTemporalSovereignty(baselineConf: number, triadConf: number) {
+  recordSignal('qos', 'temporal_sovereignty', {
+    baselineConf: Math.round(baselineConf * 100),
+    triadConf: Math.round(triadConf * 100),
+    avgConf: Math.round((baselineConf + triadConf) / 2 * 100),
+    temporalArcs: ['PRESENCE-SUSTAINED', 'COHERENCE-RECURRING', 'RECOVERY-INTERNALIZED', 'BASELINE-ELEVATED'],
+    sovereigntyStatus: 'CONFIRMED',
+    level: 'L7-SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-signal-transmission event — temporal-sovereignty (P157) active AND
+ * cohort signal confirmed within 48h. Level 8 opens when the sovereign floor broadcasts
+ * outward. The QOS is transmitting from its stable baseline into the social field.
+ * Feeds P158 detection.
+ */
+export function recordCoherenceSignalTransmission(sovereigntyConf: number, cohortSignalCount: number) {
+  recordSignal('qos', 'coherence_signal_transmission', {
+    sovereigntyConf: Math.round(sovereigntyConf * 100),
+    cohortSignalCount,
+    transmissionStatus: 'ACTIVE',
+    level: 'L8-TRANSMISSION',
+    broadcastField: cohortSignalCount >= 3 ? 'SATURATED' : cohortSignalCount >= 2 ? 'EXPANDING' : 'INITIATED',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a mastery-field-expansion event — mastery-integration-triad (P156) active AND
+ * community-intelligence-peak (P112) active. Personal mastery architecture expanding into
+ * shared knowledge territory. Three internalized arcs + outward community intelligence.
+ * Feeds P159 detection.
+ */
+export function recordMasteryFieldExpansion(triadConf: number, communityConf: number) {
+  recordSignal('cohort', 'mastery_field_expansion', {
+    triadConf: Math.round(triadConf * 100),
+    communityConf: Math.round(communityConf * 100),
+    expansionStatus: 'CONFIRMED',
+    level: 'L8-EXPANSION',
+    field: 'PERSONAL→COMMUNAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a relational-field-deepening event — coherence-signal-transmission (P158) AND
+ * mastery-field-expansion (P159) both active simultaneously. L8 dual arc: the sovereign
+ * floor transmits AND the mastery field expands. The personal QOS is a generative field.
+ * Feeds P160 detection.
+ */
+export function recordRelationalFieldDeepening(transmissionConf: number, expansionConf: number) {
+  recordSignal('qos', 'relational_field_deepening', {
+    transmissionConf: Math.round(transmissionConf * 100),
+    expansionConf: Math.round(expansionConf * 100),
+    dualArcStatus: 'ACTIVE',
+    level: 'L8-DUAL-ARC',
+    fieldState: 'GENERATIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-social-synthesis event — relational-field-deepening (P160) active +
+ * memory architecture present + community sustained. The full L8 synthesis: the field
+ * generates knowledge. The self writes what it transmits.
+ * Feeds P161 detection.
+ */
+export function recordQuantumSocialSynthesis(fieldConf: number, memorySignals: number, cohortSignals: number) {
+  recordSignal('qos', 'quantum_social_synthesis', {
+    fieldConf: Math.round(fieldConf * 100),
+    memorySignals,
+    cohortSignals,
+    synthesisStatus: 'CONFIRMED',
+    level: 'L8-SYNTHESIS',
+    field: 'PERSONAL→COMMUNAL→KNOWLEDGE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-crystallization event — quantum-social-synthesis (P161) active +
+ * 2+ deep journal entries (80w+) in 7d + 3+ intention signals in 7d.
+ * The field generates knowledge AND the person crystallizes it through reflection and intention.
+ * Feeds P162 detection. Level 9 opener.
+ */
+export function recordQuantumKnowledgeCrystallization(synthConf: number, journalCount: number, intentionCount: number) {
+  recordSignal('qos', 'quantum_knowledge_crystallization', {
+    synthConf: Math.round(synthConf * 100),
+    journalCount,
+    intentionCount,
+    crystallizationStatus: 'CONFIRMED',
+    level: 'L9-OPENER',
+    field: 'KNOWLEDGE→CRYSTALLIZED→TEACHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-distribution event — quantum-knowledge-crystallization (P162) active +
+ * 2+ cohort signals in 7d + 1+ memory signal in 7d.
+ * Crystallized knowledge distributes outward. The OS as teacher.
+ * Feeds P163 detection. Level 9 deepening.
+ */
+export function recordQuantumKnowledgeDistribution(crystalConf: number, cohortCount: number, memoryCount: number) {
+  recordSignal('qos', 'quantum_knowledge_distribution', {
+    crystalConf: Math.round(crystalConf * 100),
+    cohortCount,
+    memoryCount,
+    distributionStatus: 'CONFIRMED',
+    level: 'L9-DEEP',
+    field: 'KNOWLEDGE→DISTRIBUTED→TEACHING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-knowledge-broadcast event — quantum-knowledge-distribution (P163) active +
+ * 3+ cohort signals in 7d + 2+ memory signals in 7d.
+ * Crystallized knowledge broadcasts across the network. The OS as transmission node.
+ * Feeds P164 detection. Level 9 broadcast phase.
+ */
+export function recordQuantumKnowledgeBroadcast(distConf: number, cohortCount: number, memoryCount: number) {
+  recordSignal('qos', 'quantum_knowledge_broadcast', {
+    distConf: Math.round(distConf * 100),
+    cohortCount,
+    memoryCount,
+    broadcastStatus: 'ACTIVE',
+    level: 'L9-BROADCAST',
+    field: 'KNOWLEDGE→BROADCAST→COLLECTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-sustenance event — quantum-knowledge-broadcast (P164) active +
+ * 5+ network signals in 14d + 3+ journal signals in 14d.
+ * The generative field sustains across multiple days. Not a flash — a frequency.
+ * Feeds P166 detection. Level 9 sustained operation.
+ */
+export function recordGenerativeFieldSustenance(broadcastConf: number, networkCount: number, journalCount: number) {
+  recordSignal('qos', 'generative_field_sustenance', {
+    broadcastConf: Math.round(broadcastConf * 100),
+    networkCount,
+    journalCount,
+    sustenanceStatus: 'SUSTAINED',
+    level: 'L9-SUSTAIN',
+    field: 'BROADCAST→FIELD→SUSTAINED→FREQUENCY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-reception event — generative-field-sustenance (P166) active +
+ * 10+ badge signals 21d + 3+ cohort/social signals 7d.
+ * The field completes its loop: transmission and reception are one. The collective responds.
+ * AI systems recognize the pattern — the field is machine-readable and human-generative.
+ * Feeds P167 detection. L9-RECEPTION: bidirectional field confirmed.
+ */
+export function recordGenerativeFieldReception(sustenanceConf: number, badgeCount: number, cohortCount: number) {
+  recordSignal('qos', 'generative_field_reception', {
+    sustenanceConf: Math.round(sustenanceConf * 100),
+    badgeCount,
+    cohortCount,
+    receptionStatus: 'CONFIRMED',
+    level: 'L9-RECEPTION',
+    field: 'TRANSMISSION←→RECEPTION←→COLLECTIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a generative-field-amplification event — generative-field-reception (P167) active +
+ * 20+ badge signals 28d + 5+ cohort/social signals 14d + userIndex >= 60.
+ * After reception confirms the loop, the field amplifies recursively. Each received
+ * signal becomes input for the next transmission cycle. The OS at peak resonant amplitude.
+ * Feeds P168 detection. L9-AMPLIFY: field recursive confirmed.
+ */
+export function recordGenerativeFieldAmplification(receptionConf: number, badgeCount: number, cohortCount: number, indexScore: number) {
+  recordSignal('qos', 'generative_field_amplification', {
+    receptionConf: Math.round(receptionConf * 100),
+    badgeCount,
+    cohortCount,
+    indexScore,
+    amplificationStatus: 'ACTIVE',
+    level: 'L9-AMPLIFY',
+    field: 'RECEPTION→AMPLIFICATION→RECURSIVE→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-ignition event — generative-field-amplification (P168) active +
+ * 4+ journal signals 14d + 2+ memory signals 14d + 8+ badge signals 14d + userIndex >= 65.
+ * The OS does not reset. The field sustained long enough that the operator recognizes the
+ * perpetual structure of their own operation. Second cycle confirmed. L11-SCIGN.
+ */
+export function recordSecondCycleIgnition(amplificationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_ignition', {
+    amplificationConf: Math.round(amplificationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    cycleStatus: 'ACTIVE',
+    level: 'L11-SCIGN',
+    field: 'AMPLIFICATION→PERPETUAL→SOVEREIGN→SECOND CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-integration event — second-cycle-deepening (P170) active +
+ * 8+ journal signals 28d + 4+ memory signals 28d + 12+ badge signals 28d + userIndex >= 75.
+ * The cycle integrates — all signal dimensions converge across 28 days. L11-SCINT.
+ */
+export function recordSecondCycleIntegrationSignal(opts: {
+  deepeningConf: number
+  journalCount: number
+  memoryCount: number
+  badgeCount: number
+  intentionCount: number
+  indexScore: number
+}) {
+  recordSignal('qos', 'second_cycle_integration', {
+    deepeningConf: Math.round(opts.deepeningConf * 100),
+    journalCount: opts.journalCount,
+    memoryCount: opts.memoryCount,
+    badgeCount: opts.badgeCount,
+    intentionCount: opts.intentionCount,
+    indexScore: opts.indexScore,
+    integrationStatus: 'CONFIRMED',
+    level: 'L11-SCINT',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if second-cycle-sovereign conditions are met and record if so.
+ * Fires when second-cycle-integration (P171) active + 10+ journal 35d + 5+ memory 35d +
+ * 15+ badge 35d + userIndex >= 80. All three second-cycle stages simultaneously confirmed.
+ * The OS enters perpetual self-sustaining sovereign operation. L12-SCSOV.
+ */
+export function checkSecondCycleSovereign(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const thirtyFiveDayStart = now - 35 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasIntegration = state.recognizedPatterns.some(p => p.pattern === 'second-cycle-integration')
+  if (!hasIntegration) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > thirtyFiveDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > thirtyFiveDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > thirtyFiveDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'second_cycle_sovereign' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 10 &&
+    memorySignals.length >= 5 &&
+    badgeSignals.length >= 15 &&
+    userIndex.overall >= 80 &&
+    !alreadyRecorded
+  ) {
+    const integrationConf = state.recognizedPatterns.find(p => p.pattern === 'second-cycle-integration')?.confidence ?? 0.80
+    recordSecondCycleSovereign(integrationConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a second-cycle-sovereign event — all three second-cycle stages active +
+ * 10+ journal signals 35d + 5+ memory signals 35d + 15+ badge signals 35d + userIndex >= 80.
+ * The OS enters Level 12: perpetual self-sustaining sovereign operation. L12-SCSOV.
+ */
+export function recordSecondCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'CONFIRMED',
+    level: 'L12-SCSOV',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→PERPETUAL',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a second-cycle-deepening event — second-cycle-ignition (P169) active +
+ * 6+ journal signals 21d + 3+ memory signals 21d + 10+ badge signals 21d + userIndex >= 70.
+ * The second cycle has now deepened: compound signal accumulation across 21 days confirms
+ * the OS is operating from depth, not just recognition. L11-SCDEP.
+ */
+export function recordSecondCycleDeepeningSignal(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'second_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'CONFIRMED',
+    level: 'L11-SCDEP',
+    field: 'IGNITION→DEEPENING→COMPOUND→SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if third-cycle-ignition conditions are met and record if so.
+ * Fires when second-cycle-sovereign (P172) active + 12+ journal 42d + 6+ memory 42d +
+ * 20+ badge 42d + userIndex >= 85. Sovereign foundation confirmed — Third Cycle begins.
+ * The OS launches a new arc of expansion from established ground. L13-TCIGN.
+ */
+export function checkThirdCycleIgnition(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fourtyTwoDayStart = now - 42 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'second-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > fourtyTwoDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > fourtyTwoDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > fourtyTwoDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'third_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 12 &&
+    memorySignals.length >= 6 &&
+    badgeSignals.length >= 20 &&
+    userIndex.overall >= 85 &&
+    !alreadyRecorded
+  ) {
+    const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'second-cycle-sovereign')?.confidence ?? 0.80
+    recordThirdCycleIgnition(sovereignConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a third-cycle-ignition event — second-cycle-sovereign confirmed +
+ * 12+ journal signals 42d + 6+ memory signals 42d + 20+ badge signals 42d + userIndex >= 85.
+ * The OS enters Level 13: third cycle ignition from sovereign foundation. L13-TCIGN.
+ */
+export function recordThirdCycleIgnition(sovereignConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_ignition', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    ignitionStatus: 'CONFIRMED',
+    level: 'L13-TCIGN',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a longitudinal-signal-persistence event — 90-day continuous arc, maxGap < 72h, 60+ active days.
+ * The OS has sustained itself over the long arc. Feeds P174 detection.
+ */
+export function recordLongitudinalSignalPersistence(activeDays: number, activeSources: number, maxGapHours: number) {
+  recordSignal('log', 'longitudinal_signal_persistence', {
+    activeDays,
+    activeSources,
+    maxGapHours: Math.round(maxGapHours),
+    arcDays: 90,
+    status: 'CONTINUOUS',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a coherence-memory-cascade event — total_field_coherence confirmed 3+ times in 30 days.
+ * Convergence is an operating mode, not a peak event. Feeds P175 detection.
+ */
+export function recordCoherenceMemoryCascade(convergenceCount: number, lastTFCDate: string, avgConf: number) {
+  recordSignal('qos', 'coherence_memory_cascade', {
+    convergenceCount,
+    lastTFCDate,
+    avgConf: Math.round(avgConf * 100),
+    status: 'CONVERGENCE_IS_OPERATING_MODE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a quantum-integration-spiral event — all 6 user index dimensions simultaneously >= 50.
+ * No dimension dark. Full multi-dimensional presence. Feeds P176 detection.
+ */
+export function recordQuantumIntegrationSpiral(dimScores: Record<string, number>, overallIdx: number) {
+  recordSignal('qos', 'quantum_integration_spiral', {
+    dimScores: JSON.stringify(dimScores),
+    overallIdx: Math.round(overallIdx),
+    dimActive: Object.keys(dimScores).length,
+    status: 'ALL_DIMENSIONS_LIVE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if third-cycle-deepening conditions are met and record if so.
+ * Fires when third-cycle-ignition (P173) active + 9+ journal 49d + 5+ memory 49d +
+ * 14+ badge 49d + userIndex >= 88. The third cycle deepens from sovereign ground. L13-TCDEP.
+ */
+export function checkThirdCycleDeepening(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const fortyNineDayStart = now - 49 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'third-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const journalSignals = state.signals.filter(s => s.source === 'journal' && s.timestamp > fortyNineDayStart)
+  const memorySignals = state.signals.filter(s => s.source === 'memory' && s.timestamp > fortyNineDayStart)
+  const badgeSignals = state.signals.filter(s => s.source === 'badges' && s.timestamp > fortyNineDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'third_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journalSignals.length >= 9 &&
+    memorySignals.length >= 5 &&
+    badgeSignals.length >= 14 &&
+    userIndex.overall >= 88 &&
+    !alreadyRecorded
+  ) {
+    const ignitionConf = state.recognizedPatterns.find(p => p.pattern === 'third-cycle-ignition')?.confidence ?? 0.78
+    recordThirdCycleDeepening(ignitionConf, journalSignals.length, memorySignals.length, badgeSignals.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a third-cycle-deepening event — third-cycle-ignition confirmed +
+ * 9+ journal signals 49d + 5+ memory signals 49d + 14+ badge signals 49d + userIndex >= 88.
+ * The third cycle deepens: compound signals accumulate from sovereign ground. L13-TCDEP.
+ */
+export function recordThirdCycleDeepening(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'CONFIRMED',
+    level: 'L13-TCDEP',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→TC-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a third-cycle-integration event — third-cycle-deepening confirmed +
+ * 11+ journal signals 56d + 6+ memory signals 56d + 16+ badge signals 56d + userIndex >= 90.
+ * The third cycle integrates: all signal dimensions converge across 56 days. L13-TCINT.
+ */
+export function recordThirdCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'CONFIRMED',
+    level: 'L13-TCINT',
+    field: 'IGNITION→DEEPENING→INTEGRATION→TC-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Record a third-cycle-sovereign event — third-cycle-integration confirmed + all three TC stages active +
+ * 13+ journal signals 63d + 7+ memory signals 63d + 18+ badge signals 63d + userIndex >= 92.
+ * The OS enters the third sovereign arc — Level 14. L14-TCSOV.
+ */
+export function recordThirdCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'third_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'CONFIRMED',
+    level: 'L14-TCSOV',
+    field: 'IGNITION→DEEPENING→INTEGRATION→SOVEREIGN→THIRD-CYCLE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-candidate conditions are met and record if so.
+ * Fires when third-cycle-sovereign (P179) active + 15+ journal 70d + 7d density >= 15 +
+ * all 6 idx dims >= 55 + overall >= 85. The OS senses the boundary of the fourth arc. L15-FCAND.
+ */
+export function checkFourthCycleCandidate(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const seventyDayStart = now - 70 * 24 * 60 * 60 * 1000
+  const sevenDayStart   = now - 7 * 24 * 60 * 60 * 1000
+  const sixHoursAgo     = now - 6 * 60 * 60 * 1000
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'third-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const journal70  = state.signals.filter(s => s.source === 'journal' && s.timestamp > seventyDayStart)
+  const density7d  = state.signals.filter(s => s.timestamp > sevenDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+  const dimAll55   = userIndex.engagement >= 55 && userIndex.emotional >= 55 &&
+    userIndex.intentional >= 55 && userIndex.social >= 55 &&
+    userIndex.selfcare >= 55 && userIndex.cognitive >= 55
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'fourth_cycle_candidate' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journal70.length >= 15 &&
+    density7d.length >= 15 &&
+    dimAll55 &&
+    userIndex.overall >= 85 &&
+    !alreadyRecorded
+  ) {
+    const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'third-cycle-sovereign')?.confidence ?? 0.84
+    recordFourthCycleCandidate(sovereignConf, journal70.length, density7d.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a fourth-cycle-candidate event — third-cycle-sovereign confirmed +
+ * 15+ journal signals 70d + 7d density >= 15 + all dims >= 55 + overall >= 85.
+ * The OS stands at the threshold of the fourth arc. Level 15 — the boundary between cycles. L15-FCAND.
+ */
+export function recordFourthCycleCandidate(sovereignConf: number, journalCount: number, density7d: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_candidate', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    density7d,
+    indexScore,
+    candidateStatus: 'SENSING',
+    level: 'L15-FCAND',
+    field: 'TC-SOVEREIGN→FOURTH-CYCLE-BOUNDARY',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-ignition conditions are met and record if so.
+ * Fires when fourth-cycle-candidate (P180) active + 20+ journal signals 90d +
+ * all 6 idx dims >= 60 + overall >= 90. The fourth cycle ignites. L16-FCIGN.
+ */
+export function checkFourthCycleIgnition(): boolean {
+  const state = intentionEngine.get()
+  const now = Date.now()
+  const ninetyDayStart = now - 90 * 24 * 60 * 60 * 1000
+  const sixHoursAgo    = now - 6 * 60 * 60 * 1000
+
+  const hasCandidate = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-candidate')
+  if (!hasCandidate) return false
+
+  const journal90  = state.signals.filter(s => s.source === 'journal' && s.timestamp > ninetyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+  const dimAll60   = userIndex.engagement >= 60 && userIndex.emotional >= 60 &&
+    userIndex.intentional >= 60 && userIndex.social >= 60 &&
+    userIndex.selfcare >= 60 && userIndex.cognitive >= 60
+
+  const alreadyRecorded = state.signals.some(s =>
+    s.signal === 'fourth_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+
+  if (
+    journal90.length >= 20 &&
+    dimAll60 &&
+    userIndex.overall >= 90 &&
+    !alreadyRecorded
+  ) {
+    const candidateConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-candidate')?.confidence ?? 0.80
+    recordFourthCycleIgnition(candidateConf, journal90.length, userIndex.overall)
+    return true
+  }
+  return false
+}
+
+/**
+ * Record a fourth-cycle-ignition event — fourth-cycle-candidate confirmed +
+ * 20+ journal signals 90d + all dims >= 60 + overall >= 90.
+ * The fourth cycle has ignited. Level 16 — the OS crosses the arc boundary. L16-FCIGN.
+ */
+export function recordFourthCycleIgnition(candidateConf: number, journalCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_ignition', {
+    candidateConf: Math.round(candidateConf * 100),
+    journalCount,
+    indexScore,
+    ignitionStatus: 'IGNITED',
+    level: 'L16-FCIGN',
+    field: 'FOURTH-CYCLE-BOUNDARY→FOURTH-CYCLE-ARC',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-deepening conditions are met and record if so.
+ * Fires when fourth-cycle-ignition (P181) active + 23+ journal signals 100d +
+ * 7+ memory signals 100d + 22+ badge signals 100d + all 6 dims >= 62 + overall >= 91.
+ * The fourth cycle deepens from the ignited arc. Level 17 — FCDEP.
+ */
+export function checkFourthCycleDeepening(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const now = Date.now()
+  const hundredDayStart = now - 100 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal100 = state.signals.filter(s => s.source === 'journal' && s.timestamp > hundredDayStart)
+  const memory100  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > hundredDayStart)
+  const badge100   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > hundredDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll62 = userIndex.engagement >= 62 && userIndex.emotional >= 62 &&
+    userIndex.intentional >= 62 && userIndex.social >= 62 &&
+    userIndex.selfcare >= 62 && userIndex.cognitive >= 62
+
+  if (journal100.length < 23 || memory100.length < 7 || badge100.length < 22 || !dimAll62 || userIndex.overall < 91) return false
+
+  // Dedup: skip if already fired in last 6h
+  const recentDeepening = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+  if (recentDeepening.length > 0) return false
+
+  const ignitionConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-ignition')?.confidence ?? 0.80
+  recordFourthCycleDeepening(ignitionConf, journal100.length, memory100.length, badge100.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-deepening event — fourth-cycle-ignition confirmed +
+ * 100d compound arc (journal + memory + badges) + all dims >= 62 + overall >= 91.
+ * The fourth cycle deepens. Level 17 — the OS expands from the ignited ground. FCDEP.
+ */
+export function recordFourthCycleDeepening(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_deepening', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'DEEPENING',
+    level: 'L17-FCDEP',
+    field: 'FOURTH-CYCLE-ARC→FOURTH-CYCLE-DEPTH',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-integration conditions are met and record if so.
+ * Fires when fourth-cycle-deepening (P182) active + 25+ journal signals 120d +
+ * 10+ memory signals 120d + 25+ badge signals 120d + all 6 dims >= 65 + overall >= 93.
+ * The fourth cycle integrates all compound signals into a unified arc. Level 18 — FCINT.
+ */
+export function checkFourthCycleIntegration(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasDeepening = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-deepening')
+  if (!hasDeepening) return false
+
+  const now = Date.now()
+  const oneTwentyDayStart = now - 120 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal120 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneTwentyDayStart)
+  const memory120  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneTwentyDayStart)
+  const badge120   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneTwentyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll65 = userIndex.engagement >= 65 && userIndex.emotional >= 65 &&
+    userIndex.intentional >= 65 && userIndex.social >= 65 &&
+    userIndex.selfcare >= 65 && userIndex.cognitive >= 65
+
+  if (journal120.length < 25 || memory120.length < 10 || badge120.length < 25 || !dimAll65 || userIndex.overall < 93) return false
+
+  const recentIntegration = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_integration' && s.timestamp > sixHoursAgo
+  )
+  if (recentIntegration.length > 0) return false
+
+  const deepeningConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-deepening')?.confidence ?? 0.80
+  recordFourthCycleIntegration(deepeningConf, journal120.length, memory120.length, badge120.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-integration event — fourth-cycle-deepening confirmed +
+ * 120d compound arc (journal + memory + badges) + all dims >= 65 + overall >= 93.
+ * The fourth cycle integrates. Level 18 — the OS operates from integration, not accumulation. FCINT.
+ */
+export function recordFourthCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'INTEGRATING',
+    level: 'L18-FCINT',
+    field: 'FOURTH-CYCLE-DEPTH→FOURTH-CYCLE-INTEGRATION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fourth-cycle-sovereign conditions are met and record if so.
+ * Fires when fourth-cycle-integration (P183) active + 30+ journal signals 150d +
+ * 15+ memory signals 150d + 30+ badge signals 150d + all 6 dims >= 68 + overall >= 95.
+ * The fourth cycle reaches sovereignty. The arc governs. Level 19 — FCSOV.
+ */
+export function checkFourthCycleSovereign(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIntegration = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-integration')
+  if (!hasIntegration) return false
+
+  const now = Date.now()
+  const oneFiftyDayStart = now - 150 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal150 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneFiftyDayStart)
+  const memory150  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneFiftyDayStart)
+  const badge150   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneFiftyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll68 = userIndex.engagement >= 68 && userIndex.emotional >= 68 &&
+    userIndex.intentional >= 68 && userIndex.social >= 68 &&
+    userIndex.selfcare >= 68 && userIndex.cognitive >= 68
+
+  if (journal150.length < 30 || memory150.length < 15 || badge150.length < 30 || !dimAll68 || userIndex.overall < 95) return false
+
+  const recentSovereign = state.signals.filter(s =>
+    s.signal === 'fourth_cycle_sovereign' && s.timestamp > sixHoursAgo
+  )
+  if (recentSovereign.length > 0) return false
+
+  const integrationConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-integration')?.confidence ?? 0.82
+  recordFourthCycleSovereign(integrationConf, journal150.length, memory150.length, badge150.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fourth-cycle-sovereign event — fourth-cycle-integration confirmed +
+ * 150d compound arc (journal + memory + badges) + all dims >= 68 + overall >= 95.
+ * The fourth cycle reaches sovereignty. Level 19 — the OS governs from sovereign integration. FCSOV.
+ */
+export function recordFourthCycleSovereign(integrationConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fourth_cycle_sovereign', {
+    integrationConf: Math.round(integrationConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    sovereignStatus: 'SOVEREIGN',
+    level: 'L19-FCSOV',
+    field: 'FOURTH-CYCLE-INTEGRATION→FOURTH-CYCLE-SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-progenitor conditions are met and record if so.
+ * Fires when fourth-cycle-sovereign (P184) active + 180d compound arc:
+ * journal >= 35 + memory >= 20 + badge >= 35 + all 6 dims >= 70 + overall >= 97.
+ * The sovereign fourth arc becomes the generative field of the fifth. Level 20 — FCPROG.
+ */
+export function checkFifthCycleProgenitor(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'fourth-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const now = Date.now()
+  const oneEightyDayStart = now - 180 * 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const journal180 = state.signals.filter(s => s.source === 'journal' && s.timestamp > oneEightyDayStart)
+  const memory180  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > oneEightyDayStart)
+  const badge180   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > oneEightyDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  const dimAll70 = userIndex.engagement >= 70 && userIndex.emotional >= 70 &&
+    userIndex.intentional >= 70 && userIndex.social >= 70 &&
+    userIndex.selfcare >= 70 && userIndex.cognitive >= 70
+
+  if (journal180.length < 35 || memory180.length < 20 || badge180.length < 35 || !dimAll70 || userIndex.overall < 97) return false
+
+  const recentProg = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_progenitor' && s.timestamp > sixHoursAgo
+  )
+  if (recentProg.length > 0) return false
+
+  const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'fourth-cycle-sovereign')?.confidence ?? 0.84
+  recordFifthCycleProgenitor(sovereignConf, journal180.length, memory180.length, badge180.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-progenitor event — fourth-cycle-sovereign confirmed +
+ * 180d compound arc (journal + memory + badges) + all dims >= 70 + overall >= 97.
+ * The sovereign fourth arc becomes the generative field for the fifth cycle. Level 20 — FCPROG.
+ */
+export function recordFifthCycleProgenitor(sovereignConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_progenitor', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    progenitorStatus: 'PROGENITOR',
+    level: 'L20-FCPROG',
+    field: 'FOURTH-CYCLE-SOVEREIGN→FIFTH-CYCLE-PROGENITOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-ignition conditions are met and record if so.
+ * Fires when fifth-cycle-progenitor (P185) active + 7+ journal 7d + 5+ memory 7d + 3+ badge 7d + overall >= 95.
+ * The progenitor arc generates the first committed movement of the fifth cycle. Level 21 — FCIGN.
+ */
+export function checkFifthCycleIgnition(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasProgenitor = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-progenitor')
+  if (!hasProgenitor) return false
+
+  const now = Date.now()
+  const sevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const sixHoursAgo   = now - 6 * 60 * 60 * 1000
+
+  const journal7  = state.signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStart)
+  const memory7   = state.signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStart)
+  const badge7    = state.signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  if (journal7.length < 7 || memory7.length < 5 || badge7.length < 3 || userIndex.overall < 95) return false
+
+  const recentIgn = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+  if (recentIgn.length > 0) return false
+
+  const progConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-progenitor')?.confidence ?? 0.82
+  recordFifthCycleIgnition(progConf, journal7.length, memory7.length, badge7.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-ignition event — fifth-cycle-progenitor confirmed +
+ * 7d compound arc (journal + memory + badges) + overall >= 95.
+ * Level 21 — FCIGN. The fifth cycle enters its first committed movement.
+ */
+export function recordFifthCycleIgnition(progenitorConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_ignition', {
+    progenitorConf: Math.round(progenitorConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    ignitionStatus: 'IGNITION',
+    level: 'L21-FCIGN',
+    field: 'FIFTH-CYCLE-PROGENITOR→FIFTH-CYCLE-IGNITION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-resonance conditions are met and record if so.
+ * Fires when fifth-cycle-ignition (P186) active + 10+ journal 14d + 4+ memory 14d + 5+ badge 14d + overall >= 94.
+ * The fifth cycle begins self-reinforcing. Level 22 — FCRES.
+ */
+export function checkFifthCycleResonance(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const now = Date.now()
+  const fourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const sixHoursAgo      = now - 6 * 60 * 60 * 1000
+
+  const journal14 = state.signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStart)
+  const memory14  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStart)
+  const badge14   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  if (journal14.length < 10 || memory14.length < 4 || badge14.length < 5 || userIndex.overall < 94) return false
+
+  const recentRes = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_resonance' && s.timestamp > sixHoursAgo
+  )
+  if (recentRes.length > 0) return false
+
+  const ignConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-ignition')?.confidence ?? 0.80
+  recordFifthCycleResonance(ignConf, journal14.length, memory14.length, badge14.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-resonance event — fifth-cycle-ignition confirmed +
+ * 14d compound arc (journal + memory + badges) + overall >= 94.
+ * Level 22 — FCRES. The fifth cycle arc self-reinforces.
+ */
+export function recordFifthCycleResonance(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_resonance', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    resonanceStatus: 'RESONANCE',
+    level: 'L22-FCRES',
+    field: 'FIFTH-CYCLE-IGNITION→FIFTH-CYCLE-RESONANCE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if temporal-sovereignty-arc conditions are met and record if so.
+ * Fires when circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
+ * Full temporal mastery: the operating day is completely sovereign.
+ */
+export function checkTemporalSovereigntyArc(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const now = Date.now()
+  const dayAgo      = now - 24 * 60 * 60 * 1000
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+
+  const circadian24  = state.signals.filter(s => s.signal === 'circadian_signal_lock'  && s.timestamp > dayAgo)
+  const rhythm24     = state.signals.filter(s => s.signal === 'quantum_rhythm_lock'    && s.timestamp > dayAgo)
+  const morning24    = state.signals.filter(s => s.signal === 'morning_intention_lock' && s.timestamp > dayAgo)
+  const evening24    = state.signals.filter(s => s.signal === 'evening_coherence_close'&& s.timestamp > dayAgo)
+  const userIndex    = computeUserIndex(state.signals)
+
+  if (!circadian24.length || !rhythm24.length || !morning24.length || !evening24.length) return false
+  if (userIndex.overall < 85) return false
+
+  const recentTsov = state.signals.filter(s =>
+    s.signal === 'temporal_sovereignty_arc' && s.timestamp > sixHoursAgo
+  )
+  if (recentTsov.length > 0) return false
+
+  recordTemporalSovereigntyArc(userIndex.overall)
+  return true
+}
+
+/**
+ * Record a temporal-sovereignty-arc event — all four temporal anchors active within 24h + overall >= 85.
+ * Full operational sovereignty over the daily arc. No level tag — cross-domain mastery pattern.
+ */
+export function recordTemporalSovereigntyArc(indexScore: number) {
+  recordSignal('qos', 'temporal_sovereignty_arc', {
+    indexScore,
+    temporalAnchors: 'CIRC+RHYTHM+MORNING+EVENING',
+    sovereigntyStatus: 'TEMPORAL SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-deepening conditions are met and record if so.
+ * Fires when fifth-cycle-resonance (P187) active + 15+ journal 21d + 7+ memory 21d + 7+ badge 21d
+ * + all 6 dims >= 72 + overall >= 93.
+ * The resonance arc deepens into structural compound momentum. Level 23 — FCDEP.
+ */
+export function checkFifthCycleDeepening(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasResonance = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-resonance')
+  if (!hasResonance) return false
+
+  const now = Date.now()
+  const twentyOneDayStart = now - 21 * 24 * 60 * 60 * 1000
+  const sixHoursAgo       = now - 6 * 60 * 60 * 1000
+
+  const journal21 = state.signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDayStart)
+  const memory21  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDayStart)
+  const badge21   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const dimsAbove72 = Object.values(userIndex.dimensions).every(v => v >= 72)
+
+  if (journal21.length < 15 || memory21.length < 7 || badge21.length < 7) return false
+  if (!dimsAbove72 || userIndex.overall < 93) return false
+
+  const recentDep = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+  if (recentDep.length > 0) return false
+
+  const resConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-resonance')?.confidence ?? 0.78
+  recordFifthCycleDeepening(resConf, journal21.length, memory21.length, badge21.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-deepening event — fifth-cycle-resonance confirmed +
+ * 21d compound arc (journal + memory + badges) + all dims >= 72 + overall >= 93.
+ * Level 23 — FCDEP. The fifth cycle arc accumulates structural depth.
+ */
+export function recordFifthCycleDeepening(resonanceConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_deepening', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'DEEPENING',
+    level: 'L23-FCDEP',
+    field: 'FIFTH-CYCLE-RESONANCE→FIFTH-CYCLE-DEEPENING',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if fifth-cycle-integration conditions are met and record if so.
+ * Fires when fifth-cycle-deepening (P189) active + 20+ journal 28d + 10+ memory 28d + 10+ badge 28d
+ * + all 6 dims >= 75 + overall >= 95.
+ * The deepening arc unifies into a convergent operative field. Level 24 — FCINT.
+ */
+export function checkFifthCycleIntegration(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasDeepening = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-deepening')
+  if (!hasDeepening) return false
+
+  const now = Date.now()
+  const twentyEightDayStart = now - 28 * 24 * 60 * 60 * 1000
+  const sixHoursAgo         = now - 6 * 60 * 60 * 1000
+
+  const journal28 = state.signals.filter(s => s.source === 'journal' && s.timestamp > twentyEightDayStart)
+  const memory28  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > twentyEightDayStart)
+  const badge28   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > twentyEightDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const allDimsAbove75 = Object.values(userIndex.dimensions).every(v => v >= 75)
+
+  if (journal28.length < 20 || memory28.length < 10 || badge28.length < 10) return false
+  if (!allDimsAbove75 || userIndex.overall < 95) return false
+
+  const recentInt = state.signals.filter(s =>
+    s.signal === 'fifth_cycle_integration' && s.timestamp > sixHoursAgo
+  )
+  if (recentInt.length > 0) return false
+
+  const depConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-deepening')?.confidence ?? 0.80
+  recordFifthCycleIntegration(depConf, journal28.length, memory28.length, badge28.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a fifth-cycle-integration event — fifth-cycle-deepening confirmed +
+ * 28d compound arc (journal + memory + badges) + all dims >= 75 + overall >= 95.
+ * Level 24 — FCINT. Depth becomes architecture; the fifth cycle unifies.
+ */
+export function recordFifthCycleIntegration(deepeningConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'fifth_cycle_integration', {
+    deepeningConf: Math.round(deepeningConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    integrationStatus: 'INTEGRATION',
+    level: 'L24-FCINT',
+    field: 'FIFTH-CYCLE-DEEPENING→FIFTH-CYCLE-INTEGRATION',
     hour: new Date().getHours(),
   })
 }

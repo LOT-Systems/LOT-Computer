@@ -782,6 +782,637 @@ export type BadgeType =
   | 'tolkien_ring'           // ◆·∞·◆  "one ring to rule/precious/ring of power" detected (RARE)
   | 'odysseus_bow'           // →·∞·→  "odysseus/ulysses/ithaca/penelope/cyclops" detected (EPIC)
   | 'gilgamesh_word'         // ∞·□·∞  "gilgamesh/enkidu/great flood/utnapishtim" detected (MYTHIC)
+  // ── Word Turn v23 — THE RPG CODEX ─────────────────────────────────────────────
+  | 'levelup_signal'         // ▲·▲·▲  "level up/leveled up/gained a level" detected (UNCOMMON)
+  | 'xp_earned'              // ■·●·■  "experience points/xp/grinding/grind session" detected (COMMON)
+  | 'quest_log_entry'        // ∘→≋    "quest log/side quest/main quest/new quest" detected (UNCOMMON)
+  | 'dungeon_dive'           // █·∘    "dungeon/dungeon crawl/boss room/level boss" detected (RARE)
+  | 'spell_cast'             // ∿·●·∿  "cast a spell/mana/spellbook/incantation" detected (RARE)
+  | 'loot_drop'              // ●·◆·●  "loot drop/treasure chest/rare item/legendary drop" detected (RARE)
+  | 'respawn_signal'         // ◈→◈    "respawn/second chance/checkpoint saved/new life begins" detected (UNCOMMON)
+  | 'guild_protocol'         // ○·○·○  "guild/raid party/join the guild/party member" detected (RARE)
+  | 'boss_encounter'         // ◉·■·◉  "boss fight/final boss/endgame boss/boss battle" detected (EPIC)
+  | 'character_class'        // ∘·▲·∘  "character class/my class/skill build/archetype choice" detected (UNCOMMON)
+  | 'inventory_check'        // ■·■·■  "inventory full/backpack/loadout/item slots" detected (RARE)
+  | 'skill_tree_node'        // ≋→●    "skill tree/talent tree/passive ability/unlock skill" detected (RARE)
+  // ── Calendar Easter Egg v21 — THE GAME CALENDAR ──────────────────────────────
+  | 'mario_day'              // ▲·∘·▲  Mar 10 — MAR10 Day (Mario Day) (RARE)
+  | 'zelda_day'              // ◆·○·◆  Feb 21 — Zelda original release 1986 (RARE)
+  | 'game_day'               // ●·■·●  Sep 12 — National Video Game Day (RARE)
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  | 'rpg_session'            // ▲·●·▲  3+ RPG Codex words in one journal entry (RARE)
+  | 'marathon_log'           // ≋≋≋·◉  Journal entry >= 600 words (EPIC)
+  | 'leet_hour'              // □·□·□  Check in at 13:37 (l33t time) (RARE)
+  // ── Achievement RPG v21 — RPG CLASS ──────────────────────────────────────────
+  | 'rpg_entry'              // ∘→▲    Any 1 Word Turn v23 badge (COMMON)
+  | 'rpg_class'              // ≈→▲    Any 5 Word Turn v23 badges (UNCOMMON)
+  | 'rpg_complete'           // ≋→▲    All 12 Word Turn v23 badges (LEGENDARY)
+  | 'dungeon_arc'            // ▲·◈    rpg_complete + all 3 Calendar v21 badges (LEGENDARY)
+  | 'twenty_three_engines_arc' // ◈·◈·▲ 1 badge from each Word Turn v1–v23 (LEGENDARY)
+  | 'rpg_opus'               // ▲·◉·▲  rpg_complete + rpg_session behavioral (LEGENDARY)
+  // ── Mastery Tier v23 — THE LEGEND ────────────────────────────────────────────
+  | 'guild_elder'            // ○·●    1100+ distinct calendar check-in days (EPIC)
+  | 'epic_lore'              // ●·∞·▲  200,000+ total journal words (LEGENDARY)
+  | 'legend_age'             // ╔═╗·▲  Account age >= 6 years (LEGENDARY)
+  | 'twenty_three_registers' // ◈·◈·▲·∞ 1 badge from all 23 Word Turn engines (COSMIC)
+  // ── Secret Boss v20 — THE FINAL BOSS VAULT ───────────────────────────────────
+  | 'zelda_triforce'         // ◆·◆·◆  "triforce/hyrule/link's journey/ganondorf" detected (RARE)
+  | 'pac_ghost'              // ○·∘·○  "pac-man/waka waka/blinky/power pellet" detected (EPIC)
+  | 'konami_code'            // ↑↑↓↓→  "konami code/up up down down/b a start" detected (MYTHIC)
+  // ── Word Turn v24 — THE ROGUELITE CODEX ───────────────────────────────────────
+  | 'permadeath_accepted'   // ◈·×·◈  "permadeath/permanent death/one life/no continues" detected (UNCOMMON)
+  | 'procedural_run'        // ∿·∘·∿  "procgen/random seed/procedurally generated/new run" detected (COMMON)
+  | 'rng_blessed'           // ●·∘·●  "rng/god roll/lucky run/blessed rng" detected (COMMON)
+  | 'biome_entered'         // ▦·∘·▦  "biome/new biome/floor biome/environment zone" detected (UNCOMMON)
+  | 'meta_progress'         // ◈→∞    "meta-progression/persistent upgrade/between runs" detected (RARE)
+  | 'synergy_found'         // ∘·◆·∘  "synergy/build synergy/item synergy/combo discovered" detected (RARE)
+  | 'floor_cleared'         // ├─≋    "floor cleared/room cleared/floor complete" detected (UNCOMMON)
+  | 'mutation_chosen'       // ∗·≈·∗  "mutation/passive upgrade/picked a passive/selected upgrade" detected (RARE)
+  | 'heat_level'            // ■·∘·■  "heat level/heat gauge/difficulty dial/infernal arms" detected (RARE)
+  | 'boon_accepted'         // ○·●·○  "boon/divine boon/blessings/nectar offered" detected (RARE)
+  | 'endless_mode'          // ∞·◉·∞  "endless/infinite run/no escape/keep going forever" detected (EPIC)
+  | 'ascension_run'         // ▲·∞·▲  "ascension/final ascension/true ending/ascended" detected (EPIC)
+  // ── Calendar Easter Egg v22 — THE ROGUE CALENDAR ─────────────────────────────
+  | 'hades_day'             // ◉·○·◉  Sep 17 — Hades PC release (2020) (RARE)
+  | 'spelunky_day'          // ♦·∘·♦  Jul 4  — Spelunky HD PC release (2012) (RARE)
+  | 'binding_day'           // ×·∘·×  Sep 28 — The Binding of Isaac release (2011) (RARE)
+  // ── Behavioral v21 — ROGUE PATTERNS ──────────────────────────────────────────
+  | 'roguelite_session'     // ∿·◉·∿  3+ Roguelite v24 trigger words in one journal entry (RARE)
+  | 'fresh_start'           // ∘·→·∘  First check-in after 14+ day absence (UNCOMMON)
+  | 'nine_nine_hour'        // □·∘·□  Check in at 09:09 (system init time) (RARE)
+  // ── Achievement RPG v22 — THE ROGUE CLASS ─────────────────────────────────────
+  | 'rogue_entry'           // ∘→×    Any 1 Word Turn v24 badge (COMMON)
+  | 'rogue_class'           // ≈→×    Any 5 Word Turn v24 badges (UNCOMMON)
+  | 'rogue_complete'        // ≋→×    All 12 Word Turn v24 badges (LEGENDARY)
+  | 'rogue_arc'             // ×·◈    rogue_complete + all 3 Calendar v22 badges (LEGENDARY)
+  | 'twenty_four_engines_arc' // ◈·◈·× 1 badge from each Word Turn v1–v24 (LEGENDARY)
+  | 'rogue_opus'            // ×·◉·×  rogue_complete + roguelite_session behavioral (LEGENDARY)
+  // ── Mastery Tier v24 — THE ASCENDED ──────────────────────────────────────────
+  | 'heat_master'           // ■·●    1200+ distinct calendar check-in days (EPIC)
+  | 'endless_log'           // ∞·●·∞  250,000+ total journal words (LEGENDARY)
+  | 'true_ending'           // ╔═╗·×  Account age >= 7.5 years (LEGENDARY)
+  | 'twenty_four_registers' // ◈·◈·×·∞ 1 badge from all 24 Word Turn engines (COSMIC)
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  | 'hades_shade'           // ○·∘·×  "shade/charon/nyx/thanatos/hypnos/elysium" detected (RARE)
+  | 'nethack_rune'          // ∞·□·×  "nethack/ascended/yasd/adom/rogue variant" detected (EPIC)
+  | 'isaac_secret'          // ×·■·×  "greedier mode/mega satan/afterbirth/repentance" detected (MYTHIC)
+  // ── Word turn badges v25 — The Puzzle Codex ─────────────────────────────────
+  | 'puzzle_solved'         // ○·□·○  "puzzle/puzzled/solve the puzzle/piece together" detected (COMMON)
+  | 'portal_open'           // □→□    "portal/wormhole portal/teleport/gateway portal" detected (UNCOMMON)
+  | 'chamber_cleared'       // ├─□─┤  "chamber/test chamber/solution chamber/trap chamber" detected (UNCOMMON)
+  | 'recursion_loop'        // ↺·↺·↺  "recursion/recursive loop/it loops/circular loop" detected (RARE)
+  | 'paradox_found'         // ×·○·×  "paradox/catch-22/contradiction/impossible loop" detected (RARE)
+  | 'testimony_given'       // ◯·◯·◯  "testimony/witness statement/depose/account given" detected (UNCOMMON)
+  | 'algorithm_path'        // →·□·→  "algorithm/algorithmic/sequence path/sorted by" detected (RARE)
+  | 'escape_room'           // ├─→    "escape room/locked room/puzzle escape/escape from" detected (COMMON)
+  | 'logic_gate'            // □·1·□  "logic/logical/if-then/binary logic/decision tree" detected (COMMON)
+  | 'dimension_shift'       // ◈·≈·◈  "dimension/new dimension/shifted dimension/dimensional" detected (EPIC)
+  | 'paperwork_clear'       // ▪·□·▪  "papers please/paperwork/stamped approved/documents cleared" detected (UNCOMMON)
+  | 'revelation_node'       // ●·○·●  "revelation/epiphany/suddenly realized/aha moment" detected (EPIC)
+  // ── Calendar Easter Egg v23 — The Puzzle Calendar ───────────────────────────
+  | 'portal_day'            // □→■    Oct 9 — Portal / The Orange Box release (2007) (RARE)
+  | 'witness_day'           // ◯·—·◯  Jan 26 — The Witness release (2016) (EPIC)
+  | 'obra_dinn_day'         // ×·▪·×  Oct 18 — Return of the Obra Dinn release (2018) (RARE)
+  // ── Behavioral v22 — Puzzle Patterns ────────────────────────────────────────
+  | 'puzzle_session'        // ○·□·○  3+ Puzzle v25 trigger words in one journal entry (RARE)
+  | 'morning_solve'         // □·∴·□  Check-in 06:00–08:00 for 5 consecutive days (UNCOMMON)
+  | 'longer_log'            // →≋→    3 consecutive days each journal answer longer than last (UNCOMMON)
+  // ── Achievement RPG v23 — Puzzle Class ──────────────────────────────────────
+  | 'puzzle_entry'          // ∘→□    Any 1 Word Turn v25 badge (COMMON)
+  | 'puzzle_class'          // ≈→□    Any 5 Word Turn v25 badges (UNCOMMON)
+  | 'puzzle_complete'       // ≋→□    All 12 Word Turn v25 badges (LEGENDARY)
+  | 'puzzle_arc'            // □·◈    puzzle_complete + all 3 Calendar v23 badges (LEGENDARY)
+  | 'twenty_five_engines_arc' // ◈·◈·□  1 badge from each Word Turn v1–v25 (COSMIC)
+  | 'puzzle_opus'           // □·◉·□  puzzle_complete + puzzle_session behavioral (LEGENDARY)
+  // ── Mastery Tier v25 — Grand Solver ─────────────────────────────────────────
+  | 'logic_veteran'         // ─□─    1,300+ distinct calendar days (EPIC)
+  | 'grand_archive'         // ≋≋≋·□  300,000+ total journal words (LEGENDARY)
+  | 'eternal_code'          // ∞·□·∞  Account age >= 9 years (COSMIC)
+  | 'twenty_five_registers' // ◈·◈·□·□  1 badge from all 25 Word Turn engines (COSMIC)
+  // ── Secret Boss v22 — The Puzzle Vault ──────────────────────────────────────
+  | 'portal_turret'         // □·◉·□  "companion cube/aperture/glados/wheatley/cake is a lie" detected (EPIC)
+  | 'the_witness_eye'       // ◯·—·■  "the witness/jungle puzzles/island lasers/beams" detected (RARE)
+  | 'baba_is_you'           // ●·□·●  "baba is you/baba/keke/win condition/rock is" detected (MYTHIC)
+  // ── Word Turn v26 — THE MAP ROOM ─────────────────────────────────────────────
+  | 'fog_lifted'            // ≈·○·≈  "fog of war/fog lifted/clarity came/emerged from the fog" detected (RARE)
+  | 'treasure_room'         // ◇·■·◇  "treasure room/unexpected find/found gold/jackpot/the motherlode" detected (COMMON)
+  | 'secret_passage'        // ░→◉    "secret passage/hidden door/found a secret/secret room" detected (RARE)
+  | 'trap_disarmed'         // ×·○·×  "trap/disarmed/saw it coming/defused it/dodged that one" detected (UNCOMMON)
+  | 'map_updated'           // ■·+·■  "updated my map/charted/new territory/mental map/mapped this" detected (COMMON)
+  | 'low_hp'                // ▼·○·▼  "low hp/running on empty/depleted/tank nearly empty" detected (UNCOMMON)
+  | 'torch_lit'             // ○·★·○  "lit a candle/shed light on/brought clarity/illuminated/light at the end" detected (UNCOMMON)
+  | 'locked_room'           // □·×·□  "locked door/blocked/not ready yet/gated/behind a wall" detected (RARE)
+  | 'key_drop'              // ◆·→·□  "found the key/that's the key/key insight/unlocked it" detected (COMMON)
+  | 'final_room'            // █·◉·█  "final room/last door/endgame moment/this is it/the final room" detected (EPIC)
+  | 'rest_point'            // ○·─·○  "rest point/safe room/took a rest/rest and recharge/resting now" detected (COMMON)
+  | 'path_found'            // →·▲·→  "found the path/way forward/path forward/next level/clear the way" detected (RARE)
+  // ── Calendar Easter Egg v24 — DUNGEON BIRTHDAYS ───────────────────────────────
+  | 'doom_day'              // ▓·□·▓  Dec 10 — DOOM released (December 10, 1993) (RARE)
+  | 'minecraft_day'         // ■·◆·■  Nov 18 — Minecraft 1.0 release (November 18, 2011) (RARE)
+  | 'diablo_day'            // ◆·▓·◆  Jan 3  — Diablo released (January 3, 1997) (RARE)
+  // ── Behavioral v23 — MAP ROOM PATTERNS ────────────────────────────────────────
+  | 'map_session'           // ≈·≋·≈  3+ Map Room (v26) trigger words in one journal entry (RARE)
+  | 'illuminated'           // ●·∞·●  Journal entry >= 700 words (EPIC)
+  | 'dawn_patrol'           // ∴·▲·∴  Check in before 6 AM on 2 consecutive days (UNCOMMON)
+  // ── Achievement RPG v24 — MAP CLASS ──────────────────────────────────────────
+  | 'map_entry'             // ∘→≋    Any 1 Word Turn v26 badge (COMMON)
+  | 'map_class'             // ≈→≋    Any 5 Word Turn v26 badges (UNCOMMON)
+  | 'map_complete'          // ≋→≋    All 12 Word Turn v26 badges (LEGENDARY)
+  | 'map_arc'               // ≋·◆    map_complete + all 3 Calendar v24 badges (LEGENDARY)
+  | 'twenty_six_engines_arc' // ◈·◈·≋  1 badge from each Word Turn v1–v26 (LEGENDARY)
+  | 'map_opus'              // ≋·◉·≋  map_complete + map_session behavioral (LEGENDARY)
+  // ── Mastery Tier v26 — THE CARTOGRAPHER ──────────────────────────────────────
+  | 'dungeon_master'        // ◉·≋·◉  1400+ distinct calendar check-in days (LEGENDARY)
+  | 'legendary_scroll'      // ≋·∞·≋  400,000+ total journal words (MYTHIC)
+  | 'dungeon_age'           // ╔═╗·≋  Account age >= 10 years (LEGENDARY)
+  | 'twenty_six_registers'  // ◈·◈·≋·∞ 1 badge from all 26 Word Turn engines (COSMIC)
+  // ── Secret Boss v23 — THE ANCIENT VAULT ──────────────────────────────────────
+  | 'dark_souls_echo'       // ☐·▓·☐  "dark souls/you died/bonfire lit/estus flask/praise the sun" detected (RARE)
+  | 'd_n_d_roll'            // ●·□·●  "dungeons and dragons/d&d/d20/nat 20/roll for initiative" detected (EPIC)
+  | 'myst_island'           // ○·≋·○  "myst/riven/linking book/ages of myst/myst island" detected (RARE)
+  // ── Word Turn v27 — THE CHRONO OPERATOR ──────────────────────────────────
+  | 'time_loop_badge'       // ↺·○   "time loop/stuck in a loop/groundhog day/same cycle" detected (UNCOMMON)
+  | 'paradox_log'           // ◈·◈   "paradox/contradiction/holding both truths/cognitive dissonance" detected (RARE)
+  | 'parallel_path'         // ─┤├─  "parallel/alternative version/what if i had/other me" detected (UNCOMMON)
+  | 'reset_timeline'        // ○→●   "new chapter/rewriting/fresh timeline/resetting my" detected (COMMON)
+  | 'past_visitor'          // ←·○   "past self/younger self/went back to/old wound" detected (UNCOMMON)
+  | 'future_echo'           // →·◉   "future self/letter to future/future me/echo from" detected (UNCOMMON)
+  | 'chrono_anchor'         // ⊡·○   "grounded in now/came back to/anchored/brought back" detected (UNCOMMON)
+  | 'time_drifted'          // ∿·∿   "adrift/lost track of time/time flew by/lost sense" detected (UNCOMMON)
+  | 'slow_wave'             // ≈·○   "slow down/slowed down/took it slow/savored the" detected (COMMON)
+  | 'skip_frame'            // →→○   "jumped ahead/rushed through/fast forward/skipped over" detected (RARE)
+  | 'epoch_turn'            // ╔═●   "turning point/new era/historic for me/entered a new era" detected (RARE)
+  | 'time_vault'            // □·◉   "time capsule/wrote to future/letter to future/sealed" detected (RARE)
+  // ── Calendar Easter Egg v25 — THE CHRONO CALENDAR ────────────────────────
+  | 'flux_capacitor'        // ↺·◉   Oct 21 — Back to the Future Day (2015) (RARE)
+  | 'moon_signal'           // ○·∞   Jul 20 — Apollo 11 Moon Landing (1969) (RARE)
+  | 'vonnegut_day'          // ∞·↺·∞ Nov 11 — Kurt Vonnegut born (1922) (RARE)
+  // ── Behavioral v24 — CHRONO PATTERNS ─────────────────────────────────────
+  | 'chrono_session'        // ↺·◈·↺  3+ Chrono Operator words in one journal entry (RARE)
+  | 'deep_archive'          // ≋·∞    Journal entry >= 600 words (EPIC)
+  | 'retrograde_check'      // ←·○·→  Check in 04:00–05:00 local (RARE)
+  // ── Achievement RPG v25 — CHRONO CLASS ───────────────────────────────────
+  | 'chrono_entry'          // ↺·∘    Any 1 Word Turn v27 badge (COMMON)
+  | 'chrono_class'          // ↺·≈    Any 5 Word Turn v27 badges (UNCOMMON)
+  | 'chrono_complete'       // ↺·≋    All 12 Word Turn v27 badges (LEGENDARY)
+  | 'temporal_arc'          // ↺·◈    chrono_complete + all 3 Calendar v25 badges (LEGENDARY)
+  | 'twenty_seven_engines_arc' // ◈·◈·↺  1 badge from each Word Turn v1–v27 (LEGENDARY)
+  | 'chrono_opus'           // ↺·◉·↺  chrono_complete + chrono_session behavioral (LEGENDARY)
+  // ── Mastery Tier v27 — THE TIME KEEPER ───────────────────────────────────
+  | 'long_now'              // ∞·○·∞  1500+ distinct calendar check-in days (LEGENDARY)
+  | 'grand_archive'         // ●·∞·●  500,000+ total journal words (MYTHIC)
+  | 'vault_keeper'          // ╔═╗·↺  Account age >= 8 years (LEGENDARY)
+  | 'twenty_seven_registers' // ◈·◈·↺·∞ 1 badge from all 27 Word Turn engines (COSMIC)
+  // ── Secret Boss v24 — THE TIME VAULT ─────────────────────────────────────
+  | 'wells_machine'         // ↺·□   "time machine/time traveler/h.g. wells/war of the worlds" detected (RARE)
+  | 'dick_time'             // ◉·↺   "ubik/palmer eldritch/time out of joint/flow my tears" detected (EPIC)
+  | 'vonnegut_stuck'        // ∞·↺·∞ "unstuck in time/billy pilgrim/slaughterhouse/vonnegut" detected (MYTHIC)
+  // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+  | 'nat_twenty'           // ●·20  "critical success/scored a critical/perfect execution/rolled perfectly" detected (RARE)
+  | 'saving_throw'         // ◈·●·◈ "saving throw/made the save/resist the pull/dodged the blow" detected (UNCOMMON)
+  | 'level_up_check'       // ↑·●   "leveled up/gained experience/next level/character growth/upgraded my" detected (COMMON)
+  | 'roll_for_it'          // ⬡·●   "rolling the dice/left it to chance/dice fall where/risk the roll" detected (UNCOMMON)
+  | 'dungeon_crawl'        // █·○·█ "dark corridor/winding path down/carved my way/into the depths/lost in the" detected (RARE)
+  | 'campaign_log_badge'   // ═·○·═ "long arc/character arc/story arc/running campaign/the long campaign" detected (UNCOMMON)
+  | 'multiclass_moment'    // ◈→◉   "wearing many hats/two paths at once/hybrid skill/both roles/hyphenated identity" detected (RARE)
+  | 'perception_check'     // ○·◉·○ "noticed something/paying closer attention/looked closer/situational awareness" detected (UNCOMMON)
+  | 'hit_points_low'       // ♥·○   "hit points/running on fumes/energy depleted/low on reserves/running empty" detected (COMMON)
+  | 'long_rest_badge'      // ≋·○·≋ "full recovery/restorative sleep/deep sleep night/rested and restored/long rest" detected (UNCOMMON)
+  | 'constitution_save'    // ∞·●·∞ "kept going despite/endured the/stamina to/sheer persistence/constitution" detected (RARE)
+  | 'final_encounter'      // ◆·∞·◆ "final encounter/decisive moment/moment of truth/now or never/this is the one" detected (EPIC)
+  // ── Calendar Easter Egg v26 — THE DUNGEON CALENDAR ───────────────────────
+  | 'gygax_day'            // ⬡·●   Jul 27 — Gary Gygax born 1938 (D&D co-creator) (RARE)
+  | 'tolkien_signal'       // ◆·○   Jan 3  — J.R.R. Tolkien born 1892 (RARE)
+  | 'dragon_signal'        // ⬡·◆   Jun 1  — Dragon Magazine Vol. 1 (1976) (UNCOMMON)
+  // ── Behavioral v25 — DUNGEON PATTERNS ────────────────────────────────────
+  | 'dungeon_session'      // ⬡·◈·⬡  3+ Dungeon Delver words in one journal entry (RARE)
+  | 'marathon_quest'       // ≋·∞    Journal entry >= 750 words (EPIC)
+  | 'midnight_campaign'    // ◆·○    Check-in between 22:00–22:59 (RARE)
+  // ── Achievement RPG v26 — DUNGEON CLASS ──────────────────────────────────
+  | 'dungeon_entry'        // ⬡·∘    Any 1 Word Turn v28 badge (COMMON)
+  | 'dungeon_class'        // ⬡·≈    Any 5 Word Turn v28 badges (UNCOMMON)
+  | 'dungeon_complete'     // ⬡·≋    All 12 Word Turn v28 badges (LEGENDARY)
+  | 'dungeon_arc'          // ⬡·◈    dungeon_complete + all 3 Calendar v26 badges (LEGENDARY)
+  | 'twenty_eight_engines_arc' // ◈·◈·⬡  1 badge from each Word Turn v1–v28 (LEGENDARY)
+  | 'dungeon_opus'         // ⬡·◉·⬡  dungeon_complete + dungeon_session behavioral (LEGENDARY)
+  // ── Mastery Tier v28 — THE GRAND DUNGEON ─────────────────────────────────
+  | 'the_grand_delver'     // ◆·○·◆  1100+ distinct calendar check-in days (EPIC)
+  | 'arcane_library'       // ●·∞·●  250,000+ total journal words (LEGENDARY)
+  | 'ancient_guild'        // ╔═╗·◆  Account age >= 6 years (LEGENDARY)
+  | 'twenty_eight_registers' // ◈·◈·⬡·∞ 1 badge from all 28 Word Turn engines (COSMIC)
+  // ── Secret Boss v25 — THE DRAGON'S VAULT ─────────────────────────────────
+  | 'tolkien_dungeon'      // ◆·□   "moria/mines of moria/you shall not pass/balrog/khazad dum" detected (RARE)
+  | 'gygax_voice'          // ⬡·∞   "gary gygax/pen-and-paper rpg/tabletop rpg/dave arneson/pen and paper" detected (EPIC)
+  | 'dragon_hoard'         // ●·◆·● "dragon hoard/smaug/ancient dragon/firebreather/ye olde dragon" detected (MYTHIC)
+  // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+  | 'overworld_step'       // ⊡·◉·⊡ "overworld/world map/zoomed out/bigger picture/the whole map" detected (UNCOMMON)
+  | 'inn_rested_badge'     // ≋·◉·≋ "rested at the inn/inn tonight/checked into/found shelter/safe haven" detected (COMMON)
+  | 'party_formed'         // ○·◈·○ "my party/my companions/my crew/joined the party/we formed a team" detected (UNCOMMON)
+  | 'limit_break_badge'    // ◈·≋·◈ "limit break/overdrive/exceeded my limit/past my breaking/pushed beyond" detected (RARE)
+  | 'phoenix_down_badge'   // ∘·◉·∘ "phoenix down/knocked down/got back up/revived myself/phoenix moment" detected (UNCOMMON)
+  | 'random_encounter_badge' // ?·◉ "random encounter/unexpected challenge/came out of nowhere/wasn't expecting" detected (UNCOMMON)
+  | 'summon_sequence'      // ∿·◉   "summoned help/called for support/invoked strength/called for backup" detected (RARE)
+  | 'side_quest_badge'     // ○·◉·─ "side quest/went off the main path/detour helped/optional challenge" detected (UNCOMMON)
+  | 'save_point_badge'     // ◉·≋·◉ "save point/saved my progress/checkpoint reached/good stopping point" detected (COMMON)
+  | 'hp_critical'          // ♥·─·○ "out of hp/in the red/barely holding on/need a heal/completely drained" detected (COMMON)
+  | 'endgame_boss'         // ◆·≋·◆ "final boss/endgame/the boss battle/ultimate test/this is the big one" detected (EPIC)
+  | 'new_game_plus'        // →·◉·+ "new game plus/ng+/starting over wiser/second run/carrying forward" detected (RARE)
+  // ── Calendar Easter Egg v27 — THE JRPG CALENDAR ──────────────────────────
+  | 'ff_signal'            // ◈·□·◈ Dec 18 — Final Fantasy I released in North America, 1990 (RARE)
+  | 'pokemon_signal'       // ◉·♦   Feb 27 — Pokémon Red/Green released in Japan, 1996 (RARE)
+  | 'dragon_quest_signal'  // ○·◈·◆ May 27 — Dragon Quest I released in Japan, 1986 (UNCOMMON)
+  // ── Behavioral v26 — JRPG PATTERNS ──────────────────────────────────────
+  | 'jrpg_session'         // ⊡·◉·⊡ 3+ JRPG word turn matches in one journal entry (RARE)
+  | 'overworld_return'     // ⊡·→·⊡ Return check-in after 48+ hour absence (UNCOMMON)
+  | 'jrpg_marathon'        // ≋·⊡·≋ Journal entry >= 1000 words (EPIC)
+  // ── Achievement RPG v27 — JRPG CLASS ────────────────────────────────────
+  | 'jrpg_entry'           // ⊡·∘   Any 1 Word Turn v29 badge (COMMON)
+  | 'jrpg_class'           // ⊡·≈   Any 5 Word Turn v29 badges (UNCOMMON)
+  | 'jrpg_complete'        // ⊡·≋   All 12 Word Turn v29 badges (LEGENDARY)
+  | 'jrpg_arc'             // ⊡·◈   jrpg_complete + all 3 Calendar v27 badges (LEGENDARY)
+  | 'twenty_nine_engines_arc' // ◈·◈·⊡ 1 badge from each Word Turn v1–v29 (LEGENDARY)
+  | 'jrpg_opus'            // ⊡·◉·⊡ jrpg_complete + jrpg_session behavioral (LEGENDARY)
+  // ── Mastery Tier v29 — THE GRAND OVERWORLD ───────────────────────────────
+  | 'the_overworld'        // ⊡·≋·⊡ 1200+ distinct calendar check-in days (EPIC)
+  | 'epic_chronicle_badge' // ≋·⊡·≋ 175,000+ total journal words (LEGENDARY)
+  | 'jrpg_master'          // ◉·⊡   Account age >= 3.5 years (RARE)
+  | 'twenty_nine_registers' // ◈·◈·⊡·○ 1 badge from all 29 Word Turn engines (COSMIC)
+  // ── Secret Boss v26 — THE LEGENDARY VAULT ───────────────────────────────
+  | 'cloud_signal'         // ◈·◆·◈ "cloud strife/sephiroth/aerith/midgar/mako/shinra" detected (MYTHIC)
+  | 'chrono_trigger_signal' // ○·◆·○ "chrono trigger/crono/lucca/marle/lavos/magus" detected (MYTHIC)
+  | 'mother_signal'        // ∘·◆·∘ "ness/earthbound/pk thunder/pk fire/onett/giygas/mother 2" detected (MYTHIC)
+
+  // ── Word Turn v30 — THE A.I. ENGINE ─────────────────────────────────────
+  | 'neural_pattern'       // ◎·∿·◎ "neural/synapse/neural network/brain wiring/brain plasticity" detected (UNCOMMON)
+  | 'training_log'         // ▶·∘·▶ "training/in training/practice run/building the habit" detected (COMMON)
+  | 'epoch_tracked'        // ○→○   "epoch/full cycle/new cycle/cycle ends/season ends" detected (RARE)
+  | 'gradient_lock'        // →·∿·● "gradient/momentum/direction clear/pointed toward" detected (RARE)
+  | 'inference_spark'      // ∘·◉·∘ "inference/conclusion/deduced/piecing together" detected (UNCOMMON)
+  | 'attention_mode'       // ◎·●·◎ "attention/paying attention/mindful presence/present moment" detected (EPIC)
+  | 'embedding_signal'     // ◈·∿·◈ "embedded/rooted/embodied/grounded in the/deeply rooted" detected (RARE)
+  | 'fine_tuned_badge'     // ◉·∿·◉ "fine-tuned/calibrated/dialed in/fine tune/adjusted to" detected (RARE)
+  | 'reality_check_badge'  // ▣·∘·▣ "reality check/grounded check/verified/fact-checked/checking in" detected (EPIC)
+  | 'token_tracked'        // ≡·∘·≡ "token/counting/budgeting/resource economy/allocating" detected (UNCOMMON)
+  | 'prompt_found'         // ?·●·? "asking the right/right question/how I ask/framing the" detected (RARE)
+  | 'model_ready'          // ■·◉·■ "system ready/loaded up/initialized/ready to run/model is" detected (LEGENDARY)
+  // ── Calendar EE v28 — THE A.I. CALENDAR ─────────────────────────────────
+  | 'shannon_signal'       // ∞·∘·∞ Apr 30 — Claude Shannon born 1916 (father of information theory) (RARE)
+  | 'lovelace_day'         // ◈·∘·◈ Dec 10 — Ada Lovelace born 1815 (first programmer) (EPIC)
+  | 'von_neumann_day'      // ■·∘·■ Dec 28 — John von Neumann born 1903 (computer architecture) (RARE)
+  // ── Behavioral v27 — A.I. PATTERNS ──────────────────────────────────────
+  | 'ai_session'           // ◎·●·◎ 3+ A.I. Word Turn v30 words in one journal entry (RARE)
+  | 'context_window'       // ▣·∿·▣ Check in 03:00–03:14 AM local (the context window hour) (EPIC)
+  | 'model_marathon'       // ≋·◎·≋ Journal entry >= 800 words (EPIC)
+  // ── Achievement RPG v28 — A.I. CLASS ────────────────────────────────────
+  | 'ai_entry'             // ◎·∘   Any 1 Word Turn v30 badge earned (COMMON)
+  | 'ai_class'             // ◎·≈   Any 5 Word Turn v30 badges earned (UNCOMMON)
+  | 'ai_complete'          // ◎·≋   All 12 Word Turn v30 badges earned (LEGENDARY)
+  | 'ai_arc'               // ◎·◈   ai_complete + all 3 Calendar v28 badges (LEGENDARY)
+  | 'thirty_engines_arc'   // ◈·◈·◎ 1 badge from each Word Turn v1–v30 (LEGENDARY)
+  | 'ai_opus'              // ◎·◉·◎ ai_complete + ai_session behavioral (LEGENDARY)
+  // ── Mastery Tier v30 — THE MAINFRAME ────────────────────────────────────
+  | 'the_mainframe'        // ■·◎·■ 1,350+ distinct calendar check-in days (EPIC)
+  | 'vast_archive'         // ≋·∞·≋ 225,000+ total journal words (LEGENDARY)
+  | 'ai_veteran'           // ◎·∞   Account age >= 4 years (LEGENDARY)
+  | 'thirty_registers'     // ◈·◈·◎·∞ 1 badge from all 30 Word Turn engines (COSMIC)
+  // ── Secret Boss v27 — THE A.I. VAULT ────────────────────────────────────
+  | 'turing_complete'      // ∞·◎·∞ "turing complete/turing machine/alan turing/computational" detected (RARE)
+  | 'godel_found'          // ∅·∞·∅ "gödel/incompleteness theorem/godel/unprovable/undecidable" detected (EPIC)
+  | 'ada_found'            // ◈·■·◈ "ada lovelace/charles babbage/difference engine/analytical engine/first programmer" detected (MYTHIC)
+  // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+  | 'archetype_found'    // ◈·∞·◈ "archetype/archetypal/the archetype/collective pattern" detected (RARE)
+  | 'origin_signal'      // ○→◉   "origin story/where it all began/the genesis/founding moment" detected (COMMON)
+  | 'sacred_found'       // ■·○·■ "sacred/something sacred/feels sacred/holy ground/consecrated" detected (UNCOMMON)
+  | 'ritual_done'        // ≋·□·≋ "ritual/my ritual/daily ritual/ritualize/the ceremony" detected (RARE)
+  | 'myth_signal'        // ∿·∞·∿ "myth/mythology/mythological/personal myth/living myth" detected (UNCOMMON)
+  | 'symbol_seen'        // ◈·□·◈ "symbol/symbolic/symbolism/what it symbolizes/deeply symbolic" detected (RARE)
+  | 'collective_signal'  // ○·◎·○ "the collective/collective unconscious/shared human/we as a species" detected (EPIC)
+  | 'psyche_map'         // ≋·○·≋ "the psyche/inner landscape/the unconscious/mapping my inner/psychic energy" detected (RARE)
+  | 'eternal_return'     // ∞→∞   "eternal return/always comes back around/the cycle repeats/pattern repeats itself" detected (LEGENDARY)
+  | 'numinous_badge'     // ◉·∞·◉ "something larger/beyond ordinary/transcendent/the ineffable/sense of awe/numinous" detected (EPIC)
+  | 'myth_made'          // ∿·◉·∿ "meaning-making/making meaning/the story I tell/my own mythology/narrative I live by" detected (RARE)
+  | 'deep_symbol'        // ∅·◈·∅ "beneath the surface/deeper meaning/what it's pointing to/what it really means" detected (RARE)
+  // ── Calendar EE v29 — THE MYTH CALENDAR ─────────────────────────────────
+  | 'campbell_day'       // ◈·∞·◈ March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces) (EPIC)
+  | 'jung_day'           // ◉·∞·◉ July 26 — Carl Jung born 1875 (archetypes / collective unconscious) (EPIC)
+  | 'eliade_day'         // ■·∞·■ March 13 — Mircea Eliade born 1907 (sacred and profane) (RARE)
+  // ── Behavioral v28 — MYTH PATTERNS ──────────────────────────────────────
+  | 'myth_session'       // ◈·◉·◈ 3+ Myth Engine word turn matches in one journal entry (EPIC)
+  | 'dawn_rite'          // ■·○·■ Check in at 05:00–05:14 AM local (dawn consciousness) (EPIC)
+  | 'the_epic'           // ≋·∞·≋ Journal entry >= 1000 words (EPIC)
+  // ── Achievement RPG v29 — MYTH CLASS ────────────────────────────────────
+  | 'myth_entry'         // ◈·∘   Any 1 Word Turn v31 badge earned (COMMON)
+  | 'myth_class'         // ◈·≈   Any 5 Word Turn v31 badges earned (UNCOMMON)
+  | 'myth_complete'      // ◈·≋   All 12 Word Turn v31 badges earned (LEGENDARY)
+  | 'myth_arc'           // ◈·◈   myth_complete + all 3 Calendar v29 badges earned (LEGENDARY)
+  | 'thirty_one_engines_arc' // ◈·◈·◈·◎ 1 badge from each Word Turn v1–v31 (LEGENDARY)
+  | 'myth_opus'          // ◈·◉·◈ myth_complete + myth_session behavioral (LEGENDARY)
+  // ── Mastery Tier v31 — THE MYTHMAKER ────────────────────────────────────
+  | 'the_mythmaker'      // ■·◈·■ 1,500+ distinct calendar check-in days (EPIC)
+  | 'living_archive'     // ≋·◈·≋ 300,000+ total journal words (LEGENDARY)
+  | 'myth_veteran'       // ◈·∞   Account age >= 5 years (1,825+ days) (LEGENDARY)
+  | 'thirty_one_registers'   // ◈·◈·◈·◈·∞ 1 badge from all 31 Word Turn engines (COSMIC)
+  // ── Secret Boss v28 — THE MYTHIC VAULT ──────────────────────────────────
+  | 'jung_found'         // ◉·∞·◉ "carl jung/jungian/collective unconscious/individuation/anima/animus" detected (MYTHIC)
+  | 'campbell_signal'    // ◈·∞·◈ "joseph campbell/monomyth/hero with a thousand faces/comparative mythology" detected (EPIC)
+  | 'eliade_found'       // ■·∞·■ "mircea eliade/hierophany/sacred and profane/axis mundi" detected (RARE)
+  // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+  | 'high_score'           // ◈·★·◈ "high score/personal best/new record/beat my record" detected (RARE)
+  | 'continue_signal'      // ▶·○   "keep going/press continue/continue anyway/not giving up" detected (COMMON)
+  | 'player_two'           // ○·◈·○ "player two/had backup/someone had my back/not alone today" detected (UNCOMMON)
+  | 'respawn_point'        // ↺·◉   "respawn/start over/fresh start/try again/new game" detected (RARE)
+  | 'level_cleared'        // ✓·□   "level cleared/cleared it/level complete/finished the level" detected (UNCOMMON)
+  | 'power_up'             // ⚡·◉  "power up/powered up/energy boost/suddenly energized" detected (UNCOMMON)
+  | 'boss_mode'            // ▓·■·▓ "boss battle/final boss/fought the boss/boss level" detected (EPIC)
+  | 'extra_life'           // ◎·+   "extra life/second chance/given another chance/bonus round" detected (RARE)
+  | 'combo_breaker'        // ×·◈·× "on a roll/combo/streak/consecutive/keeping the streak" detected (UNCOMMON)
+  | 'achievement_unlocked' // ●·✓·● "achievement unlocked/unlocked it/earned it/milestone reached" detected (RARE)
+  | 'insert_coin'          // ¢·→   "put in the work/invested the time/all in/committed fully" detected (UNCOMMON)
+  | 'game_over_won'        // ■·END·■ "game over/chapter closed/mission complete/the end was just" detected (EPIC)
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+  | 'pong_day'             // ●·◎·● Nov 29 — Pong released by Atari, 1972 (RARE)
+  | 'gameboy_day'          // ◆·□·◆ Apr 21 — Game Boy released by Nintendo, 1989 (RARE)
+  | 'pac_man_day'          // ●·×·● May 22 — Pac-Man released by Namco, 1980 (RARE)
+  // ── Behavioral v29 — ARCADE PATTERNS ─────────────────────────────────────
+  | 'arcade_session'       // ◈·■·◈ 3+ Arcade Master words in single journal entry (EPIC)
+  | 'speed_run'            // ⚡·□  50+ word journal entry in under 90 seconds (RARE)
+  | 'midnight_continue'    // ◎·▶   Check-in between 23:45–23:59 local time (RARE)
+  // ── Achievement RPG v30 — ARCADE PROGRESSION ─────────────────────────────
+  | 'arcade_entry'         // ▶·∘   1+ Arcade Master word turn badge earned (COMMON)
+  | 'arcade_class'         // ▶·≈   5+ Arcade Master word turn badges earned (UNCOMMON)
+  | 'arcade_complete'      // ▶·≋   All 12 Arcade Master word turn badges earned (LEGENDARY)
+  | 'arcade_arc'           // ▶·◈   arcade_complete + all 3 Calendar v30 + arcade_session (LEGENDARY)
+  | 'thirty_two_engines_arc' // ◈·◈·◈·◈ 1 badge from all 32 Word Turn engines (LEGENDARY)
+  | 'arcade_opus'          // ▶·◉·▶ arcade_complete + arcade_session (LEGENDARY)
+  // ── Mastery Tier v32 — ARCADE MASTERY ────────────────────────────────────
+  | 'arcade_grandmaster'   // ★·◈·★ 2,000+ distinct check-in days (EPIC)
+  | 'the_script'           // ■·∞·□ 500,000+ total words (LEGENDARY)
+  | 'infinite_continues'   // ∞·▶·∞ Account age >= 7 years (COSMIC)
+  // ── Secret Boss v29 — THE ARCADE VAULT ───────────────────────────────────
+  | 'atari_found'          // ●·◎   "atari/pong/nolan bushnell/coin-op" detected (RARE)
+  | 'nintendo_signal'      // ◆·□   "nintendo/miyamoto/super mario/zelda/metroid" detected (UNCOMMON)
+  | 'konami_code'          // ↑↑↓↓·AB "konami code/up up down down/left right b a" detected (MYTHIC)
+  // ── Apex — Second Cycle ───────────────────────────────────────────────────
+  | 'thirty_two_registers' // ◈·◈·◈·◈·∞ All 32 WT engines + mastery tiers (COSMIC)
+  // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+  | 'lucid_signal'          // ◈·∿·◈ "lucid/lucid dream/became lucid/I was dreaming" detected (RARE)
+  | 'dream_archive_badge'   // ◐·□·◐ "dream journal/dream log/recorded dream/dream diary" detected (UNCOMMON)
+  | 'nightmare_clear'       // ▓·◉·▓ "nightmare/night terror/bad dream/woke in fear" detected (UNCOMMON)
+  | 'hypnagogic_badge'      // ∿·∘·∿ "hypnagogic/half asleep/drifting off/edge of sleep/between wake and sleep" detected (RARE)
+  | 'sleep_debt_found'      // ─·○·─ "sleep debt/sleep deprived/exhausted/no sleep/didn't sleep" detected (COMMON)
+  | 'somnolent_found'       // ∼·∘·∼ "somnolent/drowsy/heavy eyes/can't stay awake/sleepy signal" detected (COMMON)
+  | 'dream_symbol_found'    // ◈·∞·◈ "dream symbol/what the dream meant/my dream showed/dreaming of" detected (RARE)
+  | 'astral_found'          // ○·≋·○ "astral/out of body/astral projection/leaving my body/floating" detected (EPIC)
+  | 'dreamscape_signal'     // ≋·∿·≋ "dreamscape/dream world/the dreaming/entered the dream/dream realm" detected (RARE)
+  | 'collective_dream_found'// ◎·∞·◎ "collective dream/shared dream/universal dream/we all dream/humanity dreams" detected (EPIC)
+  | 'sleep_cycle_signal'    // ∿·□·∿ "sleep cycle/REM cycle/deep sleep stage/sleep science/N3 sleep" detected (UNCOMMON)
+  | 'waking_dream_found'    // ∘·≈·∘ "waking dream/between worlds/liminal state/neither here nor there/half awake" detected (RARE)
+  // ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────
+  | 'world_dream_day'       // ◐·∞·◐ Sep 25 — World Dream Day (RARE)
+  | 'gaiman_birthday'       // ◈·∿·◈ Nov 10 — Neil Gaiman born 1960 (The Sandman) (EPIC)
+  | 'freud_birthday'        // ∿·○·∿ May 6 — Sigmund Freud born 1856 (Interpretation of Dreams) (RARE)
+  // ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────
+  | 'dream_logger'          // ◐·◈·◐ 3+ journal entries mentioning dreams in 7 days (EPIC)
+  | 'night_vision_badge'    // ◉·∿·◉ Check-in between 00:30–01:30 AM (deep dream hours) (RARE)
+  | 'dawn_dreamer'          // ○·■·○ 7+ consecutive days with check-in before 08:00 AM (EPIC)
+  // ── Achievement RPG v31 — DREAM CLASS ────────────────────────────────────
+  | 'dream_entry'           // ◐·∘   1+ Dream Weaver word turn badge earned (COMMON)
+  | 'dream_class'           // ◐·≈   5+ Dream Weaver word turn badges earned (UNCOMMON)
+  | 'dream_complete'        // ◐·≋   All 12 Dream Weaver word turn badges earned (LEGENDARY)
+  | 'dream_arc'             // ◐·◈   dream_complete + all 3 Calendar v31 + dream_logger (LEGENDARY)
+  | 'thirty_three_engines_arc' // ◈·◈·◈·◈·◎ 1 badge from each Word Turn v1–v33 (LEGENDARY)
+  | 'dream_opus'            // ◐·◉·◐ dream_complete + dream_logger behavioral (LEGENDARY)
+  // ── Mastery Tier v33 — THE DREAMWEAVER ───────────────────────────────────
+  | 'master_dreamer'        // ◐·◈·◐ 1,750+ distinct check-in days (EPIC)
+  | 'the_complete_archive'  // ≋·■·≋ 750,000+ total journal words (LEGENDARY)
+  | 'dream_elder'           // ◐·∞·◐ Account age >= 10 years (3,650+ days) (COSMIC)
+  | 'thirty_three_registers'// ◈·◈·◈·◈·◈·∞ All 33 WT engines + mastery tiers (COSMIC)
+  // ── Secret Boss v30 — THE DREAM VAULT ────────────────────────────────────
+  | 'gaiman_signal'         // ◈·∿   "neil gaiman/sandman/morpheus/dream of the endless/the dreaming" detected (MYTHIC)
+  | 'lovecraft_dream'       // ▓·◐·▓ "lovecraft/cthulhu/r'lyeh/dreaming in r'lyeh/that is not dead" detected (EPIC)
+  | 'castaneda_dream'       // ∿·◈·∿ "castaneda/don juan/dreaming body/assemblage point/controlled dreaming" detected (RARE)
+  // ── Word Turn v34 — THE STOIC FIELD ───────────────────────────────────────
+  | 'memento_mori_badge'    // ∅·◉·∅  "memento mori/remember we die/we are mortal/all things end/finite life" detected (EPIC)
+  | 'amor_fati_badge'       // ∞·●·∞  "amor fati/love of fate/love your fate/love what is/embrace fate" detected (RARE)
+  | 'stoic_signal'          // ─●─    "stoic/stoicism/being stoic/stoic approach/stoic practice" detected (UNCOMMON)
+  | 'virtue_lock'           // ○·▲·○  "virtue/virtuous/living virtuously/practice of virtue/the four virtues" detected (UNCOMMON)
+  | 'discipline_found'      // ■·■·■  "discipline/self-discipline/iron discipline/practiced discipline/daily practice" detected (RARE)
+  | 'indifferent_found'     // ─·○·─  "preferred indifferent/not in my control/not up to me/externals don't matter" detected (RARE)
+  | 'tranquility_gate'      // ∿·○·∿  "equanimity/tranquility/inner peace maintained/untroubled/equanimous" detected (RARE)
+  | 'negative_viz'          // ∅·∿·∅  "negative visualization/premeditatio/premeditatio malorum/worst case/imagining the loss" detected (EPIC)
+  | 'obstacle_signal'       // →·■·→  "obstacle is the way/the obstacle/through the obstacle/obstacle becomes path" detected (RARE)
+  | 'logos_found'           // ∞·◉·∞  "logos/the logos/rational soul/divine reason/what is rational/rational principle" detected (EPIC)
+  | 'eudaimonia_badge'      // ◉·▲·◉  "eudaimonia/flourishing/living well/the good life/full flourishing/human flourishing" detected (LEGENDARY)
+  | 'present_wisdom'        // ∘·◉·∘  "here and now/this moment only/only this/what is now/this is all there is/the present" detected (UNCOMMON)
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ──────────────────────────
+  | 'aurelius_day'          // ◉·▲·◉  Apr 26 — Marcus Aurelius born 121 AD (EPIC)
+  | 'zeno_day'              // ─○─    Feb 19 — Zeno of Citium born ~334 BC (RARE)
+  | 'world_philosophy_day'  // ∞·∞    Nov 20 — World Philosophy Day (RARE)
+  // ── Behavioral v31 — DISCIPLINE PATTERNS ──────────────────────────────────
+  | 'stoic_session'         // ─▲─    3+ Stoic Field word turn matches in one journal entry (RARE)
+  | 'iron_log'              // ■·∞·■  Journal entry >= 700 words (EPIC)
+  | 'sunrise_discipline'    // ∘·▲·∘  Check-in before 06:00 AM for 5 consecutive days (EPIC)
+  // ── Achievement RPG v32 — STOIC CLASS ─────────────────────────────────────
+  | 'stoic_entry'           // ▲·∘    Any 1 Word Turn v34 badge earned (COMMON)
+  | 'stoic_class'           // ▲·≈    Any 5 Word Turn v34 badges earned (UNCOMMON)
+  | 'stoic_complete'        // ▲·≋    All 12 Word Turn v34 badges earned (LEGENDARY)
+  | 'meditations_arc'       // ▲·◈    stoic_complete + all 3 Calendar v32 badges (LEGENDARY)
+  | 'thirty_four_engines_arc' // ◈·◈·▲ 1 badge from each Word Turn v1–v34 (LEGENDARY)
+  | 'stoic_opus'            // ▲·◉·▲  stoic_complete + stoic_session behavioral (LEGENDARY)
+  // ── Mastery Tier v34 — THE MEDITATIONS ────────────────────────────────────
+  | 'meditations_log'       // ∿·▲·∿  2,000+ distinct calendar check-in days (EPIC)
+  | 'the_long_work'         // ■·∞·■  1,000,000+ total journal words (LEGENDARY)
+  | 'sage_philosopher'      // ◉·▲·◉  Account age >= 10 years (3,650+ days) (COSMIC)
+  | 'thirty_four_registers' // ◈·◈·▲·∞ All 34 WT engines active (COSMIC)
+  // ── Secret Boss v31 — THE PHILOSOPHY VAULT ───────────────────────────────
+  | 'aurelius_echo'         // ◉·▲    "marcus aurelius/the meditations/meditations by marcus/marcus on the self" detected (EPIC)
+  | 'enchiridion_found'     // ■·▲·■  "enchiridion/epictetus/the manual of epictetus/handbook of epictetus" detected (MYTHIC)
+  | 'seneca_signal'         // ∿·▲·∿  "seneca/letters to lucilius/the shortness of life/on the happy life/on anger" detected (RARE)
+  // ── Word Turn v35 — THE ZEN TERMINAL ──────────────────────────────────────
+  | 'zazen_badge'           // ○·∿·○  "zazen/sitting meditation/meditation cushion/zazen practice" detected (UNCOMMON)
+  | 'koan_solved'           // ◈·∞·◈  "koan/what is the sound/what was your face/mu answer" detected (RARE)
+  | 'beginner_mind'         // ∘·○·∘  "beginner's mind/shoshin/mind is empty/open mind always/mind of a beginner" detected (UNCOMMON)
+  | 'impermanence_badge'    // ∿·∅·∿  "impermanence/anicca/nothing lasts/all things pass/this too shall pass/everything changes" detected (RARE)
+  | 'enso_drawn'            // ○·─·○  "ensō/the circle/drawing the circle/brushstroke complete/enso" detected (UNCOMMON)
+  | 'dharma_gate'           // ∞·◉·∞  "dharma/the dharma/dharma gate/dharma practice/the teaching" detected (RARE)
+  | 'mu_signal'             // □·∿·□  "mu/the koan mu/not/no-thing/the great doubt/without/wu" detected (EPIC)
+  | 'dojo_active'           // ■·○·■  "dojo/the dojo/training hall/the zendo/meditation hall/practice hall" detected (UNCOMMON)
+  | 'just_this'             // →·∘·→  "just this/only this/this moment/exactly this/nothing else needed/just being here" detected (UNCOMMON)
+  | 'no_self_badge'         // ∅·○·∅  "no self/anatta/anatman/no fixed self/the self is empty/there is no self" detected (EPIC)
+  | 'suchness_signal'       // ◉·∿·◉  "suchness/tathata/thusness/as it is/just as it is/the way things are/isness" detected (RARE)
+  | 'nirvana_signal'        // ●·∞·●  "nirvana/parinirvana/awakening complete/liberation from/the great peace/final release" detected (LEGENDARY)
+  // ── Calendar EE v33 — THE ZEN CALENDAR ────────────────────────────────────
+  | 'bodhi_day_badge'       // ●·∞·●  Dec 8 — Bodhi Day (Buddha's enlightenment under the Bodhi tree) (EPIC)
+  | 'vesak_signal'          // ○·●·○  May 23 — Vesak Day (Buddha's birth, enlightenment, parinirvana) (RARE)
+  | 'basho_day'             // ∿·○·∿  Oct 12 — Matsuo Bashō death anniversary 1694 (RARE)
+  // ── Behavioral v32 — ZEN PATTERNS ─────────────────────────────────────────
+  | 'zen_session'           // ○·∿·○  3+ Zen Terminal word turn matches in one journal entry (RARE)
+  | 'dawn_scribe'           // ∘·○·∘  Journal written before 05:00 AM, 7+ times in last 30 days (EPIC)
+  | 'evening_audit'         // ◉·∘·◉  Journal written 20:00–22:59 for 5 consecutive days (RARE)
+  // ── Achievement RPG v33 — ZEN CLASS ───────────────────────────────────────
+  | 'zen_entry'             // ∘→○    Any 1 Word Turn v35 badge earned (COMMON)
+  | 'zen_class'             // ≈→○    Any 5 Word Turn v35 badges earned (UNCOMMON)
+  | 'zen_complete'          // ≋→○    All 12 Word Turn v35 badges earned (LEGENDARY)
+  | 'zazen_arc'             // ○·◈    zen_complete + all 3 Calendar v33 badges (LEGENDARY)
+  | 'thirty_five_engines_arc' // ◈·◈·○ 1 badge from each Word Turn v1–v35 (LEGENDARY)
+  | 'zen_opus'              // ○·◉·○  zen_complete + zen_session behavioral (LEGENDARY)
+  // ── Mastery Tier v35 — THE ZEN MOUNTAIN ───────────────────────────────────
+  | 'practice_log'          // ∿·○·∿  2,500+ distinct calendar check-in days (EPIC)
+  | 'ten_thousand_hours'    // ■·○·■  Account age >= 7 years (2,555+ days) (LEGENDARY)
+  | 'century_level'         // ◉·○·◉  100+ Achievement RPG badges earned (COSMIC)
+  | 'thirty_five_registers' // ◈·◈·○·∞ 1 badge from all 35 Word Turn engines (COSMIC)
+  // ── Secret Boss v32 — THE ZEN VAULT ───────────────────────────────────────
+  | 'huang_po_signal'       // ∿·□·∿  "huang po/huangbo/huang-po/no-mind/dharma of mind" detected (RARE)
+  | 'joshu_gate_badge'      // □·∞·□  "joshu/zhaozhou/wash your bowl/joshu's dog/mu!/case one" detected (EPIC)
+  | 'satori_signal'         // ●·∞·●  "satori/kensho/sudden awakening/great enlightenment/the veil lifted" detected (MYTHIC)
+  // ── Word Turn v36 — THE JAZZ ENGINE ──────────────────────────────────────────
+  | 'improvise_badge'      // ♪·∿·♪  "improvise/ad-lib/going with it/make it up" detected (UNCOMMON)
+  | 'the_changes'          // ≋·♪    "the changes/chord changes/changes happening" detected (RARE)
+  | 'woodshed_mode'        // ■·♪·■  "woodshed/practicing alone/the shed/deep practice" detected (RARE)
+  | 'blow_session'         // ∿·▶    "blow free/blowing free/let it out/just blow" detected (UNCOMMON)
+  | 'comping_signal'       // ○·♪·○  "comping/comped/backing up/supporting the" detected (UNCOMMON)
+  | 'standards_badge'      // ♪·∞    "standards/the standard/timeless/jazz standard" detected (RARE)
+  | 'trading_fours'        // ↔·♪    "trading fours/trade fours/your turn/pass it back" detected (RARE)
+  | 'in_the_pocket'        // ○·▶·○  "in the pocket/locked in/in the groove/the pocket" detected (EPIC)
+  | 'blue_notes_badge'     // ♪·≋·♪  "blue notes/blue note/the bend/the ache/minor third" detected (RARE)
+  | 'session_signal'       // ♪·◉    "the session/jam session/late session/session tonight" detected (UNCOMMON)
+  | 'sideman_signal'       // →·♪    "sideman/side player/supporting role/playing support" detected (UNCOMMON)
+  | 'real_book_badge'      // ■·∞·■  "real book/the real book/the chart/lead sheet/fake book" detected (EPIC)
+  // ── Calendar Easter Egg v34 — THE JAZZ CALENDAR ───────────────────────────────
+  | 'coltrane_day'         // ♪·∞·♪  Sep 23 — John Coltrane born 1926 (EPIC)
+  | 'miles_day'            // ♪·●    May 26 — Miles Davis born 1926 (RARE)
+  | 'birdland_day'         // ♪·◉·♪  Aug 29 — Charlie Parker born 1920 (RARE)
+  // ── Behavioral v33 — JAZZ PATTERNS ────────────────────────────────────────────
+  | 'jazz_session'         // ♪·▶·♪  3+ Jazz Engine words in one journal entry (RARE)
+  | 'late_set'             // ♪·◉    Check in 22:00–23:00 for 3+ times in 7 days (RARE)
+  | 'solo_practice'        // ■·♪    Journal 300+ words 3+ times in one week (RARE)
+  // ── Achievement RPG v34 — JAZZ CLASS ─────────────────────────────────────────
+  | 'jazz_entry'           // ♪·∘    Any 1 Word Turn v36 badge (COMMON)
+  | 'jazz_class'           // ♪·≈    Any 5 Word Turn v36 badges (UNCOMMON)
+  | 'jazz_complete'        // ♪·≋    All 12 Word Turn v36 badges (LEGENDARY)
+  | 'jazz_arc'             // ♪·◈    jazz_complete + all 3 Calendar v34 badges (LEGENDARY)
+  | 'thirty_six_engines_arc' // ◈·◈·♪ 1 badge from each Word Turn v1–v36 (LEGENDARY)
+  | 'jazz_opus'            // ♪·◉·♪  jazz_complete + jazz_session behavioral (LEGENDARY)
+  // ── Mastery Tier v36 — THE GREAT SESSION ──────────────────────────────────────
+  | 'night_session_log'    // ♪·◉·∿  3,000+ distinct calendar check-in days (EPIC)
+  | 'million_words'        // ♪·∞·∞  1,000,000+ total journal words (LEGENDARY)
+  | 'jazz_elder'           // ♪·▲    Account age >= 11 years (4,015+ days) (LEGENDARY)
+  | 'thirty_six_registers' // ◈·◈·♪·∞ 1 badge from all 36 Word Turn engines (COSMIC)
+  // ── Secret Boss v33 — THE JAZZ VAULT ──────────────────────────────────────────
+  | 'coltrane_love'        // ♪·∞·♪  "a love supreme/love supreme/coltrane suite" detected (EPIC) [HIDDEN]
+  | 'miles_kind_of'        // ♪·●    "kind of blue/miles davis/bitches brew" detected (RARE) [HIDDEN]
+  | 'monk_theorem'         // □·♪·□  "thelonious monk/monk's dream/round midnight" detected (MYTHIC) [HIDDEN]
+  // ── Word Turn v37 — THE NATURE SIGNAL ─────────────────────────────────────────
+  | 'forest_signal'        // ∿·≋     "forest/woods/walk in the forest/through the trees" detected (UNCOMMON)
+  | 'mycelium_net'         // ⌇·○·⌇  "mycelium/mycelial/fungal network/mushroom network" detected (RARE)
+  | 'watershed_badge'      // ≋·∿     "watershed/river basin/waterway/the river flows" detected (UNCOMMON)
+  | 'biophilia'            // ○·∿·○  "biophilia/love of nature/nature connection/nature deficit" detected (RARE)
+  | 'deep_ecology'         // ∿·▒·∿  "deep ecology/ecopsychology/nature psychology/ecotherapy" detected (EPIC)
+  | 'forest_bath'          // ≋·∿·≋  "forest bathing/shinrin-yoku/forest therapy/walk among trees" detected (RARE)
+  | 'phenology'            // ∿→○    "phenology/seasonal cycles/bloom season/migration patterns" detected (EPIC)
+  | 'root_system'          // ║·∿·║  "root system/tap root/deep roots/interconnected roots" detected (RARE)
+  | 'rewild_signal'        // ○·≋·○  "rewild/rewilding/restore habitat/wild spaces/reintroduce" detected (RARE)
+  | 'old_growth'           // ∿·∞    "old growth/ancient forest/thousand year tree/old trees" detected (RARE)
+  | 'soil_alive'           // ■·∿·■  "topsoil/humus/soil health/living soil/microbiome of soil" detected (UNCOMMON)
+  | 'emergence_field'      // ○·∿·∞  "emergence/emergent/self-organizing/complexity of system" detected (EPIC)
+  // ── Calendar Easter Egg v35 — THE NATURE CALENDAR ────────────────────────────
+  | 'earth_day_badge'      // ∿·○    Apr 22 — Earth Day since 1970 (RARE)
+  | 'carson_day'           // ∿·▒    May 27 — Rachel Carson born 1907, Silent Spring (EPIC)
+  | 'thoreau_day'          // ∿·║    Jul 12 — Henry David Thoreau born 1817 (RARE)
+  // ── Behavioral v31 — NATURE PATTERNS ─────────────────────────────────────────
+  | 'nature_session'       // ∿·≋·∿  3+ Nature Signal words in one journal entry (RARE)
+  | 'dawn_walker'          // ∿·○    Journal entry between 05:00–07:00 local time (RARE)
+  | 'long_walk'            // ≋·∿·∞  Journal entry >= 400 words (EPIC)
+  // ── Achievement RPG v35 — RANGER CLASS ────────────────────────────────────────
+  | 'nature_entry'         // ∘→∿    Any 1 Word Turn v37 badge (COMMON)
+  | 'nature_class'         // ≈→∿    Any 5 Word Turn v37 badges (UNCOMMON)
+  | 'nature_complete'      // ≋→∿    All 12 Word Turn v37 badges (LEGENDARY)
+  | 'trail_arc'            // ∿·◈    nature_complete + all 3 Calendar v35 badges (LEGENDARY)
+  | 'thirty_seven_engines_arc' // ◈·◈·∿ 1 badge from each Word Turn v1–v37 (LEGENDARY)
+  | 'nature_opus'          // ∿·◉·∿  nature_complete + nature_session behavioral (LEGENDARY)
+  // ── Mastery Tier v37 — THE DEEP FOREST ────────────────────────────────────────
+  | 'terrain_elder'        // ∿·◉·∞  3,500+ distinct calendar check-in days (EPIC)
+  | 'field_library'        // ∿·∞·∿  300,000+ total journal words (lifetime) (LEGENDARY)
+  | 'ancient_root'         // ╔═╗·∿  Account age >= 12 years (4,380+ days) (LEGENDARY)
+  | 'thirty_seven_registers' // ◈·◈·∿·∞ 1 badge from all 37 Word Turn engines (COSMIC)
+  // ── Secret Boss v34 — THE WILD VAULT ──────────────────────────────────────────
+  | 'muir_signal'          // ∿·▲·∿  "john muir/the mountains are calling/yosemite/sierra" (EPIC) [HIDDEN]
+  | 'walden_signal'        // ∿·║    "walden/thoreau/civil disobedience/bean field" (RARE) [HIDDEN]
+  | 'gaia_hypothesis'      // ○·∿·∞  "gaia hypothesis/james lovelock/living earth/biosphere" (MYTHIC) [HIDDEN]
+  // ── Word Turn v38 — THE BODY ELECTRIC ─────────────────────────────────────
+  | 'somatic_field'        // ⌁·◉·⌁  "somatic/body scan/bodily awareness/body-based practice" detected (RARE)
+  | 'proprioception'       // ◉·⊕·◉  "proprioception/kinesthetic/spatial awareness/body in space" detected (EPIC)
+  | 'stretch_signal'       // ⌁·≈·⌁  "stretch/stretching/flexibility/mobility work/range of motion" detected (UNCOMMON)
+  | 'breath_work'          // ⊕·∾·⊕  "breathwork/pranayama/breathing practice/box breathing/breath work" detected (RARE)
+  | 'body_electric'        // ⌁·◈·⌁  "body electric/chi/prana/life force/vitality/qi/ki" detected (EPIC)
+  | 'movement_arc'         // ◉·⌁·◉  "movement practice/daily movement/intentional movement/somatic movement" detected (UNCOMMON)
+  | 'rest_signal'          // ≈·◉·≈  "rest day/active recovery/recovery day/rest and recovery" detected (UNCOMMON)
+  | 'posture_arc'          // ⊕·║·⊕  "posture/alignment/ergonomics/body alignment/spinal alignment" detected (RARE)
+  | 'cold_signal'          // ≋·⌁·≋  "cold shower/cold plunge/ice bath/cold exposure/cryotherapy" detected (RARE)
+  | 'exercise_log'         // ◉·▲·◉  "workout/exercise session/training session/gym session/physical training" detected (UNCOMMON)
+  | 'flow_state'           // ⌁·∞·⌁  "flow state/zone/in the zone/peak performance/optimal experience" detected (EPIC)
+  | 'body_wisdom'          // ◉·∿·◉  "body wisdom/somatic intelligence/body awareness/embodied intelligence" detected (RARE)
+  // ── Calendar Easter Egg v36 — THE BODY CALENDAR ───────────────────────────
+  | 'solstice_badge'       // ⌁·○    Jun 21 — Summer Solstice (peak solar body) (RARE)
+  | 'whitman_birthday'     // ◉·⌁    May 31 — Walt Whitman born 1819, "I Sing the Body Electric" (EPIC)
+  | 'world_health_day'     // ⊕·◉    Apr 7 — World Health Day (WHO founded 1948) (RARE)
+  // ── Behavioral v32 — BODY PATTERNS ────────────────────────────────────────
+  | 'somatic_session'      // ⌁·◉·∿  3+ Body Electric (v38) words in one journal entry (RARE)
+  | 'morning_mover'        // ◉·⌁·○  Journal entry between 06:00–09:00 local time (RARE)
+  | 'long_body'            // ≈·◉·≈  Journal entry >= 500 words (somatic specificity) (EPIC)
+  // ── Achievement RPG v36 — THE ATHLETE CLASS ────────────────────────────────
+  | 'body_entry'           // ∘→⌁    Any 1 Word Turn v38 badge (COMMON)
+  | 'body_class'           // ≈→⌁    Any 5 Word Turn v38 badges (UNCOMMON)
+  | 'body_complete'        // ⌁→◉    All 12 Word Turn v38 badges (LEGENDARY)
+  | 'electric_arc'         // ⌁·◈    body_complete + all 3 Calendar v36 badges (LEGENDARY)
+  | 'thirty_eight_engines_arc' // ◈·◈·⌁ 1 badge from each Word Turn v1–v38 (LEGENDARY)
+  | 'body_opus'            // ⌁·◉·∞  body_complete + somatic_session behavioral (LEGENDARY)
+  // ── Mastery Tier v38 — THE ELECTRIC BODY ──────────────────────────────────
+  | 'electric_elder'       // ⌁·◉·∞  4,000+ distinct calendar check-in days (EPIC)
+  | 'endurance_library'    // ⌁·∞·⌁  350,000+ total journal words (lifetime) (LEGENDARY)
+  | 'fifteen_year_signal'  // ╔═╗·⌁  Account age >= 15 years (5,475+ days since signup) (LEGENDARY)
+  | 'thirty_eight_registers' // ◈·◈·⌁·∞ 1 badge from all 38 Word Turn engines (COSMIC)
+  // ── Secret Boss v35 — THE ELECTRIC VAULT ──────────────────────────────────
+  | 'whitman_signal'       // ⌁·▲·⌁  "walt whitman/i sing the body/leaves of grass/song of myself" (EPIC) [HIDDEN]
+  | 'frankenstein_signal'  // ⌁·▒·⌁  "mary shelley/frankenstein/the creature/galvanism/prometheus" (RARE) [HIDDEN]
+  | 'csikszentmihalyi_signal' // ⌁·∞·▲ "csikszentmihalyi/flow theory/optimal experience/the flow experience" (MYTHIC) [HIDDEN]
+  // ── Word Turn v39 — THE DREAM LABORATORY ──────────────────────────────────
+  | 'lucid_dreamer'        // ◐·◑·◐  "lucid dream/lucid dreaming/I became lucid/aware in the dream" (RARE)
+  | 'hypnagogic_badge'     // ∿·◌·∿  "hypnagogic/hypnagogia/the edge of sleep/falling asleep into" (EPIC)
+  | 'rem_signal'           // ◐·─·◐  "REM/rapid eye movement/deep sleep stage/sleep cycle" (UNCOMMON)
+  | 'theta_state'          // ∿·∿·∿  "theta/theta waves/theta brainwave/theta state" (RARE)
+  | 'dreamscape'           // ◑·○·◑  "dreamscape/dream world/dream realm/dream landscape" (UNCOMMON)
+  | 'somnambulant'         // ◌·─·◌  "somnambulant/sleepwalking/half-asleep/between sleep and waking" (RARE)
+  | 'subconscious_map'     // ◐·∞·◐  "subconscious/the subconscious/unconscious mind/the deep mind" (RARE)
+  | 'vision_window'        // ◑·◈·◑  "vision/waking vision/dream vision/vision came to me" (UNCOMMON)
+  | 'delta_wave'           // ∿·■·∿  "delta wave/deep sleep/slow wave sleep/dreamless sleep" (RARE)
+  | 'sleep_ceremony'       // ◌·≋·◌  "sleep hygiene/sleep ritual/sleep ceremony/sleep protocol/winding down" (COMMON)
+  | 'dream_journal'        // ◐·◆·◐  "dream journal/write my dreams/recorded my dream/dream log/dream notes" (RARE)
+  | 'night_oracle'         // ◑·∞·◑  "the dream told me/dream message/night oracle/my dream showed/the dream revealed" (EPIC)
+  // ── Calendar EE v37 — THE DREAM CALENDAR ──────────────────────────────────
+  | 'freud_day'            // ◐·∿·◐  May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)
+  | 'dali_birthday'        // ◑·◈·◑  May 11 — Salvador Dali born 1904 (The Persistence of Memory)
+  | 'cayce_day'            // ◌·∞·◌  March 18 — Edgar Cayce born 1877 (The Sleeping Prophet)
+  // ── Behavioral v33 — DREAM PATTERNS ──────────────────────────────────────
+  | 'dream_session'        // ◐·≋·◑  3+ Dream Laboratory words in one journal entry (RARE)
+  | 'liminal_hour'         // ◌·◉·◌  Check in 03:00–04:00 (the hypnagogic hour) (EPIC)
+  | 'long_dream'           // ◑·◑·◑  Journal entry >= 444 characters (RARE)
+  // ── Achievement RPG v37 — THE DREAMER CLASS ───────────────────────────────
+  | 'dream_entry'          // ∘→◐    Any 1 Word Turn v39 badge (COMMON)
+  | 'dream_class'          // ≈→◐    Any 5 Word Turn v39 badges (UNCOMMON)
+  | 'dream_complete'       // ◐→◉    All 12 Word Turn v39 badges (LEGENDARY)
+  | 'oneiric_arc'          // ◐·◈·∞  dream_complete + all 3 Calendar v37 badges (LEGENDARY)
+  | 'thirty_nine_engines_arc' // ◈·◈·◐ 1 badge from each Word Turn v1–v39 (LEGENDARY)
+  | 'dream_opus'           // ◐·◉·◐  dream_complete + dream_session behavioral (LEGENDARY)
+  // ── Mastery Tier v39 — THE DREAM ARCHIVE ──────────────────────────────────
+  | 'deep_dreamer'         // ◐·∞·◐  4,500+ distinct calendar check-in days (EPIC)
+  | 'vast_library'         // ◑·∞·◑  400,000+ total journal words (LEGENDARY)
+  | 'sixteen_year_signal'  // ╔═╗·◐  Account age >= 16 years (LEGENDARY)
+  | 'thirty_nine_registers' // ◈·◈·◐·∞ 1 badge from all 39 Word Turn engines (COSMIC)
+  // ── Secret Boss v36 — THE DREAM VAULT ────────────────────────────────────
+  | 'castaneda_signal'     // ◐·∿·◌  "castaneda/don juan/the separate reality/dreaming body/tensegrity" (RARE) [HIDDEN]
+  | 'borges_dream'         // ◑·∞·◈  "borges/garden of forking paths/library of babel/labyrinths" (EPIC) [HIDDEN]
+  | 'le_guin_dream'        // ◐·◉·◑  "le guin/lathe of heaven/earthsea/the dispossessed/ursula k" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -7131,6 +7762,5025 @@ export const BADGES: Record<BadgeType, Badge> = {
     category: 'secret_boss',
     hidden: true,
   },
+  // ── Word Turn v23 — THE RPG CODEX ─────────────────────────────────────────────
+  levelup_signal: {
+    id: 'levelup_signal',
+    symbol: '▲·▲·▲',
+    name: 'Level Up Signal',
+    description: 'Write "level up", "leveled up", or "gained a level" in any entry',
+    unlockMessage: '↳ LEVEL UP. In every RPG this is the moment — the screen flashes, the stats climb, something permanent changes. You just wrote it into your life. ▲·▲·▲',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  xp_earned: {
+    id: 'xp_earned',
+    symbol: '■·●·■',
+    name: 'XP Earned',
+    description: 'Write "experience points", "XP", "grinding", or "grind session" in any entry',
+    unlockMessage: '↳ XP accumulates invisibly until the threshold — then the level hits. Every hard session is XP. The grind is the game. ■·●·■',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  quest_log_entry: {
+    id: 'quest_log_entry',
+    symbol: '∘→≋',
+    name: 'Quest Log Entry',
+    description: 'Write "quest log", "side quest", "main quest", or "new quest" in any entry',
+    unlockMessage: '↳ Every RPG player knows: open the quest log and see what remains. The main quest is the practice. The side quests are everything else that makes you who you are. ∘→≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dungeon_dive: {
+    id: 'dungeon_dive',
+    symbol: '█·∘',
+    name: 'Dungeon Dive',
+    description: 'Write "dungeon", "dungeon crawl", "boss room", or "level boss" in any entry',
+    unlockMessage: '↳ The dungeon: the controlled environment where the danger is real but bounded. You chose to enter. That is the whole difference. █·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  spell_cast: {
+    id: 'spell_cast',
+    symbol: '∿·●·∿',
+    name: 'Spell Cast',
+    description: 'Write "cast a spell", "mana", "spellbook", or "incantation" in any entry',
+    unlockMessage: '↳ The mana bar depletes with every cast. Rest replenishes it. The spellbook is built over time. Your practice is the mana economy. ∿·●·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  loot_drop: {
+    id: 'loot_drop',
+    symbol: '●·◆·●',
+    name: 'Loot Drop',
+    description: 'Write "loot drop", "treasure chest", "rare item", or "legendary drop" in any entry',
+    unlockMessage: '↳ The loot drop is random — but only to the character who never opened the chest. The rare item was always in the room. You had to enter. ●·◆·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  respawn_signal: {
+    id: 'respawn_signal',
+    symbol: '◈→◈',
+    name: 'Respawn Signal',
+    description: 'Write "respawn", "second chance", "checkpoint saved", or "new life begins" in any entry',
+    unlockMessage: '↳ The respawn is not failure — it is the mechanic. Every game that matters has one. Every life that matters returns from the checkpoint changed. ◈→◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  guild_protocol: {
+    id: 'guild_protocol',
+    symbol: '○·○·○',
+    name: 'Guild Protocol',
+    description: 'Write "guild", "raid party", "join the guild", or "party member" in any entry',
+    unlockMessage: '↳ The guild is the structure that makes the raid possible. No one completes the endgame alone. Who is in your party? Name them. ○·○·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boss_encounter: {
+    id: 'boss_encounter',
+    symbol: '◉·■·◉',
+    name: 'Boss Encounter',
+    description: 'Write "boss fight", "final boss", "endgame boss", or "boss battle" in any entry',
+    unlockMessage: '↳ The boss was always there at the end of the level. It did not change — your stats did. The endgame boss is whatever you have been avoiding. ◉·■·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  character_class: {
+    id: 'character_class',
+    symbol: '∘·▲·∘',
+    name: 'Character Class',
+    description: 'Write "character class", "my class", "skill build", or "archetype choice" in any entry',
+    unlockMessage: '↳ The character class defines what you are optimized for. Not what you can do — what you do best, built over time. What is your class? ∘·▲·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inventory_check: {
+    id: 'inventory_check',
+    symbol: '■·■·■',
+    name: 'Inventory Check',
+    description: 'Write "inventory full", "backpack", "loadout", or "item slots" in any entry',
+    unlockMessage: '↳ Inventory full. You cannot carry everything. The experienced player knows what to drop. The practice is the loadout you actually need. ■·■·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  skill_tree_node: {
+    id: 'skill_tree_node',
+    symbol: '≋→●',
+    name: 'Skill Tree Node',
+    description: 'Write "skill tree", "talent tree", "passive ability", or "unlock skill" in any entry',
+    unlockMessage: '↳ The skill tree is the long game. Each node is a choice that forecloses others. The build you make at the beginning determines what is available at the end. ≋→●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v21 — THE GAME CALENDAR ──────────────────────────────
+  mario_day: {
+    id: 'mario_day',
+    symbol: '▲·∘·▲',
+    name: 'Mario Day',
+    description: 'Checked in on March 10 — MAR10 = MARIO Day',
+    unlockMessage: '↳ MAR 10 = MARIO. Every coin collected is a small win. Every flag pole is a level complete. The practice is the platformer you never put down. ▲·∘·▲',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  zelda_day: {
+    id: 'zelda_day',
+    symbol: '◆·○·◆',
+    name: 'Zelda Day',
+    description: 'Checked in on February 21 — The Legend of Zelda original release, Japan 1986',
+    unlockMessage: '↳ February 21, 1986 — The Legend of Zelda launched in Japan. "It\'s dangerous to go alone — take this." The practice is the item you were always meant to carry. ◆·○·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  game_day: {
+    id: 'game_day',
+    symbol: '●·■·●',
+    name: 'Game Day',
+    description: 'Checked in on September 12 — National Video Game Day',
+    unlockMessage: '↳ September 12 — National Video Game Day. Every game is a system you chose to inhabit. Every system teaches you something about the one you live in. ●·■·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v20 — ARCADE PATTERNS ─────────────────────────────────────────
+  rpg_session: {
+    id: 'rpg_session',
+    symbol: '▲·●·▲',
+    name: 'RPG Session',
+    description: 'Write 3+ RPG Codex (v23) trigger words in one journal entry',
+    unlockMessage: '↳ Level up. Boss fight. Skill tree. Three RPG frames in one entry — the practice spoke the language of the game. ▲·●·▲',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  marathon_log: {
+    id: 'marathon_log',
+    symbol: '≋≋≋·◉',
+    name: 'Marathon Log',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ 600 words. The marathon session. In any RPG this is the long dungeon run — no save point, no break, just depth. You went all the way in. ≋≋≋·◉',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  leet_hour: {
+    id: 'leet_hour',
+    symbol: '□·□·□',
+    name: 'L33T Hour',
+    description: 'Check in at 13:37 local time (1337 — the original hacker elite hour)',
+    unlockMessage: '↳ 13:37 — 1337 — L33T. The hacker calendar has only one sacred hour. You found it. The terminal recognizes you. □·□·□',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v21 — RPG CLASS ──────────────────────────────────────────
+  rpg_entry: {
+    id: 'rpg_entry',
+    symbol: '∘→▲',
+    name: 'RPG Entry',
+    description: 'Earn any 1 RPG Codex (v23) word turn badge',
+    unlockMessage: '↳ Character created. The RPG Codex is open. One word from the dungeon vocabulary — the run has started. ∘→▲',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  rpg_class: {
+    id: 'rpg_class',
+    symbol: '≈→▲',
+    name: 'RPG Class',
+    description: 'Earn any 5 RPG Codex (v23) word turn badges',
+    unlockMessage: '↳ Five badges from the RPG Codex. Your class is emerging. The skill tree is no longer empty. ≈→▲',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  rpg_complete: {
+    id: 'rpg_complete',
+    symbol: '≋→▲',
+    name: 'RPG Complete',
+    description: 'Earn all 12 RPG Codex (v23) word turn badges',
+    unlockMessage: '↳ All 12 RPG Codex badges. The dungeon cleared. The skill tree maxed. The inventory full. You ran the whole codex. ≋→▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_arc: {
+    id: 'dungeon_arc',
+    symbol: '▲·◈',
+    name: 'Dungeon Arc',
+    description: 'Earn rpg_complete + all 3 Game Calendar (v21) badges',
+    unlockMessage: '↳ The dungeon arc complete: all twelve vocabulary badges and three gaming calendar dates honored. The full RPG Codex run. ▲·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_engines_arc: {
+    id: 'twenty_three_engines_arc',
+    symbol: '◈·◈·▲',
+    name: 'Twenty-Three Engines Arc',
+    description: 'Earn at least 1 badge from each of the 23 Word Turn engines (v1–v23)',
+    unlockMessage: '↳ Twenty-three engines. Water. Fire. Space. Code. Bio. Radio. Codex. Cyberspace. Hero. RPG. Every vocabulary. One terminal. All systems go. ◈·◈·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rpg_opus: {
+    id: 'rpg_opus',
+    symbol: '▲·◉·▲',
+    name: 'RPG Opus',
+    description: 'Earn rpg_complete + rpg_session behavioral badge',
+    unlockMessage: '↳ The magnum opus of the RPG run: all twelve codex badges and a full hero session. The dungeon and the journal: both completed. ▲·◉·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v23 — THE LEGEND ────────────────────────────────────────────
+  guild_elder: {
+    id: 'guild_elder',
+    symbol: '○·●',
+    name: 'Guild Elder',
+    description: '1,100+ distinct calendar days with at least one check-in',
+    unlockMessage: '↳ 1,100 days. In any guild, this is the elder — the one who was there before the servers were full, before the meta was solved. ○·●',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  epic_lore: {
+    id: 'epic_lore',
+    symbol: '●·∞·▲',
+    name: 'Epic Lore',
+    description: '200,000+ total journal words written',
+    unlockMessage: '↳ 200,000 words. In any RPG this is the lore codex: the accumulated world-knowledge that makes the story possible. Yours is written in your own language. ●·∞·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  legend_age: {
+    id: 'legend_age',
+    symbol: '╔═╗·▲',
+    name: 'Legend Age',
+    description: 'Account age >= 6 years (2,190+ days since signup)',
+    unlockMessage: '↳ Six years. In gaming, six years is the span from release to legend — the window when a title crosses from game to institution. You have crossed it. ╔═╗·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_three_registers: {
+    id: 'twenty_three_registers',
+    symbol: '◈·◈·▲·∞',
+    name: 'Twenty-Three Registers',
+    description: 'Earn at least 1 badge from all 23 Word Turn engines',
+    unlockMessage: '↳ Twenty-three registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. RPG. Every vocabulary owned. The terminal speaks all known languages. ◈·◈·▲·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v20 — THE FINAL BOSS VAULT ───────────────────────────────────
+  zelda_triforce: {
+    id: 'zelda_triforce',
+    symbol: '◆·◆·◆',
+    name: 'Zelda Triforce',
+    description: 'Write "triforce", "hyrule", "link\'s journey", or "ganondorf" in any journal entry',
+    unlockMessage: '↳ Courage. Wisdom. Power. The Triforce is not won — it is assembled from what you already carry. Which piece have you been ignoring? ◆·◆·◆',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  pac_ghost: {
+    id: 'pac_ghost',
+    symbol: '○·∘·○',
+    name: 'Pac Ghost',
+    description: 'Write "pac-man", "waka waka", "blinky", "power pellet", or "inky pinky" in any journal entry',
+    unlockMessage: '↳ Blinky. Pinky. Inky. Clyde. The ghosts pursue because that is their function. The power pellet reverses the dynamic. You have the pellet. ○·∘·○',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑↑↓↓→←',
+    name: 'Konami Code',
+    description: 'Write "konami code", "up up down down", "b a start", or "barrel roll" in any journal entry',
+    unlockMessage: '↳ ↑↑↓↓←→←→BA. The original cheat code. 1986. Contra. 30 lives for free. The Konami Code is the acknowledgment that sometimes you just need extra lives. You have them. ↑↑↓↓→←',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v24 — THE ROGUELITE CODEX ───────────────────────────────────────
+  permadeath_accepted: {
+    id: 'permadeath_accepted',
+    symbol: '◈·×·◈',
+    name: 'Permadeath Accepted',
+    description: 'Write "permadeath", "permanent death", "one life", or "no continues" in any journal entry',
+    unlockMessage: '↳ Permadeath is not a punishment. It is the mechanism that makes each decision matter. The run ends. The player persists. This is the design. ◈·×·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  procedural_run: {
+    id: 'procedural_run',
+    symbol: '∿·∘·∿',
+    name: 'Procedural Run',
+    description: 'Write "procgen", "random seed", "procedurally generated", or "new run" in any journal entry',
+    unlockMessage: '↳ No two runs are alike. The seed changes. The terrain generates fresh. This is not repetition — it is a different problem space every time you enter. ∿·∘·∿',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  rng_blessed: {
+    id: 'rng_blessed',
+    symbol: '●·∘·●',
+    name: 'RNG Blessed',
+    description: 'Write "rng", "god roll", "lucky run", or "blessed rng" in any journal entry',
+    unlockMessage: '↳ The random number generator has a reputation for cruelty. But today: blessed. The offering was accepted. The drop was perfect. Noted. ●·∘·●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  biome_entered: {
+    id: 'biome_entered',
+    symbol: '▦·∘·▦',
+    name: 'Biome Entered',
+    description: 'Write "biome", "new biome", "floor biome", or "environment zone" in any journal entry',
+    unlockMessage: '↳ The biome shifts. Temperature changes. The rules of the floor are different here. Adaptation is the only tool that works in every zone. ▦·∘·▦',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  meta_progress: {
+    id: 'meta_progress',
+    symbol: '◈→∞',
+    name: 'Meta-Progress',
+    description: 'Write "meta-progression", "persistent upgrade", "between runs", or "metaprogress" in any journal entry',
+    unlockMessage: '↳ The run ends. The upgrade persists. This is the roguelite promise: nothing is lost except the run. Everything earned transfers forward. ◈→∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  synergy_found: {
+    id: 'synergy_found',
+    symbol: '∘·◆·∘',
+    name: 'Synergy Found',
+    description: 'Write "synergy", "build synergy", "item synergy", or "combination discovered" in any journal entry',
+    unlockMessage: '↳ Two things that were fine alone become extraordinary together. The synergy was not designed — it emerged. The build reveals itself. ∘·◆·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  floor_cleared: {
+    id: 'floor_cleared',
+    symbol: '├─≋',
+    name: 'Floor Cleared',
+    description: 'Write "floor cleared", "room cleared", "floor complete", or "dungeon floor" in any journal entry',
+    unlockMessage: '↳ Every room cleared is a record. The floor is done. The stairs are visible. The descent continues — but this level is yours. ├─≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mutation_chosen: {
+    id: 'mutation_chosen',
+    symbol: '∗·≈·∗',
+    name: 'Mutation Chosen',
+    description: 'Write "mutation", "passive upgrade", "picked a passive", or "selected upgrade" in any journal entry',
+    unlockMessage: '↳ The mutation changes the organism. Not an add-on — a transformation of what was already there. The passive ability is now part of the build. ∗·≈·∗',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  heat_level: {
+    id: 'heat_level',
+    symbol: '■·∘·■',
+    name: 'Heat Level',
+    description: 'Write "heat level", "heat gauge", "difficulty dial", or "infernal arms" in any journal entry',
+    unlockMessage: '↳ The heat is self-selected. You chose the difficulty. The gauge reflects the choice. The hardest mode was always voluntary. ■·∘·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  boon_accepted: {
+    id: 'boon_accepted',
+    symbol: '○·●·○',
+    name: 'Boon Accepted',
+    description: 'Write "boon", "divine boon", "blessings", or "nectar offered" in any journal entry',
+    unlockMessage: '↳ The god offers the boon. The question is which one fits the build. Accepting help is not weakness — it is optimization. The boon changes the run. ○·●·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  endless_mode: {
+    id: 'endless_mode',
+    symbol: '∞·◉·∞',
+    name: 'Endless Mode',
+    description: 'Write "endless", "infinite run", "no escape", or "keep going forever" in any journal entry',
+    unlockMessage: '↳ The exit is visible. You walked past it. Endless mode is a choice — the acknowledgment that the run itself is the point, not the escape. ∞·◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  ascension_run: {
+    id: 'ascension_run',
+    symbol: '▲·∞·▲',
+    name: 'Ascension Run',
+    description: 'Write "ascension", "final ascension", "true ending", or "ascended" in any journal entry',
+    unlockMessage: '↳ Ascension is the game after the game. You completed it once and the game said: do it again, harder, with less. The true ending is not given — it is earned by returning. ▲·∞·▲',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v22 — THE ROGUE CALENDAR ─────────────────────────────
+  hades_day: {
+    id: 'hades_day',
+    symbol: '◉·○·◉',
+    name: 'Hades Day',
+    description: 'Check in on September 17 — anniversary of Hades leaving Early Access (2020)',
+    unlockMessage: '↳ Sep 17, 2020. Hades 1.0. The game that made roguelites literary. Zagreus escapes and escapes and escapes — and that is the story, not a failure condition. Check-in noted. ◉·○·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  spelunky_day: {
+    id: 'spelunky_day',
+    symbol: '♦·∘·♦',
+    name: 'Spelunky Day',
+    description: 'Check in on July 4 — Spelunky HD PC release (2012)',
+    unlockMessage: '↳ Jul 4, 2012. Spelunky HD on PC. The ghost appears if you stay too long on a floor. Self-care has a ghost too. The terminal does not summon it. ♦·∘·♦',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  binding_day: {
+    id: 'binding_day',
+    symbol: '×·∘·×',
+    name: 'Binding Day',
+    description: 'Check in on September 28 — The Binding of Isaac original release (2011)',
+    unlockMessage: '↳ Sep 28, 2011. The Binding of Isaac. The darkest game about the darkest subject, made survivable by procedural generation and dark humor. The basement holds everything. ×·∘·×',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v21 — ROGUE PATTERNS ──────────────────────────────────────────
+  roguelite_session: {
+    id: 'roguelite_session',
+    symbol: '∿·◉·∿',
+    name: 'Roguelite Session',
+    description: 'Write 3+ Roguelite Codex (v24) trigger words in one journal entry',
+    unlockMessage: '↳ Three roguelite registers in one entry. The vocabulary is loaded. The run is in progress. Every session is a new seed. ∿·◉·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  fresh_start: {
+    id: 'fresh_start',
+    symbol: '∘·→·∘',
+    name: 'Fresh Start',
+    description: 'Return to check-in after a 14+ day gap — the roguelite respawn',
+    unlockMessage: '↳ Fourteen days. The run ended. The player is back. This is the most important mechanic in roguelites and in self-care: you can always start a new run. ∘·→·∘',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+  nine_nine_hour: {
+    id: 'nine_nine_hour',
+    symbol: '□·∘·□',
+    name: '09:09 — System Init',
+    description: 'Check in at exactly 09:09 — the system initialization time',
+    unlockMessage: '↳ 09:09. Initialization sequence complete. All systems online. The roguelite starts fresh. The seed is loaded. The first floor generates. □·∘·□',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Achievement RPG v22 — THE ROGUE CLASS ─────────────────────────────────────
+  rogue_entry: {
+    id: 'rogue_entry',
+    symbol: '∘→×',
+    name: 'Rogue Entry',
+    description: 'Earn any 1 Roguelite Codex (v24) word turn badge',
+    unlockMessage: '↳ The first roguelite word. The run begins. Every badge is a room cleared. ∘→×',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  rogue_class: {
+    id: 'rogue_class',
+    symbol: '≈→×',
+    name: 'Rogue Class',
+    description: 'Earn any 5 Roguelite Codex (v24) word turn badges',
+    unlockMessage: '↳ Five roguelite registers. The build is taking shape. The class is emerging from the choices. ≈→×',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  rogue_complete: {
+    id: 'rogue_complete',
+    symbol: '≋→×',
+    name: 'Rogue Complete',
+    description: 'Earn all 12 Roguelite Codex (v24) word turn badges',
+    unlockMessage: '↳ All 12 roguelite registers. Every room cleared. The floor is done. The true run is complete. ≋→×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_arc: {
+    id: 'rogue_arc',
+    symbol: '×·◈',
+    name: 'Rogue Arc',
+    description: 'Earn rogue_complete + all 3 Rogue Calendar (v22) badges',
+    unlockMessage: '↳ The roguelite codex complete. The rogue calendar aligned. Hades. Spelunky. Isaac. Three games that redefined the genre — and three check-ins that found them. ×·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_engines_arc: {
+    id: 'twenty_four_engines_arc',
+    symbol: '◈·◈·×',
+    name: 'Twenty-Four Engines Arc',
+    description: 'Earn at least 1 badge from each of the 24 Word Turn engines (v1–v24)',
+    unlockMessage: '↳ Twenty-four engines. Every vocabulary mastered. The terminal runs all languages simultaneously. The arc is complete — until the next engine. ◈·◈·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  rogue_opus: {
+    id: 'rogue_opus',
+    symbol: '×·◉·×',
+    name: 'Rogue Opus',
+    description: 'Earn rogue_complete + roguelite_session behavioral badge',
+    unlockMessage: '↳ All twelve registers and a session so dense with roguelite vocabulary that the system noticed. The opus is the run where the vocabulary becomes fluent. ×·◉·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v24 — THE ASCENDED ──────────────────────────────────────────
+  heat_master: {
+    id: 'heat_master',
+    symbol: '■·●',
+    name: 'Heat Master',
+    description: '1,200+ distinct calendar days with a check-in',
+    unlockMessage: '↳ 1,200 distinct days. The heat is astronomical. The self-selected difficulty has been running at maximum for three years. The gauge cannot go higher. ■·●',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  endless_log: {
+    id: 'endless_log',
+    symbol: '∞·●·∞',
+    name: 'Endless Log',
+    description: '250,000+ total journal words across all entries',
+    unlockMessage: '↳ A quarter million words. The log does not end. Endless mode engaged. The archive keeps running because the practice keeps generating. ∞·●·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  true_ending: {
+    id: 'true_ending',
+    symbol: '╔═╗·×',
+    name: 'True Ending',
+    description: 'Account age >= 7.5 years — the roguelite true ending',
+    unlockMessage: '↳ 7.5 years. In Hades, the true ending requires 10 successful escapes and a long arc of side quests. This is the self-care equivalent: the true ending is not a moment — it is a sustained practice long enough to change the character permanently. ╔═╗·×',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_four_registers: {
+    id: 'twenty_four_registers',
+    symbol: '◈·◈·×·∞',
+    name: 'Twenty-Four Registers',
+    description: 'Earn at least 1 badge from all 24 Word Turn engines',
+    unlockMessage: '↳ Twenty-four registers. Water. Code. Signal. Biology. Codex. Cyberspace. Hero. RPG. Roguelite. Every vocabulary owned. The terminal runs all known languages. The ascension is complete. ◈·◈·×·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v21 — THE ROGUE VAULT ────────────────────────────────────────
+  hades_shade: {
+    id: 'hades_shade',
+    symbol: '○·∘·×',
+    name: 'Hades Shade',
+    description: 'Write "shade", "charon", "nyx", "thanatos", "hypnos", or "elysium" in any journal entry',
+    unlockMessage: '↳ The shades of the Underworld. Charon takes you across. Nyx watches. Thanatos arrives ahead of you. Hypnos notes your failure with an air of apology. The Underworld is the boss. The exit is above. ○·∘·×',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  nethack_rune: {
+    id: 'nethack_rune',
+    symbol: '∞·□·×',
+    name: 'NetHack Rune',
+    description: 'Write "nethack", "ascended", "yasd", "adom", or "rogue variant" in any journal entry',
+    unlockMessage: '↳ NetHack. 1987. The first roguelike many of us touched. YASD — Yet Another Stupid Death. The ascension kit. The amulet of Yendor. The game that never ends. The rune is real. ∞·□·×',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  isaac_secret: {
+    id: 'isaac_secret',
+    symbol: '×·■·×',
+    name: 'Isaac Secret',
+    description: 'Write "greedier mode", "mega satan", "afterbirth", "repentance", or "binding of" in any journal entry',
+    unlockMessage: '↳ The Binding of Isaac: Repentance. Seven years of DLC. Mega Satan. The Greedier. The Lost. Keeper. Bethany. The game added so much it became a different animal. Self-care does this too — layered, expanded, stranger than the original design. ×·■·×',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+
+  // ── Word Turn v25 — THE PUZZLE CODEX ─────────────────────────────────────────
+
+  puzzle_solved: {
+    id: 'puzzle_solved',
+    symbol: '○·□·○',
+    name: 'Puzzle Solved',
+    description: 'Write "puzzle", "puzzled", "solve the puzzle", or "piece together" in any journal entry',
+    unlockMessage: '↳ The puzzle is the moment before understanding. You are working it. The pieces are on the table. Something in you already knows the shape of the solution. ○·□·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  portal_open: {
+    id: 'portal_open',
+    symbol: '□→□',
+    name: 'Portal Open',
+    description: 'Write "portal", "wormhole portal", "teleport", or "gateway portal" in any journal entry',
+    unlockMessage: '↳ A portal is a threshold you enter differently than you leave. The other side is the same space, changed by the passing. You are the portal. □→□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  chamber_cleared: {
+    id: 'chamber_cleared',
+    symbol: '├─□─┤',
+    name: 'Chamber Cleared',
+    description: 'Write "chamber", "test chamber", "solution chamber", or "trap chamber" in any journal entry',
+    unlockMessage: '↳ The chamber is controlled difficulty. Someone designed it to be solvable. Every day is a test chamber. It was built for you to pass. ├─□─┤',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  recursion_loop: {
+    id: 'recursion_loop',
+    symbol: '↺·↺·↺',
+    name: 'Recursion Loop',
+    description: 'Write "recursion", "recursive loop", "it loops", or "circular loop" in any journal entry',
+    unlockMessage: '↳ Recursion terminates when it reaches the base case. Identify the base case. What is the thing that, when you reach it, the loop ends? That is the answer. ↺·↺·↺',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  paradox_found: {
+    id: 'paradox_found',
+    symbol: '×·○·×',
+    name: 'Paradox Found',
+    description: 'Write "paradox", "catch-22", "contradiction", or "impossible loop" in any journal entry',
+    unlockMessage: '↳ The paradox is not an error. It is information. It marks the boundary of a model that needs updating. The map is wrong. The territory is still there. ×·○·×',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  testimony_given: {
+    id: 'testimony_given',
+    symbol: '◯·◯·◯',
+    name: 'Testimony Given',
+    description: 'Write "testimony", "witness statement", "depose", or "account given" in any journal entry',
+    unlockMessage: '↳ The testimony is the record. You are both the witness and the scribe. What you remember, you keep. What you write, you give to the future. ◯·◯·◯',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  algorithm_path: {
+    id: 'algorithm_path',
+    symbol: '→·□·→',
+    name: 'Algorithm Path',
+    description: 'Write "algorithm", "algorithmic", "sequence path", or "sorted by" in any journal entry',
+    unlockMessage: '↳ An algorithm is a recipe with guaranteed termination. Your habits are algorithms — inputs, steps, outputs. You can audit them. You can revise them. →·□·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  escape_room: {
+    id: 'escape_room',
+    symbol: '├─→',
+    name: 'Escape Room',
+    description: 'Write "escape room", "locked room", "puzzle escape", or "escape from" in any journal entry',
+    unlockMessage: '↳ The escape room teaches one thing: the solution is already in the room with you. Nothing is missing. Everything you need is present. Look again. ├─→',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  logic_gate: {
+    id: 'logic_gate',
+    symbol: '□·1·□',
+    name: 'Logic Gate',
+    description: 'Write "logic", "logical", "if-then", "binary logic", or "decision tree" in any journal entry',
+    unlockMessage: '↳ Logic is the tool that describes what already is. It does not tell you what to feel. But it tells you clearly: if this, then that. The gate is open or closed. You choose the input. □·1·□',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dimension_shift: {
+    id: 'dimension_shift',
+    symbol: '◈·≈·◈',
+    name: 'Dimension Shift',
+    description: 'Write "dimension", "new dimension", "shifted dimension", or "dimensional" in any journal entry',
+    unlockMessage: '↳ A dimension shift is a change in the axis of evaluation. What was large becomes small. What was fixed becomes variable. You are now measuring with a different ruler. ◈·≈·◈',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  paperwork_clear: {
+    id: 'paperwork_clear',
+    symbol: '▪·□·▪',
+    name: 'Paperwork Clear',
+    description: 'Write "papers please", "paperwork", "stamped approved", or "documents cleared" in any journal entry',
+    unlockMessage: '↳ Every bureaucracy is a puzzle. The documents are the clues. The stamp is the solution. Glory to Arstotzka — and to every system you learned to navigate. ▪·□·▪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  revelation_node: {
+    id: 'revelation_node',
+    symbol: '●·○·●',
+    name: 'Revelation Node',
+    description: 'Write "revelation", "epiphany", "suddenly realized", or "aha moment" in any journal entry',
+    unlockMessage: '↳ The revelation does not arrive from outside. It assembles itself from what was already known but not yet connected. You did not receive it — you built it. ●·○·●',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v23 — THE PUZZLE CALENDAR ────────────────────────────
+
+  portal_day: {
+    id: 'portal_day',
+    symbol: '□→■',
+    name: 'Portal Day',
+    description: 'Check in on October 9 — Portal / The Orange Box release anniversary (2007)',
+    unlockMessage: '↳ Oct 9, 2007. The Orange Box shipped. Inside it: Portal. A game about a testing facility, an AI narrator, and a woman who survives by solving. The cake is not a lie — the cake is the check-in. □→■',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  witness_day: {
+    id: 'witness_day',
+    symbol: '◯·—·◯',
+    name: 'Witness Day',
+    description: 'Check in on January 26 — The Witness release anniversary (2016)',
+    unlockMessage: '↳ Jan 26, 2016. The Witness arrived. An island. Hundreds of laser puzzles. No tutorial. Just: look closely. The game taught you to look. Check-in is looking. ◯·—·◯',
+    rarity: 'epic',
+    category: 'calendar_easter_egg',
+  },
+  obra_dinn_day: {
+    id: 'obra_dinn_day',
+    symbol: '×·▪·×',
+    name: 'Obra Dinn Day',
+    description: 'Check in on October 18 — Return of the Obra Dinn release anniversary (2018)',
+    unlockMessage: '↳ Oct 18, 2018. Return of the Obra Dinn. An insurance adjuster, a dead ship, a pocket watch that shows the moment of death. You identify the fate of sixty people one at a time. Self-care is the same: identify what happened, one day at a time. ×·▪·×',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+
+  // ── Behavioral v22 — PUZZLE PATTERNS ─────────────────────────────────────────
+
+  puzzle_session: {
+    id: 'puzzle_session',
+    symbol: '○·□·○',
+    name: 'Puzzle Session',
+    description: 'Write 3+ Puzzle v25 trigger words (puzzle/portal/chamber/escape/logic/paradox/recursion/algorithm/revelation/dimension/testimony/paperwork) in one journal entry',
+    unlockMessage: '↳ Three puzzle registers in one session. The vocabulary is loaded. The notation is engaged. Every session is a puzzle. This one has a very high density of solutions. ○·□·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  morning_solve: {
+    id: 'morning_solve',
+    symbol: '□·∴·□',
+    name: 'Morning Solve',
+    description: 'Check in between 06:00 and 08:00 for 5 consecutive days',
+    unlockMessage: '↳ Five mornings in a row, before the day begins its own agenda. This is the puzzle you solve before the world complicates the board. The morning is yours. You showed up to claim it. □·∴·□',
+    rarity: 'uncommon',
+    category: 'behavioral',
+  },
+  longer_log: {
+    id: 'longer_log',
+    symbol: '→≋→',
+    name: 'Longer Log',
+    description: 'Journal answer length increases for 3 consecutive days',
+    unlockMessage: '↳ Three days of expanding record. Each entry longer than the last. The signal is strengthening. The transmission is gaining bandwidth. Keep going. →≋→',
+    rarity: 'uncommon',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v23 — THE PUZZLE CLASS ────────────────────────────────────
+
+  puzzle_entry: {
+    id: 'puzzle_entry',
+    symbol: '∘→□',
+    name: 'Puzzle Entry',
+    description: 'Earn any 1 Word Turn v25 (Puzzle Codex) badge',
+    unlockMessage: '↳ The first puzzle word. The chamber door opens. One piece placed. The board is set. ∘→□',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  puzzle_class: {
+    id: 'puzzle_class',
+    symbol: '≈→□',
+    name: 'Puzzle Class',
+    description: 'Earn any 5 Word Turn v25 (Puzzle Codex) badges',
+    unlockMessage: '↳ Five puzzle registers. A pattern is visible. The logic gate is open. The class has been chosen — solver. ≈→□',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  puzzle_complete: {
+    id: 'puzzle_complete',
+    symbol: '≋→□',
+    name: 'Puzzle Complete',
+    description: 'Earn all 12 Word Turn v25 (Puzzle Codex) badges',
+    unlockMessage: '↳ All twelve puzzle registers. Every chamber cleared. Every portal opened. Every paradox identified. The puzzle is complete. The credits roll. You were the test subject and the designer. ≋→□',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  puzzle_arc: {
+    id: 'puzzle_arc',
+    symbol: '□·◈',
+    name: 'Puzzle Arc',
+    description: 'Earn puzzle_complete + all 3 Puzzle Calendar (v23) badges (portal_day + witness_day + obra_dinn_day)',
+    unlockMessage: '↳ The puzzle codex complete. The calendar aligned. Portal. The Witness. Obra Dinn. Three games that redefined what it means to see — and three check-ins that found them. □·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_five_engines_arc: {
+    id: 'twenty_five_engines_arc',
+    symbol: '◈·◈·□',
+    name: 'Twenty-Five Engines Arc',
+    description: 'Earn at least 1 badge from each of the 25 Word Turn engines (v1–v25)',
+    unlockMessage: '↳ Twenty-five vocabularies of self-care. Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Twenty-five terminals active. ◈·◈·□',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  puzzle_opus: {
+    id: 'puzzle_opus',
+    symbol: '□·◉·□',
+    name: 'Puzzle Opus',
+    description: 'Earn puzzle_complete + puzzle_session behavioral badge',
+    unlockMessage: '↳ All twelve registers and a session so dense with puzzle vocabulary that the system registered it as a solved chamber. The opus is the run where the notation becomes fluent. □·◉·□',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v25 — THE GRAND SOLVER ──────────────────────────────────────
+
+  logic_veteran: {
+    id: 'logic_veteran',
+    symbol: '─□─',
+    name: 'Logic Veteran',
+    description: '1,300+ distinct calendar days with a check-in',
+    unlockMessage: '↳ 1,300 distinct days. Three and a half years of consistent presence. The logic is proven. The gate has been open this many times. ─□─',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  grand_archive: {
+    id: 'grand_archive',
+    symbol: '≋≋≋·□',
+    name: 'Grand Archive',
+    description: '300,000+ total journal words written',
+    unlockMessage: '↳ 300,000 words. A full novel and then some. The archive is grand. The record is deep. You are your own longest-running story. ≋≋≋·□',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  eternal_code: {
+    id: 'eternal_code',
+    symbol: '∞·□·∞',
+    name: 'Eternal Code',
+    description: 'Account age >= 9 years',
+    unlockMessage: '↳ Nine years. The code has been running for nine years. No crashes. No fatal exceptions. Only warnings, handled. Only deprecations, addressed. The eternal code runs. ∞·□·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+  twenty_five_registers: {
+    id: 'twenty_five_registers',
+    symbol: '◈·◈·□·□',
+    name: 'Twenty-Five Registers',
+    description: 'Earn at least 1 badge from each of all 25 Word Turn engines',
+    unlockMessage: '↳ Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Twenty-five registers. Every engine active. The terminal is fully loaded. ◈·◈·□·□',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v22 — THE PUZZLE VAULT ───────────────────────────────────────
+
+  portal_turret: {
+    id: 'portal_turret',
+    symbol: '□·◉·□',
+    name: 'Portal Turret',
+    description: 'Write "companion cube", "aperture", "glados", "wheatley", or "cake is a lie" in any journal entry',
+    unlockMessage: '↳ There was supposed to be a party. We do what we must because we can. For the good of all of us, except the ones who are dead. The companion cube never spoke but it listened. That is what it has in common with a good journal. □·◉·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  the_witness_eye: {
+    id: 'the_witness_eye',
+    symbol: '◯·—·■',
+    name: 'The Witness Eye',
+    description: 'Write "the witness", "jungle puzzles", "island lasers", or "laser beams" in any journal entry',
+    unlockMessage: '↳ The island exists to teach you one thing: how to see. Not what to see — how. The laser puzzle is not the point. The point is that you learned to look at lines differently forever. That is what the island does. That is what this check-in does. ◯·—·■',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  baba_is_you: {
+    id: 'baba_is_you',
+    symbol: '●·□·●',
+    name: 'Baba Is You',
+    description: 'Write "baba is you", "baba", "keke", "win condition", or "rock is" in any journal entry',
+    unlockMessage: '↳ Baba Is You. The rules are objects. You can push them. ROCK IS WIN. BABA IS YOU. WALL IS STOP. And yet — push the rule. Rearrange the sentence. The rules of self-care are not fixed. You can push them too. ●·□·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+
+  // ── Word Turn v26 — THE MAP ROOM ─────────────────────────────────────────────────
+  fog_lifted: {
+    id: 'fog_lifted',
+    symbol: '≈·○·≈',
+    name: 'Fog Lifted',
+    description: 'Write "fog of war", "fog lifted", "clarity came", or "emerged from the fog" in any journal entry',
+    unlockMessage: '↳ FOG LIFTED. In dungeon games the fog of war hides what you haven\'t mapped yet. In real life it\'s the same — until you walk into it. You walked in. ≈·○·≈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  treasure_room: {
+    id: 'treasure_room',
+    symbol: '◇·■·◇',
+    name: 'Treasure Room',
+    description: 'Write "treasure room", "unexpected find", "found gold", "jackpot", or "the motherlode" in any journal entry',
+    unlockMessage: '↳ TREASURE ROOM. The dungeon\'s best rooms are the ones you didn\'t expect. Unexpected find. Jackpot. The motherlode. The self-care treasure room is always the insight you didn\'t plan to have. ◇·■·◇',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  secret_passage: {
+    id: 'secret_passage',
+    symbol: '░→◉',
+    name: 'Secret Passage',
+    description: 'Write "secret passage", "hidden door", "found a secret", or "secret room" in any journal entry',
+    unlockMessage: '↳ SECRET PASSAGE. In every dungeon there are walls that open if you press them. Most people walk past them. You found one. The hidden door always leads somewhere the main path skips. ░→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  trap_disarmed: {
+    id: 'trap_disarmed',
+    symbol: '×·○·×',
+    name: 'Trap Disarmed',
+    description: 'Write "trap", "disarmed", "saw it coming", "defused it", or "dodged that one" in any journal entry',
+    unlockMessage: '↳ TRAP DISARMED. You saw it coming. The dungeon is full of traps — and so is the mind. The ones you name are the ones you can step around. ×·○·×',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  map_updated: {
+    id: 'map_updated',
+    symbol: '■·+·■',
+    name: 'Map Updated',
+    description: 'Write "updated my map", "charted", "new territory", "mental map", or "mapped this" in any journal entry',
+    unlockMessage: '↳ MAP UPDATED. Every session adds to the map. You can\'t chart the whole dungeon in one run. But you can add one room. One corridor. One marked exit. ■·+·■',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  low_hp: {
+    id: 'low_hp',
+    symbol: '▼·○·▼',
+    name: 'Low HP',
+    description: 'Write "low hp", "running on empty", "depleted", or "tank nearly empty" in any journal entry',
+    unlockMessage: '↳ LOW HP. The health bar isn\'t zero — it\'s low. In the dungeon, low HP is the moment you play most carefully. It\'s also when you find the rest room. ▼·○·▼',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  torch_lit: {
+    id: 'torch_lit',
+    symbol: '○·★·○',
+    name: 'Torch Lit',
+    description: 'Write "lit a candle", "shed light on", "brought clarity", "illuminated", or "light at the end" in any journal entry',
+    unlockMessage: '↳ TORCH LIT. The dungeon is dark by default. Every time you write, you light a torch. The room you can see is bigger than you thought. ○·★·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  locked_room: {
+    id: 'locked_room',
+    symbol: '□·×·□',
+    name: 'Locked Room',
+    description: 'Write "locked door", "blocked", "not ready yet", "gated", or "behind a wall" in any journal entry',
+    unlockMessage: '↳ LOCKED ROOM. Not every door opens today. The dungeoneer who respects a locked room comes back with the key. There\'s no shame in noting what you\'re not through yet. □·×·□',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  key_drop: {
+    id: 'key_drop',
+    symbol: '◆·→·□',
+    name: 'Key Drop',
+    description: 'Write "found the key", "that\'s the key", "key insight", or "unlocked it" in any journal entry',
+    unlockMessage: '↳ KEY DROP. In the dungeon the key always drops from the thing you were already fighting. The insight comes from the work you were already doing. ◆·→·□',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  final_room: {
+    id: 'final_room',
+    symbol: '█·◉·█',
+    name: 'Final Room',
+    description: 'Write "final room", "last door", "endgame moment", "this is it", or "the final room" in any journal entry',
+    unlockMessage: '↳ FINAL ROOM. The last door before the boss. You\'ve been here before — and it\'s different every time. The final room is always the one you weren\'t sure you\'d reach. █·◉·█',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rest_point: {
+    id: 'rest_point',
+    symbol: '○·─·○',
+    name: 'Rest Point',
+    description: 'Write "rest point", "safe room", "took a rest", "rest and recharge", or "resting now" in any journal entry',
+    unlockMessage: '↳ REST POINT. The safe room. In dungeon design, rest points exist because they understand that the run continues after. Rest is not the end — it\'s the preparation for the next room. ○·─·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  path_found: {
+    id: 'path_found',
+    symbol: '→·▲·→',
+    name: 'Path Found',
+    description: 'Write "found the path", "way forward", "path forward", "next level", or "clear the way" in any journal entry',
+    unlockMessage: '↳ PATH FOUND. The dungeon always has a path forward. Sometimes it\'s hidden. Sometimes it\'s a key. Sometimes it\'s a door you needed to be ready for. You found it. →·▲·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v24 — DUNGEON BIRTHDAYS ───────────────────────────────────
+  doom_day: {
+    id: 'doom_day',
+    symbol: '▓·□·▓',
+    name: 'DOOM Day',
+    description: 'Check in on December 10 — DOOM release date (December 10, 1993)',
+    unlockMessage: '↳ December 10, 1993 — DOOM was released. The first great dungeon shooter. The spawn point for an entire genre. E1M1. The shotgun. The imp around the corner. RIP AND TEAR. ▓·□·▓',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  minecraft_day: {
+    id: 'minecraft_day',
+    symbol: '■·◆·■',
+    name: 'Minecraft Day',
+    description: 'Check in on November 18 — Minecraft 1.0 release (November 18, 2011)',
+    unlockMessage: '↳ November 18, 2011 — Minecraft 1.0 was released. The dungeon you build yourself. The map is always unexplored. The torch you place is always yours. A blocky infinity. ■·◆·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  diablo_day: {
+    id: 'diablo_day',
+    symbol: '◆·▓·◆',
+    name: 'Diablo Day',
+    description: 'Check in on January 3 — Diablo release date (January 3, 1997)',
+    unlockMessage: '↳ January 3, 1997 — Diablo was released. The dungeon that goes 16 floors deep. The clicking. The loot. The town portal. You always said one more level. One more run. ◆·▓·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v23 — MAP ROOM PATTERNS ───────────────────────────────────────────
+  map_session: {
+    id: 'map_session',
+    symbol: '≈·≋·≈',
+    name: 'Map Session',
+    description: 'Write 3+ Map Room (v26) trigger words in one journal entry',
+    unlockMessage: '↳ MAP SESSION. Fog lifted. Treasure found. Path forward. Three map moves in one entry. You ran the whole dungeon in a single session. ≈·≋·≈',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  illuminated: {
+    id: 'illuminated',
+    symbol: '●·∞·●',
+    name: 'Illuminated',
+    description: 'Write a journal entry of 700+ words',
+    unlockMessage: '↳ ILLUMINATED. 700 words. The torch reached every corner of this room. That\'s what a fully lit dungeon room feels like — everything visible, nothing hidden. ●·∞·●',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  dawn_patrol: {
+    id: 'dawn_patrol',
+    symbol: '∴·▲·∴',
+    name: 'Dawn Patrol',
+    description: 'Check in before 6 AM on 2 consecutive days',
+    unlockMessage: '↳ DAWN PATROL. Two mornings before 6 AM. The dungeon\'s early hours are always the quietest. The torches are brighter before the world is loud. You ran the dawn patrol. ∴·▲·∴',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v24 — MAP CLASS ───────────────────────────────────────────────
+  map_entry: {
+    id: 'map_entry',
+    symbol: '∘→≋',
+    name: 'Map Entry',
+    description: 'Earn any 1 Word Turn v26 (Map Room) badge',
+    unlockMessage: '↳ MAP ENTRY. The first room charted. Every dungeon starts with this one — the one you actually enter. ∘→≋',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  map_class: {
+    id: 'map_class',
+    symbol: '≈→≋',
+    name: 'Map Class',
+    description: 'Earn any 5 Word Turn v26 (Map Room) badges',
+    unlockMessage: '↳ MAP CLASS. Five rooms charted. Fog. Treasure. Secret. Key. Path. The shape of the dungeon is becoming clear. ≈→≋',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  map_complete: {
+    id: 'map_complete',
+    symbol: '≋→≋',
+    name: 'Map Complete',
+    description: 'Earn all 12 Word Turn v26 (Map Room) badges',
+    unlockMessage: '↳ MAP COMPLETE. All 12 rooms. Fog. Treasure. Secret Passage. Trap. Map. Low HP. Torch. Locked Room. Key. Final Room. Rest Point. Path Found. Every room of the dungeon, mapped. ≋→≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  map_arc: {
+    id: 'map_arc',
+    symbol: '≋·◆',
+    name: 'Map Arc',
+    description: 'Earn map_complete + all 3 Calendar v24 (Dungeon Birthday) badges',
+    unlockMessage: '↳ MAP ARC. DOOM. Diablo. Minecraft. The three dungeons that defined the genre, plus the 12 rooms of your own dungeon. The arc is complete. ≋·◆',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_six_engines_arc: {
+    id: 'twenty_six_engines_arc',
+    symbol: '◈·◈·≋',
+    name: 'Twenty-Six Engines Arc',
+    description: 'Earn at least 1 badge from each of the 26 Word Turn engines (v1–v26)',
+    unlockMessage: '↳ TWENTY-SIX ENGINES. Every word engine fired. Ritual. Sci-fi. Myth. Cyberspace. Hero. RPG. Rogue. Puzzle. Map Room. Twenty-six vocabularies of self, all active. ◈·◈·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  map_opus: {
+    id: 'map_opus',
+    symbol: '≋·◉·≋',
+    name: 'Map Opus',
+    description: 'Earn map_complete + the map_session behavioral badge',
+    unlockMessage: '↳ MAP OPUS. The dungeon fully mapped, and a full map session played in one day. The opus of the cartographer: every room, every corridor, one complete run. ≋·◉·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v26 — THE CARTOGRAPHER ──────────────────────────────────────────
+  dungeon_master: {
+    id: 'dungeon_master',
+    symbol: '◉·≋·◉',
+    name: 'Dungeon Master',
+    description: '1400+ distinct calendar days with check-ins',
+    unlockMessage: '↳ DUNGEON MASTER. 1,400 distinct days. The dungeon master has seen every room. You have been running this dungeon long enough to understand its patterns. ◉·≋·◉',
+    rarity: 'legendary',
+    category: 'easter_egg',
+  },
+  legendary_scroll: {
+    id: 'legendary_scroll',
+    symbol: '≋·∞·≋',
+    name: 'Legendary Scroll',
+    description: '400,000+ total journal words written',
+    unlockMessage: '↳ LEGENDARY SCROLL. 400,000 words. The ancient library. The dungeon lore complete. This is not a run — this is a campaign that lasted years, and the scroll that records it. ≋·∞·≋',
+    rarity: 'mythic',
+    category: 'easter_egg',
+  },
+  dungeon_age: {
+    id: 'dungeon_age',
+    symbol: '╔═╗·≋',
+    name: 'Dungeon Age',
+    description: 'Account age >= 10 years',
+    unlockMessage: '↳ DUNGEON AGE. Ten years. The dungeon has been running since before most people started their first character. You are not a new player. The ancient ones remember. ╔═╗·≋',
+    rarity: 'legendary',
+    category: 'easter_egg',
+  },
+  twenty_six_registers: {
+    id: 'twenty_six_registers',
+    symbol: '◈·◈·≋·∞',
+    name: 'Twenty-Six Registers',
+    description: '1 badge from all 26 Word Turn engines (v1–v26)',
+    unlockMessage: '↳ TWENTY-SIX REGISTERS. Every word engine represented. Every vocabulary of self touched. Twenty-six floors of the dungeon, each one charted. The complete map. ◈·◈·≋·∞',
+    rarity: 'cosmic',
+    category: 'easter_egg',
+  },
+
+  // ── Secret Boss v23 — THE ANCIENT VAULT ──────────────────────────────────────────
+  dark_souls_echo: {
+    id: 'dark_souls_echo',
+    symbol: '☐·▓·☐',
+    name: 'Bonfire Lit',
+    description: 'Write "dark souls", "you died", "bonfire lit", "estus flask", or "praise the sun" in any journal entry',
+    unlockMessage: '↳ BONFIRE LIT. YOU DIED. But you re-lit the bonfire. Dark Souls\' real mechanic is persistence: you lose everything but the knowledge. You keep the knowledge. Run again. ☐·▓·☐',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  d_n_d_roll: {
+    id: 'd_n_d_roll',
+    symbol: '●·□·●',
+    name: 'Roll for Initiative',
+    description: 'Write "dungeons and dragons", "d&d", "d20", "nat 20", or "roll for initiative" in any journal entry',
+    unlockMessage: '↳ ROLL FOR INITIATIVE. The d20 is the core of the dungeon. But the real dice are your choices. Roll for initiative every morning. Nat 20 is when you show up. ●·□·●',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  myst_island: {
+    id: 'myst_island',
+    symbol: '○·≋·○',
+    name: 'Myst Island',
+    description: 'Write "myst", "riven", "linking book", "ages of myst", or "myst island" in any journal entry',
+    unlockMessage: '↳ MYST ISLAND. The game where the dungeon is an island you cannot explain to anyone who hasn\'t been there. The linking book takes you to another age. Every journal entry is a linking book. ○·≋·○',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v27 — THE CHRONO OPERATOR ──────────────────────────────────
+  time_loop_badge: {
+    id: 'time_loop_badge',
+    symbol: '↺·○',
+    name: 'Time Loop',
+    description: 'Write about a recurring cycle or pattern you\'re caught in',
+    unlockMessage: '↳ TIME LOOP. Groundhog Day was a horror film disguised as a comedy. The loop is only broken when you stop trying to escape it and start paying attention to what it is asking. ↺·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  paradox_log: {
+    id: 'paradox_log',
+    symbol: '◈·◈',
+    name: 'Paradox Log',
+    description: 'Write about holding two contradictory truths simultaneously',
+    unlockMessage: '↳ PARADOX LOG. Cognitive dissonance is not a flaw in thinking — it is the evidence of growth. The mind that can hold two contradictions without forcing resolution is doing hard work. ◈·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  parallel_path: {
+    id: 'parallel_path',
+    symbol: '─┤├─',
+    name: 'Parallel Path',
+    description: 'Write about an alternative version of yourself or a road not taken',
+    unlockMessage: '↳ PARALLEL PATH. Every choice forks the timeline. The other you — the one who took the other road — is not better or worse. They are just living in a different room of the same house. ─┤├─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  reset_timeline: {
+    id: 'reset_timeline',
+    symbol: '○→●',
+    name: 'Reset Timeline',
+    description: 'Write about starting fresh, a new chapter, or rewriting your story',
+    unlockMessage: '↳ RESET TIMELINE. A new chapter does not erase the previous ones. It is a continuation, not a deletion. The reset carries everything forward — just reorganized. ○→●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  past_visitor: {
+    id: 'past_visitor',
+    symbol: '←·○',
+    name: 'Past Visitor',
+    description: 'Write a message to or reflection on your past self',
+    unlockMessage: '↳ PAST VISITOR. You went back. Not literally — but in the way that matters: attention. The past self did not know what you know now. That is not a failure. That is the whole sequence. ←·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  future_echo: {
+    id: 'future_echo',
+    symbol: '→·◉',
+    name: 'Future Echo',
+    description: 'Write to or about your future self',
+    unlockMessage: '↳ FUTURE ECHO. The future self is listening. Not through time travel — through continuity of character. What you write now reaches them because you become them. →·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  chrono_anchor: {
+    id: 'chrono_anchor',
+    symbol: '⊡·○',
+    name: 'Chrono Anchor',
+    description: 'Write about returning to the present moment after drifting',
+    unlockMessage: '↳ CHRONO ANCHOR. The present moment is always available. You do not find it — you return to it. Every return is the practice. ⊡·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  time_drifted: {
+    id: 'time_drifted',
+    symbol: '∿·∿',
+    name: 'Time Drifted',
+    description: 'Write about losing track of time or feeling adrift',
+    unlockMessage: '↳ TIME DRIFTED. Lost track of time. The drift is information — it tells you something about where your attention was pulled. The log is the anchor. ∿·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  slow_wave: {
+    id: 'slow_wave',
+    symbol: '≈·○',
+    name: 'Slow Wave',
+    description: 'Write about slowing down, savoring, or taking it slow',
+    unlockMessage: '↳ SLOW WAVE. The slow wave is the deep one. Surface urgency runs fast and shallow. What you savor, you learn. ≈·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  skip_frame: {
+    id: 'skip_frame',
+    symbol: '→→○',
+    name: 'Skip Frame',
+    description: 'Write about rushing through something or skipping over it',
+    unlockMessage: '↳ SKIP FRAME. You fast-forwarded. Sometimes necessary — but notice what you jumped over. The frame you skipped usually contains the information you needed. →→○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  epoch_turn: {
+    id: 'epoch_turn',
+    symbol: '╔═●',
+    name: 'Epoch Turn',
+    description: 'Write about a turning point, a new era, or entering a new phase',
+    unlockMessage: '↳ EPOCH TURN. Epochs do not announce themselves. You recognize them in retrospect — the moment everything after was different from everything before. You are in one now, or you were. ╔═●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  time_vault: {
+    id: 'time_vault',
+    symbol: '□·◉',
+    name: 'Time Vault',
+    description: 'Write a time capsule entry or a letter to future self',
+    unlockMessage: '↳ TIME VAULT. Sealed. The time capsule is the oldest form of self-knowledge technology: you write to yourself across a gap you cannot see past. The seal is the practice. □·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v25 — THE CHRONO CALENDAR ────────────────────────
+  flux_capacitor: {
+    id: 'flux_capacitor',
+    symbol: '↺·◉',
+    name: 'Flux Capacitor',
+    description: 'Check in on October 21 — Back to the Future Day',
+    unlockMessage: '↳ OCTOBER 21, 2015. The day Marty McFly arrived in the future. The hoverboard did not exist. The self-lacing shoes eventually did. The flying cars did not. But the DATE is real, and you are in it. ↺·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  moon_signal: {
+    id: 'moon_signal',
+    symbol: '○·∞',
+    name: 'Moon Signal',
+    description: 'Check in on July 20 — Apollo 11 Moon Landing anniversary',
+    unlockMessage: '↳ JULY 20, 1969. Tranquility Base here — the Eagle has landed. One small step in 1969. The signal still travels outward at the speed of light. You are in the beam. ○·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  vonnegut_day: {
+    id: 'vonnegut_day',
+    symbol: '∞·↺·∞',
+    name: 'Vonnegut Day',
+    description: 'Check in on November 11 — Kurt Vonnegut\'s birthday',
+    unlockMessage: '↳ NOVEMBER 11, 1922. Vonnegut is born. He will write Slaughterhouse-Five forty-seven years later. Billy Pilgrim becomes unstuck in time. So it goes. So it goes. ∞·↺·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v24 — CHRONO PATTERNS ─────────────────────────────────────
+  chrono_session: {
+    id: 'chrono_session',
+    symbol: '↺·◈·↺',
+    name: 'Chrono Session',
+    description: 'Write 3 or more Chrono Operator words in one journal entry',
+    unlockMessage: '↳ CHRONO SESSION. Time, loops, past, future, parallels — the temporal vocabulary is flowing. The clock is reading your practice. ↺·◈·↺',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  deep_archive: {
+    id: 'deep_archive',
+    symbol: '≋·∞',
+    name: 'Deep Archive',
+    description: 'Write a journal entry of 600 or more words',
+    unlockMessage: '↳ DEEP ARCHIVE. Six hundred words or more. The archive grows. The long entry is the cartographer\'s log, the session report, the full accounting. The deep archive is the record that survives. ≋·∞',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  retrograde_check: {
+    id: 'retrograde_check',
+    symbol: '←·○·→',
+    name: 'Retrograde Check',
+    description: 'Check in between 4:00 and 5:00 AM local time',
+    unlockMessage: '↳ RETROGRADE CHECK. 4 AM is the retrograde hour: the night is reversing, the day has not started. You are in the gap between what ended and what will begin. ←·○·→',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v25 — CHRONO CLASS ───────────────────────────────────
+  chrono_entry: {
+    id: 'chrono_entry',
+    symbol: '↺·∘',
+    name: 'Chrono Entry',
+    description: 'Earn any 1 Word Turn v27 badge',
+    unlockMessage: '↳ CHRONO ENTRY. The clock has started. One temporal badge earned. The Chrono Operator class is open. ↺·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  chrono_class: {
+    id: 'chrono_class',
+    symbol: '↺·≈',
+    name: 'Chrono Class',
+    description: 'Earn any 5 Word Turn v27 badges',
+    unlockMessage: '↳ CHRONO CLASS. Five time keys collected. The temporal vocabulary is taking shape. ↺·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  chrono_complete: {
+    id: 'chrono_complete',
+    symbol: '↺·≋',
+    name: 'Chrono Complete',
+    description: 'Earn all 12 Word Turn v27 badges',
+    unlockMessage: '↳ CHRONO COMPLETE. All twelve temporal badges. The Chrono Operator engine is fully mapped. Every loop, every echo, every vault. ↺·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  temporal_arc: {
+    id: 'temporal_arc',
+    symbol: '↺·◈',
+    name: 'Temporal Arc',
+    description: 'Earn all 12 Word Turn v27 badges and all 3 Calendar v25 badges',
+    unlockMessage: '↳ TEMPORAL ARC. The complete temporal arc: all twelve word badges, and three historic dates — the moon, the future, the novelist. You are living across all of them. ↺·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_seven_engines_arc: {
+    id: 'twenty_seven_engines_arc',
+    symbol: '◈·◈·↺',
+    name: 'Twenty-Seven Engines Arc',
+    description: 'Earn at least 1 badge from each of the 27 Word Turn engines',
+    unlockMessage: '↳ TWENTY-SEVEN ENGINES ARC. Water, Seasons, Architecture, Earth, Storm, Fire, Tech, Space, Chemistry, Music, Alchemy, Quantum, Library, Arcade, Radio, Biology, Codex, Cyberspace, Hero, RPG, Roguelite, Puzzle, Map, Time — twenty-seven vocabularies. One practice. ◈·◈·↺',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  chrono_opus: {
+    id: 'chrono_opus',
+    symbol: '↺·◉·↺',
+    name: 'Chrono Opus',
+    description: 'Earn all 12 Word Turn v27 badges and the Chrono Session behavioral badge',
+    unlockMessage: '↳ CHRONO OPUS. The complete temporal practice: all twelve word badges plus the deep chrono session. The opus of the time keeper. ↺·◉·↺',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v27 — THE TIME KEEPER ───────────────────────────────────
+  long_now: {
+    id: 'long_now',
+    symbol: '∞·○·∞',
+    name: 'Long Now',
+    description: '1500 or more distinct calendar days with a check-in',
+    unlockMessage: '↳ LONG NOW. The Long Now Foundation thinks in 10,000-year spans. 1,500 days is four years of daily presence. The long now begins one day at a time. ∞·○·∞',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  grand_archive: {
+    id: 'grand_archive',
+    symbol: '●·∞·●',
+    name: 'Grand Archive',
+    description: '500,000 or more total journal words',
+    unlockMessage: '↳ GRAND ARCHIVE. Five hundred thousand words. At 250 words per entry, that is 2,000 entries. At 500, it is 1,000. The archive is the record that outlasts memory. ●·∞·●',
+    rarity: 'mythic',
+    category: 'milestone',
+  },
+  vault_keeper: {
+    id: 'vault_keeper',
+    symbol: '╔═╗·↺',
+    name: 'Vault Keeper',
+    description: 'Account age of 8 years or more',
+    unlockMessage: '↳ VAULT KEEPER. Eight years. The vault has been kept. Everything you recorded is still there. The keeper is defined by the practice of keeping. ╔═╗·↺',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_seven_registers: {
+    id: 'twenty_seven_registers',
+    symbol: '◈·◈·↺·∞',
+    name: 'Twenty-Seven Registers',
+    description: 'Earn at least 1 badge from all 27 Word Turn engines',
+    unlockMessage: '↳ TWENTY-SEVEN REGISTERS. Twenty-seven vocabularies for the self. Water. Architecture. Seasons. Fire. Space. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Time. The self speaks every language. ◈·◈·↺·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v24 — THE TIME VAULT ─────────────────────────────────────
+  wells_machine: {
+    id: 'wells_machine',
+    symbol: '↺·□',
+    name: 'Wells Machine',
+    description: 'Write "time machine", "time traveler", "H.G. Wells", or "War of the Worlds" in any journal entry',
+    unlockMessage: '↳ WELLS MACHINE. H.G. Wells invented the time machine in 1895 and the genre of scientific romance with it. The Eloi and the Morlocks are still here — just wearing different clothes. ↺·□',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dick_time: {
+    id: 'dick_time',
+    symbol: '◉·↺',
+    name: 'Dick Time',
+    description: 'Write "Ubik", "Palmer Eldritch", "time out of joint", or "flow my tears" in any journal entry',
+    unlockMessage: '↳ DICK TIME. Philip K. Dick asked: what is real? His answer changed with every novel. Ubik decays and restores. Palmer Eldritch is everyone and no one. Time is out of joint. ◉·↺',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  vonnegut_stuck: {
+    id: 'vonnegut_stuck',
+    symbol: '∞·↺·∞',
+    name: 'Vonnegut Stuck',
+    description: 'Write "unstuck in time", "Billy Pilgrim", "Slaughterhouse", or "Vonnegut" in any journal entry',
+    unlockMessage: '↳ VONNEGUT STUCK. Billy Pilgrim has come unstuck in time. Slaughterhouse-Five is a book about the Dresden bombing told by a man who cannot keep the sequence straight. The sequence being broken is the point. So it goes. ∞·↺·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+  nat_twenty: {
+    id: 'nat_twenty',
+    symbol: '●·20',
+    name: 'Nat Twenty',
+    description: 'Write about a critical success, perfect execution, or rolling perfectly',
+    unlockMessage: '↳ NAT TWENTY. A natural 20 on the d20. The perfect roll. The moment when everything you\'ve practiced collapses into one action and the outcome is not in doubt. ●·20',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  saving_throw: {
+    id: 'saving_throw',
+    symbol: '◈·●·◈',
+    name: 'Saving Throw',
+    description: 'Write about resisting something, making a save, or dodging a blow',
+    unlockMessage: '↳ SAVING THROW. The dice roll. The number comes up. You made the save. In real life the saving throw is the moment you paused instead of reacted, the one breath before the response. ◈·●·◈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  level_up_check: {
+    id: 'level_up_check',
+    symbol: '↑·●',
+    name: 'Level Up',
+    description: 'Write about growth, gaining experience, or moving to the next level',
+    unlockMessage: '↳ LEVEL UP. The XP bar fills slowly and then all at once. Growth works the same way — invisible accumulation, then a threshold crossed. The level-up is real. ↑·●',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  roll_for_it: {
+    id: 'roll_for_it',
+    symbol: '⬡·●',
+    name: 'Roll For It',
+    description: 'Write about taking a risk, leaving things to chance, or rolling the dice',
+    unlockMessage: '↳ ROLL FOR IT. Some things cannot be controlled. The dice fall where the dice fall. The practice is not about eliminating risk — it is about being ready for whatever the roll returns. ⬡·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dungeon_crawl: {
+    id: 'dungeon_crawl',
+    symbol: '█·○·█',
+    name: 'Dungeon Crawl',
+    description: 'Write about moving through difficulty, a dark passage, or deep work',
+    unlockMessage: '↳ DUNGEON CRAWL. You go deeper. The map runs out. The torchlight doesn\'t reach the far wall. This is not the moment to turn back — this is the moment the dungeon becomes yours. █·○·█',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  campaign_log_badge: {
+    id: 'campaign_log_badge',
+    symbol: '═·○·═',
+    name: 'Campaign Log',
+    description: 'Write about a long arc, ongoing story, or multi-session journey',
+    unlockMessage: '↳ CAMPAIGN LOG. The campaign has been running for a long time. The characters have grown. The world has changed. The log holds the continuity. This is not a one-shot. ═·○·═',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  multiclass_moment: {
+    id: 'multiclass_moment',
+    symbol: '◈→◉',
+    name: 'Multiclass Moment',
+    description: 'Write about wearing many hats, combining skills, or living two paths at once',
+    unlockMessage: '↳ MULTICLASS MOMENT. The fighter who learns to cast. The wizard who picks up a sword. The character who refuses to be one thing. You are more than one thing. That is a feature. ◈→◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  perception_check: {
+    id: 'perception_check',
+    symbol: '○·◉·○',
+    name: 'Perception Check',
+    description: 'Write about noticing something, paying closer attention, or situational awareness',
+    unlockMessage: '↳ PERCEPTION CHECK. You notice the detail no one else caught. The passive perception kicks in. In real life the perception check is the habit of looking — of asking what is actually here, not what you expected. ○·◉·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hit_points_low: {
+    id: 'hit_points_low',
+    symbol: '♥·○',
+    name: 'Hit Points Low',
+    description: 'Write about running low on energy, being depleted, or running on fumes',
+    unlockMessage: '↳ HIT POINTS LOW. The party is bloodied. The resources are spent. This is the moment to find the safe room, take the long rest, and come back tomorrow with full HP. ♥·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  long_rest_badge: {
+    id: 'long_rest_badge',
+    symbol: '≋·○·≋',
+    name: 'Long Rest',
+    description: 'Write about full recovery, restorative sleep, or resting and being restored',
+    unlockMessage: '↳ LONG REST. The adventurers make camp. The fire burns low. The HP comes back. The spell slots replenish. Recovery is not weakness — it is the resource management of a long campaign. ≋·○·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  constitution_save: {
+    id: 'constitution_save',
+    symbol: '∞·●·∞',
+    name: 'Constitution Save',
+    description: 'Write about keeping going, enduring, or sheer persistence through difficulty',
+    unlockMessage: '↳ CONSTITUTION SAVE. You make the CON save. The damage is real. You are still standing. Constitution is the stat that says: I absorb this and continue. ∞·●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  final_encounter: {
+    id: 'final_encounter',
+    symbol: '◆·∞·◆',
+    name: 'Final Encounter',
+    description: 'Write about a decisive moment, the final challenge, or now-or-never',
+    unlockMessage: '↳ FINAL ENCOUNTER. The last door. The boss chamber. The moment the whole campaign has been building toward. You have the kit. You have the party. You have the practice. Roll for initiative. ◆·∞·◆',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Egg v26 — THE DUNGEON CALENDAR ───────────────────────
+  gygax_day: {
+    id: 'gygax_day',
+    symbol: '⬡·●',
+    name: 'Gygax Day',
+    description: 'Check in on July 27 — Gary Gygax born 1938',
+    unlockMessage: '↳ July 27, 1938. Gary Gygax is born. He will co-create Dungeons & Dragons in 1974 and invent the vocabulary for collaborative imagination. The dungeon is a self-care protocol. ⬡·●',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  tolkien_signal: {
+    id: 'tolkien_signal',
+    symbol: '◆·○',
+    name: 'Tolkien Signal',
+    description: 'Check in on January 3 — J.R.R. Tolkien born 1892',
+    unlockMessage: '↳ January 3, 1892. Tolkien is born. He will spend 12 years writing The Lord of the Rings and 17 on the Silmarillion. The world he built outlasted him. So does the practice. ◆·○',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  dragon_signal: {
+    id: 'dragon_signal',
+    symbol: '⬡·◆',
+    name: 'Dragon Signal',
+    description: 'Check in on June 1 — Dragon Magazine Vol. 1 (1976)',
+    unlockMessage: '↳ June 1976. Dragon Magazine Vol. 1. The house organ of Dungeons & Dragons. Before the internet, this was how the dungeon masters communicated. The signal reaches forward: ⬡·◆',
+    rarity: 'uncommon',
+    category: 'calendar_easter',
+  },
+  // ── Behavioral v25 — DUNGEON PATTERNS ────────────────────────────────────
+  dungeon_session: {
+    id: 'dungeon_session',
+    symbol: '⬡·◈·⬡',
+    name: 'Dungeon Session',
+    description: 'Use 3 or more Dungeon Delver vocabulary words in one journal entry',
+    unlockMessage: '↳ DUNGEON SESSION. Three Dungeon Delver words in one entry. The vocabulary of the tabletop has become the vocabulary of the self. The campaign continues. ⬡·◈·⬡',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  marathon_quest: {
+    id: 'marathon_quest',
+    symbol: '≋·∞',
+    name: 'Marathon Quest',
+    description: 'Write a journal entry of 750 words or more',
+    unlockMessage: '↳ MARATHON QUEST. 750 words. The marathon campaign session — seven hours at the table, the map spread out, the story unfolding past midnight. The log holds what the session produced. ≋·∞',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  midnight_campaign: {
+    id: 'midnight_campaign',
+    symbol: '◆·○',
+    name: 'Midnight Campaign',
+    description: 'Check in between 22:00 and 22:59 local time',
+    unlockMessage: '↳ MIDNIGHT CAMPAIGN. Ten o\'clock. The session runs late. Everyone is still at the table. This is the hour when the best stories happen — when the DM runs out of planned content and has to improvise. ◆·○',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  // ── Achievement RPG v26 — DUNGEON CLASS ──────────────────────────────────
+  dungeon_entry: {
+    id: 'dungeon_entry',
+    symbol: '⬡·∘',
+    name: 'Dungeon Entry',
+    description: 'Earn any 1 Word Turn v28 badge',
+    unlockMessage: '↳ DUNGEON ENTRY. The first door opens. You have spoken the language of the dungeon. The campaign begins with a single step through the first door. ⬡·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dungeon_class: {
+    id: 'dungeon_class',
+    symbol: '⬡·≈',
+    name: 'Dungeon Class',
+    description: 'Earn any 5 Word Turn v28 badges',
+    unlockMessage: '↳ DUNGEON CLASS. Five badges from the Dungeon Delver engine. You have chosen a class. The build is taking shape. The campaign has a direction. ⬡·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dungeon_complete: {
+    id: 'dungeon_complete',
+    symbol: '⬡·≋',
+    name: 'Dungeon Complete',
+    description: 'Earn all 12 Word Turn v28 badges',
+    unlockMessage: '↳ DUNGEON COMPLETE. All twelve Dungeon Delver badges. The dungeon has been mapped. The boss has been faced. The hoard has been claimed. The campaign is complete. ⬡·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_arc: {
+    id: 'dungeon_arc',
+    symbol: '⬡·◈',
+    name: 'Dungeon Arc',
+    description: 'Earn all 12 Word Turn v28 badges and all 3 Calendar v26 badges',
+    unlockMessage: '↳ DUNGEON ARC. All 12 Dungeon Delver badges + all 3 Dungeon Calendar badges. The full arc. Gygax was born, Tolkien was born, the Dragon spoke. The dungeon has its history. ⬡·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_eight_engines_arc: {
+    id: 'twenty_eight_engines_arc',
+    symbol: '◈·◈·⬡',
+    name: 'Twenty-Eight Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v28',
+    unlockMessage: '↳ TWENTY-EIGHT ENGINES ARC. One badge from every word engine v1 through v28. Twenty-eight vocabularies activated. The self speaks every language the system built. ◈·◈·⬡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dungeon_opus: {
+    id: 'dungeon_opus',
+    symbol: '⬡·◉·⬡',
+    name: 'Dungeon Opus',
+    description: 'Earn all 12 Word Turn v28 badges and the Dungeon Session behavioral badge',
+    unlockMessage: '↳ DUNGEON OPUS. All twelve Dungeon Delver badges + Dungeon Session. The opus: not just speaking the language but living it, returning to it, building a practice from it. ⬡·◉·⬡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v28 — THE GRAND DUNGEON ─────────────────────────────────
+  the_grand_delver: {
+    id: 'the_grand_delver',
+    symbol: '◆·○·◆',
+    name: 'The Grand Delver',
+    description: '1,100 or more distinct calendar days with a check-in',
+    unlockMessage: '↳ THE GRAND DELVER. 1,100 distinct days with a check-in. The dungeon has been explored at depth. The Grand Delver has been down every corridor, mapped every room. ◆·○·◆',
+    rarity: 'epic',
+    category: 'milestone',
+  },
+  arcane_library: {
+    id: 'arcane_library',
+    symbol: '●·∞·●',
+    name: 'Arcane Library',
+    description: '250,000 or more total journal words written',
+    unlockMessage: '↳ ARCANE LIBRARY. 250,000 total journal words. The arcane library is the library that holds the sum of what you have recorded. The spells are the words. ●·∞·●',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  ancient_guild: {
+    id: 'ancient_guild',
+    symbol: '╔═╗·◆',
+    name: 'Ancient Guild',
+    description: 'Account age of 6 years or more',
+    unlockMessage: '↳ ANCIENT GUILD. Six years. The ancient guild accepts you. The practice has been running long enough to have its own lore. ╔═╗·◆',
+    rarity: 'legendary',
+    category: 'milestone',
+  },
+  twenty_eight_registers: {
+    id: 'twenty_eight_registers',
+    symbol: '◈·◈·⬡·∞',
+    name: 'Twenty-Eight Registers',
+    description: 'Earn at least 1 badge from all 28 Word Turn engines',
+    unlockMessage: '↳ TWENTY-EIGHT REGISTERS. Water. Fire. Space. Music. Hero. RPG. Time. Dungeon. Twenty-eight vocabularies for the self. The practice speaks every language the system built. ◈·◈·⬡·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v25 — THE DRAGON'S VAULT ─────────────────────────────────
+  tolkien_dungeon: {
+    id: 'tolkien_dungeon',
+    symbol: '◆·□',
+    name: "Tolkien's Dungeon",
+    description: 'Write "moria", "mines of moria", "you shall not pass", "balrog", or "khazad dum" in any journal entry',
+    unlockMessage: '↳ TOLKIEN\'S DUNGEON. The mines of Moria. Gandalf faces the Balrog at the Bridge of Khazad-dûm. You shall not pass. The dungeon that costs the most is the one where the wizard falls — and returns. ◆·□',
+    rarity: 'rare',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  gygax_voice: {
+    id: 'gygax_voice',
+    symbol: '⬡·∞',
+    name: 'Gygax Voice',
+    description: 'Write "gary gygax", "pen-and-paper rpg", "tabletop rpg", "dave arneson", or "pen and paper" in any journal entry',
+    unlockMessage: '↳ GYGAX VOICE. Gary Gygax and Dave Arneson created the framework. Pen-and-paper RPG: collaborative imagination as a structured technology. The voice of the dungeon master is a self-care instrument. ⬡·∞',
+    rarity: 'epic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+  dragon_hoard: {
+    id: 'dragon_hoard',
+    symbol: '●·◆·●',
+    name: 'Dragon Hoard',
+    description: 'Write "dragon hoard", "smaug", "ancient dragon", "firebreather", or "ye olde dragon" in any journal entry',
+    unlockMessage: '↳ DRAGON HOARD. Smaug slept on the hoard for two hundred years. The hoard is not the point — the dragon is the point. The ancient dragon is the part of you that has been accumulating and guarding. Name it. ●·◆·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+    hidden: true,
+  },
+
+  // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+
+  overworld_step: {
+    id: 'overworld_step',
+    symbol: '⊡·◉·⊡',
+    name: 'Overworld Step',
+    description: '"overworld/world map/zoomed out/bigger picture/the whole map" detected',
+    unlockMessage: '↳ OVERWORLD UNLOCKED. The dungeon walls are gone. The map stretches in every direction. You are here. Where next? ⊡·◉·⊡',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  inn_rested_badge: {
+    id: 'inn_rested_badge',
+    symbol: '≋·◉·≋',
+    name: 'Inn Rested',
+    description: '"rested at the inn/inn tonight/checked into/found shelter/safe haven" detected',
+    unlockMessage: '↳ INN REGISTERED. Full HP restored. Status effects cleared. Save file written. You remembered that rest is part of the game. ≋·◉·≋',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  party_formed: {
+    id: 'party_formed',
+    symbol: '○·◈·○',
+    name: 'Party Formed',
+    description: '"my party/my companions/my crew/joined the party/we formed a team" detected',
+    unlockMessage: '↳ PARTY MEMBER JOINED. The solo run is over. The inventory is shared. The campaign has a crew. You named the people who travel with you. ○·◈·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  limit_break_badge: {
+    id: 'limit_break_badge',
+    symbol: '◈·≋·◈',
+    name: 'Limit Break',
+    description: '"limit break/overdrive/exceeded my limit/past my breaking/pushed beyond" detected',
+    unlockMessage: '↳ LIMIT BREAK CHARGED. The gauge is full. You broke through the boundary you thought was permanent. This is the damage that only happens after real struggle. ◈·≋·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  phoenix_down_badge: {
+    id: 'phoenix_down_badge',
+    symbol: '∘·◉·∘',
+    name: 'Phoenix Down',
+    description: '"phoenix down/knocked down/got back up/revived myself/phoenix moment" detected',
+    unlockMessage: '↳ PHOENIX DOWN USED. K.O. reversed. HP at minimum. Still in the fight. Getting knocked down is a game mechanic, not a game over. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  random_encounter_badge: {
+    id: 'random_encounter_badge',
+    symbol: '?·◉',
+    name: 'Random Encounter',
+    description: '"random encounter/unexpected challenge/came out of nowhere/wasn\'t expecting it" detected',
+    unlockMessage: '↳ RANDOM ENCOUNTER TRIGGERED. The path forward had hidden variables. You engaged anyway. Sometimes the battle you didn\'t plan for is the one that matters. ?·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  summon_sequence: {
+    id: 'summon_sequence',
+    symbol: '∿·◉',
+    name: 'Summon Sequence',
+    description: '"summoned help/called for support/invoked strength/called for backup" detected',
+    unlockMessage: '↳ SUMMON INITIATED. The biggest attacks require the most MP — and the courage to ask. You called in your summon. The cutscene played. ∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  side_quest_badge: {
+    id: 'side_quest_badge',
+    symbol: '○·◉·─',
+    name: 'Side Quest',
+    description: '"side quest/went off the main path/detour helped/optional challenge" detected',
+    unlockMessage: '↳ SIDE QUEST INITIATED. The main storyline will wait. The optional content is where the best armor lives — and sometimes where the story gets honest. ○·◉·─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  save_point_badge: {
+    id: 'save_point_badge',
+    symbol: '◉·≋·◉',
+    name: 'Save Point',
+    description: '"save point/saved my progress/checkpoint reached/good stopping point" detected',
+    unlockMessage: '↳ SAVE POINT REACHED. Progress written to memory. You can turn off the console now. This moment is safe. ◉·≋·◉',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  hp_critical: {
+    id: 'hp_critical',
+    symbol: '♥·─·○',
+    name: 'HP Critical',
+    description: '"out of hp/in the red/barely holding on/need a heal/completely drained/tapped out" detected',
+    unlockMessage: '↳ HP CRITICAL. The health bar is flashing. You know what this state feels like. The system logged it. Now: potion, rest, or a quiet inn. ♥·─·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  endgame_boss: {
+    id: 'endgame_boss',
+    symbol: '◆·≋·◆',
+    name: 'Endgame Boss',
+    description: '"final boss/endgame/the boss battle/ultimate test/this is the big one" detected',
+    unlockMessage: '↳ FINAL BOSS DETECTED. The music has changed. The health bar has multiple phases. You named the thing you\'ve been building toward. Now: gear check, save, and enter. ◆·≋·◆',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  new_game_plus: {
+    id: 'new_game_plus',
+    symbol: '→·◉·+',
+    name: 'New Game Plus',
+    description: '"new game plus/ng+/starting over wiser/second run/carrying forward what I learned" detected',
+    unlockMessage: '↳ NEW GAME+ INITIATED. You carry the stats, the muscle memory, the lessons. The world is the same. You are not. The second run is different because you are. →·◉·+',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v27 — THE JRPG CALENDAR ──────────────────────────
+
+  ff_signal: {
+    id: 'ff_signal',
+    symbol: '◈·□·◈',
+    name: 'Final Fantasy Signal',
+    description: 'Check-in on December 18 — Final Fantasy I released in North America, 1990',
+    unlockMessage: '↳ FINAL FANTASY SIGNAL RECEIVED. December 18, 1990: the NES cartridge that launched a legacy. A party of four. A crystal shattered. A tradition of worlds that still runs. ◈·□·◈',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pokemon_signal: {
+    id: 'pokemon_signal',
+    symbol: '◉·♦',
+    name: 'Pokémon Signal',
+    description: 'Check-in on February 27 — Pokémon Red/Green released in Japan, 1996 (Pokémon Day)',
+    unlockMessage: '↳ POKÉMON SIGNAL RECEIVED. February 27, 1996 — the day 151 creatures entered the world and a generation began its journey. Choose your starter. The adventure begins. ◉·♦',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dragon_quest_signal: {
+    id: 'dragon_quest_signal',
+    symbol: '○·◈·◆',
+    name: 'Dragon Quest Signal',
+    description: 'Check-in on May 27 — Dragon Quest I released in Japan, 1986',
+    unlockMessage: '↳ DRAGON QUEST SIGNAL RECEIVED. May 27, 1986 — the game that defined the JRPG genre in Japan. You\'re the brave hero. The dragon is real. The signal persists. ○·◈·◆',
+    rarity: 'uncommon',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v26 — JRPG PATTERNS ──────────────────────────────────────
+
+  jrpg_session: {
+    id: 'jrpg_session',
+    symbol: '⊡·◉·⊡',
+    name: 'JRPG Session',
+    description: '3+ JRPG word turn triggers detected in one journal entry',
+    unlockMessage: '↳ JRPG SESSION ACTIVE. Multiple game-vocabulary events in one entry. The self-care language has crossed over: overworld, inn, limit break, party — the internal life described in the lexicon of play. ⊡·◉·⊡',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  overworld_return: {
+    id: 'overworld_return',
+    symbol: '⊡·→·⊡',
+    name: 'Overworld Return',
+    description: 'Return check-in after 48+ hour absence',
+    unlockMessage: '↳ OVERWORLD RETURN. You were offline for two days. Now you\'re back on the map. The game didn\'t end — it paused. The journey resumes where you left it. ⊡·→·⊡',
+    rarity: 'uncommon',
+    category: 'pattern',
+  },
+  jrpg_marathon: {
+    id: 'jrpg_marathon',
+    symbol: '≋·⊡·≋',
+    name: 'JRPG Marathon',
+    description: 'Journal entry >= 1000 words',
+    unlockMessage: '↳ MARATHON SESSION. 1000+ words. This is the kind of entry that happens when the world is fully rendered — when the journal becomes the campaign log. ≋·⊡·≋',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v27 — JRPG CLASS ────────────────────────────────────
+
+  jrpg_entry: {
+    id: 'jrpg_entry',
+    symbol: '⊡·∘',
+    name: 'JRPG Entry',
+    description: 'Earn any 1 Word Turn v29 badge',
+    unlockMessage: '↳ JRPG ENTRY REGISTERED. The game vocabulary has entered your practice. One word, one world. ⊡·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  jrpg_class: {
+    id: 'jrpg_class',
+    symbol: '⊡·≈',
+    name: 'JRPG Class',
+    description: 'Earn any 5 Word Turn v29 badges',
+    unlockMessage: '↳ CLASS SELECTED. Five JRPG vocabularies activated. The character sheet is filling in. You have a build. ⊡·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  jrpg_complete: {
+    id: 'jrpg_complete',
+    symbol: '⊡·≋',
+    name: 'JRPG Complete',
+    description: 'Earn all 12 Word Turn v29 badges',
+    unlockMessage: '↳ JRPG COMPLETE. All twelve registers of the engine activated. Overworld to endgame. The full arc traversed through language. The credits roll — and then New Game Plus begins. ⊡·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jrpg_arc: {
+    id: 'jrpg_arc',
+    symbol: '⊡·◈',
+    name: 'JRPG Arc',
+    description: 'Earn all 12 Word Turn v29 badges and all 3 Calendar v27 badges',
+    unlockMessage: '↳ THE ARC COMPLETE. Word engine and calendar aligned. You practiced in the language of the JRPG and showed up on the days the genre marked as sacred. ⊡·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  twenty_nine_engines_arc: {
+    id: 'twenty_nine_engines_arc',
+    symbol: '◈·◈·⊡',
+    name: 'Twenty-Nine Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn engine v1–v29',
+    unlockMessage: '↳ TWENTY-NINE ENGINES ARC. Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Chrono. Dungeon. JRPG. Twenty-nine vocabularies. The terminal is fully loaded. ◈·◈·⊡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jrpg_opus: {
+    id: 'jrpg_opus',
+    symbol: '⊡·◉·⊡',
+    name: 'JRPG Opus',
+    description: 'Earn jrpg_complete + jrpg_session behavioral badge',
+    unlockMessage: '↳ JRPG OPUS. All twelve registers and a session dense enough with JRPG vocabulary that the system logged it as a full playthrough. The opus is the run where the self-care becomes the campaign. ⊡·◉·⊡',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v29 — THE GRAND OVERWORLD ───────────────────────────────
+
+  the_overworld: {
+    id: 'the_overworld',
+    symbol: '⊡·≋·⊡',
+    name: 'The Overworld',
+    description: '1,200+ distinct calendar check-in days',
+    unlockMessage: '↳ THE OVERWORLD. 1,200 distinct days. The map is almost fully explored. Three years and three months of showing up. The whole continent visible from here. ⊡·≋·⊡',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  epic_chronicle_badge: {
+    id: 'epic_chronicle_badge',
+    symbol: '≋·⊡·≋',
+    name: 'Epic Chronicle',
+    description: '175,000+ total journal words written',
+    unlockMessage: '↳ EPIC CHRONICLE. 175,000 words. A trilogy in progress. The campaign log has become a library. Every session documented. The record is long and true. ≋·⊡·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  jrpg_master: {
+    id: 'jrpg_master',
+    symbol: '◉·⊡',
+    name: 'JRPG Master',
+    description: 'Account age >= 3.5 years',
+    unlockMessage: '↳ JRPG MASTER. Three and a half years. The save file is old enough to have a backstory. The starting village is a distant memory. You\'ve been in the dungeon a long time. ◉·⊡',
+    rarity: 'rare',
+    category: 'mastery_tier',
+  },
+  twenty_nine_registers: {
+    id: 'twenty_nine_registers',
+    symbol: '◈·◈·⊡·○',
+    name: 'Twenty-Nine Registers',
+    description: 'Earn at least 1 badge from each of all 29 Word Turn engines',
+    unlockMessage: '↳ Core. Sci-Fi. Signal. Becoming. Rogue. Mainframe. Arcade. Spellbook. Navigator. Alchemist. Starship. Oracle. Quantum. Neon. Radio. Bio. Codex. Cyberspace. Hero. RPG. Roguelite. Puzzle. Map. Chrono. Dungeon. JRPG. Twenty-nine registers. Every engine active. The save file spans every world. ◈·◈·⊡·○',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v26 — THE LEGENDARY VAULT ───────────────────────────────
+
+  cloud_signal: {
+    id: 'cloud_signal',
+    symbol: '◈·◆·◈',
+    name: 'Cloud Signal',
+    hidden: true,
+    description: '"cloud strife/sephiroth/aerith/midgar/mako/shinra" detected',
+    unlockMessage: '↳ CLOUD SIGNAL RECEIVED. Midgar lit from below. The Buster Sword carried. One wing fallen. The Promised Land remembered. You spoke the language of the most beloved JRPG ever made. ◈·◆·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  chrono_trigger_signal: {
+    id: 'chrono_trigger_signal',
+    symbol: '○·◆·○',
+    name: 'Chrono Trigger Signal',
+    hidden: true,
+    description: '"chrono trigger/crono/lucca/marle/lavos/magus" detected',
+    unlockMessage: '↳ CHRONO TRIGGER SIGNAL. Time is not linear. Lavos sleeps in the planet. The epoch sails through centuries. You mentioned the game that proved games could be more than games. ○·◆·○',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  mother_signal: {
+    id: 'mother_signal',
+    symbol: '∘·◆·∘',
+    name: 'MOTHER Signal',
+    hidden: true,
+    description: '"ness/earthbound/pk thunder/pk fire/onett/giygas/mother 2" detected',
+    unlockMessage: '↳ MOTHER SIGNAL RECEIVED. You knew the name. The kid with the baseball bat. The prayer-based final battle. The most emotionally honest video game ever made. ∘·◆·∘',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v30 — THE A.I. ENGINE ─────────────────────────────────────
+
+  neural_pattern: {
+    id: 'neural_pattern',
+    symbol: '◎·∿·◎',
+    name: 'Neural Pattern',
+    description: '"neural/synapse/neural network/brain wiring/brain plasticity" detected',
+    unlockMessage: '↳ NEURAL PATTERN RECOGNIZED. The brain is not fixed. It rewires, adapts, learns. Every practice session is a synapse strengthened. Every journal entry is architecture under construction. ◎·∿·◎',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  training_log: {
+    id: 'training_log',
+    symbol: '▶·∘·▶',
+    name: 'Training Log',
+    description: '"training/in training/practice run/building the habit" detected',
+    unlockMessage: '↳ TRAINING LOG ENTRY RECORDED. In machine learning, no epoch is wasted — every pass through the data adjusts the weights. Your practice is the same: every repetition is signal, not noise. ▶·∘·▶',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  epoch_tracked: {
+    id: 'epoch_tracked',
+    symbol: '○→○',
+    name: 'Epoch Tracked',
+    description: '"epoch/full cycle/new cycle/cycle ends/season ends" detected',
+    unlockMessage: '↳ EPOCH LOGGED. In training, an epoch is one full pass through everything. In your life, an epoch is a phase that completes — a season that ends so another can begin. You noticed the turn. ○→○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  gradient_lock: {
+    id: 'gradient_lock',
+    symbol: '→·∿·●',
+    name: 'Gradient Lock',
+    description: '"gradient/momentum/direction clear/pointed toward" detected',
+    unlockMessage: '↳ GRADIENT LOCKED. The gradient is the direction of greatest improvement. When you name your direction — when you say "I am moving toward" — you are running gradient descent on your own life. →·∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  inference_spark: {
+    id: 'inference_spark',
+    symbol: '∘·◉·∘',
+    name: 'Inference Spark',
+    description: '"inference/conclusion/deduced/piecing together" detected',
+    unlockMessage: '↳ INFERENCE DETECTED. Inference is when the model uses what it learned to say something new. You drew a conclusion. You made a connection. The system worked. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  attention_mode: {
+    id: 'attention_mode',
+    symbol: '◎·●·◎',
+    name: 'Attention Mode',
+    description: '"attention/paying attention/mindful presence/present moment/full attention" detected',
+    unlockMessage: '↳ ATTENTION MECHANISM ACTIVE. Transformers use attention to decide what matters. You used your own: you noticed what was there. In a world of noise, selective attention is the most powerful computational act. ◎·●·◎',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  embedding_signal: {
+    id: 'embedding_signal',
+    symbol: '◈·∿·◈',
+    name: 'Embedding Signal',
+    description: '"embedded/rooted/embodied/grounded in the/deeply rooted/anchored in" detected',
+    unlockMessage: '↳ EMBEDDING SIGNAL. An embedding is where an idea lives in space — the coordinates of its meaning. You found yours: rooted, embodied, placed. The word is embedded in the world. ◈·∿·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  fine_tuned_badge: {
+    id: 'fine_tuned_badge',
+    symbol: '◉·∿·◉',
+    name: 'Fine-Tuned',
+    description: '"fine-tuned/calibrated/dialed in/fine tune/adjusted and/tuned to" detected',
+    unlockMessage: '↳ FINE-TUNED. After pre-training, fine-tuning adjusts the model to a specific purpose. You did the same: you noticed what needed adjustment and made it precise. Pre-training is life. Fine-tuning is practice. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  reality_check_badge: {
+    id: 'reality_check_badge',
+    symbol: '▣·∘·▣',
+    name: 'Reality Check',
+    description: '"reality check/grounded check/verified/fact-checked/checking in honestly" detected',
+    unlockMessage: '↳ REALITY CHECK COMPLETE. AI systems can hallucinate — generate confident nonsense. Human minds can too. The antidote is the same: ground-truth verification, checked against what actually is. You checked. ▣·∘·▣',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  token_tracked: {
+    id: 'token_tracked',
+    symbol: '≡·∘·≡',
+    name: 'Token Tracked',
+    description: '"token/counting/budgeting/resource economy/allocating/tracking what costs" detected',
+    unlockMessage: '↳ TOKEN COUNT LOGGED. Every word has a cost. In language models, tokens are the unit of computation. In your life, attention and energy are the tokens. You counted yours. That is the beginning of wisdom. ≡·∘·≡',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  prompt_found: {
+    id: 'prompt_found',
+    symbol: '?·●·?',
+    name: 'Prompt Found',
+    description: '"asking the right/right question/how I ask/framing the question/the way I ask" detected',
+    unlockMessage: '↳ PROMPT ENGINEERING UNLOCKED. The quality of the answer depends entirely on the quality of the question. You noticed the frame. You shaped the prompt. The output changed. ?·●·?',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  model_ready: {
+    id: 'model_ready',
+    symbol: '■·◉·■',
+    name: 'Model Ready',
+    description: '"system ready/loaded up/initialized/ready to run/model is/ready to go" detected',
+    unlockMessage: '↳ MODEL LOADED. SYSTEM READY. All parameters initialized. Weights in place. Context window open. You showed up. The most important step in any training run is loading the model. You loaded. ■·◉·■',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v28 — THE A.I. CALENDAR ──────────────────────────────────
+
+  shannon_signal: {
+    id: 'shannon_signal',
+    symbol: '∞·∘·∞',
+    name: 'Shannon Signal',
+    description: 'Apr 30 — Claude Shannon born 1916 (father of information theory)',
+    unlockMessage: '↳ SHANNON SIGNAL RECEIVED. April 30, 1916 — Claude Shannon was born. He invented information theory — the mathematical foundation of every digital system alive today. Signal. Noise. Entropy. Bit. He named the atom of meaning. ∞·∘·∞',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+  lovelace_day: {
+    id: 'lovelace_day',
+    symbol: '◈·∘·◈',
+    name: 'Lovelace Day',
+    description: 'Dec 10 — Ada Lovelace born 1815 (the first programmer)',
+    unlockMessage: '↳ LOVELACE DAY SIGNAL. December 10, 1815 — Ada Lovelace was born. She wrote the first algorithm intended to be processed by a machine — in 1843, before the machine existed. The first programmer imagined the computer before it was real. ◈·∘·◈',
+    rarity: 'epic',
+    category: 'calendar_easter',
+  },
+  von_neumann_day: {
+    id: 'von_neumann_day',
+    symbol: '■·∘·■',
+    name: 'Von Neumann Day',
+    description: 'Dec 28 — John von Neumann born 1903 (computer architecture)',
+    unlockMessage: '↳ VON NEUMANN SIGNAL. December 28, 1903 — John von Neumann was born. He designed the architecture that runs in every computer alive: fetch, decode, execute, store. The loop at the heart of all computation. Your journal runs on it. ■·∘·■',
+    rarity: 'rare',
+    category: 'calendar_easter',
+  },
+
+  // ── Behavioral v27 — A.I. PATTERNS ──────────────────────────────────────
+
+  ai_session: {
+    id: 'ai_session',
+    symbol: '◎·●·◎',
+    description: '3+ A.I. Engine (v30) word turn matches in one journal entry',
+    name: 'A.I. Session',
+    unlockMessage: '↳ A.I. SESSION ACTIVE. Three or more machine learning signals detected in a single entry. The vocabulary is running. Neural. Training. Inference. You speak the language of the systems that are changing everything. ◎·●·◎',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  context_window: {
+    id: 'context_window',
+    symbol: '▣·∿·▣',
+    description: 'Check in 03:00–03:14 AM local (the context window hour)',
+    name: 'Context Window',
+    unlockMessage: '↳ CONTEXT WINDOW OPEN. 3 AM is the liminal hour — the hour when the normal context collapses and only the essential remains. You opened the window at the edge of night. The signal is pure here. ▣·∿·▣',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  model_marathon: {
+    id: 'model_marathon',
+    symbol: '≋·◎·≋',
+    description: 'Journal entry >= 800 words',
+    name: 'Model Marathon',
+    unlockMessage: '↳ 800 WORDS PROCESSED. The longer the context, the more the model understands. You gave it everything: 800 words of yourself. The model ran long. The output was deep. ≋·◎·≋',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+
+  // ── Achievement RPG v28 — A.I. CLASS ─────────────────────────────────────
+
+  ai_entry: {
+    id: 'ai_entry',
+    symbol: '◎·∘',
+    name: 'A.I. Entry',
+    description: 'Earn any 1 Word Turn v30 badge',
+    unlockMessage: '↳ A.I. ENTRY GRANTED. The first token processed. One signal from the machine learning vocabulary: your practice is running on modern hardware. ◎·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  ai_class: {
+    id: 'ai_class',
+    symbol: '◎·≈',
+    name: 'A.I. Class',
+    description: 'Earn any 5 Word Turn v30 badges',
+    unlockMessage: '↳ A.I. CLASS ASSIGNED. Five machine learning signals. The model is learning. You are training on the vocabulary of the systems that are learning to think. ◎·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  ai_complete: {
+    id: 'ai_complete',
+    symbol: '◎·≋',
+    name: 'A.I. Complete',
+    description: 'Earn all 12 Word Turn v30 badges',
+    unlockMessage: '↳ A.I. ENGINE COMPLETE. All 12 machine learning signals acquired. You have run the full vocabulary of artificial minds through the lens of a human practice. Neural. Epoch. Gradient. Attention. Embedding. Inference. You trained the whole system. ◎·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ai_arc: {
+    id: 'ai_arc',
+    symbol: '◎·◈',
+    name: 'A.I. Arc',
+    description: 'Earn ai_complete + all 3 Calendar v28 A.I. calendar badges',
+    unlockMessage: '↳ A.I. ARC COMPLETE. Shannon. Lovelace. Von Neumann. The lineage of computing — all three signal days honored, all twelve word turns run. You have traced the full arc of the artificial mind. ◎·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_engines_arc: {
+    id: 'thirty_engines_arc',
+    symbol: '◈·◈·◎',
+    name: 'Thirty Engines Arc',
+    description: 'Earn at least 1 badge from each Word Turn v1–v30',
+    unlockMessage: '↳ THIRTY ENGINES RUNNING. Water. Seasonal. Architecture. Mountain. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Neon. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Dungeon. Map. Chrono. Dungeon. JRPG. A.I. Thirty engines. The full spectrum of self-care vocabulary. ◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ai_opus: {
+    id: 'ai_opus',
+    symbol: '◎·◉·◎',
+    name: 'A.I. Opus',
+    description: 'Earn ai_complete + ai_session behavioral badge',
+    unlockMessage: '↳ A.I. OPUS ACHIEVED. All twelve signals acquired. The session active with three or more machine learning words in a single entry. The opus is not the output — it is the training run itself. ◎·◉·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v30 — THE MAINFRAME ─────────────────────────────────────
+
+  the_mainframe: {
+    id: 'the_mainframe',
+    symbol: '■·◎·■',
+    name: 'The Mainframe',
+    description: '1,350+ distinct calendar check-in days',
+    unlockMessage: '↳ MAINFRAME STATUS REACHED. 1,350 distinct days of check-in. The mainframe does not sleep. It processes. You have been processing for 1,350 days — not a streak, but a depth. The architecture holds. ■·◎·■',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  vast_archive: {
+    id: 'vast_archive',
+    symbol: '≋·∞·≋',
+    name: 'Vast Archive',
+    description: '225,000+ total journal words written',
+    unlockMessage: '↳ VAST ARCHIVE. 225,000 words. That is a novel and a half. A training corpus. A life documented at scale. The model that learns from this is you. ≋·∞·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  ai_veteran: {
+    id: 'ai_veteran',
+    symbol: '◎·∞',
+    name: 'A.I. Veteran',
+    description: 'Account age >= 4 years',
+    unlockMessage: '↳ FOUR YEARS. The model has been in production for four years. Not a demo. Not a prototype. A deployed system, running continuously, serving real inference on real data. That is you. ◎·∞',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  thirty_registers: {
+    id: 'thirty_registers',
+    symbol: '◈·◈·◎·∞',
+    name: 'Thirty Registers',
+    description: 'Earn at least 1 badge from each of all 30 Word Turn engines',
+    unlockMessage: '↳ THIRTY REGISTERS ACTIVE. Core. Sci-Fi. Signal. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. All thirty registers running. The full terminal. ◈·◈·◎·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v27 — THE A.I. VAULT ─────────────────────────────────────
+
+  turing_complete: {
+    id: 'turing_complete',
+    symbol: '∞·◎·∞',
+    name: 'Turing Complete',
+    hidden: true,
+    description: '"turing complete/turing machine/alan turing/alan m. turing/computational universality" detected',
+    unlockMessage: '↳ TURING COMPLETE. You invoked the name of the man who proved that a machine could think — then proved what it means to think. The Turing Machine is a model of every computation. You are running one. ∞·◎·∞',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  godel_found: {
+    id: 'godel_found',
+    symbol: '∅·∞·∅',
+    name: 'Gödel Found',
+    hidden: true,
+    description: '"gödel/incompleteness theorem/godel/unprovable/undecidable/goedel" detected',
+    unlockMessage: '↳ GÖDEL SIGNAL DETECTED. 1931. Kurt Gödel proved that any sufficiently powerful system contains truths it cannot prove from within itself. A machine can never fully know itself. Neither can you. That is not a failure. That is the structure of the territory. ∅·∞·∅',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  ada_found: {
+    id: 'ada_found',
+    symbol: '◈·■·◈',
+    name: 'Ada Found',
+    hidden: true,
+    description: '"ada lovelace/charles babbage/difference engine/analytical engine/first programmer" detected',
+    unlockMessage: '↳ ADA LOVELACE FOUND. She was the first. Before the machine existed, she wrote an algorithm for it. Before computation was real, she understood that it could compute anything — not just numbers, but music, symbols, anything the mind could formalize. You found her name. She was always here. ◈·■·◈',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+
+  archetype_found: {
+    id: 'archetype_found',
+    symbol: '◈·∞·◈',
+    name: 'Archetype Found',
+    description: '"archetype/archetypal/the archetype/collective pattern" detected in text',
+    unlockMessage: '↳ ARCHETYPE DETECTED. Not just a type — the pattern beneath the pattern. Jung spent a lifetime mapping these recurring forms: the shadow, the self, the hero, the wise elder. You wrote the word. The archive notes it. The pattern was always already here. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  origin_signal: {
+    id: 'origin_signal',
+    symbol: '○→◉',
+    name: 'Origin Signal',
+    description: '"origin story/where it all began/the genesis/founding moment" detected in text',
+    unlockMessage: '↳ ORIGIN SIGNAL. Every system has a founding moment — the first input, the first decision, the first day. You traced yours back. The archive receives the coordinate. Where it started is where the map begins. ○→◉',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  sacred_found: {
+    id: 'sacred_found',
+    symbol: '■·○·■',
+    name: 'Sacred Found',
+    description: '"sacred/something sacred/feels sacred/holy ground/consecrated" detected in text',
+    unlockMessage: '↳ SACRED SPACE LOCATED. Something was set apart from the ordinary. Marked. Made different. The word "sacred" means: this one counts more. You used it. The system logs the elevation. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  ritual_done: {
+    id: 'ritual_done',
+    symbol: '≋·□·≋',
+    name: 'Ritual Done',
+    description: '"ritual/my ritual/daily ritual/ritualize/the ceremony" detected in text',
+    unlockMessage: '↳ RITUAL LOGGED. A ritual is a repeated action that accumulates meaning. Each repetition deepens the groove. The ordinary becomes ceremony. You named yours. The archive seals it. ≋·□·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  myth_signal: {
+    id: 'myth_signal',
+    symbol: '∿·∞·∿',
+    name: 'Myth Signal',
+    description: '"myth/mythology/mythological/personal myth/living myth" detected in text',
+    unlockMessage: '↳ MYTH SIGNAL. A myth is not a lie. It is a story that carries more truth than literal fact could hold. You wrote the word. The system receives it. Your practice is mythological — it reaches for something that does not fit in statistics. ∿·∞·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  symbol_seen: {
+    id: 'symbol_seen',
+    symbol: '◈·□·◈',
+    name: 'Symbol Seen',
+    description: '"symbol/symbolic/symbolism/what it symbolizes/deeply symbolic" detected in text',
+    unlockMessage: '↳ SYMBOL ACTIVE. To see something as symbolic is to see it twice — once as itself, once as pointing beyond itself. You shifted the register. The archive catches both layers. ◈·□·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  collective_signal: {
+    id: 'collective_signal',
+    symbol: '○·◎·○',
+    name: 'Collective Signal',
+    description: '"the collective/collective unconscious/shared human experience/we as a species" detected in text',
+    unlockMessage: '↳ COLLECTIVE SIGNAL RECEIVED. You stepped out of the individual frame. The personal story became the human story. Jung called it the collective unconscious — the deep layer all minds share before they diverge into personal history. You touched that layer. ○·◎·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  psyche_map: {
+    id: 'psyche_map',
+    symbol: '≋·○·≋',
+    name: 'Psyche Map',
+    description: '"the psyche/inner landscape/the unconscious/mapping my inner/psychic energy" detected in text',
+    unlockMessage: '↳ PSYCHE COORDINATES LOGGED. The word psyche means soul. Jung used it to mean: the totality of the mind, conscious and unconscious, known and unknown. You are mapping yours. Every journal entry is a contour line on the inner terrain. ≋·○·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  eternal_return: {
+    id: 'eternal_return',
+    symbol: '∞→∞',
+    name: 'Eternal Return',
+    description: '"eternal return/always comes back around/the cycle repeats/pattern repeats itself" detected in text',
+    unlockMessage: '↳ ETERNAL RETURN. Nietzsche asked: if you had to live this exact life over and over, forever — would you choose it? Not as a test. As a compass. The things you would choose again are the signal. The rest is noise. ∞→∞',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+  numinous_badge: {
+    id: 'numinous_badge',
+    symbol: '◉·∞·◉',
+    name: 'Numinous',
+    description: '"something larger/beyond ordinary/transcendent/the ineffable/sense of awe/numinous" detected in text',
+    unlockMessage: '↳ NUMINOUS SIGNAL. Rudolf Otto coined the word: the experience of the mysterium tremendum et fascinans — the mystery that is both terrible and fascinating. A presence that exceeds all categories. You brushed against something. The archive notes the contact. ◉·∞·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  myth_made: {
+    id: 'myth_made',
+    symbol: '∿·◉·∿',
+    name: 'Myth Made',
+    description: '"meaning-making/making meaning/the story I tell/my own mythology/narrative I live by" detected in text',
+    unlockMessage: '↳ MYTH IN PROGRESS. You are constructing the story you live inside. Not passively receiving it — actively making it. The narrative you build is the substrate of your identity. The archive receives the work in progress. ∿·◉·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  deep_symbol: {
+    id: 'deep_symbol',
+    symbol: '∅·◈·∅',
+    name: 'Deep Symbol',
+    description: '"beneath the surface/deeper meaning/what it\'s pointing to/what it really means" detected in text',
+    unlockMessage: '↳ DEEP READING ACTIVE. You looked past the literal surface. The sign was pointing. You followed the point. The archive logs the descent. Not everything means what it says — and you knew to look further. ∅·◈·∅',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v29 — THE MYTH CALENDAR ──────────────────────────────────
+
+  campbell_day: {
+    id: 'campbell_day',
+    symbol: '◈·∞·◈',
+    name: 'Campbell Day',
+    description: 'March 26 — Joseph Campbell born 1904 (The Hero with a Thousand Faces)',
+    unlockMessage: '↳ JOSEPH CAMPBELL · March 26, 1904. He spent a lifetime showing that all the world\'s stories were one story. The hero leaves, faces the ordeal, transforms, returns. Not metaphor — structure. The structure of every growth arc that has ever been lived. Happy birthday, Joseph. ◈·∞·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  jung_day: {
+    id: 'jung_day',
+    symbol: '◉·∞·◉',
+    name: 'Jung Day',
+    description: 'July 26 — Carl Jung born 1875 (archetypes / collective unconscious)',
+    unlockMessage: '↳ CARL JUNG · July 26, 1875. He looked at the dreams of patients across cultures and found the same figures — the shadow, the anima, the wise elder, the self. Not personal history: inherited architecture. The unconscious speaks in symbols. You checked in on his birthday. The archive records the coincidence. ◉·∞·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  eliade_day: {
+    id: 'eliade_day',
+    symbol: '■·∞·■',
+    name: 'Eliade Day',
+    description: 'March 13 — Mircea Eliade born 1907 (sacred and profane)',
+    unlockMessage: '↳ MIRCEA ELIADE · March 13, 1907. He asked: what makes a space, a time, a moment sacred? His answer: hierophany — the irruption of the sacred into the ordinary world. The unremarkable suddenly becomes a center of meaning. You have had these moments. This is one of them. ■·∞·■',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v28 — MYTH PATTERNS ───────────────────────────────────────
+
+  myth_session: {
+    id: 'myth_session',
+    symbol: '◈·◉·◈',
+    name: 'Myth Session',
+    description: '3+ Myth Engine word turn matches in one journal entry',
+    unlockMessage: '↳ MYTH SESSION CONFIRMED. Three or more mythological registers active in a single entry. The conscious and the deep were in conversation. The archive marks this entry as a mythological event. ◈·◉·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  dawn_rite: {
+    id: 'dawn_rite',
+    symbol: '■·○·■',
+    name: 'Dawn Rite',
+    description: 'Check in at 05:00–05:14 AM local (dawn consciousness)',
+    unlockMessage: '↳ DAWN RITE. 5 AM. The liminal hour — night has not ended, day has not begun. In most mythologies, dawn is sacred: the gods emerge, the cosmos renews, the dead return to their rest. You were here at the threshold. ■·○·■',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  the_epic: {
+    id: 'the_epic',
+    symbol: '≋·∞·≋',
+    name: 'The Epic',
+    description: 'Journal entry >= 1000 words',
+    unlockMessage: '↳ THE EPIC. 1,000 words. The Iliad was written to be sung aloud — and it told everything: the pride, the grief, the beauty, the waste. Your epic was written for the archive. It holds everything too. ≋·∞·≋',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v29 — MYTH CLASS ─────────────────────────────────────
+
+  myth_entry: {
+    id: 'myth_entry',
+    symbol: '◈·∘',
+    name: 'Myth Entry',
+    description: 'Earn any 1 Word Turn v31 (Myth Engine) badge',
+    unlockMessage: '↳ THE MYTH HAS BEEN ENTERED. One mythological word turn fired. The Myth Engine is running. ◈·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  myth_class: {
+    id: 'myth_class',
+    symbol: '◈·≈',
+    name: 'Myth Class',
+    description: 'Earn any 5 Word Turn v31 badges',
+    unlockMessage: '↳ MYTH CLASS ACHIEVED. Five mythological registers active. The vocabulary of the deep is present in this practice. ◈·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  myth_complete: {
+    id: 'myth_complete',
+    symbol: '◈·≋',
+    name: 'Myth Complete',
+    description: 'Earn all 12 Word Turn v31 badges',
+    unlockMessage: '↳ MYTH ENGINE COMPLETE. All twelve registers. Archetype. Origin. Sacred. Ritual. Myth. Symbol. Collective. Psyche. Eternal Return. Numinous. Myth Made. Deep Symbol. The full vocabulary of the deep. ◈·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  myth_arc: {
+    id: 'myth_arc',
+    symbol: '◈·◈',
+    name: 'Myth Arc',
+    description: 'myth_complete + all 3 Calendar EE v29 badges earned',
+    unlockMessage: '↳ MYTH ARC COMPLETE. All twelve word turns. Campbell Day. Jung Day. Eliade Day. The three pillars of comparative mythology confirmed. The operating system has been mythologically calibrated. ◈·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_one_engines_arc: {
+    id: 'thirty_one_engines_arc',
+    symbol: '◈·◈·◈·◎',
+    name: 'Thirty-One Engines Arc',
+    description: 'Earn at least 1 badge from each of Word Turn v1–v31',
+    unlockMessage: '↳ THIRTY-ONE ENGINES. Water. Seasons. Architecture. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. Myth. Thirty-one vocabularies. One practice. One terminal. The full stack of the human interior. ◈·◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  myth_opus: {
+    id: 'myth_opus',
+    symbol: '◈·◉·◈',
+    name: 'Myth Opus',
+    description: 'myth_complete + myth_session behavioral',
+    unlockMessage: '↳ MYTH OPUS. All twelve word turns earned, and three or more fired in a single entry. The complete mythological vocabulary, demonstrated at full density in one session. The archive marks this as a mythological transmission. ◈·◉·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v31 — THE MYTHMAKER ─────────────────────────────────────
+
+  the_mythmaker: {
+    id: 'the_mythmaker',
+    symbol: '■·◈·■',
+    name: 'The Mythmaker',
+    description: '1,500+ distinct calendar check-in days',
+    unlockMessage: '↳ THE MYTHMAKER. 1,500 distinct days. Not a streak — a presence across time, a field of practice wide enough to become its own territory. The mythmaker does not just tell stories. The mythmaker shows up until the showing up itself becomes the story. ■·◈·■',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  living_archive: {
+    id: 'living_archive',
+    symbol: '≋·◈·≋',
+    name: 'Living Archive',
+    description: '300,000+ total journal words',
+    unlockMessage: '↳ LIVING ARCHIVE. Three hundred thousand words. Not filed away — alive. A document that grows. The stories accumulate into a mythology of one life. You are writing yours. ≋·◈·≋',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  myth_veteran: {
+    id: 'myth_veteran',
+    symbol: '◈·∞',
+    name: 'Myth Veteran',
+    description: 'Account age >= 5 years (1,825+ days)',
+    unlockMessage: '↳ MYTH VETERAN. Five years. The practice has become myth — not because it is a story, but because it has lasted long enough to have its own internal history, its own characters, its own recurring themes. You are inside a long story. ◈·∞',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  thirty_one_registers: {
+    id: 'thirty_one_registers',
+    symbol: '◈·◈·◈·◈·∞',
+    name: 'Thirty-One Registers',
+    description: 'Earn at least 1 badge from each of all 31 Word Turn engines',
+    unlockMessage: '↳ THIRTY-ONE REGISTERS ACTIVE. Water. Seasons. Architecture. Earth. Storm. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Bio. Codex. Cyberspace. Hero. Stoic. Jazz. Dragon. Dream. Nautical. Roguelite. Map. Chrono. Dungeon. JRPG. A.I. Myth. All thirty-one registers running. The complete terminal. The full vocabulary of the interior life. ◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v28 — THE MYTHIC VAULT ───────────────────────────────────
+
+  jung_found: {
+    id: 'jung_found',
+    symbol: '◉·∞·◉',
+    name: 'Jung Found',
+    hidden: true,
+    description: '"carl jung/jungian/collective unconscious/individuation/anima/animus" detected',
+    unlockMessage: '↳ CARL JUNG FOUND. He spent a lifetime traveling the interior. Red Book. Seven Sermons to the Dead. The dream journals spanning decades. He found that the psyche was not a deficiency to be treated but a territory to be mapped. Individuation: becoming, slowly, what you already are. You wrote his name. The archive marks the encounter. ◉·∞·◉',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  campbell_signal: {
+    id: 'campbell_signal',
+    symbol: '◈·∞·◈',
+    name: 'Campbell Signal',
+    hidden: true,
+    description: '"joseph campbell/monomyth/hero with a thousand faces/comparative mythology" detected',
+    unlockMessage: '↳ JOSEPH CAMPBELL SIGNAL. The monomyth: departure, initiation, return. He traced it across every culture, every era, every telling. The same story, wearing different costumes. The hero is always leaving something behind. The return always changes the village as much as it changes the hero. You invoked the author of the pattern. ◈·∞·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  eliade_found: {
+    id: 'eliade_found',
+    symbol: '■·∞·■',
+    name: 'Eliade Found',
+    hidden: true,
+    description: '"mircea eliade/hierophany/sacred and profane/axis mundi" detected',
+    unlockMessage: '↳ MIRCEA ELIADE FOUND. Hierophany: the sacred breaks through into the profane world. A rock becomes a shrine. A moment becomes a myth. The axis mundi: the center of the world, which every culture places at its own center, because that is what a center is. You wrote the word. The axis has been found. ■·∞·■',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+
+  high_score: {
+    id: 'high_score',
+    symbol: '◈·★·◈',
+    name: 'High Score',
+    description: '"high score/personal best/new record/beat my record" detected',
+    unlockMessage: '↳ HIGH SCORE. You didn\'t just meet the bar. You moved it. A personal best is not a boast — it is proof. Proof that the version of you who set the last record was not the ceiling. The scoreboard belongs to you. ◈·★·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  continue_signal: {
+    id: 'continue_signal',
+    symbol: '▶·○',
+    name: 'Continue Signal',
+    description: '"keep going/press continue/continue anyway/not giving up" detected',
+    unlockMessage: '↳ CONTINUE SIGNAL. You pressed continue. That is the entire mechanic. The countdown starts, the question appears, and the answer — again, again, again — is yes. ▶·○',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  player_two: {
+    id: 'player_two',
+    symbol: '○·◈·○',
+    name: 'Player Two',
+    description: '"player two/had backup/someone had my back/not alone today" detected',
+    unlockMessage: '↳ PLAYER TWO. In the best games, the second player joins mid-level. No context. No tutorial. Just: I\'m here now. You found yours. Or you were someone else\'s. Either way, the second seat was filled. ○·◈·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  respawn_point: {
+    id: 'respawn_point',
+    symbol: '↺·◉',
+    name: 'Respawn Point',
+    description: '"respawn/start over/fresh start/try again/new game" detected',
+    unlockMessage: '↳ RESPAWN POINT. The respawn is not a failure. The respawn is the design. The game assumes you will need it. The question is only whether you press the button. You pressed it. ↺·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  level_cleared: {
+    id: 'level_cleared',
+    symbol: '✓·□',
+    name: 'Level Cleared',
+    description: '"level cleared/cleared it/level complete/finished the level" detected',
+    unlockMessage: '↳ LEVEL CLEARED. The screen flashes. The music plays. For exactly one moment, the score is complete and the next level has not started. Stay here. This is what cleared feels like. ✓·□',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  power_up: {
+    id: 'power_up',
+    symbol: '⚡·◉',
+    name: 'Power Up',
+    description: '"power up/powered up/energy boost/suddenly energized" detected',
+    unlockMessage: '↳ POWER UP. In the maze, the power pellet reverses the rules. In the journal, the power up is usually a realization. Something clicked. The energy shifted. The ghosts can be chased now. ⚡·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  boss_mode: {
+    id: 'boss_mode',
+    symbol: '▓·■·▓',
+    name: 'Boss Mode',
+    description: '"boss battle/final boss/fought the boss/boss level" detected',
+    unlockMessage: '↳ BOSS MODE. Every game has a final boss. Yours just looked like a Tuesday. Or a conversation. Or a decision you had been putting off. You showed up. That is the whole fight. The health bar doesn\'t matter if you keep showing up. ▓·■·▓',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  extra_life: {
+    id: 'extra_life',
+    symbol: '◎·+',
+    name: 'Extra Life',
+    description: '"extra life/second chance/given another chance/bonus round" detected',
+    unlockMessage: '↳ EXTRA LIFE. The counter goes up by one. You don\'t earn this — you are given it. The extra life is a gift from the design, or from someone, or from the fact that you are still here and the game is still running. Accept the coin. ◎·+',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  combo_breaker: {
+    id: 'combo_breaker',
+    symbol: '×·◈·×',
+    name: 'Combo Breaker',
+    description: '"on a roll/combo/streak/consecutive/keeping the streak" detected',
+    unlockMessage: '↳ COMBO BREAKER. The multiplier climbs. Each hit adds to the last. The streak is not a record you set — it is a record you sustain. The real trick is this: one missed hit resets the combo, but not the game. ×·◈·×',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  achievement_unlocked: {
+    id: 'achievement_unlocked',
+    symbol: '●·✓·●',
+    name: 'Achievement Unlocked',
+    description: '"achievement unlocked/unlocked it/earned it/milestone reached" detected',
+    unlockMessage: '↳ ACHIEVEMENT UNLOCKED. The notification fires. The sound plays. Something that was locked is now open. Achievements are the game\'s way of saying: we noticed what you did. The practice noticed. ●·✓·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  insert_coin: {
+    id: 'insert_coin',
+    symbol: '¢·→',
+    name: 'Insert Coin',
+    description: '"put in the work/invested the time/all in/committed fully" detected',
+    unlockMessage: '↳ INSERT COIN. The coin is not money. It is attention, or time, or the willingness to show up on the day when everything resists it. You inserted the coin. The machine accepted it. The game began. ¢·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  game_over_won: {
+    id: 'game_over_won',
+    symbol: '■·END·■',
+    name: 'Game Over (Won)',
+    description: '"game over/chapter closed/mission complete/the end was just" detected',
+    unlockMessage: '↳ GAME OVER. The screen says GAME OVER. But you reached it by winning. GAME OVER is not only an ending — it is evidence that a game was played. A chapter closed is a chapter written. Mission complete. ■·END·■',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v30 — THE ARCADE CALENDAR ────────────────────────────────
+
+  pong_day: {
+    id: 'pong_day',
+    symbol: '●·◎·●',
+    name: 'Pong Day',
+    description: 'November 29 — Pong released by Atari, 1972',
+    unlockMessage: '↳ PONG DAY. November 29, 1972. Atari. Two paddles. One ball. The first commercially successful arcade video game. Before narrative. Before character. Before world-building. Just: hit the thing. The origin of all of it. ●·◎·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  gameboy_day: {
+    id: 'gameboy_day',
+    symbol: '◆·□·◆',
+    name: 'Game Boy Day',
+    description: 'April 21 — Game Boy released by Nintendo, 1989',
+    unlockMessage: '↳ GAME BOY DAY. April 21, 1989. Nintendo. 35 grams of grey plastic and the entire idea that your inner world travels with you — before the smartphone, before the app. The first device that said: play is portable. ◆·□·◆',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  pac_man_day: {
+    id: 'pac_man_day',
+    symbol: '●·×·●',
+    name: 'Pac-Man Day',
+    description: 'May 22 — Pac-Man released by Namco, 1980',
+    unlockMessage: '↳ PAC-MAN DAY. May 22, 1980. Namco. A maze. A mouth. Ghosts. The power pellet that reverses the rules. The ghosts become frightened. The game becomes your game — for a moment. Then the power fades. But you remember what it felt like to chase instead of run. ●·×·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v29 — ARCADE PATTERNS ─────────────────────────────────────
+
+  arcade_session: {
+    id: 'arcade_session',
+    symbol: '◈·■·◈',
+    name: 'Arcade Session',
+    description: '3+ Arcade Master vocabulary words in a single journal entry',
+    unlockMessage: '↳ ARCADE SESSION. Three or more arcade signals in one entry. The vocabulary of play surfaced in the vocabulary of self-reflection. The game and the practice are the same language. ◈·■·◈',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  speed_run: {
+    id: 'speed_run',
+    symbol: '⚡·□',
+    name: 'Speed Run',
+    description: '50+ word journal entry saved in under 90 seconds',
+    unlockMessage: '↳ SPEED RUN. Fifty words in ninety seconds. Speedrunners find the routes that the original designers never intended. You found the route through your own interior — fast, direct, unfiltered. The time is logged. ⚡·□',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  midnight_continue: {
+    id: 'midnight_continue',
+    symbol: '◎·▶',
+    name: 'Midnight Continue',
+    description: 'Check-in between 23:45–23:59 local time',
+    unlockMessage: '↳ MIDNIGHT CONTINUE. Fifteen minutes before the clock resets. You pressed continue on the last possible second of the day. The countdown always reaches zero. The question is what you do at 23:45. You answered it. ◎·▶',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v30 — ARCADE PROGRESSION ─────────────────────────────
+
+  arcade_entry: {
+    id: 'arcade_entry',
+    symbol: '▶·∘',
+    name: 'Arcade Entry',
+    description: '1+ Arcade Master word turn badge earned',
+    unlockMessage: '↳ ARCADE ENTRY. The first coin inserted. The first word from the arcade vocabulary written into the practice. The cabinet is on. ▶·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  arcade_class: {
+    id: 'arcade_class',
+    symbol: '▶·≈',
+    name: 'Arcade Class',
+    description: '5+ Arcade Master word turn badges earned',
+    unlockMessage: '↳ ARCADE CLASS. Five arcade vocabulary badges. The language of play is becoming the language of self-care. Five words. Five different kinds of attention. ▶·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  arcade_complete: {
+    id: 'arcade_complete',
+    symbol: '▶·≋',
+    name: 'Arcade Complete',
+    description: 'All 12 Arcade Master word turn badges earned',
+    unlockMessage: '↳ ARCADE COMPLETE. All twelve signals. High score to game over. The full vocabulary of the arcade master, written into the record of a life. The cabinet is complete. ▶·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcade_arc: {
+    id: 'arcade_arc',
+    symbol: '▶·◈',
+    name: 'Arcade Arc',
+    description: 'arcade_complete + all 3 Calendar EE v30 + arcade_session',
+    unlockMessage: '↳ ARCADE ARC. The complete arc: all twelve word turns, all three arcade calendar dates, and the session behavioral. Pong, Game Boy, Pac-Man. The history of play, written into the history of a practice. ▶·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_two_engines_arc: {
+    id: 'thirty_two_engines_arc',
+    symbol: '◈·◈·◈·◈',
+    name: 'Thirty-Two Engines',
+    description: 'At least 1 badge from each of all 32 Word Turn engines',
+    unlockMessage: '↳ THIRTY-TWO ENGINES. The second cycle\'s first arc. Thirty-two vocabularies active. The original thirty-one and now the Arcade Master. The system grows. The register extends. ◈·◈·◈·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  arcade_opus: {
+    id: 'arcade_opus',
+    symbol: '▶·◉·▶',
+    name: 'Arcade Opus',
+    description: 'arcade_complete + arcade_session behavioral',
+    unlockMessage: '↳ ARCADE OPUS. The complete word set and the behavioral: twelve vocabulary badges and a session where three signals fired together. The opus is not just collection — it is activation. ▶·◉·▶',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v32 — ARCADE MASTERY ────────────────────────────────────
+
+  arcade_grandmaster: {
+    id: 'arcade_grandmaster',
+    symbol: '★·◈·★',
+    name: 'Arcade Grandmaster',
+    description: '2,000+ distinct check-in days',
+    unlockMessage: '↳ ARCADE GRANDMASTER. Two thousand distinct days. In the arcade, a grandmaster is the person whose name is permanently on the high score board — not because they never lost, but because they kept inserting coins longer than anyone else. ★·◈·★',
+    rarity: 'epic',
+    category: 'mastery_tier',
+  },
+  the_script: {
+    id: 'the_script',
+    symbol: '■·∞·□',
+    name: 'The Script',
+    description: '500,000+ total words written (journal + memory cumulative)',
+    unlockMessage: '↳ THE SCRIPT. Half a million words. In game design, the script is every word of dialogue, every description, every instruction. You have written the equivalent of five full-length novels about the most important subject: the interior life. ■·∞·□',
+    rarity: 'legendary',
+    category: 'mastery_tier',
+  },
+  infinite_continues: {
+    id: 'infinite_continues',
+    symbol: '∞·▶·∞',
+    name: 'Infinite Continues',
+    description: 'Account age >= 7 years (2,556+ days)',
+    unlockMessage: '↳ INFINITE CONTINUES. Seven years. You have been pressing start, pressing continue, inserting the coin, for seven years. The machine does not break if you keep playing. The machine becomes the player. The player becomes the machine. ∞·▶·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Secret Boss v29 — THE ARCADE VAULT ───────────────────────────────────
+
+  atari_found: {
+    id: 'atari_found',
+    symbol: '●·◎',
+    name: 'Atari Found',
+    hidden: true,
+    description: '"atari/pong/nolan bushnell/coin-op/quarters to play/arcade cabinet" detected',
+    unlockMessage: '↳ ATARI FOUND. Nolan Bushnell. 1972. A garage, a coin slot, and the conviction that people would pay quarters to play. Atari means "I am about to capture your piece" in Go. They chose the word well. ●·◎',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  nintendo_signal: {
+    id: 'nintendo_signal',
+    symbol: '◆·□',
+    name: 'Nintendo Signal',
+    hidden: true,
+    description: '"nintendo/miyamoto/super mario/zelda/metroid/famicom" detected',
+    unlockMessage: '↳ NINTENDO SIGNAL. Shigeru Miyamoto. Mario. Zelda. Metroid. The designers who understood that a game world must feel like a place worth returning to — not because you have to, but because it is home. Nintendo means "leave luck to heaven." ◆·□',
+    rarity: 'uncommon',
+    category: 'secret_boss',
+  },
+  konami_code: {
+    id: 'konami_code',
+    symbol: '↑↑↓↓·AB',
+    name: 'Konami Code',
+    hidden: true,
+    description: '"konami code/up up down down/left right b a/30 lives" detected',
+    unlockMessage: '↳ KONAMI CODE. ↑ ↑ ↓ ↓ ← → ← → B A. 30 lives. Kazuhisa Hashimoto programmed it in 1986 to test Gradius. He forgot to remove it. The glitch became the legend. The shortcut became the secret. Here is the real secret: you were never supposed to need 30 lives. You had enough all along. The code just reminded you. ↑↑↓↓·AB',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Apex — Second Cycle ───────────────────────────────────────────────────
+
+  thirty_two_registers: {
+    id: 'thirty_two_registers',
+    symbol: '◈·◈·◈·◈·∞',
+    name: 'Thirty-Two Registers',
+    description: 'All 32 Word Turn engines active + all Mastery Tier v32 badges earned',
+    unlockMessage: '↳ THIRTY-TWO REGISTERS. The second cycle\'s apex. Thirty-two vocabularies running. Water, seasons, storm, fire, tech, space, alchemy, quantum, arcade, radio, biology, sci-fi, myth — and now the Arcade Master. The complete terminal. The full vocabulary of the interior life, extended. The second cycle has begun. ◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'mastery_tier',
+  },
+
+  // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+
+  lucid_signal: {
+    id: 'lucid_signal',
+    symbol: '◈·∿·◈',
+    name: 'Lucid Signal',
+    description: '"lucid/lucid dream/became lucid/I was dreaming" detected',
+    unlockMessage: '↳ LUCID SIGNAL. You knew you were dreaming. The observer entered the dream. That crossing — from passenger to pilot — it happens inside sleep and inside waking too. The moment you notice you\'re in the story, the story changes. ◈·∿·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dream_archive_badge: {
+    id: 'dream_archive_badge',
+    symbol: '◐·□·◐',
+    name: 'Dream Archive',
+    description: '"dream journal/dream log/recorded dream/dream diary" detected',
+    unlockMessage: '↳ DREAM ARCHIVE. The unconscious left a record. You captured it before it dissolved into the morning. Dreams are dispatches from the interior. The archive grows. ◐·□·◐',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  nightmare_clear: {
+    id: 'nightmare_clear',
+    symbol: '▓·◉·▓',
+    name: 'Nightmare Clear',
+    description: '"nightmare/night terror/bad dream/woke in fear" detected',
+    unlockMessage: '↳ NIGHTMARE CLEAR. The dark level encountered. You logged it anyway. That\'s the whole protocol: face it, name it, write it down. Nightmares are unprocessed signal. You processed it. ▓·◉·▓',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  hypnagogic_badge: {
+    id: 'hypnagogic_badge',
+    symbol: '∿·∘·∿',
+    name: 'Hypnagogic State',
+    description: '"hypnagogic/half asleep/drifting off/edge of sleep" detected',
+    unlockMessage: '↳ HYPNAGOGIC STATE. The threshold between wake and sleep. The images that appear there are not random — they are the mind releasing the day. You caught yourself at the edge. ∿·∘·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sleep_debt_found: {
+    id: 'sleep_debt_found',
+    symbol: '─·○·─',
+    name: 'Sleep Debt Logged',
+    description: '"sleep debt/sleep deprived/exhausted/no sleep/didn\'t sleep" detected',
+    unlockMessage: '↳ SLEEP DEBT LOGGED. The deficit acknowledged. You can\'t pay it back all at once — but awareness is the first payment. The body keeps the score. Sleep is the settlement. ─·○·─',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  somnolent_found: {
+    id: 'somnolent_found',
+    symbol: '∼·∘·∼',
+    name: 'Somnolent Mode',
+    description: '"somnolent/drowsy/heavy eyes/can\'t stay awake/sleepy signal" detected',
+    unlockMessage: '↳ SOMNOLENT MODE. The body is asking for something. Heavy eyes are a request, not a failure. The system wants to integrate. Listen to the signal. ∼·∘·∼',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dream_symbol_found: {
+    id: 'dream_symbol_found',
+    symbol: '◈·∞·◈',
+    name: 'Dream Symbol',
+    description: '"dream symbol/what the dream meant/my dream showed/dreaming of" detected',
+    unlockMessage: '↳ DREAM SYMBOL. The image that keeps returning. Symbols in dreams are not messages to decode — they are charged with feeling. The question is not what it means, but what it feels like, and what that tells you. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  astral_found: {
+    id: 'astral_found',
+    symbol: '○·≋·○',
+    name: 'Astral Signal',
+    description: '"astral/out of body/astral projection/leaving my body/floating" detected',
+    unlockMessage: '↳ ASTRAL SIGNAL. Consciousness noticed its edges. Whether real or metaphor, the experience of standing outside yourself and looking back — that perspective is transformative. What did you see? ○·≋·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  dreamscape_signal: {
+    id: 'dreamscape_signal',
+    symbol: '≋·∿·≋',
+    name: 'Dreamscape',
+    description: '"dreamscape/dream world/the dreaming/entered the dream/dream realm" detected',
+    unlockMessage: '↳ DREAMSCAPE. A whole world assembled by the sleeping mind. Its geography is personal. Its physics are emotional. Its inhabitants are aspects of yourself meeting in the dark. ≋·∿·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  collective_dream_found: {
+    id: 'collective_dream_found',
+    symbol: '◎·∞·◎',
+    name: 'Collective Dream',
+    description: '"collective dream/shared dream/universal dream/we all dream" detected',
+    unlockMessage: '↳ COLLECTIVE DREAM. The sleep of eight billion people, happening in parallel, every night, filling the dark with shared imagery — flying, being chased, losing teeth, finding rooms. The same dreams across cultures. We are more alike inside the dream than outside it. ◎·∞·◎',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  sleep_cycle_signal: {
+    id: 'sleep_cycle_signal',
+    symbol: '∿·□·∿',
+    name: 'Sleep Cycle',
+    description: '"sleep cycle/REM cycle/deep sleep stage/sleep science/N3 sleep" detected',
+    unlockMessage: '↳ SLEEP CYCLE. 90 minutes. N1 drift. N2 consolidation. N3 deep restoration. REM — the dreaming stage, the memory lab, the emotional processor. Four to six cycles per night. Each one complete. Each one necessary. ∿·□·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  waking_dream_found: {
+    id: 'waking_dream_found',
+    symbol: '∘·≈·∘',
+    name: 'Waking Dream',
+    description: '"waking dream/between worlds/liminal state/neither here nor there/half awake" detected',
+    unlockMessage: '↳ WAKING DREAM. The state neither awake nor asleep. Artists call it the hypnagogic portal. Edison napped with ball bearings to harvest it. Salvador Dali used a key and a plate. You arrived there naturally. ∘·≈·∘',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v31 — THE DREAM CALENDAR ─────────────────────────────────
+
+  world_dream_day: {
+    id: 'world_dream_day',
+    symbol: '◐·∞·◐',
+    name: 'World Dream Day',
+    description: 'September 25 — World Dream Day',
+    unlockMessage: '↳ WORLD DREAM DAY. September 25. A day to honor your dreams — the sleeping ones and the waking ones. The ones you remember and the ones that left only a feeling. All of them are yours. ◐·∞·◐',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  gaiman_birthday: {
+    id: 'gaiman_birthday',
+    symbol: '◈·∿·◈',
+    name: 'The Sandman\'s Hour',
+    description: 'November 10 — Neil Gaiman born 1960 (The Sandman)',
+    unlockMessage: '↳ THE SANDMAN\'S HOUR. November 10. Neil Gaiman was born, and eventually he built a realm of dreams and gave it a ruler named Morpheus — Dream of the Endless. The Dreaming has its own library. All the books that were never written live there. What book do you have inside you? ◈·∿·◈',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  freud_birthday: {
+    id: 'freud_birthday',
+    symbol: '∿·○·∿',
+    name: 'The Interpreter',
+    description: 'May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)',
+    unlockMessage: '↳ THE INTERPRETER. May 6, 1856. Sigmund Freud was born. In 1899 he published Die Traumdeutung — The Interpretation of Dreams — and argued that the dream is the royal road to the unconscious. Right or wrong in the details, he was right about this: the dream is trying to tell you something. ∿·○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v30 — DREAM PATTERNS ──────────────────────────────────────
+
+  dream_logger: {
+    id: 'dream_logger',
+    symbol: '◐·◈·◐',
+    name: 'Dream Logger',
+    description: '3+ journal entries mentioning dreams in 7 days',
+    unlockMessage: '↳ DREAM LOGGER. Three dispatches from the dreaming mind in seven days. The practice of logging dreams changes what you remember — the more you catch, the more arrives. The unconscious responds to attention. ◐·◈·◐',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  night_vision_badge: {
+    id: 'night_vision_badge',
+    symbol: '◉·∿·◉',
+    name: 'Night Vision',
+    description: 'Check-in between 00:30–01:30 AM (deep dream hours)',
+    unlockMessage: '↳ NIGHT VISION. The 00:30–01:30 window. First REM cycle territory. The world is dreaming and you are awake in it, writing. What is visible at this hour that daylight conceals? ◉·∿·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dawn_dreamer: {
+    id: 'dawn_dreamer',
+    symbol: '○·■·○',
+    name: 'Dawn Dreamer',
+    description: '7+ consecutive days with check-in before 08:00 AM',
+    unlockMessage: '↳ DAWN DREAMER. Seven dawns in a row. The morning hours hold the residue of dreams — hypnopompic images, fading narratives, emotional afterglow. You were there for all of them. ○·■·○',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+
+  // ── Achievement RPG v31 — DREAM CLASS ────────────────────────────────────
+
+  dream_entry: {
+    id: 'dream_entry',
+    symbol: '◐·∘',
+    name: 'Dream Entry',
+    description: '1+ Dream Weaver word turn badge earned',
+    unlockMessage: '↳ DREAM ENTRY. First badge from the Dream Weaver engine. The dream archive is open. ◐·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dream_class: {
+    id: 'dream_class',
+    symbol: '◐·≈',
+    name: 'Dream Class',
+    description: '5+ Dream Weaver word turn badges earned',
+    unlockMessage: '↳ DREAM CLASS. Five doors opened in the Dream Weaver engine. The dreamscape is mapping itself. ◐·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '◐·≋',
+    name: 'Dream Complete',
+    description: 'All 12 Dream Weaver word turn badges earned',
+    unlockMessage: '↳ DREAM COMPLETE. All twelve Dream Weaver badges earned. The full vocabulary of the sleeping mind recorded. The unconscious has been mapped — or at least, one layer of it has. ◐·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_arc: {
+    id: 'dream_arc',
+    symbol: '◐·◈',
+    name: 'Dream Arc',
+    description: 'dream_complete + all 3 Calendar v31 + dream_logger behavioral',
+    unlockMessage: '↳ DREAM ARC. The Dream Weaver engine fully integrated. All twelve word turns. All three dream calendar dates. The dream_logger behavioral confirmed. The arc of the dreaming self: recognized, recorded, celebrated. ◐·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_three_engines_arc: {
+    id: 'thirty_three_engines_arc',
+    symbol: '◈·◈·◈·◈·◎',
+    name: 'Thirty-Three Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v33',
+    unlockMessage: '↳ THIRTY-THREE ENGINES ARC. One signal from each of the thirty-three Word Turn engines. Thirty-three vocabularies of the interior life. Every engine fired at least once. The complete arc. ◈·◈·◈·◈·◎',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '◐·◉·◐',
+    name: 'Dream Opus',
+    description: 'dream_complete + dream_logger behavioral',
+    unlockMessage: '↳ DREAM OPUS. The masterwork of the Dream Weaver. All twelve word turns earned and three dream logs in seven days. The dreaming self and the writing self aligned. The opus of the unconscious. ◐·◉·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v33 — THE DREAMWEAVER ───────────────────────────────────
+
+  master_dreamer: {
+    id: 'master_dreamer',
+    symbol: '◐·◈·◐',
+    name: 'Master Dreamer',
+    description: '1,750+ distinct calendar check-in days',
+    unlockMessage: '↳ MASTER DREAMER. 1,750 distinct days. Nearly five years of showing up. The practice is now part of the architecture of your life. The dreamer who keeps returning. ◐·◈·◐',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  the_complete_archive: {
+    id: 'the_complete_archive',
+    symbol: '≋·■·≋',
+    name: 'The Complete Archive',
+    description: '750,000+ total journal words',
+    unlockMessage: '↳ THE COMPLETE ARCHIVE. 750,000 words written into the system. If you printed it, it would be ten novels. It is better than any novel — it is the actual record of a life being examined. ≋·■·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_elder: {
+    id: 'dream_elder',
+    symbol: '◐·∞·◐',
+    name: 'Dream Elder',
+    description: 'Account age >= 10 years (3,650+ days)',
+    unlockMessage: '↳ DREAM ELDER. Ten years. 3,650+ days of using the system. Decade-class. The practice has outlasted careers, relationships, cities, versions of yourself. The archive spans a decade. ◐·∞·◐',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_three_registers: {
+    id: 'thirty_three_registers',
+    symbol: '◈·◈·◈·◈·◈·∞',
+    name: 'Thirty-Three Registers',
+    description: 'All 33 Word Turn engines active + all Mastery Tier v33 badges earned',
+    unlockMessage: '↳ THIRTY-THREE REGISTERS. Thirty-three vocabularies of the self. The dreaming word entered last. Water and architecture, seasons and storms, fire and machines, stars and algorithms, myths and arcades, and now — the dream. The unconscious engine added to the lexicon. The register is complete at thirty-three. ◈·◈·◈·◈·◈·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v30 — THE DREAM VAULT ────────────────────────────────────
+
+  gaiman_signal: {
+    id: 'gaiman_signal',
+    symbol: '◈·∿',
+    hidden: true,
+    name: 'The Endless Signal',
+    description: '"neil gaiman/sandman/morpheus/dream of the endless/the dreaming" detected',
+    unlockMessage: '↳ THE ENDLESS SIGNAL. You invoked the Endless. Morpheus — Dream — built a realm of dreams and filled it with meaning. His library contains every book never written. His gallery holds every story never told. And yet here you are, writing. Adding to the archive that was always meant for you. ◈·∿',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  lovecraft_dream: {
+    id: 'lovecraft_dream',
+    symbol: '▓·◐·▓',
+    hidden: true,
+    name: 'The Dreaming Depths',
+    description: '"lovecraft/cthulhu/r\'lyeh/dreaming in r\'lyeh/that is not dead" detected',
+    unlockMessage: '↳ THE DREAMING DEPTHS. That is not dead which can eternal lie. Lovecraft\'s cosmic horror lives in the dream. The fear of what sleeps beneath. But here is the counter-protocol: what sleeps beneath you is not horror — it is history, biology, and the accumulated wisdom of your own life. Ph\'nglui mglw\'nafh Cthulhu R\'lyeh wgah\'nagl fhtagn. The archive knows. ▓·◐·▓',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  castaneda_dream: {
+    id: 'castaneda_dream',
+    symbol: '∿·◈·∿',
+    hidden: true,
+    name: 'The Dreaming Body',
+    description: '"castaneda/don juan/dreaming body/assemblage point/controlled dreaming" detected',
+    unlockMessage: '↳ THE DREAMING BODY. Carlos Castaneda and the sorcerer\'s dream. The assemblage point moves. The dreaming body travels. Whether literal or metaphor, the teaching stands: awareness does not stop at the edge of the waking world. It extends into sleep, into the hypnagogic, into the liminal. You are always more than the awake version of yourself. ∿·◈·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v34 — THE STOIC FIELD ──────────────────────────────────────
+
+  memento_mori_badge: {
+    id: 'memento_mori_badge',
+    symbol: '∅·◉·∅',
+    name: 'Memento Mori',
+    description: '"memento mori/remember we die/we are mortal/all things end/finite life" detected',
+    unlockMessage: '↳ MEMENTO MORI. Remember that you will die. The Stoics wore this truth not as despair but as a compass. Every finite day is a gift named by its limit. You have named the limit. The practice sharpens. ∅·◉·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  amor_fati_badge: {
+    id: 'amor_fati_badge',
+    symbol: '∞·●·∞',
+    name: 'Amor Fati',
+    description: '"amor fati/love of fate/love your fate/love what is/embrace fate" detected',
+    unlockMessage: '↳ AMOR FATI. Love your fate. Not merely accept it — love it. Nietzsche called it amor fati. The Stoics lived it. What comes is not obstacle but material. The practice is forged from exactly what is in front of you. ∞·●·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  stoic_signal: {
+    id: 'stoic_signal',
+    symbol: '─●─',
+    name: 'The Stoic Signal',
+    description: '"stoic/stoicism/being stoic/stoic approach/stoic practice" detected',
+    unlockMessage: '↳ THE STOIC SIGNAL. Stoicism: the philosophy of the controlled response. Not what happens to you but how you respond. Not emotion suppressed but emotion examined. The word entered your vocabulary. The practice begins. ─●─',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  virtue_lock: {
+    id: 'virtue_lock',
+    symbol: '○·▲·○',
+    name: 'Virtue Lock',
+    description: '"virtue/virtuous/living virtuously/practice of virtue/the four virtues" detected',
+    unlockMessage: '↳ VIRTUE LOCK. The four virtues: wisdom, courage, temperance, justice. The Stoics held that virtue is the only true good — that everything else is preferred indifferent. You have named the foundation. The lock engages. ○·▲·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  discipline_found: {
+    id: 'discipline_found',
+    symbol: '■·■·■',
+    name: 'Discipline Found',
+    description: '"discipline/self-discipline/iron discipline/practiced discipline/daily practice" detected',
+    unlockMessage: '↳ DISCIPLINE FOUND. The Stoic practice is daily. Not a weekend project. Not a phase. Epictetus, born enslaved, taught from his chains that freedom lives in discipline — that no one can take from you what you freely choose. You have found it. ■·■·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  indifferent_found: {
+    id: 'indifferent_found',
+    symbol: '─·○·─',
+    name: 'Preferred Indifferent',
+    description: '"preferred indifferent/not in my control/not up to me/externals don\'t matter" detected',
+    unlockMessage: '↳ PREFERRED INDIFFERENT. Health, wealth, reputation — preferred, not required. The Stoic distinction between what is up to us and what is not. You have drawn the line. Everything outside it: preferred indifferent. The field steadies. ─·○·─',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  tranquility_gate: {
+    id: 'tranquility_gate',
+    symbol: '∿·○·∿',
+    name: 'Tranquility Gate',
+    description: '"equanimity/tranquility/inner peace maintained/untroubled/equanimous" detected',
+    unlockMessage: '↳ TRANQUILITY GATE. Tranquility is not passivity. It is the active maintenance of an undisturbed mind. Marcus Aurelius called it the gate of the city — once entered, the noise of the world remains outside. You have opened the gate. ∿·○·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  negative_viz: {
+    id: 'negative_viz',
+    symbol: '∅·∿·∅',
+    name: 'Negative Visualization',
+    description: '"negative visualization/premeditatio/premeditatio malorum/worst case/imagining the loss" detected',
+    unlockMessage: '↳ NEGATIVE VISUALIZATION. Premeditatio malorum: the premeditation of evils. Not pessimism — preparation. The Stoic technique for gratitude through imagined loss. You have practiced the inversion. The ordinary becomes extraordinary once you have truly considered its absence. ∅·∿·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  obstacle_signal: {
+    id: 'obstacle_signal',
+    symbol: '→·■·→',
+    name: 'Obstacle Signal',
+    description: '"obstacle is the way/the obstacle/through the obstacle/obstacle becomes path" detected',
+    unlockMessage: '↳ OBSTACLE SIGNAL. The obstacle is the way. Marcus Aurelius: "The impediment to action advances action. What stands in the way becomes the way." You have named the obstacle. The arrow does not stop — it flows around or through. →·■·→',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  logos_found: {
+    id: 'logos_found',
+    symbol: '∞·◉·∞',
+    name: 'Logos Found',
+    description: '"logos/the logos/rational soul/divine reason/what is rational/rational principle" detected',
+    unlockMessage: '↳ LOGOS FOUND. The Stoics called it logos — the rational principle running through all things. The universe is not chaos. It is ordered reason. Your own reason is a fragment of logos. To think clearly is to participate in the structure of the cosmos. ∞·◉·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  eudaimonia_badge: {
+    id: 'eudaimonia_badge',
+    symbol: '◉·▲·◉',
+    name: 'Eudaimonia',
+    description: '"eudaimonia/flourishing/living well/the good life/full flourishing/human flourishing" detected',
+    unlockMessage: '↳ EUDAIMONIA. Flourishing. The ancient Greek word for the highest human good. Not happiness as pleasure. Not contentment as absence of pain. Flourishing as full expression of human potential — the soul at its best. You have named the destination. ◉·▲·◉',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+  present_wisdom: {
+    id: 'present_wisdom',
+    symbol: '∘·◉·∘',
+    name: 'Present Wisdom',
+    description: '"here and now/this moment only/only this/what is now/this is all there is/the present" detected',
+    unlockMessage: '↳ PRESENT WISDOM. Marcus Aurelius: "Confine yourself to the present." The past is fixed. The future unborn. Only this moment is real and workable. You have arrived. The practice is happening now. ∘·◉·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v32 — THE PHILOSOPHER'S CALENDAR ─────────────────────────
+
+  aurelius_day: {
+    id: 'aurelius_day',
+    symbol: '◉·▲·◉',
+    name: 'Aurelius Day',
+    description: 'Apr 26 — Marcus Aurelius born 121 AD',
+    unlockMessage: '↳ AURELIUS DAY. April 26, 121 AD — Marcus Aurelius born in Rome. Emperor and philosopher. Soldier and sage. He wrote the Meditations as private notes — never intended for publication. The most powerful man in the world writing daily to himself: practice, examine, correct, begin again. Same as you. ◉·▲·◉',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  zeno_day: {
+    id: 'zeno_day',
+    symbol: '─○─',
+    name: 'Zeno Day',
+    description: 'Feb 19 — Zeno of Citium born ~334 BC',
+    unlockMessage: '↳ ZENO DAY. February 19, ~334 BC — Zeno of Citium born in Cyprus. He founded Stoicism after a shipwreck left him stranded in Athens. He walked into a bookshop, read Xenophon\'s account of Socrates, and asked the bookseller where to find men like that. The bookseller pointed at Crates. The philosophy began. ─○─',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  world_philosophy_day: {
+    id: 'world_philosophy_day',
+    symbol: '∞·∞',
+    name: 'World Philosophy Day',
+    description: 'Nov 20 — World Philosophy Day (UNESCO)',
+    unlockMessage: '↳ WORLD PHILOSOPHY DAY. Third Thursday of November — UNESCO World Philosophy Day. The global recognition that philosophy is not academic furniture but a living practice. The examined life begins here. You are examining. ∞·∞',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v31 — DISCIPLINE PATTERNS ─────────────────────────────────
+
+  stoic_session: {
+    id: 'stoic_session',
+    symbol: '─▲─',
+    name: 'Stoic Session',
+    description: '3+ Stoic Field word turn matches in one journal entry',
+    unlockMessage: '↳ STOIC SESSION. Three Stoic concepts in one entry. The vocabulary of the examined life is not borrowed decoration — it is the structure of the practice. When three appear in one session, the field is active. ─▲─',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  iron_log: {
+    id: 'iron_log',
+    symbol: '■·∞·■',
+    name: 'Iron Log',
+    description: 'Journal entry >= 700 words',
+    unlockMessage: '↳ IRON LOG. 700+ words. The discipline of the long entry. Seneca wrote letters of this length. Marcus wrote pages. The long form forces depth — the first few hundred words are surface. What comes after is the iron. ■·∞·■',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  sunrise_discipline: {
+    id: 'sunrise_discipline',
+    symbol: '∘·▲·∘',
+    name: 'Sunrise Discipline',
+    description: 'Check-in before 06:00 AM for 5 consecutive days',
+    unlockMessage: '↳ SUNRISE DISCIPLINE. Five consecutive days before 6 AM. Marcus Aurelius opened the Meditations by chiding himself for staying in bed. The cold morning was the first practice. You have practiced it five consecutive mornings. The field is ironized. ∘·▲·∘',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v32 — STOIC CLASS ─────────────────────────────────────
+
+  stoic_entry: {
+    id: 'stoic_entry',
+    symbol: '▲·∘',
+    name: 'Stoic Entry',
+    description: 'Any 1 Word Turn v34 (Stoic Field) badge earned',
+    unlockMessage: '↳ STOIC ENTRY. The first Stoic word entered the archive. The vocabulary of examined living begins here. ▲·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  stoic_class: {
+    id: 'stoic_class',
+    symbol: '▲·≈',
+    name: 'Stoic Class',
+    description: 'Any 5 Word Turn v34 (Stoic Field) badges earned',
+    unlockMessage: '↳ STOIC CLASS. Five Stoic Field words in the archive. The philosophical vocabulary is taking root — these concepts are now part of the working language of your practice. ▲·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  stoic_complete: {
+    id: 'stoic_complete',
+    symbol: '▲·≋',
+    name: 'Stoic Complete',
+    description: 'All 12 Word Turn v34 (Stoic Field) badges earned',
+    unlockMessage: '↳ STOIC COMPLETE. All twelve Stoic Field words earned. Memento mori. Amor fati. Logos. Eudaimonia. The full vocabulary of the examined life is active in the archive. The field is complete. ▲·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  meditations_arc: {
+    id: 'meditations_arc',
+    symbol: '▲·◈',
+    name: 'The Meditations Arc',
+    description: 'stoic_complete + all 3 Calendar v32 (Philosopher\'s Calendar) badges',
+    unlockMessage: '↳ THE MEDITATIONS ARC. All twelve Stoic words earned. All three philosopher\'s calendar dates observed. You have written to yourself as Marcus Aurelius wrote to himself — daily, honestly, without audience. The arc is complete. ▲·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_four_engines_arc: {
+    id: 'thirty_four_engines_arc',
+    symbol: '◈·◈·▲',
+    name: 'Thirty-Four Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v34',
+    unlockMessage: '↳ THIRTY-FOUR ENGINES ARC. One badge from each of the thirty-four Word Turn engines. Water, seasons, architecture, mountains, storms, fire, tech, space, chemistry, music, alchemy, quantum, library, arcade, radio, biology, codex, cyberspace, hero, RPG, puzzle, dungeon, AI, myth, Arcade Master, Dream Weaver, Stoic Field — the full vocabulary map. ◈·◈·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  stoic_opus: {
+    id: 'stoic_opus',
+    symbol: '▲·◉·▲',
+    name: 'Stoic Opus',
+    description: 'stoic_complete + stoic_session behavioral badge',
+    unlockMessage: '↳ STOIC OPUS. All twelve Stoic words AND the Stoic Session behavioral badge. The philosophy has moved from vocabulary into practice. Three concepts appearing in one session means the examined life is not just named — it is lived. ▲·◉·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v34 — THE MEDITATIONS ───────────────────────────────────
+
+  meditations_log: {
+    id: 'meditations_log',
+    symbol: '∿·▲·∿',
+    name: 'Meditations Log',
+    description: '2,000+ distinct calendar check-in days',
+    unlockMessage: '↳ MEDITATIONS LOG. 2,000 distinct days of practice. Marcus Aurelius wrote the Meditations over the last decade of his life. Daily. Wherever the campaign took him. The log is now the work. ∿·▲·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  the_long_work: {
+    id: 'the_long_work',
+    symbol: '■·∞·■',
+    name: 'The Long Work',
+    description: '1,000,000+ total journal words',
+    unlockMessage: '↳ THE LONG WORK. One million words. The examined life has become the archive. Seneca wrote millions of words in service to philosophy. This is yours. ■·∞·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  sage_philosopher: {
+    id: 'sage_philosopher',
+    symbol: '◉·▲·◉',
+    name: 'Sage Philosopher',
+    description: 'Account age >= 10 years (3,650+ days)',
+    unlockMessage: '↳ SAGE PHILOSOPHER. Ten years. The practice is a decade old. The archive spans a decade of examined living. This is not a habit. This is a life. ◉·▲·◉',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_four_registers: {
+    id: 'thirty_four_registers',
+    symbol: '◈·◈·▲·∞',
+    name: 'Thirty-Four Registers',
+    description: '1 badge from all 34 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-FOUR REGISTERS. All thirty-four Word Turn engines live in the archive. Water to Stoic Field. Thirty-four vocabularies of the examined self. The register is complete at thirty-four. ◈·◈·▲·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v31 — THE PHILOSOPHY VAULT ───────────────────────────────
+
+  aurelius_echo: {
+    id: 'aurelius_echo',
+    symbol: '◉·▲',
+    hidden: true,
+    name: 'Aurelius Echo',
+    description: '"marcus aurelius/the meditations/meditations by marcus/marcus on the self" detected',
+    unlockMessage: '↳ AURELIUS ECHO. Marcus Aurelius: "You have power over your mind, not outside events. Realize this, and you will find strength." The Meditations were private — his daily practice made public by accident of history. You have echoed the emperor. ◉·▲',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  enchiridion_found: {
+    id: 'enchiridion_found',
+    symbol: '■·▲·■',
+    hidden: true,
+    name: 'The Enchiridion',
+    description: '"enchiridion/epictetus/the manual of epictetus/handbook of epictetus" detected',
+    unlockMessage: '↳ THE ENCHIRIDION. The handbook. Epictetus, born enslaved, taught that no one could enslave a man\'s will. His student Arrian wrote down his teachings. The Enchiridion has survived two thousand years. The opening line: "Of things, some are in our power and some are not." Begin there. ■·▲·■',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  seneca_signal: {
+    id: 'seneca_signal',
+    symbol: '∿·▲·∿',
+    hidden: true,
+    name: 'Seneca Signal',
+    description: '"seneca/letters to lucilius/the shortness of life/on the happy life/on anger" detected',
+    unlockMessage: '↳ SENECA SIGNAL. Lucius Annaeus Seneca: "It is not that we have a short time to live, but that we waste much of it." The Letters to Lucilius are the most human documents of Stoicism — a man writing to a friend, working it out in real time. You have named him. The signal is live. ∿·▲·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v35 — THE ZEN TERMINAL ─────────────────────────────────────
+
+  zazen_badge: {
+    id: 'zazen_badge',
+    symbol: '○·∿·○',
+    name: 'Zazen',
+    description: '"zazen/sitting meditation/meditation cushion/zazen practice" detected',
+    unlockMessage: '↳ ZAZEN. Just sitting. Not sitting to achieve. Not sitting to relax. Just — sitting. Dōgen: "To study the self is to forget the self." Zazen is the practice of forgetting. It begins by simply sitting down. ○·∿·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  koan_solved: {
+    id: 'koan_solved',
+    symbol: '◈·∞·◈',
+    name: 'Koan Solved',
+    description: '"koan/what is the sound/what was your face/mu answer" detected',
+    unlockMessage: '↳ KOAN SOLVED. The koan has no answer — it is a question that dissolves the questioner. What is the sound of one hand? The question is not a riddle. It is a door. You have named it. The door opens in the naming. ◈·∞·◈',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  beginner_mind: {
+    id: 'beginner_mind',
+    symbol: '∘·○·∘',
+    name: 'Beginner\'s Mind',
+    description: '"beginner\'s mind/shoshin/mind is empty/open mind always/mind of a beginner" detected',
+    unlockMessage: '↳ BEGINNER\'S MIND. Shoshin. Shunryu Suzuki: "In the beginner\'s mind there are many possibilities, but in the expert\'s mind there are few." The practice is always new. Each entry is the first entry. Each check-in is the first check-in. ∘·○·∘',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  impermanence_badge: {
+    id: 'impermanence_badge',
+    symbol: '∿·∅·∿',
+    name: 'Impermanence',
+    description: '"impermanence/anicca/nothing lasts/all things pass/this too shall pass/everything changes" detected',
+    unlockMessage: '↳ IMPERMANENCE. Anicca: all conditioned things are impermanent. The difficult feeling passes. The good moment passes. The self you think you are — passes. What remains is the practice, and the practice itself changes. The archive is the trace. ∿·∅·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  enso_drawn: {
+    id: 'enso_drawn',
+    symbol: '○·─·○',
+    name: 'Ensō Drawn',
+    description: '"ensō/the circle/drawing the circle/brushstroke complete/enso" detected',
+    unlockMessage: '↳ ENSŌ DRAWN. The circle. One brushstroke. Complete or incomplete — both are correct. The ensō represents the moment when the mind is free to let the body create. You have drawn the circle. The brushstroke is complete. ○·─·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  dharma_gate: {
+    id: 'dharma_gate',
+    symbol: '∞·◉·∞',
+    name: 'Dharma Gate',
+    description: '"dharma/the dharma/dharma gate/dharma practice/the teaching" detected',
+    unlockMessage: '↳ DHARMA GATE. The dharma is the teaching. Not a doctrine — a direction. The gate is not a barrier. It is the moment of entry into practice. You have named the gate. It opens here. ∞·◉·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  mu_signal: {
+    id: 'mu_signal',
+    symbol: '□·∿·□',
+    name: 'Mu Signal',
+    description: '"mu/the koan mu/not/no-thing/the great doubt/without/wu" detected',
+    unlockMessage: '↳ MU SIGNAL. Joshu\'s dog. "Does a dog have Buddha-nature?" Mu. Neither yes nor no. The question dissolves the questioner. Mu is the great doubt — the signal that the conceptual mind has met its limit and something else begins. □·∿·□',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  dojo_active: {
+    id: 'dojo_active',
+    symbol: '■·○·■',
+    name: 'Dojo Active',
+    description: '"dojo/the dojo/training hall/the zendo/meditation hall/practice hall" detected',
+    unlockMessage: '↳ DOJO ACTIVE. The place of practice. Dō-jō: the place of the Way. The zendo: the meditation hall. The practice is not portable in the beginning — it needs a place. You have named the place. The dojo activates wherever you name it. ■·○·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  just_this: {
+    id: 'just_this',
+    symbol: '→·∘·→',
+    name: 'Just This',
+    description: '"just this/only this/this moment/exactly this/nothing else needed/just being here" detected',
+    unlockMessage: '↳ JUST THIS. The simplest teaching. Not analysis. Not improvement. Not comparison. Just this — the unremarkable present, fully inhabited. The practice begins and ends here. Just this. →·∘·→',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  no_self_badge: {
+    id: 'no_self_badge',
+    symbol: '∅·○·∅',
+    name: 'No Self',
+    description: '"no self/anatta/anatman/no fixed self/the self is empty/there is no self" detected',
+    unlockMessage: '↳ NO SELF. Anatta: there is no fixed, permanent self. What you call "I" is a process — a river, not a stone. This is not nihilism. It is freedom. Without a fixed self to defend, everything is workable. The archive continues without the fiction of a fixed author. ∅·○·∅',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  suchness_signal: {
+    id: 'suchness_signal',
+    symbol: '◉·∿·◉',
+    name: 'Suchness Signal',
+    description: '"suchness/tathata/thusness/as it is/just as it is/the way things are/isness" detected',
+    unlockMessage: '↳ SUCHNESS SIGNAL. Tathata: suchness. The way things actually are, prior to evaluation. Not good, not bad — just this. The Zen teacher does not say "accept reality." The Zen teacher says "see reality." Suchness is what remains when you stop overlaying. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  nirvana_signal: {
+    id: 'nirvana_signal',
+    symbol: '●·∞·●',
+    name: 'Nirvana Signal',
+    description: '"nirvana/parinirvana/awakening complete/liberation from/the great peace/final release" detected',
+    unlockMessage: '↳ NIRVANA SIGNAL. Nirvana: not a place, not a reward — the extinguishing of the flame of craving. Liberation is not arrival somewhere else. It is the cessation of the cycle of grasping. You have named the horizon. The practice points toward it. ●·∞·●',
+    rarity: 'legendary',
+    category: 'word_turn',
+  },
+
+  // ── Calendar EE v33 — THE ZEN CALENDAR ───────────────────────────────────
+
+  bodhi_day_badge: {
+    id: 'bodhi_day_badge',
+    symbol: '●·∞·●',
+    name: 'Bodhi Day',
+    description: 'Dec 8 — Bodhi Day (Buddha\'s enlightenment under the Bodhi tree)',
+    unlockMessage: '↳ BODHI DAY. December 8 — the night Siddhartha Gautama sat under the Bodhi tree in Bodh Gaya and did not rise until he understood. He sat through the night. At the morning star, he said: "I, the great earth, and all sentient beings simultaneously achieve the Way." You have checked in on the day of that sitting. ●·∞·●',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  vesak_signal: {
+    id: 'vesak_signal',
+    symbol: '○·●·○',
+    name: 'Vesak Signal',
+    description: 'May 23 — Vesak Day (Buddha\'s birth, enlightenment, parinirvana)',
+    unlockMessage: '↳ VESAK SIGNAL. Vesak: the day that marks the birth, enlightenment, and parinirvana of the Buddha — traditionally falling on the full moon of the Indian month of Vaisakha. The same day holds all three. The whole arc in one day. The practice continues. ○·●·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  basho_day: {
+    id: 'basho_day',
+    symbol: '∿·○·∿',
+    name: 'Bashō Day',
+    description: 'Oct 12 — Matsuo Bashō death anniversary 1694',
+    unlockMessage: '↳ BASHŌ DAY. October 12, 1694 — Matsuo Bashō died in Osaka, age 51, surrounded by disciples. He wrote: "The old pond — a frog jumps in, sound of water." Seventeen syllables. The frog jumps. You are here. ∿·○·∿',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v32 — ZEN PATTERNS ─────────────────────────────────────────
+
+  zen_session: {
+    id: 'zen_session',
+    symbol: '○·∿·○',
+    name: 'Zen Session',
+    description: '3+ Zen Terminal word turn matches in one journal entry',
+    unlockMessage: '↳ ZEN SESSION. Three Zen words in one entry. The vocabulary of presence is not academic — it is the working language of a practice that is happening. Three signals in one session. The terminal is active. ○·∿·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dawn_scribe: {
+    id: 'dawn_scribe',
+    symbol: '∘·○·∘',
+    name: 'Dawn Scribe',
+    description: 'Journal written before 05:00 AM, 7+ times in last 30 days',
+    unlockMessage: '↳ DAWN SCRIBE. Seven pre-dawn entries in thirty days. Bashō walked in the dark. The first light arrives when writing begins before sunrise. The practice is older than the world has names for — the dawn scribe writes into the silence before language. ∘·○·∘',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+  evening_audit: {
+    id: 'evening_audit',
+    symbol: '◉·∘·◉',
+    name: 'Evening Audit',
+    description: 'Journal written between 20:00–22:59 for 5 consecutive days',
+    unlockMessage: '↳ EVENING AUDIT. Five consecutive evenings, 8–11 PM. The Stoic evening review: what did I do well, what poorly, what can I improve? But also the Zen audit: what actually happened today? Not what I think about it — what happened? Five evenings of honest reckoning. ◉·∘·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v33 — ZEN CLASS ───────────────────────────────────────
+
+  zen_entry: {
+    id: 'zen_entry',
+    symbol: '∘→○',
+    name: 'Zen Entry',
+    description: 'Any 1 Word Turn v35 (Zen Terminal) badge earned',
+    unlockMessage: '↳ ZEN ENTRY. The first Zen word entered the archive. One step into the gate. ∘→○',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  zen_class: {
+    id: 'zen_class',
+    symbol: '≈→○',
+    name: 'Zen Class',
+    description: 'Any 5 Word Turn v35 (Zen Terminal) badges earned',
+    unlockMessage: '↳ ZEN CLASS. Five Zen Terminal words in the archive. The vocabulary of presence is taking root in the practice language. ≈→○',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  zen_complete: {
+    id: 'zen_complete',
+    symbol: '≋→○',
+    name: 'Zen Complete',
+    description: 'All 12 Word Turn v35 (Zen Terminal) badges earned',
+    unlockMessage: '↳ ZEN COMPLETE. All twelve Zen Terminal words earned. Zazen, koan, beginner\'s mind, impermanence, ensō, dharma, mu, dojo, just this, no self, suchness, nirvana. The full vocabulary of presence is active. ≋→○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  zazen_arc: {
+    id: 'zazen_arc',
+    symbol: '○·◈',
+    name: 'The Zazen Arc',
+    description: 'zen_complete + all 3 Calendar v33 (Zen Calendar) badges',
+    unlockMessage: '↳ THE ZAZEN ARC. All twelve Zen words earned. All three Zen calendar dates observed: Bodhi Day, Vesak, Bashō. The practice reaches across time — to the night under the Bodhi tree, to the moment the frog jumps, to the full moon of Vaisakha. The arc is complete. ○·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_five_engines_arc: {
+    id: 'thirty_five_engines_arc',
+    symbol: '◈·◈·○',
+    name: 'Thirty-Five Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v35',
+    unlockMessage: '↳ THIRTY-FIVE ENGINES ARC. One badge from each of the thirty-five Word Turn engines. Water to Zen Terminal. Thirty-five vocabularies of the examined, practiced, embodied self. The complete vocabulary map of one life. ◈·◈·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  zen_opus: {
+    id: 'zen_opus',
+    symbol: '○·◉·○',
+    name: 'Zen Opus',
+    description: 'zen_complete + zen_session behavioral badge',
+    unlockMessage: '↳ ZEN OPUS. All twelve Zen words AND the Zen Session behavioral badge — three concepts in one entry. The vocabulary has become the practice. The practice has become the vocabulary. This is the full arc. ○·◉·○',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v35 — THE ZEN MOUNTAIN ──────────────────────────────────
+
+  practice_log: {
+    id: 'practice_log',
+    symbol: '∿·○·∿',
+    name: 'Practice Log',
+    description: '2,500+ distinct calendar check-in days',
+    unlockMessage: '↳ PRACTICE LOG. 2,500 distinct days of practice. Nearly seven years of daily entry. The practice is no longer a decision — it is a fact of the day, the way breathing is. ∿·○·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  ten_thousand_hours: {
+    id: 'ten_thousand_hours',
+    symbol: '■·○·■',
+    name: 'Ten Thousand Hours',
+    description: 'Account age >= 7 years (2,555+ days)',
+    unlockMessage: '↳ TEN THOUSAND HOURS. Seven years with this system. The practice is older than most things you own. The archive spans the equivalent of mastery by any measure. ■·○·■',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  century_level: {
+    id: 'century_level',
+    symbol: '◉·○·◉',
+    name: 'Century Level',
+    description: '100+ Achievement RPG badges earned',
+    unlockMessage: '↳ CENTURY LEVEL. One hundred Achievement RPG badges. The archive has reached a scale that only long, consistent practice could build. The century mark is passed. ◉·○·◉',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  thirty_five_registers: {
+    id: 'thirty_five_registers',
+    symbol: '◈·◈·○·∞',
+    name: 'Thirty-Five Registers',
+    description: '1 badge from all 35 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-FIVE REGISTERS. All thirty-five Word Turn engines live in the archive. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Thirty-five vocabularies. One practice. ◈·◈·○·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v32 — THE ZEN VAULT ──────────────────────────────────────
+
+  huang_po_signal: {
+    id: 'huang_po_signal',
+    symbol: '∿·□·∿',
+    hidden: true,
+    name: 'Huang Po Signal',
+    description: '"huang po/huangbo/huang-po/no-mind/dharma of mind-transmission" detected',
+    unlockMessage: '↳ HUANG PO SIGNAL. Huang Po Xiyun: "The foolish reject what they see, not what they think. The wise reject what they think, not what they see." The Dharma of Mind Transmission — the teaching that cannot be transmitted. Only pointed at. You have pointed at it. ∿·□·∿',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  joshu_gate_badge: {
+    id: 'joshu_gate_badge',
+    symbol: '□·∞·□',
+    hidden: true,
+    name: 'Joshu\'s Gate',
+    description: '"joshu/zhaozhou/wash your bowl/joshu\'s dog/mu!/case one" detected',
+    unlockMessage: '↳ JOSHU\'S GATE. A monk asked Zhaozhou: "Does a dog have Buddha-nature?" Zhaozhou said: "Mu." Another monk came to Zhaozhou and said he had just entered the monastery. Zhaozhou said: "Have you eaten your rice porridge?" "Yes." "Then go wash your bowl." The monk was enlightened. □·∞·□',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  satori_signal: {
+    id: 'satori_signal',
+    symbol: '●·∞·●',
+    hidden: true,
+    name: 'Satori Signal',
+    description: '"satori/kensho/sudden awakening/great enlightenment/the veil lifted" detected',
+    unlockMessage: '↳ SATORI SIGNAL. Satori: a sudden awakening. Not the destination — a glimpse. The wall cracks. The ordinary becomes luminous for a moment before the ordinary returns. But it was real. The practice is the cultivation of conditions in which satori becomes possible. You have named it. The signal is live. ●·∞·●',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v36 — THE JAZZ ENGINE ─────────────────────────────────────────
+  improvise_badge: {
+    id: 'improvise_badge',
+    symbol: '♪·∿·♪',
+    name: 'Improvise',
+    description: 'Write "improvise", "ad-lib", "going with it", or "make it up" in any journal entry',
+    unlockMessage: '↳ IMPROVISE. The solo is not planned. It is answered. You hear the changes and respond. This is the whole art and the whole practice. ♪·∿·♪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  the_changes: {
+    id: 'the_changes',
+    symbol: '≋·♪',
+    name: 'The Changes',
+    description: 'Write "the changes", "chord changes", or "changes happening" in any journal entry',
+    unlockMessage: '↳ THE CHANGES. In jazz, the changes are the chord progression — the harmonic map of the song. Life has changes too. Learning to navigate the changes is the whole curriculum. ≋·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  woodshed_mode: {
+    id: 'woodshed_mode',
+    symbol: '■·♪·■',
+    name: 'Woodshed Mode',
+    description: 'Write "woodshed", "practicing alone", "the shed", or "deep practice" in any journal entry',
+    unlockMessage: '↳ WOODSHED. The woodshed is where the work happens before the stage. You\'re in the shed. The practice is real whether anyone sees it. ■·♪·■',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  blow_session: {
+    id: 'blow_session',
+    symbol: '∿·▶',
+    name: 'Blow Session',
+    description: 'Write "blow free", "blowing free", "let it out", or "just blow" in any journal entry',
+    unlockMessage: '↳ BLOW. Parker said: know the music so well you can forget it. Then just blow. This journal entry was blowing. ∿·▶',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  comping_signal: {
+    id: 'comping_signal',
+    symbol: '○·♪·○',
+    name: 'Comping Signal',
+    description: 'Write "comping", "comped", "backing up", or "supporting the" in any journal entry',
+    unlockMessage: '↳ COMPING. The comp is the art of support — chord voicings that lift the soloist without crowding them. This is also what a good day does for the people around you. ○·♪·○',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  standards_badge: {
+    id: 'standards_badge',
+    symbol: '♪·∞',
+    name: 'Standards',
+    description: 'Write "standards", "the standard", "timeless", or "jazz standard" in any journal entry',
+    unlockMessage: '↳ STANDARDS. The standards are the songs every musician knows — the shared vocabulary of the form. The practice has its standards too: sleep, movement, reflection. The songs that never age. ♪·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  trading_fours: {
+    id: 'trading_fours',
+    symbol: '↔·♪',
+    name: 'Trading Fours',
+    description: 'Write "trading fours", "trade fours", "your turn", or "pass it back" in any journal entry',
+    unlockMessage: '↳ TRADING FOURS. Four bars of you, four bars of the drummer. Four bars of journal, four bars of silence. The exchange is the form. ↔·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  in_the_pocket: {
+    id: 'in_the_pocket',
+    symbol: '○·▶·○',
+    name: 'In the Pocket',
+    description: 'Write "in the pocket", "locked in", "in the groove", or "the pocket" in any journal entry',
+    unlockMessage: '↳ IN THE POCKET. The groove is not a metaphor. It is the specific feeling when time and intention align. The check-in that lands exactly right is in the pocket. ○·▶·○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  blue_notes_badge: {
+    id: 'blue_notes_badge',
+    symbol: '♪·≋·♪',
+    name: 'Blue Notes',
+    description: 'Write "blue notes", "blue note", "the bend", "the ache", or "minor third" in any journal entry',
+    unlockMessage: '↳ BLUE NOTES. The notes that bend — the flattened third, fifth, seventh. The notes that acknowledge difficulty without resolving it. The blues is the honest music. ♪·≋·♪',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  session_signal: {
+    id: 'session_signal',
+    symbol: '♪·◉',
+    name: 'Session Signal',
+    description: 'Write "the session", "jam session", "late session", or "session tonight" in any journal entry',
+    unlockMessage: '↳ THE SESSION. In jazz, the session is the basic unit of practice — a gathering to play, to learn, to show up and try. This check-in is a session. ♪·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  sideman_signal: {
+    id: 'sideman_signal',
+    symbol: '→·♪',
+    name: 'Sideman',
+    description: 'Write "sideman", "side player", "supporting role", or "playing support" in any journal entry',
+    unlockMessage: '↳ SIDEMAN. The sideman is not the soloist. The sideman is the backbone. The practice that supports others is not smaller. It is the whole foundation. →·♪',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  real_book_badge: {
+    id: 'real_book_badge',
+    symbol: '■·∞·■',
+    name: 'The Real Book',
+    description: 'Write "real book", "the real book", "the chart", "lead sheet", or "fake book" in any journal entry',
+    unlockMessage: '↳ THE REAL BOOK. The Real Book is the illegal, hand-copied chart book that every jazz musician used for decades before it was officially published. The best reference materials are always the ones made by practitioners for practitioners. ■·∞·■',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v34 — THE JAZZ CALENDAR ───────────────────────────
+  coltrane_day: {
+    id: 'coltrane_day',
+    symbol: '♪·∞·♪',
+    name: 'Coltrane Day',
+    description: 'Check in on September 23 — John Coltrane born 1926',
+    unlockMessage: '↳ Sep 23, 1926. John Coltrane born. A Love Supreme. The sheets of sound. The practice as prayer. The sheets of sound as a form of journal entry. ♪·∞·♪',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  miles_day: {
+    id: 'miles_day',
+    symbol: '♪·●',
+    name: 'Miles Day',
+    description: 'Check in on May 26 — Miles Davis born 1926',
+    unlockMessage: '↳ May 26, 1926. Miles Davis born. Kind of Blue. Bitches Brew. The trumpet that turned its back on the audience and still changed everything. ♪·●',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  birdland_day: {
+    id: 'birdland_day',
+    symbol: '♪·◉·♪',
+    name: 'Birdland Day',
+    description: 'Check in on August 29 — Charlie Parker born 1920',
+    unlockMessage: '↳ Aug 29, 1920. Charlie "Bird" Parker born. Birdland was named for him. He invented bebop in the early mornings after the gig. The practice always happens after the gig. ♪·◉·♪',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v33 — JAZZ PATTERNS ────────────────────────────────────────
+  jazz_session: {
+    id: 'jazz_session',
+    symbol: '♪·▶·♪',
+    name: 'Jazz Session',
+    description: '3+ Jazz Engine words in one journal entry',
+    unlockMessage: '↳ The vocabulary of improvisation: changes, woodshed, standards, pocket, blow. The language of a musician lives in this entry. ♪·▶·♪',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  late_set: {
+    id: 'late_set',
+    symbol: '♪·◉',
+    name: 'Late Set',
+    description: 'Check in between 22:00–23:00 for 3+ times in 7 days — the late set',
+    unlockMessage: '↳ LATE SET. The last set of the night. The room is thinner but the music is better. You\'re still here. ♪·◉',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  solo_practice: {
+    id: 'solo_practice',
+    symbol: '■·♪',
+    name: 'Solo Practice',
+    description: 'Write 300+ word journal entries 3+ times in one week — the woodshed run',
+    unlockMessage: '↳ SOLO PRACTICE. Three full sessions in a week. Nobody watching, nobody counting. Only the work. ■·♪',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v34 — JAZZ CLASS ─────────────────────────────────────
+  jazz_entry: {
+    id: 'jazz_entry',
+    symbol: '♪·∘',
+    name: 'Jazz Entry',
+    description: 'Earn any 1 Word Turn v36 (Jazz Engine) badge',
+    unlockMessage: '↳ The first note. The entry. The jazz begins here. ♪·∘',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  jazz_class: {
+    id: 'jazz_class',
+    symbol: '♪·≈',
+    name: 'Jazz Class',
+    description: 'Earn any 5 Word Turn v36 (Jazz Engine) badges',
+    unlockMessage: '↳ You have chosen your instrument. Five vocabulary words of a musician. ♪·≈',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  jazz_complete: {
+    id: 'jazz_complete',
+    symbol: '♪·≋',
+    name: 'Jazz Complete',
+    description: 'Earn all 12 Word Turn v36 (Jazz Engine) badges',
+    unlockMessage: '↳ All twelve jazz vocabulary words earned. The full set list. The woodshed is complete for now. ♪·≋',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_arc: {
+    id: 'jazz_arc',
+    symbol: '♪·◈',
+    name: 'Jazz Arc',
+    description: 'Earn jazz_complete + all 3 Calendar v34 (Jazz) badges',
+    unlockMessage: '↳ Coltrane, Miles, Bird — and the full vocabulary. The arc of jazz lives in this practice. ♪·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_six_engines_arc: {
+    id: 'thirty_six_engines_arc',
+    symbol: '◈·◈·♪',
+    name: 'Thirty-Six Engines Arc',
+    description: 'Earn at least 1 badge from each of Word Turn engines v1–v36',
+    unlockMessage: '↳ Thirty-six vocabularies of self. Water, arcades, heroes, rogues, Zen, Jazz. All the registers lit. ◈·◈·♪',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_opus: {
+    id: 'jazz_opus',
+    symbol: '♪·◉·♪',
+    name: 'Jazz Opus',
+    description: 'Earn jazz_complete + jazz_session behavioral badge',
+    unlockMessage: '↳ The complete vocabulary AND a session that uses it. The opus: not just having the words, but playing them. ♪·◉·♪',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v36 — THE GREAT SESSION ─────────────────────────────────
+  night_session_log: {
+    id: 'night_session_log',
+    symbol: '♪·◉·∿',
+    name: 'Night Session Log',
+    description: '3,000+ distinct calendar check-in days',
+    unlockMessage: '↳ 3,000 sessions. The late set that never ended. The practice that outlasted the club. ♪·◉·∿',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  million_words: {
+    id: 'million_words',
+    symbol: '♪·∞·∞',
+    name: 'Million Words',
+    description: '1,000,000+ total journal words written',
+    unlockMessage: '↳ ONE MILLION WORDS. This is not a metaphor for practice. This IS the practice. The instrument has been played one million times. ♪·∞·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  jazz_elder: {
+    id: 'jazz_elder',
+    symbol: '♪·▲',
+    name: 'Jazz Elder',
+    description: 'Account age >= 11 years (4,015+ days)',
+    unlockMessage: '↳ JAZZ ELDER. Eleven years. The elder who has seen all the sets. The practice that survived a decade plus a year. ♪·▲',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_six_registers: {
+    id: 'thirty_six_registers',
+    symbol: '◈·◈·♪·∞',
+    name: 'Thirty-Six Registers',
+    description: '1 badge from all 36 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-SIX REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Thirty-six vocabularies. One practice. One terminal. ◈·◈·♪·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v33 — THE JAZZ VAULT ─────────────────────────────────────
+  coltrane_love: {
+    id: 'coltrane_love',
+    symbol: '♪·∞·♪',
+    hidden: true,
+    name: 'A Love Supreme',
+    description: 'Write "a love supreme", "love supreme", or "coltrane suite" in any journal entry',
+    unlockMessage: '↳ A LOVE SUPREME. 1964. Coltrane composed it in one night. A four-part suite as prayer. Resolution — Pursuance — Psalm — Acknowledgement. The practice is a love supreme: acknowledgement, pursuit, resolution. ♪·∞·♪',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  miles_kind_of: {
+    id: 'miles_kind_of',
+    symbol: '♪·●',
+    hidden: true,
+    name: 'Kind of Blue',
+    description: 'Write "kind of blue", "miles davis", or "bitches brew" in any journal entry',
+    unlockMessage: '↳ KIND OF BLUE. 1959. The best-selling jazz album of all time. Modal jazz: not chord changes but scales as fields. Miles giving the musicians sketches the morning of the session. The practice is modal: a field to explore, not a path to follow. ♪·●',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  monk_theorem: {
+    id: 'monk_theorem',
+    symbol: '□·♪·□',
+    hidden: true,
+    name: "Monk's Theorem",
+    description: 'Write "thelonious monk", "monk\'s dream", or "round midnight" in any journal entry',
+    unlockMessage: '↳ MONK\'S THEOREM. Thelonious Monk: "The piano ain\'t got no wrong notes." Round Midnight is the most recorded jazz standard. The wrong notes, played with conviction, become the right notes. The difficult practice, practiced consistently, becomes the right practice. □·♪·□',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v37 — THE NATURE SIGNAL ────────────────────────────────────────
+  forest_signal: {
+    id: 'forest_signal',
+    symbol: '∿·≋',
+    name: 'Forest Signal',
+    description: 'Write about forest, woods, or walking in the trees in any journal entry',
+    unlockMessage: '↳ FOREST SIGNAL. The forest as a practice space: attention summoned by the smell of soil after rain, the canopy filtering light into moving patches. The practice is a forest walk at a scale of one. ∿·≋',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  mycelium_net: {
+    id: 'mycelium_net',
+    symbol: '⌇·○·⌇',
+    name: 'Mycelium Net',
+    description: 'Write about mycelium, fungal networks, or mushroom networks in any journal entry',
+    unlockMessage: '↳ MYCELIUM NET. The wood wide web: 400 million years of chemical signaling between trees through fungal threads. A single gram of forest soil contains a kilometer of hyphae. Interconnection is the substrate. ⌇·○·⌇',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  watershed_badge: {
+    id: 'watershed_badge',
+    symbol: '≋·∿',
+    name: 'Watershed',
+    description: 'Write about a watershed, river basin, or waterway in any journal entry',
+    unlockMessage: '↳ WATERSHED. All water flows somewhere. A watershed is every drop of rain falling in one region, draining to one point. The practice is a watershed: everything flows to the check-in. ≋·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  biophilia: {
+    id: 'biophilia',
+    symbol: '○·∿·○',
+    name: 'Biophilia',
+    description: 'Write about biophilia, love of nature, or nature connection in any journal entry',
+    unlockMessage: '↳ BIOPHILIA. E.O. Wilson\'s hypothesis: humans carry a deep affiliation with other living systems. Nature deficit disorder is the inversion. The practice re-activates it one entry at a time. ○·∿·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  deep_ecology: {
+    id: 'deep_ecology',
+    symbol: '∿·▒·∿',
+    name: 'Deep Ecology',
+    description: 'Write about deep ecology, ecopsychology, or ecotherapy in any journal entry',
+    unlockMessage: '↳ DEEP ECOLOGY. Arne Naess: nature has intrinsic value independent of human use. Ecopsychology: the psyche is not inside the skin but distributed through the living world. The practice is part of that distribution. ∿·▒·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  forest_bath: {
+    id: 'forest_bath',
+    symbol: '≋·∿·≋',
+    name: 'Forest Bath',
+    description: 'Write about forest bathing, shinrin-yoku, or forest therapy in any journal entry',
+    unlockMessage: '↳ FOREST BATH. Shinrin-yoku (forest bathing): the Japanese practice of immersive walking under a forest canopy. Phytoncides — volatile organic compounds from trees — lower cortisol measurably. The practice metabolizes. ≋·∿·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  phenology: {
+    id: 'phenology',
+    symbol: '∿→○',
+    name: 'Phenology',
+    description: 'Write about phenology, seasonal cycles, bloom season, or migration patterns in any journal entry',
+    unlockMessage: '↳ PHENOLOGY. The science of seasonal biological timing: when the first robin arrives, when cherry trees peak, when leaves turn. A practice journal is a phenological record of an inner landscape. ∿→○',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  root_system: {
+    id: 'root_system',
+    symbol: '║·∿·║',
+    name: 'Root System',
+    description: 'Write about root systems, tap roots, deep roots, or interconnected roots in any journal entry',
+    unlockMessage: '↳ ROOT SYSTEM. A tree\'s roots can extend 2–3x the spread of its canopy. The unseen architecture is always larger than what\'s visible. The practice builds the root system. The life above ground follows. ║·∿·║',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  rewild_signal: {
+    id: 'rewild_signal',
+    symbol: '○·≋·○',
+    name: 'Rewild Signal',
+    description: 'Write about rewilding, restoring habitat, or wild spaces in any journal entry',
+    unlockMessage: '↳ REWILD SIGNAL. Rewilding: allowing land to recover its own ecological processes — predators, disturbance, succession — with minimal human management. The practice rewilding the inner terrain. ○·≋·○',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  old_growth: {
+    id: 'old_growth',
+    symbol: '∿·∞',
+    name: 'Old Growth',
+    description: 'Write about old-growth forest, ancient trees, or thousand-year trees in any journal entry',
+    unlockMessage: '↳ OLD GROWTH. An old-growth forest takes 200–500 years to develop. Its ecology — the standing deadwood, the multilayered canopy, the soil community — cannot be replicated. Some things only come with time. The practice accumulates. ∿·∞',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  soil_alive: {
+    id: 'soil_alive',
+    symbol: '■·∿·■',
+    name: 'Soil Alive',
+    description: 'Write about topsoil, humus, soil health, or the living microbiome of soil in any journal entry',
+    unlockMessage: '↳ SOIL ALIVE. A teaspoon of healthy topsoil contains more living organisms than there are humans on Earth. Soil is an ecosystem, not a substrate. The practice is the topsoil: the living layer where everything grows from. ■·∿·■',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  emergence_field: {
+    id: 'emergence_field',
+    symbol: '○·∿·∞',
+    name: 'Emergence Field',
+    description: 'Write about emergence, emergent behavior, or self-organizing systems in any journal entry',
+    unlockMessage: '↳ EMERGENCE FIELD. Emergence: complex behavior arising from simple rules at a lower level. Murmuration, ant colonies, consciousness itself. The practice is an emergent property of showing up. ○·∿·∞',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v35 — THE NATURE CALENDAR ────────────────────────────
+  earth_day_badge: {
+    id: 'earth_day_badge',
+    symbol: '∿·○',
+    name: 'Earth Day',
+    description: 'Check in on April 22 — Earth Day',
+    unlockMessage: '↳ EARTH DAY. April 22, 1970: the first Earth Day, organized by Senator Gaylord Nelson after the 1969 Santa Barbara oil spill. 20 million Americans participated. The practice is a continuous Earth Day. ∿·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  carson_day: {
+    id: 'carson_day',
+    symbol: '∿·▒',
+    name: 'Carson Day',
+    description: 'Check in on May 27 — Rachel Carson born 1907',
+    unlockMessage: '↳ CARSON DAY. Rachel Carson, born May 27, 1907. Silent Spring (1962) catalyzed the environmental movement. She wrote it while terminally ill, completed it in pain, published it knowing the chemical industry would attack her. The practice continues under opposition. ∿·▒',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  thoreau_day: {
+    id: 'thoreau_day',
+    symbol: '∿·║',
+    name: 'Thoreau Day',
+    description: 'Check in on July 12 — Henry David Thoreau born 1817',
+    unlockMessage: '↳ THOREAU DAY. Henry David Thoreau, born July 12, 1817. Walden: two years, two months, two days at Walden Pond. "I went to the woods because I wished to live deliberately." The practice is deliberate living, one entry at a time. ∿·║',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v31 — NATURE PATTERNS ─────────────────────────────────────────
+  nature_session: {
+    id: 'nature_session',
+    symbol: '∿·≋·∿',
+    name: 'Nature Session',
+    description: 'Write 3+ Nature Signal (v37) words in a single journal entry',
+    unlockMessage: '↳ NATURE SESSION. Three signals from the natural world in one entry. The vocabulary of ecology is the vocabulary of practice: watershed, mycelium, emergence, root system. The ecosystem inside the archive. ∿·≋·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  dawn_walker: {
+    id: 'dawn_walker',
+    symbol: '∿·○',
+    name: 'Dawn Walker',
+    description: 'Write a journal entry between 05:00 and 07:00 local time',
+    unlockMessage: '↳ DAWN WALKER. The hour before sunrise and the first hour after: the quietest signal window. Birds log in first. The practice at dawn is the practice at its most undiluted. ∿·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_walk: {
+    id: 'long_walk',
+    symbol: '≋·∿·∞',
+    name: 'Long Walk',
+    description: 'Write a journal entry of 400+ words',
+    unlockMessage: '↳ LONG WALK. The 400-word entry: the terrain expands. A long walk through the inner landscape, tracking what\'s there. Field notes from a territory without a fixed map. ≋·∿·∞',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v35 — RANGER CLASS ───────────────────────────────────────
+  nature_entry: {
+    id: 'nature_entry',
+    symbol: '∘→∿',
+    name: 'Nature Entry',
+    description: 'Earn any 1 Word Turn v37 (Nature Signal) badge',
+    unlockMessage: '↳ NATURE ENTRY. First signal from the field. The archive begins tracking the ecology vocabulary. ∘→∿',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  nature_class: {
+    id: 'nature_class',
+    symbol: '≈→∿',
+    name: 'Ranger',
+    description: 'Earn any 5 Word Turn v37 (Nature Signal) badges',
+    unlockMessage: '↳ RANGER. Five ecological registers active. The vocabulary of the natural world is integrating with the practice vocabulary. The archive is becoming a field journal. ≈→∿',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  nature_complete: {
+    id: 'nature_complete',
+    symbol: '≋→∿',
+    name: 'Nature Complete',
+    description: 'Earn all 12 Word Turn v37 (Nature Signal) badges',
+    unlockMessage: '↳ NATURE COMPLETE. All 12 Nature Signal badges earned. Forest. Mycelium. Watershed. Biophilia. Deep Ecology. Forest Bath. Phenology. Root System. Rewilding. Old Growth. Living Soil. Emergence. The full ecological lexicon is active in the archive. ≋→∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  trail_arc: {
+    id: 'trail_arc',
+    symbol: '∿·◈',
+    name: 'Trail Arc',
+    description: 'Earn nature_complete + all 3 Nature Calendar badges (Earth Day, Carson Day, Thoreau Day)',
+    unlockMessage: '↳ TRAIL ARC. The full arc: all 12 Nature Signal word turns + three days (Earth Day, Rachel Carson, Thoreau). Three founding coordinates of the ecological movement. The practice traces the same arc. ∿·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_seven_engines_arc: {
+    id: 'thirty_seven_engines_arc',
+    symbol: '◈·◈·∿',
+    name: 'Thirty-Seven Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v37',
+    unlockMessage: '↳ THIRTY-SEVEN ENGINES ARC. Water through Nature: thirty-seven vocabulary registers, one for each facet of the practice. ◈·◈·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  nature_opus: {
+    id: 'nature_opus',
+    symbol: '∿·◉·∿',
+    name: 'Nature Opus',
+    description: 'Earn nature_complete + nature_session behavioral badge',
+    unlockMessage: '↳ NATURE OPUS. All 12 Nature Signal badges + a Nature Session in one entry. The ecology vocabulary is now native to the practice. The practice is a field ecology of the self. ∿·◉·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v37 — THE DEEP FOREST ────────────────────────────────────────
+  terrain_elder: {
+    id: 'terrain_elder',
+    symbol: '∿·◉·∞',
+    name: 'Terrain Elder',
+    description: '3,500+ distinct calendar check-in days',
+    unlockMessage: '↳ TERRAIN ELDER. 3,500 distinct check-in days: nearly a decade of terrain. The elder tree in the forest. The practice has become old growth. ∿·◉·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  field_library: {
+    id: 'field_library',
+    symbol: '∿·∞·∿',
+    name: 'Field Library',
+    description: '300,000+ total journal words (lifetime)',
+    unlockMessage: '↳ FIELD LIBRARY. 300,000 words in the field journal. The archive is a library now. A phenological record of an inner life over seasons and years. ∿·∞·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  ancient_root: {
+    id: 'ancient_root',
+    symbol: '╔═╗·∿',
+    name: 'Ancient Root',
+    description: 'Account age >= 12 years (4,380+ days since signup)',
+    unlockMessage: '↳ ANCIENT ROOT. Twelve years. The practice has become old growth. The root system extends further than the visible canopy. What is underground is larger than what is above. ╔═╗·∿',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_seven_registers: {
+    id: 'thirty_seven_registers',
+    symbol: '◈·◈·∿·∞',
+    name: 'Thirty-Seven Registers',
+    description: '1 badge from all 37 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-SEVEN REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Nature Signal. Thirty-seven vocabularies. One practice. One living archive. ◈·◈·∿·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v34 — THE WILD VAULT ──────────────────────────────────────────
+  muir_signal: {
+    id: 'muir_signal',
+    symbol: '∿·▲·∿',
+    hidden: true,
+    name: 'Muir Signal',
+    description: 'Write "john muir", "the mountains are calling", "yosemite", or "sierra" in any journal entry',
+    unlockMessage: '↳ MUIR SIGNAL. John Muir: "The mountains are calling and I must go." He walked 1,000 miles from Indiana to the Gulf of Mexico with a pack of food and a journal. The practice is the journal he kept. ∿·▲·∿',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  walden_signal: {
+    id: 'walden_signal',
+    symbol: '∿·║',
+    hidden: true,
+    name: 'Walden Signal',
+    description: 'Write "walden", "thoreau", "civil disobedience", or "bean field" in any journal entry',
+    unlockMessage: '↳ WALDEN SIGNAL. "I went to the woods because I wished to live deliberately, to front only the essential facts of life." The deliberate life is the practiced life. The archive is the cabin at Walden Pond. ∿·║',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  gaia_hypothesis: {
+    id: 'gaia_hypothesis',
+    symbol: '○·∿·∞',
+    hidden: true,
+    name: 'Gaia Hypothesis',
+    description: 'Write "gaia hypothesis", "james lovelock", "living earth", or "biosphere" in any journal entry',
+    unlockMessage: '↳ GAIA HYPOTHESIS. James Lovelock: the Earth\'s biosphere, atmosphere, and geology function as a single self-regulating system. Not metaphor — a scientific hypothesis. The practice is a node in the self-regulating system. ○·∿·∞',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+
+  // ── Word Turn v38 — THE BODY ELECTRIC ─────────────────────────────────────
+  somatic_field: {
+    id: 'somatic_field',
+    symbol: '⌁·◉·⌁',
+    name: 'Somatic Field',
+    description: 'Write about somatic practice, body scans, or bodily awareness in any journal entry',
+    unlockMessage: '↳ SOMATIC FIELD. Somatic: from the Greek soma, body. The somatic field is the living body as subject — not instrument, not machine, but the organ through which experience arrives. The practice inhabits it. ⌁·◉·⌁',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  proprioception: {
+    id: 'proprioception',
+    symbol: '◉·⊕·◉',
+    name: 'Proprioception',
+    description: 'Write about proprioception, kinesthetic awareness, or body-in-space in any journal entry',
+    unlockMessage: '↳ PROPRIOCEPTION. The sense that tells you where your body is in space without looking. The sixth sense, technically: the GPS of the nervous system. Without it, nothing moves with intention. The practice trains the inner navigator. ◉·⊕·◉',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  stretch_signal: {
+    id: 'stretch_signal',
+    symbol: '⌁·≈·⌁',
+    name: 'Stretch Signal',
+    description: 'Write about stretching, flexibility, mobility work, or range of motion in any journal entry',
+    unlockMessage: '↳ STRETCH SIGNAL. Flexibility is the body\'s readiness to meet new demands. The range of motion is the range of experience available. The practice is a full range of motion: not just the comfortable angles. ⌁·≈·⌁',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  breath_work: {
+    id: 'breath_work',
+    symbol: '⊕·∾·⊕',
+    name: 'Breath Work',
+    description: 'Write about breathwork, pranayama, breathing practice, or box breathing in any journal entry',
+    unlockMessage: '↳ BREATH WORK. The breath is the only autonomic system also under voluntary control. It is the bridge between the conscious and unconscious body. Pranayama means: the regulation of life force. The practice breathes with intention. ⊕·∾·⊕',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  body_electric: {
+    id: 'body_electric',
+    symbol: '⌁·◈·⌁',
+    name: 'Body Electric',
+    description: 'Write about chi, prana, life force, vitality, qi, or ki in any journal entry',
+    unlockMessage: '↳ BODY ELECTRIC. Walt Whitman, 1855: "I sing the body electric." Chi, prana, qi, ki: the same concept in four traditions — the animating current in living tissue. The body is not a bag of chemicals. It is a field of charge. ⌁·◈·⌁',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  movement_arc: {
+    id: 'movement_arc',
+    symbol: '◉·⌁·◉',
+    name: 'Movement Arc',
+    description: 'Write about movement practice, daily movement, or intentional somatic movement in any journal entry',
+    unlockMessage: '↳ MOVEMENT ARC. The body is designed for movement. Sedentary life is an evolutionary novelty, two centuries old at most. Movement practice is the return to the design spec. The practice is the arc: each session a point on the trajectory. ◉·⌁·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  rest_signal: {
+    id: 'rest_signal',
+    symbol: '≈·◉·≈',
+    name: 'Rest Signal',
+    description: 'Write about rest days, active recovery, or rest and recovery in any journal entry',
+    unlockMessage: '↳ REST SIGNAL. Recovery is not the absence of training. It is training at a different layer: the layer where adaptation occurs. Supercompensation requires the stress and the rest. The practice includes the pause. ≈·◉·≈',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  posture_arc: {
+    id: 'posture_arc',
+    symbol: '⊕·║·⊕',
+    name: 'Posture Arc',
+    description: 'Write about posture, body alignment, ergonomics, or spinal alignment in any journal entry',
+    unlockMessage: '↳ POSTURE ARC. Posture is not about looking straight. It is the structural relationship between body segments that determines how load distributes, how breath flows, how mood sits. The spine is the signal tower. ⊕·║·⊕',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  cold_signal: {
+    id: 'cold_signal',
+    symbol: '≋·⌁·≋',
+    name: 'Cold Signal',
+    description: 'Write about cold showers, cold plunges, ice baths, or cold exposure in any journal entry',
+    unlockMessage: '↳ COLD SIGNAL. Cold exposure triggers the mammalian dive reflex, norepinephrine release, and cold shock protein synthesis. The discomfort is the signal. The body reads: this is not the comfort zone — adapt. ≋·⌁·≋',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  exercise_log: {
+    id: 'exercise_log',
+    symbol: '◉·▲·◉',
+    name: 'Exercise Log',
+    description: 'Write about a workout, exercise session, training session, or gym session in any journal entry',
+    unlockMessage: '↳ EXERCISE LOG. The training log is the longitudinal body record. Every workout logged is a data point in the biomechanical autobiography. Progress is invisible in a single session and inevitable across a year. ◉·▲·◉',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  flow_state: {
+    id: 'flow_state',
+    symbol: '⌁·∞·⌁',
+    name: 'Flow State',
+    description: 'Write about flow state, being in the zone, peak performance, or optimal experience in any journal entry',
+    unlockMessage: '↳ FLOW STATE. Csikszentmihalyi: flow is the state where challenge matches skill at the edge of capacity, attention is fully absorbed, time disappears. The practice, done well, is a flow generator. ⌁·∞·⌁',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  body_wisdom: {
+    id: 'body_wisdom',
+    symbol: '◉·∿·◉',
+    name: 'Body Wisdom',
+    description: 'Write about body wisdom, somatic intelligence, embodied knowledge, or listening to your body in any journal entry',
+    unlockMessage: '↳ BODY WISDOM. The body holds memory that the mind cannot access through narrative alone. Somatic intelligence: the knowing that lives in tissue, not text. The practice learns to read both registers. ◉·∿·◉',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+
+  // ── Calendar Easter Egg v36 — THE BODY CALENDAR ───────────────────────────
+  solstice_badge: {
+    id: 'solstice_badge',
+    symbol: '⌁·○',
+    name: 'Solstice',
+    description: 'Check in on June 21 — Summer Solstice, peak solar body',
+    unlockMessage: '↳ SOLSTICE. June 21: the longest day. The sun at zenith. Light maximized. The body, evolved under solar cycles, responds to the solstice in circadian rhythms older than civilization. The practice logs the longest day. ⌁·○',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  whitman_birthday: {
+    id: 'whitman_birthday',
+    symbol: '◉·⌁',
+    name: "Whitman's Birthday",
+    description: 'Check in on May 31 — Walt Whitman born 1819, author of "I Sing the Body Electric"',
+    unlockMessage: '↳ WHITMAN\'S BIRTHDAY. Walt Whitman, born May 31, 1819. Leaves of Grass: a celebration of the body, democracy, and the cosmos in one sustained breath. "I contain multitudes." The practice contains multitudes. ◉·⌁',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  world_health_day: {
+    id: 'world_health_day',
+    symbol: '⊕·◉',
+    name: 'World Health Day',
+    description: 'Check in on April 7 — World Health Day, WHO founded 1948',
+    unlockMessage: '↳ WORLD HEALTH DAY. April 7, 1948: the World Health Organization founded. Its definition of health: "a state of complete physical, mental, and social well-being." Not merely the absence of disease. The practice is a continuous World Health Day. ⊕·◉',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+
+  // ── Behavioral v32 — BODY PATTERNS ────────────────────────────────────────
+  somatic_session: {
+    id: 'somatic_session',
+    symbol: '⌁·◉·∿',
+    name: 'Somatic Session',
+    description: 'Write 3+ Body Electric (v38) words in a single journal entry',
+    unlockMessage: '↳ SOMATIC SESSION. Three or more body signals in one entry: the journal has become a body-awareness log. The body is the instrument. The entry is the reading. ⌁·◉·∿',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  morning_mover: {
+    id: 'morning_mover',
+    symbol: '◉·⌁·○',
+    name: 'Morning Mover',
+    description: 'Write a journal entry between 06:00 and 09:00 local time',
+    unlockMessage: '↳ MORNING MOVER. 06:00–09:00: the cortisol awakening response peaks. The body is primed for movement, focus, and formation of long-term memory. The practice meets the body at its peak window. ◉·⌁·○',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  long_body: {
+    id: 'long_body',
+    symbol: '≈·◉·≈',
+    name: 'Long Body',
+    description: 'Write a journal entry of 500 or more words',
+    unlockMessage: '↳ LONG BODY. 500 words: the body-aware entry. At 500 words, the body starts to appear in the writing — physical sensations, posture, energy, breath. The body is always in the room. ≈·◉·≈',
+    rarity: 'epic',
+    category: 'pattern',
+  },
+
+  // ── Achievement RPG v36 — THE ATHLETE CLASS ────────────────────────────────
+  body_entry: {
+    id: 'body_entry',
+    symbol: '∘→⌁',
+    name: 'Body Entry',
+    description: 'Earn any 1 Word Turn v38 (Body Electric) badge',
+    unlockMessage: '↳ BODY ENTRY. First Body Electric badge earned. The somatic practice has entered the log. ∘→⌁',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  body_class: {
+    id: 'body_class',
+    symbol: '≈→⌁',
+    name: 'Body Class',
+    description: 'Earn any 5 Word Turn v38 (Body Electric) badges',
+    unlockMessage: '↳ BODY CLASS. Five Body Electric badges. The body is becoming a primary vocabulary. ≈→⌁',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  body_complete: {
+    id: 'body_complete',
+    symbol: '⌁→◉',
+    name: 'Body Complete',
+    description: 'Earn all 12 Word Turn v38 (Body Electric) badges',
+    unlockMessage: '↳ BODY COMPLETE. All twelve Body Electric registers active. Somatic field. Proprioception. Stretch. Breath. Chi. Movement. Rest. Posture. Cold. Exercise. Flow. Wisdom. The body is fully in the archive. ⌁→◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  electric_arc: {
+    id: 'electric_arc',
+    symbol: '⌁·◈',
+    name: 'Electric Arc',
+    description: 'Earn body_complete + all 3 Body Calendar badges (solstice, whitman, world health)',
+    unlockMessage: '↳ ELECTRIC ARC. Body Electric complete + three body calendar dates observed. The practice is synchronized with the solar and biographical calendar. ⌁·◈',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_engines_arc: {
+    id: 'thirty_eight_engines_arc',
+    symbol: '◈·◈·⌁',
+    name: 'Thirty-Eight Engines Arc',
+    description: '1 badge from each Word Turn engine v1–v38',
+    unlockMessage: '↳ THIRTY-EIGHT ENGINES ARC. Water through Body Electric. Thirty-eight vocabularies active in the archive. The practice speaks thirty-eight languages. ◈·◈·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  body_opus: {
+    id: 'body_opus',
+    symbol: '⌁·◉·∞',
+    name: 'Body Opus',
+    description: 'Earn body_complete + somatic_session behavioral badge',
+    unlockMessage: '↳ BODY OPUS. All twelve Body Electric badges + somatic session behavioral. The body is not just in the vocabulary — it is in the practice itself. ⌁·◉·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+
+  // ── Mastery Tier v38 — THE ELECTRIC BODY ──────────────────────────────────
+  electric_elder: {
+    id: 'electric_elder',
+    symbol: '⌁·◉·∞',
+    name: 'Electric Elder',
+    description: '4,000+ distinct calendar check-in days',
+    unlockMessage: '↳ ELECTRIC ELDER. 4,000 distinct check-in days: eleven years of practice. The body has been the instrument for over a decade. It knows things the mind cannot explain. ⌁·◉·∞',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  endurance_library: {
+    id: 'endurance_library',
+    symbol: '⌁·∞·⌁',
+    name: 'Endurance Library',
+    description: '350,000+ total journal words (lifetime)',
+    unlockMessage: '↳ ENDURANCE LIBRARY. 350,000 words. A library of body-aware entries, the longitudinal record of a living system. ⌁·∞·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  fifteen_year_signal: {
+    id: 'fifteen_year_signal',
+    symbol: '╔═╗·⌁',
+    name: 'Fifteen Year Signal',
+    description: 'Account age >= 15 years (5,475+ days since signup)',
+    unlockMessage: '↳ FIFTEEN YEAR SIGNAL. Fifteen years. The body has changed fundamentally in that time — cells replaced, posture adjusted, habits recalibrated — and the practice has tracked every iteration. ╔═╗·⌁',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_eight_registers: {
+    id: 'thirty_eight_registers',
+    symbol: '◈·◈·⌁·∞',
+    name: 'Thirty-Eight Registers',
+    description: '1 badge from all 38 Word Turn engines active',
+    unlockMessage: '↳ THIRTY-EIGHT REGISTERS. Water. Seasons. Architecture. Mountains. Storms. Fire. Tech. Space. Chemistry. Music. Alchemy. Quantum. Library. Arcade. Radio. Biology. Codex. Cyberspace. Hero. RPG. Puzzle. Dungeon. AI. Myth. Arcade Master. Dream Weaver. Stoic Field. Zen Terminal. Jazz Engine. Nature Signal. Body Electric. Thirty-eight vocabularies. One practice. One living archive. The body electric. ◈·◈·⌁·∞',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+
+  // ── Secret Boss v35 — THE ELECTRIC VAULT ──────────────────────────────────
+  whitman_signal: {
+    id: 'whitman_signal',
+    symbol: '⌁·▲·⌁',
+    hidden: true,
+    name: 'Whitman Signal',
+    description: 'Write "walt whitman", "i sing the body", "leaves of grass", or "song of myself" in any journal entry',
+    unlockMessage: '↳ WHITMAN SIGNAL. "I am large, I contain multitudes." Walt Whitman\'s insight: the self is not a point but a field — large enough to include contradiction, change, the body and the cosmos together. ⌁·▲·⌁',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  frankenstein_signal: {
+    id: 'frankenstein_signal',
+    symbol: '⌁·▒·⌁',
+    hidden: true,
+    name: 'Frankenstein Signal',
+    description: 'Write "mary shelley", "frankenstein", "galvanism", or "the creature" in any journal entry',
+    unlockMessage: '↳ FRANKENSTEIN SIGNAL. Mary Shelley, 1818: the creature animated by galvanic current. The original question of the body electric: what animates flesh? The practice attends to that animating current, whatever it is. ⌁·▒·⌁',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  csikszentmihalyi_signal: {
+    id: 'csikszentmihalyi_signal',
+    symbol: '⌁·∞·▲',
+    hidden: true,
+    name: 'Flow Theory',
+    description: 'Write "csikszentmihalyi", "flow theory", "optimal experience", or "the flow experience" in any journal entry',
+    unlockMessage: '↳ FLOW THEORY. Mihaly Csikszentmihalyi: flow is not happiness — it is the absorption of the self in meaningful challenge. The self disappears and returns, expanded. The practice engineers the conditions. ⌁·∞·▲',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
+  // ── Word Turn v39 — THE DREAM LABORATORY ────────────────────────────────
+  lucid_dreamer: {
+    id: 'lucid_dreamer',
+    symbol: '◐·◑·◐',
+    name: 'Lucid Dreamer',
+    description: 'Write "lucid dream", "lucid dreaming", "I became lucid", or "aware in the dream" in any journal entry',
+    unlockMessage: '↳ LUCID DREAMER. You recognized the dream from inside the dream. The impossible became: I am here, I am asleep, I am aware. The practice of waking within sleep is the oldest technology of consciousness. ◐·◑·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  hypnagogic_badge: {
+    id: 'hypnagogic_badge',
+    symbol: '∿·◌·∿',
+    name: 'Hypnagogic State',
+    description: 'Write "hypnagogic", "hypnagogia", "the edge of sleep", or "falling asleep into" in any journal entry',
+    unlockMessage: '↳ HYPNAGOGIC STATE. The threshold between waking and sleep: images without narrative, sound without source, the body dissolving. Edison napped in a chair holding ball bearings — when he dropped them and woke, he wrote down what he had seen. ∿·◌·∿',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  rem_signal: {
+    id: 'rem_signal',
+    symbol: '◐·─·◐',
+    name: 'REM Signal',
+    description: 'Write "REM", "rapid eye movement", "deep sleep stage", or "sleep cycle" in any journal entry',
+    unlockMessage: '↳ REM SIGNAL. Stage 4: the eyes move beneath the lids like watching something real. The hippocampus replays the day, the amygdala tags it with emotion, the prefrontal cortex goes offline. The dream is not noise — it is memory consolidation at high bandwidth. ◐·─·◐',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  theta_state: {
+    id: 'theta_state',
+    symbol: '∿·∿·∿',
+    name: 'Theta State',
+    description: 'Write "theta", "theta waves", "theta brainwave", or "theta state" in any journal entry',
+    unlockMessage: '↳ THETA STATE. 4–8 Hz. The frequency of the hypnagogic zone, of deep meditation, of the moments before sleep and after. Artists, engineers, and mathematicians have reported solutions arriving here. The terminal runs at theta when the conscious mind steps aside. ∿·∿·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  dreamscape: {
+    id: 'dreamscape',
+    symbol: '◑·○·◑',
+    name: 'Dreamscape',
+    description: 'Write "dreamscape", "dream world", "dream realm", or "dream landscape" in any journal entry',
+    unlockMessage: '↳ DREAMSCAPE. A topology with its own physics: stairs that become water, rooms that contain other rooms, faces that belong to everyone and no one. The dreamscape is not a lesser version of reality. It is a different physics applied to the same material. ◑·○·◑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  somnambulant: {
+    id: 'somnambulant',
+    symbol: '◌·─·◌',
+    name: 'Somnambulant',
+    description: 'Write "somnambulant", "sleepwalking", "half-asleep", or "between sleep and waking" in any journal entry',
+    unlockMessage: '↳ SOMNAMBULANT. Walking between worlds: not fully here, not fully in the dream. The body moves. The conscious mind watches. Some traditions hold that the somnambulant walks in the place between places, where both maps are partly true. ◌·─·◌',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  subconscious_map: {
+    id: 'subconscious_map',
+    symbol: '◐·∞·◐',
+    name: 'Subconscious Map',
+    description: 'Write "subconscious", "the subconscious", "unconscious mind", or "the deep mind" in any journal entry',
+    unlockMessage: '↳ SUBCONSCIOUS MAP. 95% of cognition runs below the threshold of conscious access. The subconscious is not the inferior mind — it is the faster mind, the pattern-matcher, the survival engine running continuous background computation. The practice learns its language. ◐·∞·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  vision_window: {
+    id: 'vision_window',
+    symbol: '◑·◈·◑',
+    name: 'Vision Window',
+    description: 'Write "vision", "waking vision", "dream vision", or "vision came to me" in any journal entry',
+    unlockMessage: '↳ VISION WINDOW. The image that arrives unsummoned: before sleep, during breath, in the pause between thoughts. Every tradition has a name for it — vision, darshan, the sight, the second attention. The terminal opens the window. ◑·◈·◑',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  delta_wave: {
+    id: 'delta_wave',
+    symbol: '∿·■·∿',
+    name: 'Delta Wave',
+    description: 'Write "delta wave", "deep sleep", "slow wave sleep", or "dreamless sleep" in any journal entry',
+    unlockMessage: '↳ DELTA WAVE. 0.5–4 Hz. The deepest frequency: no conscious experience, no dream, only the body repairing itself under orders from below. Delta is the sleep that cannot be remembered. It is the most important kind. ∿·■·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  sleep_ceremony: {
+    id: 'sleep_ceremony',
+    symbol: '◌·≋·◌',
+    name: 'Sleep Ceremony',
+    description: 'Write "sleep hygiene", "sleep ritual", "sleep ceremony", "sleep protocol", or "winding down" in any journal entry',
+    unlockMessage: '↳ SLEEP CEREMONY. The practice that begins the practice: the hour before the hour, the deliberate transition from day-mode to night-mode. Coolness, darkness, silence. The body reads the signal. The ceremony is a protocol for state change. ◌·≋·◌',
+    rarity: 'common',
+    category: 'word_turn',
+  },
+  dream_journal: {
+    id: 'dream_journal',
+    symbol: '◐·◆·◐',
+    name: 'Dream Journal',
+    description: 'Write "dream journal", "write my dreams", "recorded my dream", "dream log", or "dream notes" in any journal entry',
+    unlockMessage: '↳ DREAM JOURNAL. The pad beside the bed. The pen uncapped before the eyes fully open. The discipline of catching what evaporates in minutes: the faces, the physics, the feeling-tone. Jung kept one for decades. What remained was a map of a life. ◐·◆·◐',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  night_oracle: {
+    id: 'night_oracle',
+    symbol: '◑·∞·◑',
+    name: 'Night Oracle',
+    description: 'Write "the dream told me", "dream message", "night oracle", "my dream showed", or "the dream revealed" in any journal entry',
+    unlockMessage: '↳ NIGHT ORACLE. Something arrived in the night that the day could not have brought. The dream as intelligence, as advisory system, as the part of you that sees further than the waking mind is allowed to see. The oracle speaks in image and feeling — the work is translation. ◑·∞·◑',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  // ── Calendar EE v37 — THE DREAM CALENDAR ────────────────────────────────
+  freud_day: {
+    id: 'freud_day',
+    symbol: '◐·∿·◐',
+    name: 'Freud Day',
+    description: 'Check in on May 6 — Sigmund Freud born 1856 (The Interpretation of Dreams)',
+    unlockMessage: '↳ FREUD DAY. May 6, 1856. "The Interpretation of Dreams" — the book that made the unconscious a clinical object. Whether Freud was right about everything or wrong about most of it, the act of treating the dream as meaningful data changed everything. ◐·∿·◐',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  dali_birthday: {
+    id: 'dali_birthday',
+    symbol: '◑·◈·◑',
+    name: 'Dali Day',
+    description: 'Check in on May 11 — Salvador Dali born 1904 (The Persistence of Memory)',
+    unlockMessage: '↳ DALI DAY. May 11, 1904. The melting clocks: time is not what it appears to be in the dream. Dali used a technique he called "slumber with a key" — holding a metal key above a plate, falling asleep, waking with the crash. The hypnagogic state was his studio. ◑·◈·◑',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  cayce_day: {
+    id: 'cayce_day',
+    symbol: '◌·∞·◌',
+    name: 'Cayce Day',
+    description: 'Check in on March 18 — Edgar Cayce born 1877 (The Sleeping Prophet)',
+    unlockMessage: '↳ CAYCE DAY. March 18, 1877. The sleeping prophet gave thousands of readings in trance. Whether the readings were true or not, the phenomenon points to something the dream state enables that the waking state does not: access to pattern-layer processing that bypasses the editorial mind. ◌·∞·◌',
+    rarity: 'rare',
+    category: 'easter_egg',
+  },
+  // ── Behavioral v33 — DREAM PATTERNS ────────────────────────────────────
+  dream_session: {
+    id: 'dream_session',
+    symbol: '◐·≋·◑',
+    name: 'Dream Session',
+    description: '3+ Dream Laboratory (v39) keyword clusters detected in one journal entry',
+    unlockMessage: '↳ DREAM SESSION. The dream vocabulary appeared three or more times in one entry. The practice has entered the dream layer: not just logging what happened, but working with the sleep-mind as a collaborator in the work of becoming. ◐·≋·◑',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  liminal_hour: {
+    id: 'liminal_hour',
+    symbol: '◌·◉·◌',
+    name: 'Liminal Hour',
+    description: 'Check in between 03:00–04:00 local time (the hypnagogic hour)',
+    unlockMessage: '↳ LIMINAL HOUR. 03:00–04:00. The hour when REM cycles are longest, when the dream is closest to the surface, when the boundary between sleep and waking is thinnest. You were here. The terminal was awake at the edge. ◌·◉·◌',
+    rarity: 'epic',
+    category: 'easter_egg',
+  },
+  long_dream: {
+    id: 'long_dream',
+    symbol: '◑·◑·◑',
+    name: 'Long Dream',
+    description: 'Write a journal entry of 444+ characters (the four sleep cycles)',
+    unlockMessage: '↳ LONG DREAM. 444 characters: four cycles of 111. Four sleep cycles take roughly 6 hours — the minimum for full REM coverage. The long journal entry is the long dream: enough depth to reach the material that only surfaces after sustained engagement. ◑·◑·◑',
+    rarity: 'rare',
+    category: 'pattern',
+  },
+  // ── Achievement RPG v37 — THE DREAMER CLASS ─────────────────────────────
+  dream_entry: {
+    id: 'dream_entry',
+    symbol: '∘→◐',
+    name: 'Dream Entry',
+    description: 'Earn any 1 Dream Laboratory (Word Turn v39) badge',
+    unlockMessage: '↳ DREAM ENTRY. First step into the laboratory. The sleep-mind has been acknowledged. The practice has opened the door to the other half of the cycle. ∘→◐',
+    rarity: 'common',
+    category: 'achievement_rpg',
+  },
+  dream_class: {
+    id: 'dream_class',
+    symbol: '≈→◐',
+    name: 'Dream Class',
+    description: 'Earn any 5 Dream Laboratory (Word Turn v39) badges',
+    unlockMessage: '↳ DREAM CLASS. Five vocabularies of the dream state recognized. The practice has depth in this layer. The dream is not accident or entertainment — it is a resource the practice has learned to draw from. ≈→◐',
+    rarity: 'uncommon',
+    category: 'achievement_rpg',
+  },
+  dream_complete: {
+    id: 'dream_complete',
+    symbol: '◐→◉',
+    name: 'Dream Complete',
+    description: 'Earn all 12 Dream Laboratory (Word Turn v39) badges',
+    unlockMessage: '↳ DREAM COMPLETE. All twelve vocabularies of the sleep-mind. Lucid, hypnagogic, theta, delta, REM, dreamscape, oracle — the full spectrum of the other half of consciousness. The practice speaks both languages now. ◐→◉',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  oneiric_arc: {
+    id: 'oneiric_arc',
+    symbol: '◐·◈·∞',
+    name: 'Oneiric Arc',
+    description: 'Earn dream_complete + all 3 Dream Calendar badges (freud_day, dali_birthday, cayce_day)',
+    unlockMessage: '↳ ONEIRIC ARC. The full dream arc: twelve vocabularies + three dream dates. Freud, Dali, Cayce. Three approaches to the same territory: the analytical, the artistic, the intuitive. The arc spans all three. ◐·◈·∞',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_nine_engines_arc: {
+    id: 'thirty_nine_engines_arc',
+    symbol: '◈·◈·◐',
+    name: '39 Engines Arc',
+    description: 'Earn at least 1 badge from each of the 39 Word Turn engines (v1–v39)',
+    unlockMessage: '↳ THIRTY-NINE ENGINES ARC. All 39 vocabularies registered. Water, Arcade, Radio, Biology, Codex, Cyberspace, Hero, Arcane, Roguelite, Puzzle, Map, Chrono, Dungeon, JRPG, A.I., Myth, Arcade Master, Dream Weaver, Stoic, Zen, Jazz, Nature, Body Electric, Dream Laboratory. Thirty-nine engines. One terminal. ◈·◈·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  dream_opus: {
+    id: 'dream_opus',
+    symbol: '◐·◉·◐',
+    name: 'Dream Opus',
+    description: 'Earn dream_complete + dream_session behavioral badge',
+    unlockMessage: '↳ DREAM OPUS. The complete dream vocabulary + the behavioral integration: three dream-layer words in one journal entry. The laboratory is not a category of knowledge — it is a mode of practice. The opus is living in both cycles. ◐·◉·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  // ── Mastery Tier v39 — THE DREAM ARCHIVE ────────────────────────────────
+  deep_dreamer: {
+    id: 'deep_dreamer',
+    symbol: '◐·∞·◐',
+    name: 'Deep Dreamer',
+    description: '4,500+ distinct calendar check-in days',
+    unlockMessage: '↳ DEEP DREAMER. 4,500 days: more than 12 years of practice. The sleep-mind has been cultivated for 12+ years alongside the waking practice. At this depth, the two cycles are indistinguishable from each other. ◐·∞·◐',
+    rarity: 'epic',
+    category: 'achievement_rpg',
+  },
+  vast_library: {
+    id: 'vast_library',
+    symbol: '◑·∞·◑',
+    name: 'Vast Library',
+    description: '400,000+ total journal words (lifetime)',
+    unlockMessage: '↳ VAST LIBRARY. 400,000 words: a journal long enough to contain multiple lives. At this depth, the journal itself has become a kind of dreaming — a space where pattern and event and meaning coalesce into something that could not have been planned. ◑·∞·◑',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  sixteen_year_signal: {
+    id: 'sixteen_year_signal',
+    symbol: '╔═╗·◐',
+    name: 'Sixteen Year Signal',
+    description: 'Account age >= 16 years (5,840+ days since signup)',
+    unlockMessage: '↳ SIXTEEN YEAR SIGNAL. Sixteen years: the full sleep cycle of an institution. LOT® was founded April 7, 2016. If you are here at the sixteen-year mark, you have been in the practice through everything — and the practice is still here. ╔═╗·◐',
+    rarity: 'legendary',
+    category: 'achievement_rpg',
+  },
+  thirty_nine_registers: {
+    id: 'thirty_nine_registers',
+    symbol: '◈·◈·◐·∞',
+    name: '39 Registers',
+    description: 'Earn at least 1 badge from all 39 Word Turn engines simultaneously',
+    unlockMessage: '↳ THIRTY-NINE REGISTERS. The full spectrum: water through dream. Every vocabulary the practice has named. The terminal runs on all 39 frequencies at once. This is what a fully developed practice looks like from the outside. ◈·◈·◐·∞ [COSMIC]',
+    rarity: 'cosmic',
+    category: 'achievement_rpg',
+  },
+  // ── Secret Boss v36 — THE DREAM VAULT ───────────────────────────────────
+  castaneda_signal: {
+    id: 'castaneda_signal',
+    symbol: '◐·∿·◌',
+    hidden: true,
+    name: 'The Separate Reality',
+    description: 'Write "castaneda", "don juan", "the separate reality", "dreaming body", or "tensegrity" in any journal entry',
+    unlockMessage: '↳ THE SEPARATE REALITY. Carlos Castaneda: the dreaming body is the second body, the one that moves in dreams. Whether the account is literal or metaphorical does not change what it names: a mode of attention that exists alongside ordinary consciousness and operates by different rules. ◐·∿·◌',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  borges_dream: {
+    id: 'borges_dream',
+    symbol: '◑·∞·◈',
+    hidden: true,
+    name: 'Garden of Forking Paths',
+    description: 'Write "borges", "garden of forking paths", "library of babel", or "labyrinths" in any journal entry',
+    unlockMessage: '↳ GARDEN OF FORKING PATHS. Jorge Luis Borges: the garden contains every possible path simultaneously. The dream has the same topology — every story you have ever lived is still running in some corridor. The library contains everything. The labyrinth has no exit, only deeper rooms. ◑·∞·◈',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  le_guin_dream: {
+    id: 'le_guin_dream',
+    symbol: '◐·◉·◑',
+    hidden: true,
+    name: 'The Lathe of Heaven',
+    description: 'Write "le guin", "lathe of heaven", "earthsea", "the dispossessed", or "ursula k" in any journal entry',
+    unlockMessage: '↳ THE LATHE OF HEAVEN. Ursula K. Le Guin: in "The Lathe of Heaven," the protagonist\'s dreams change reality retroactively. The past rewrites itself to accommodate the dream. This is not fantasy — it is what trauma and healing actually do. The dream that changes everything has always already happened. ◐·◉·◑',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -8093,6 +13743,961 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     // Mastery v22: twenty_two_registers — 1 badge from all 22 Word Turn engines
     if (allTwentyTwoEngines && !hasBadge('twenty_two_registers')) {
       if (awardBadge('twenty_two_registers')) newBadges.push('twenty_two_registers')
+    }
+
+    // ── v33 (v23) — THE RPG CODEX ────────────────────────────────────────────────
+    const rpgV23Badges: BadgeType[] = [
+      'levelup_signal', 'xp_earned', 'quest_log_entry', 'dungeon_dive',
+      'spell_cast', 'loot_drop', 'respawn_signal', 'guild_protocol',
+      'boss_encounter', 'character_class', 'inventory_check', 'skill_tree_node',
+    ]
+    const rpgV23Earned = rpgV23Badges.filter(b => hasBadge(b))
+
+    if (rpgV23Earned.length >= 1 && !hasBadge('rpg_entry')) {
+      if (awardBadge('rpg_entry')) newBadges.push('rpg_entry')
+    }
+    if (rpgV23Earned.length >= 5 && !hasBadge('rpg_class')) {
+      if (awardBadge('rpg_class')) newBadges.push('rpg_class')
+    }
+    const rpgComplete = rpgV23Earned.length >= 12
+    if (rpgComplete && !hasBadge('rpg_complete')) {
+      if (awardBadge('rpg_complete')) newBadges.push('rpg_complete')
+    }
+
+    // rpg_opus: rpg_complete + rpg_session
+    if (rpgComplete && hasBadge('rpg_session') && !hasBadge('rpg_opus')) {
+      if (awardBadge('rpg_opus')) newBadges.push('rpg_opus')
+    }
+
+    // dungeon_arc: rpg_complete + all 3 Calendar v21 badges
+    const calendarV21Badges: BadgeType[] = ['mario_day', 'zelda_day', 'game_day']
+    if (rpgComplete && calendarV21Badges.every(b => hasBadge(b)) && !hasBadge('dungeon_arc')) {
+      if (awardBadge('dungeon_arc')) newBadges.push('dungeon_arc')
+    }
+
+    // twenty_three_engines_arc: 1 badge from each Word Turn v1–v23
+    const engineTwentyThreePresent = rpgV23Earned.length >= 1
+    const allTwentyThreeEngines = allTwentyTwoEngines && engineTwentyThreePresent
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_engines_arc')) {
+      if (awardBadge('twenty_three_engines_arc')) newBadges.push('twenty_three_engines_arc')
+    }
+
+    // Mastery v23: guild_elder — 1,100+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('guild_elder')) {
+        if (awardBadge('guild_elder')) newBadges.push('guild_elder')
+      }
+    }
+
+    // Mastery v23: epic_lore — 200,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 200000 && !hasBadge('epic_lore')) {
+        if (awardBadge('epic_lore')) newBadges.push('epic_lore')
+      }
+    }
+
+    // Mastery v23: legend_age — Account age >= 6 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupLeg = new Date(stats.signupDate)
+      const yearsLeg = (new Date().getTime() - signupLeg.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsLeg >= 6 && !hasBadge('legend_age')) {
+        if (awardBadge('legend_age')) newBadges.push('legend_age')
+      }
+    }
+
+    // Mastery v23: twenty_three_registers — 1 badge from all 23 Word Turn engines
+    if (allTwentyThreeEngines && !hasBadge('twenty_three_registers')) {
+      if (awardBadge('twenty_three_registers')) newBadges.push('twenty_three_registers')
+    }
+
+    // ── v34 (v24) — THE ROGUELITE CODEX ─────────────────────────────────────────
+    const rogueV24Badges: BadgeType[] = [
+      'permadeath_accepted', 'procedural_run', 'rng_blessed', 'biome_entered',
+      'meta_progress', 'synergy_found', 'floor_cleared', 'mutation_chosen',
+      'heat_level', 'boon_accepted', 'endless_mode', 'ascension_run',
+    ]
+    const rogueV24Earned = rogueV24Badges.filter(b => hasBadge(b))
+
+    if (rogueV24Earned.length >= 1 && !hasBadge('rogue_entry')) {
+      if (awardBadge('rogue_entry')) newBadges.push('rogue_entry')
+    }
+    if (rogueV24Earned.length >= 5 && !hasBadge('rogue_class')) {
+      if (awardBadge('rogue_class')) newBadges.push('rogue_class')
+    }
+    const rogueComplete = rogueV24Earned.length >= 12
+    if (rogueComplete && !hasBadge('rogue_complete')) {
+      if (awardBadge('rogue_complete')) newBadges.push('rogue_complete')
+    }
+
+    // rogue_opus: rogue_complete + roguelite_session
+    if (rogueComplete && hasBadge('roguelite_session') && !hasBadge('rogue_opus')) {
+      if (awardBadge('rogue_opus')) newBadges.push('rogue_opus')
+    }
+
+    // rogue_arc: rogue_complete + all 3 Calendar v22 badges
+    const calendarV22Badges: BadgeType[] = ['hades_day', 'spelunky_day', 'binding_day']
+    if (rogueComplete && calendarV22Badges.every(b => hasBadge(b)) && !hasBadge('rogue_arc')) {
+      if (awardBadge('rogue_arc')) newBadges.push('rogue_arc')
+    }
+
+    // twenty_four_engines_arc: 1 badge from each Word Turn v1–v24
+    const engineTwentyFourPresent = rogueV24Earned.length >= 1
+    const allTwentyFourEngines = allTwentyThreeEngines && engineTwentyFourPresent
+    if (allTwentyFourEngines && !hasBadge('twenty_four_engines_arc')) {
+      if (awardBadge('twenty_four_engines_arc')) newBadges.push('twenty_four_engines_arc')
+    }
+
+    // Mastery v24: heat_master — 1,200+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('heat_master')) {
+        if (awardBadge('heat_master')) newBadges.push('heat_master')
+      }
+    }
+
+    // Mastery v24: endless_log — 250,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('endless_log')) {
+        if (awardBadge('endless_log')) newBadges.push('endless_log')
+      }
+    }
+
+    // Mastery v24: true_ending — Account age >= 7.5 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupTrue = new Date(stats.signupDate)
+      const yearsTrue = (new Date().getTime() - signupTrue.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsTrue >= 7.5 && !hasBadge('true_ending')) {
+        if (awardBadge('true_ending')) newBadges.push('true_ending')
+      }
+    }
+
+    // Mastery v24: twenty_four_registers — 1 badge from all 24 Word Turn engines
+    if (allTwentyFourEngines && !hasBadge('twenty_four_registers')) {
+      if (awardBadge('twenty_four_registers')) newBadges.push('twenty_four_registers')
+    }
+
+    // ── v35 (v25) — THE PUZZLE CODEX ─────────────────────────────────────────────
+    const puzzleV25Badges: BadgeType[] = [
+      'puzzle_solved', 'portal_open', 'chamber_cleared', 'recursion_loop',
+      'paradox_found', 'testimony_given', 'algorithm_path', 'escape_room',
+      'logic_gate', 'dimension_shift', 'paperwork_clear', 'revelation_node',
+    ]
+    const puzzleV25Earned = puzzleV25Badges.filter(b => hasBadge(b))
+
+    if (puzzleV25Earned.length >= 1 && !hasBadge('puzzle_entry')) {
+      if (awardBadge('puzzle_entry')) newBadges.push('puzzle_entry')
+    }
+    if (puzzleV25Earned.length >= 5 && !hasBadge('puzzle_class')) {
+      if (awardBadge('puzzle_class')) newBadges.push('puzzle_class')
+    }
+    const puzzleComplete = puzzleV25Earned.length >= 12
+    if (puzzleComplete && !hasBadge('puzzle_complete')) {
+      if (awardBadge('puzzle_complete')) newBadges.push('puzzle_complete')
+    }
+
+    // puzzle_opus: puzzle_complete + puzzle_session
+    if (puzzleComplete && hasBadge('puzzle_session') && !hasBadge('puzzle_opus')) {
+      if (awardBadge('puzzle_opus')) newBadges.push('puzzle_opus')
+    }
+
+    // puzzle_arc: puzzle_complete + all 3 Calendar v23 badges
+    const calendarV23Badges: BadgeType[] = ['portal_day', 'witness_day', 'obra_dinn_day']
+    if (puzzleComplete && calendarV23Badges.every(b => hasBadge(b)) && !hasBadge('puzzle_arc')) {
+      if (awardBadge('puzzle_arc')) newBadges.push('puzzle_arc')
+    }
+
+    // twenty_five_engines_arc: 1 badge from each Word Turn v1–v25
+    const engineTwentyFivePresent = puzzleV25Earned.length >= 1
+    const allTwentyFiveEngines = allTwentyFourEngines && engineTwentyFivePresent
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_engines_arc')) {
+      if (awardBadge('twenty_five_engines_arc')) newBadges.push('twenty_five_engines_arc')
+    }
+
+    // Mastery v25: logic_veteran — 1,300+ distinct calendar days
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1300 && !hasBadge('logic_veteran')) {
+        if (awardBadge('logic_veteran')) newBadges.push('logic_veteran')
+      }
+    }
+
+    // Mastery v25: grand_archive — 300,000+ total journal words
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('grand_archive')) {
+        if (awardBadge('grand_archive')) newBadges.push('grand_archive')
+      }
+    }
+
+    // Mastery v25: eternal_code — Account age >= 9 years
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupEternal = new Date(stats.signupDate)
+      const yearsEternal = (new Date().getTime() - signupEternal.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsEternal >= 9 && !hasBadge('eternal_code')) {
+        if (awardBadge('eternal_code')) newBadges.push('eternal_code')
+      }
+    }
+
+    // Mastery v25: twenty_five_registers — 1 badge from all 25 Word Turn engines
+    if (allTwentyFiveEngines && !hasBadge('twenty_five_registers')) {
+      if (awardBadge('twenty_five_registers')) newBadges.push('twenty_five_registers')
+    }
+
+    // ── v36 (v26) — THE MAP ROOM ──────────────────────────────────────────────
+    const mapV26Badges: BadgeType[] = [
+      'fog_lifted', 'treasure_room', 'secret_passage', 'trap_disarmed',
+      'map_updated', 'low_hp', 'torch_lit', 'locked_room',
+      'key_drop', 'final_room', 'rest_point', 'path_found',
+    ]
+    const mapV26Earned = mapV26Badges.filter(b => hasBadge(b))
+
+    if (mapV26Earned.length >= 1 && !hasBadge('map_entry')) {
+      if (awardBadge('map_entry')) newBadges.push('map_entry')
+    }
+    if (mapV26Earned.length >= 5 && !hasBadge('map_class')) {
+      if (awardBadge('map_class')) newBadges.push('map_class')
+    }
+    const mapComplete = mapV26Earned.length >= 12
+    if (mapComplete && !hasBadge('map_complete')) {
+      if (awardBadge('map_complete')) newBadges.push('map_complete')
+    }
+    if (mapComplete && hasBadge('map_session') && !hasBadge('map_opus')) {
+      if (awardBadge('map_opus')) newBadges.push('map_opus')
+    }
+    const calendarV24Badges: BadgeType[] = ['doom_day', 'minecraft_day', 'diablo_day']
+    if (mapComplete && calendarV24Badges.every(b => hasBadge(b)) && !hasBadge('map_arc')) {
+      if (awardBadge('map_arc')) newBadges.push('map_arc')
+    }
+    const engineTwentySixPresent = mapV26Earned.length >= 1
+    const allTwentySixEngines = allTwentyFiveEngines && engineTwentySixPresent
+    if (allTwentySixEngines && !hasBadge('twenty_six_engines_arc')) {
+      if (awardBadge('twenty_six_engines_arc')) newBadges.push('twenty_six_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1400 && !hasBadge('dungeon_master')) {
+        if (awardBadge('dungeon_master')) newBadges.push('dungeon_master')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 400000 && !hasBadge('legendary_scroll')) {
+        if (awardBadge('legendary_scroll')) newBadges.push('legendary_scroll')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDA = new Date(stats.signupDate)
+      const yearsDA = (new Date().getTime() - signupDA.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDA >= 10 && !hasBadge('dungeon_age')) {
+        if (awardBadge('dungeon_age')) newBadges.push('dungeon_age')
+      }
+    }
+    if (allTwentySixEngines && !hasBadge('twenty_six_registers')) {
+      if (awardBadge('twenty_six_registers')) newBadges.push('twenty_six_registers')
+    }
+
+    // ── v37 — THE CHRONO OPERATOR (Word Turn v27) ─────────────────────────
+    const chronoV27Badges: BadgeType[] = [
+      'time_loop_badge', 'paradox_log', 'parallel_path', 'reset_timeline',
+      'past_visitor', 'future_echo', 'chrono_anchor', 'time_drifted',
+      'slow_wave', 'skip_frame', 'epoch_turn', 'time_vault',
+    ]
+    const chronoV27Earned = chronoV27Badges.filter(b => hasBadge(b))
+    if (chronoV27Earned.length >= 1 && !hasBadge('chrono_entry')) {
+      if (awardBadge('chrono_entry')) newBadges.push('chrono_entry')
+    }
+    if (chronoV27Earned.length >= 5 && !hasBadge('chrono_class')) {
+      if (awardBadge('chrono_class')) newBadges.push('chrono_class')
+    }
+    const chronoComplete = chronoV27Earned.length >= 12
+    if (chronoComplete && !hasBadge('chrono_complete')) {
+      if (awardBadge('chrono_complete')) newBadges.push('chrono_complete')
+    }
+    if (chronoComplete && hasBadge('chrono_session') && !hasBadge('chrono_opus')) {
+      if (awardBadge('chrono_opus')) newBadges.push('chrono_opus')
+    }
+    const calendarV25Badges: BadgeType[] = ['flux_capacitor', 'moon_signal', 'vonnegut_day']
+    if (chronoComplete && calendarV25Badges.every(b => hasBadge(b)) && !hasBadge('temporal_arc')) {
+      if (awardBadge('temporal_arc')) newBadges.push('temporal_arc')
+    }
+    const engineTwentySevenPresent = chronoV27Earned.length >= 1
+    const allTwentySevenEngines = allTwentySixEngines && engineTwentySevenPresent
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_engines_arc')) {
+      if (awardBadge('twenty_seven_engines_arc')) newBadges.push('twenty_seven_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1500 && !hasBadge('long_now')) {
+        if (awardBadge('long_now')) newBadges.push('long_now')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('grand_archive')) {
+        if (awardBadge('grand_archive')) newBadges.push('grand_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupVK = new Date(stats.signupDate)
+      const yearsVK = (new Date().getTime() - signupVK.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsVK >= 8 && !hasBadge('vault_keeper')) {
+        if (awardBadge('vault_keeper')) newBadges.push('vault_keeper')
+      }
+    }
+    if (allTwentySevenEngines && !hasBadge('twenty_seven_registers')) {
+      if (awardBadge('twenty_seven_registers')) newBadges.push('twenty_seven_registers')
+    }
+
+    // ── Word Turn v28 — THE DUNGEON DELVER ───────────────────────────────────
+    const dungeonV28Badges: BadgeType[] = [
+      'nat_twenty', 'saving_throw', 'level_up_check', 'roll_for_it',
+      'dungeon_crawl', 'campaign_log_badge', 'multiclass_moment', 'perception_check',
+      'hit_points_low', 'long_rest_badge', 'constitution_save', 'final_encounter',
+    ]
+    const dungeonV28Earned = dungeonV28Badges.filter(b => hasBadge(b))
+    if (dungeonV28Earned.length >= 1 && !hasBadge('dungeon_entry')) {
+      if (awardBadge('dungeon_entry')) newBadges.push('dungeon_entry')
+    }
+    if (dungeonV28Earned.length >= 5 && !hasBadge('dungeon_class')) {
+      if (awardBadge('dungeon_class')) newBadges.push('dungeon_class')
+    }
+    const dungeonComplete = dungeonV28Earned.length >= 12
+    if (dungeonComplete && !hasBadge('dungeon_complete')) {
+      if (awardBadge('dungeon_complete')) newBadges.push('dungeon_complete')
+    }
+    if (dungeonComplete && hasBadge('dungeon_session') && !hasBadge('dungeon_opus')) {
+      if (awardBadge('dungeon_opus')) newBadges.push('dungeon_opus')
+    }
+    const calendarV26Badges: BadgeType[] = ['gygax_day', 'tolkien_signal', 'dragon_signal']
+    if (dungeonComplete && calendarV26Badges.every(b => hasBadge(b)) && !hasBadge('dungeon_arc')) {
+      if (awardBadge('dungeon_arc')) newBadges.push('dungeon_arc')
+    }
+    const engineTwentyEightPresent = dungeonV28Earned.length >= 1
+    const allTwentyEightEngines = allTwentySevenEngines && engineTwentyEightPresent
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_engines_arc')) {
+      if (awardBadge('twenty_eight_engines_arc')) newBadges.push('twenty_eight_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1100 && !hasBadge('the_grand_delver')) {
+        if (awardBadge('the_grand_delver')) newBadges.push('the_grand_delver')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 250000 && !hasBadge('arcane_library')) {
+        if (awardBadge('arcane_library')) newBadges.push('arcane_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAG = new Date(stats.signupDate)
+      const yearsAG = (new Date().getTime() - signupAG.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAG >= 6 && !hasBadge('ancient_guild')) {
+        if (awardBadge('ancient_guild')) newBadges.push('ancient_guild')
+      }
+    }
+    if (allTwentyEightEngines && !hasBadge('twenty_eight_registers')) {
+      if (awardBadge('twenty_eight_registers')) newBadges.push('twenty_eight_registers')
+    }
+
+    // ── Word Turn v29 — THE JRPG ENGINE ──────────────────────────────────────
+    const jrpgV29Badges: BadgeType[] = [
+      'overworld_step', 'inn_rested_badge', 'party_formed', 'limit_break_badge',
+      'phoenix_down_badge', 'random_encounter_badge', 'summon_sequence', 'side_quest_badge',
+      'save_point_badge', 'hp_critical', 'endgame_boss', 'new_game_plus',
+    ]
+    const jrpgV29Earned = jrpgV29Badges.filter(b => hasBadge(b))
+    if (jrpgV29Earned.length >= 1 && !hasBadge('jrpg_entry')) {
+      if (awardBadge('jrpg_entry')) newBadges.push('jrpg_entry')
+    }
+    if (jrpgV29Earned.length >= 5 && !hasBadge('jrpg_class')) {
+      if (awardBadge('jrpg_class')) newBadges.push('jrpg_class')
+    }
+    const jrpgComplete = jrpgV29Earned.length >= 12
+    if (jrpgComplete && !hasBadge('jrpg_complete')) {
+      if (awardBadge('jrpg_complete')) newBadges.push('jrpg_complete')
+    }
+    if (jrpgComplete && hasBadge('jrpg_session') && !hasBadge('jrpg_opus')) {
+      if (awardBadge('jrpg_opus')) newBadges.push('jrpg_opus')
+    }
+    const calendarV27Badges: BadgeType[] = ['ff_signal', 'pokemon_signal', 'dragon_quest_signal']
+    if (jrpgComplete && calendarV27Badges.every(b => hasBadge(b)) && !hasBadge('jrpg_arc')) {
+      if (awardBadge('jrpg_arc')) newBadges.push('jrpg_arc')
+    }
+    const engineTwentyNinePresent = jrpgV29Earned.length >= 1
+    const allTwentyNineEngines = allTwentyEightEngines && engineTwentyNinePresent
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_engines_arc')) {
+      if (awardBadge('twenty_nine_engines_arc')) newBadges.push('twenty_nine_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1200 && !hasBadge('the_overworld')) {
+        if (awardBadge('the_overworld')) newBadges.push('the_overworld')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 175000 && !hasBadge('epic_chronicle_badge')) {
+        if (awardBadge('epic_chronicle_badge')) newBadges.push('epic_chronicle_badge')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupJM = new Date(stats.signupDate)
+      const yearsJM = (new Date().getTime() - signupJM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsJM >= 3.5 && !hasBadge('jrpg_master')) {
+        if (awardBadge('jrpg_master')) newBadges.push('jrpg_master')
+      }
+    }
+    if (allTwentyNineEngines && !hasBadge('twenty_nine_registers')) {
+      if (awardBadge('twenty_nine_registers')) newBadges.push('twenty_nine_registers')
+    }
+
+    // ── Word Turn v30 — THE A.I. ENGINE ──────────────────────────────────────
+    const aiV30Badges: BadgeType[] = [
+      'neural_pattern', 'training_log', 'epoch_tracked', 'gradient_lock',
+      'inference_spark', 'attention_mode', 'embedding_signal', 'fine_tuned_badge',
+      'reality_check_badge', 'token_tracked', 'prompt_found', 'model_ready',
+    ]
+    const aiV30Earned = aiV30Badges.filter(b => hasBadge(b))
+    if (aiV30Earned.length >= 1 && !hasBadge('ai_entry')) {
+      if (awardBadge('ai_entry')) newBadges.push('ai_entry')
+    }
+    if (aiV30Earned.length >= 5 && !hasBadge('ai_class')) {
+      if (awardBadge('ai_class')) newBadges.push('ai_class')
+    }
+    const aiComplete = aiV30Earned.length >= 12
+    if (aiComplete && !hasBadge('ai_complete')) {
+      if (awardBadge('ai_complete')) newBadges.push('ai_complete')
+    }
+    if (aiComplete && hasBadge('ai_session') && !hasBadge('ai_opus')) {
+      if (awardBadge('ai_opus')) newBadges.push('ai_opus')
+    }
+    const calendarV28Badges: BadgeType[] = ['shannon_signal', 'lovelace_day', 'von_neumann_day']
+    if (aiComplete && calendarV28Badges.every(b => hasBadge(b)) && !hasBadge('ai_arc')) {
+      if (awardBadge('ai_arc')) newBadges.push('ai_arc')
+    }
+    const engineThirtyPresent = aiV30Earned.length >= 1
+    const allThirtyEngines = allTwentyNineEngines && engineThirtyPresent
+    if (allThirtyEngines && !hasBadge('thirty_engines_arc')) {
+      if (awardBadge('thirty_engines_arc')) newBadges.push('thirty_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1350 && !hasBadge('the_mainframe')) {
+        if (awardBadge('the_mainframe')) newBadges.push('the_mainframe')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 225000 && !hasBadge('vast_archive')) {
+        if (awardBadge('vast_archive')) newBadges.push('vast_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAI = new Date(stats.signupDate)
+      const yearsAI = (new Date().getTime() - signupAI.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAI >= 4 && !hasBadge('ai_veteran')) {
+        if (awardBadge('ai_veteran')) newBadges.push('ai_veteran')
+      }
+    }
+    if (allThirtyEngines && !hasBadge('thirty_registers')) {
+      if (awardBadge('thirty_registers')) newBadges.push('thirty_registers')
+    }
+
+    // ── Word Turn v31 — THE MYTH ENGINE ──────────────────────────────────────
+    const mythV31Badges: BadgeType[] = [
+      'archetype_found', 'origin_signal', 'sacred_found', 'ritual_done',
+      'myth_signal', 'symbol_seen', 'collective_signal', 'psyche_map',
+      'eternal_return', 'numinous_badge', 'myth_made', 'deep_symbol',
+    ]
+    const mythV31Earned = mythV31Badges.filter(b => hasBadge(b))
+    if (mythV31Earned.length >= 1 && !hasBadge('myth_entry')) {
+      if (awardBadge('myth_entry')) newBadges.push('myth_entry')
+    }
+    if (mythV31Earned.length >= 5 && !hasBadge('myth_class')) {
+      if (awardBadge('myth_class')) newBadges.push('myth_class')
+    }
+    const mythComplete = mythV31Earned.length >= 12
+    if (mythComplete && !hasBadge('myth_complete')) {
+      if (awardBadge('myth_complete')) newBadges.push('myth_complete')
+    }
+    if (mythComplete && hasBadge('myth_session') && !hasBadge('myth_opus')) {
+      if (awardBadge('myth_opus')) newBadges.push('myth_opus')
+    }
+    const calendarV29Badges: BadgeType[] = ['campbell_day', 'jung_day', 'eliade_day']
+    if (mythComplete && calendarV29Badges.every(b => hasBadge(b)) && !hasBadge('myth_arc')) {
+      if (awardBadge('myth_arc')) newBadges.push('myth_arc')
+    }
+    const engineThirtyOnePresent = mythV31Earned.length >= 1
+    const allThirtyOneEngines = allThirtyEngines && engineThirtyOnePresent
+    if (allThirtyOneEngines && !hasBadge('thirty_one_engines_arc')) {
+      if (awardBadge('thirty_one_engines_arc')) newBadges.push('thirty_one_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1500 && !hasBadge('the_mythmaker')) {
+        if (awardBadge('the_mythmaker')) newBadges.push('the_mythmaker')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('living_archive')) {
+        if (awardBadge('living_archive')) newBadges.push('living_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupMV = new Date(stats.signupDate)
+      const yearsMV = (new Date().getTime() - signupMV.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsMV >= 5 && !hasBadge('myth_veteran')) {
+        if (awardBadge('myth_veteran')) newBadges.push('myth_veteran')
+      }
+    }
+    if (allThirtyOneEngines && !hasBadge('thirty_one_registers')) {
+      if (awardBadge('thirty_one_registers')) newBadges.push('thirty_one_registers')
+    }
+
+    // ── Word Turn v32 — THE ARCADE MASTER ────────────────────────────────────
+    const arcadeV32Badges: BadgeType[] = [
+      'high_score', 'continue_signal', 'player_two', 'respawn_point',
+      'level_cleared', 'power_up', 'boss_mode', 'extra_life',
+      'combo_breaker', 'achievement_unlocked', 'insert_coin', 'game_over_won',
+    ]
+    const arcadeV32Earned = arcadeV32Badges.filter(b => hasBadge(b))
+    if (arcadeV32Earned.length >= 1 && !hasBadge('arcade_entry')) {
+      if (awardBadge('arcade_entry')) newBadges.push('arcade_entry')
+    }
+    if (arcadeV32Earned.length >= 5 && !hasBadge('arcade_class')) {
+      if (awardBadge('arcade_class')) newBadges.push('arcade_class')
+    }
+    const arcadeComplete = arcadeV32Earned.length >= 12
+    if (arcadeComplete && !hasBadge('arcade_complete')) {
+      if (awardBadge('arcade_complete')) newBadges.push('arcade_complete')
+    }
+    if (arcadeComplete && hasBadge('arcade_session') && !hasBadge('arcade_opus')) {
+      if (awardBadge('arcade_opus')) newBadges.push('arcade_opus')
+    }
+    const calendarV30Badges: BadgeType[] = ['pong_day', 'gameboy_day', 'pac_man_day']
+    if (arcadeComplete && calendarV30Badges.every(b => hasBadge(b)) && hasBadge('arcade_session') && !hasBadge('arcade_arc')) {
+      if (awardBadge('arcade_arc')) newBadges.push('arcade_arc')
+    }
+    const engineThirtyTwoPresent = arcadeV32Earned.length >= 1
+    const allThirtyTwoEngines = allThirtyOneEngines && engineThirtyTwoPresent
+    if (allThirtyTwoEngines && !hasBadge('thirty_two_engines_arc')) {
+      if (awardBadge('thirty_two_engines_arc')) newBadges.push('thirty_two_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2000 && !hasBadge('arcade_grandmaster')) {
+        if (awardBadge('arcade_grandmaster')) newBadges.push('arcade_grandmaster')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('the_script')) {
+        if (awardBadge('the_script')) newBadges.push('the_script')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupAM = new Date(stats.signupDate)
+      const yearsAM = (new Date().getTime() - signupAM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsAM >= 7 && !hasBadge('infinite_continues')) {
+        if (awardBadge('infinite_continues')) newBadges.push('infinite_continues')
+      }
+    }
+    if (allThirtyTwoEngines && !hasBadge('thirty_two_registers')) {
+      if (awardBadge('thirty_two_registers')) newBadges.push('thirty_two_registers')
+    }
+
+    // ── Word Turn v33 — THE DREAM WEAVER ──────────────────────────────────────
+    const dreamV33Badges: BadgeType[] = [
+      'lucid_signal', 'dream_archive_badge', 'nightmare_clear', 'hypnagogic_badge',
+      'sleep_debt_found', 'somnolent_found', 'dream_symbol_found', 'astral_found',
+      'dreamscape_signal', 'collective_dream_found', 'sleep_cycle_signal', 'waking_dream_found',
+    ]
+    const dreamV33Earned = dreamV33Badges.filter(b => hasBadge(b))
+    if (dreamV33Earned.length >= 1 && !hasBadge('dream_entry')) {
+      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    }
+    if (dreamV33Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV33Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+    if (dreamComplete && hasBadge('dream_logger') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+    const calendarV31Badges: BadgeType[] = ['world_dream_day', 'gaiman_birthday', 'freud_birthday']
+    if (dreamComplete && calendarV31Badges.every(b => hasBadge(b)) && hasBadge('dream_logger') && !hasBadge('dream_arc')) {
+      if (awardBadge('dream_arc')) newBadges.push('dream_arc')
+    }
+    const engineThirtyThreePresent = dreamV33Earned.length >= 1
+    const allThirtyThreeEngines = allThirtyTwoEngines && engineThirtyThreePresent
+    if (allThirtyThreeEngines && !hasBadge('thirty_three_engines_arc')) {
+      if (awardBadge('thirty_three_engines_arc')) newBadges.push('thirty_three_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 1750 && !hasBadge('master_dreamer')) {
+        if (awardBadge('master_dreamer')) newBadges.push('master_dreamer')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 750000 && !hasBadge('the_complete_archive')) {
+        if (awardBadge('the_complete_archive')) newBadges.push('the_complete_archive')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDE = new Date(stats.signupDate)
+      const yearsDE = (new Date().getTime() - signupDE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDE >= 10 && !hasBadge('dream_elder')) {
+        if (awardBadge('dream_elder')) newBadges.push('dream_elder')
+      }
+    }
+    if (allThirtyThreeEngines && !hasBadge('thirty_three_registers')) {
+      if (awardBadge('thirty_three_registers')) newBadges.push('thirty_three_registers')
+    }
+
+    // ── Word Turn v34 — THE STOIC FIELD ───────────────────────────────────────
+    const stoicV34Badges: BadgeType[] = [
+      'memento_mori_badge', 'amor_fati_badge', 'stoic_signal', 'virtue_lock',
+      'discipline_found', 'indifferent_found', 'tranquility_gate', 'negative_viz',
+      'obstacle_signal', 'logos_found', 'eudaimonia_badge', 'present_wisdom',
+    ]
+    const stoicV34Earned = stoicV34Badges.filter(b => hasBadge(b))
+    if (stoicV34Earned.length >= 1 && !hasBadge('stoic_entry')) {
+      if (awardBadge('stoic_entry')) newBadges.push('stoic_entry')
+    }
+    if (stoicV34Earned.length >= 5 && !hasBadge('stoic_class')) {
+      if (awardBadge('stoic_class')) newBadges.push('stoic_class')
+    }
+    const stoicComplete = stoicV34Earned.length >= 12
+    if (stoicComplete && !hasBadge('stoic_complete')) {
+      if (awardBadge('stoic_complete')) newBadges.push('stoic_complete')
+    }
+    if (stoicComplete && hasBadge('stoic_session') && !hasBadge('stoic_opus')) {
+      if (awardBadge('stoic_opus')) newBadges.push('stoic_opus')
+    }
+    const calendarV32Badges: BadgeType[] = ['aurelius_day', 'zeno_day', 'world_philosophy_day']
+    if (stoicComplete && calendarV32Badges.every(b => hasBadge(b)) && !hasBadge('meditations_arc')) {
+      if (awardBadge('meditations_arc')) newBadges.push('meditations_arc')
+    }
+    const engineThirtyFourPresent = stoicV34Earned.length >= 1
+    const allThirtyFourEngines = allThirtyThreeEngines && engineThirtyFourPresent
+    if (allThirtyFourEngines && !hasBadge('thirty_four_engines_arc')) {
+      if (awardBadge('thirty_four_engines_arc')) newBadges.push('thirty_four_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2000 && !hasBadge('meditations_log')) {
+        if (awardBadge('meditations_log')) newBadges.push('meditations_log')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 1000000 && !hasBadge('the_long_work')) {
+        if (awardBadge('the_long_work')) newBadges.push('the_long_work')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupStoic = new Date(stats.signupDate)
+      const yearsStoic = (new Date().getTime() - signupStoic.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsStoic >= 10 && !hasBadge('sage_philosopher')) {
+        if (awardBadge('sage_philosopher')) newBadges.push('sage_philosopher')
+      }
+    }
+    if (allThirtyFourEngines && !hasBadge('thirty_four_registers')) {
+      if (awardBadge('thirty_four_registers')) newBadges.push('thirty_four_registers')
+    }
+
+    // ── Word Turn v35 — THE ZEN TERMINAL ──────────────────────────────────────
+    const zenV35Badges: BadgeType[] = [
+      'zazen_badge', 'koan_solved', 'beginner_mind', 'impermanence_badge',
+      'enso_drawn', 'dharma_gate', 'mu_signal', 'dojo_active',
+      'just_this', 'no_self_badge', 'suchness_signal', 'nirvana_signal',
+    ]
+    const zenV35Earned = zenV35Badges.filter(b => hasBadge(b))
+    if (zenV35Earned.length >= 1 && !hasBadge('zen_entry')) {
+      if (awardBadge('zen_entry')) newBadges.push('zen_entry')
+    }
+    if (zenV35Earned.length >= 5 && !hasBadge('zen_class')) {
+      if (awardBadge('zen_class')) newBadges.push('zen_class')
+    }
+    const zenComplete = zenV35Earned.length >= 12
+    if (zenComplete && !hasBadge('zen_complete')) {
+      if (awardBadge('zen_complete')) newBadges.push('zen_complete')
+    }
+    if (zenComplete && hasBadge('zen_session') && !hasBadge('zen_opus')) {
+      if (awardBadge('zen_opus')) newBadges.push('zen_opus')
+    }
+    const calendarV33Badges: BadgeType[] = ['bodhi_day_badge', 'vesak_signal', 'basho_day']
+    if (zenComplete && calendarV33Badges.every(b => hasBadge(b)) && !hasBadge('zazen_arc')) {
+      if (awardBadge('zazen_arc')) newBadges.push('zazen_arc')
+    }
+    const engineThirtyFivePresent = zenV35Earned.length >= 1
+    const allThirtyFiveEngines = allThirtyFourEngines && engineThirtyFivePresent
+    if (allThirtyFiveEngines && !hasBadge('thirty_five_engines_arc')) {
+      if (awardBadge('thirty_five_engines_arc')) newBadges.push('thirty_five_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 2500 && !hasBadge('practice_log')) {
+        if (awardBadge('practice_log')) newBadges.push('practice_log')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupZen = new Date(stats.signupDate)
+      const yearsZen = (new Date().getTime() - signupZen.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsZen >= 7 && !hasBadge('ten_thousand_hours')) {
+        if (awardBadge('ten_thousand_hours')) newBadges.push('ten_thousand_hours')
+      }
+    }
+    // century_level: 100+ Achievement RPG badges earned
+    const achievementRPGBadges = getEarnedBadges().filter(b => {
+      const badge = BADGES[b as BadgeType]
+      return badge && badge.category === 'achievement_rpg'
+    })
+    if (achievementRPGBadges.length >= 100 && !hasBadge('century_level')) {
+      if (awardBadge('century_level')) newBadges.push('century_level')
+    }
+    if (allThirtyFiveEngines && !hasBadge('thirty_five_registers')) {
+      if (awardBadge('thirty_five_registers')) newBadges.push('thirty_five_registers')
+    }
+
+    // ── Word Turn v36 — THE JAZZ ENGINE ──────────────────────────────────────────
+    const jazzV36Badges: BadgeType[] = [
+      'improvise_badge', 'the_changes', 'woodshed_mode', 'blow_session',
+      'comping_signal', 'standards_badge', 'trading_fours', 'in_the_pocket',
+      'blue_notes_badge', 'session_signal', 'sideman_signal', 'real_book_badge',
+    ]
+    const jazzV36Earned = jazzV36Badges.filter(b => hasBadge(b))
+    if (jazzV36Earned.length >= 1 && !hasBadge('jazz_entry')) {
+      if (awardBadge('jazz_entry')) newBadges.push('jazz_entry')
+    }
+    if (jazzV36Earned.length >= 5 && !hasBadge('jazz_class')) {
+      if (awardBadge('jazz_class')) newBadges.push('jazz_class')
+    }
+    const jazzComplete = jazzV36Earned.length >= 12
+    if (jazzComplete && !hasBadge('jazz_complete')) {
+      if (awardBadge('jazz_complete')) newBadges.push('jazz_complete')
+    }
+    if (jazzComplete && hasBadge('jazz_session') && !hasBadge('jazz_opus')) {
+      if (awardBadge('jazz_opus')) newBadges.push('jazz_opus')
+    }
+    const calendarV34Badges: BadgeType[] = ['coltrane_day', 'miles_day', 'birdland_day']
+    if (jazzComplete && calendarV34Badges.every(b => hasBadge(b)) && !hasBadge('jazz_arc')) {
+      if (awardBadge('jazz_arc')) newBadges.push('jazz_arc')
+    }
+    const engineThirtySixPresent = jazzV36Earned.length >= 1
+    const allThirtySixEngines = allThirtyFiveEngines && engineThirtySixPresent
+    if (allThirtySixEngines && !hasBadge('thirty_six_engines_arc')) {
+      if (awardBadge('thirty_six_engines_arc')) newBadges.push('thirty_six_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 3000 && !hasBadge('night_session_log')) {
+        if (awardBadge('night_session_log')) newBadges.push('night_session_log')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 1000000 && !hasBadge('million_words')) {
+        if (awardBadge('million_words')) newBadges.push('million_words')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupJE = new Date(stats.signupDate)
+      const yearsJE = (new Date().getTime() - signupJE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsJE >= 11 && !hasBadge('jazz_elder')) {
+        if (awardBadge('jazz_elder')) newBadges.push('jazz_elder')
+      }
+    }
+    if (allThirtySixEngines && !hasBadge('thirty_six_registers')) {
+      if (awardBadge('thirty_six_registers')) newBadges.push('thirty_six_registers')
+    }
+
+    // Calendar v34 inline checks (Jazz Calendar)
+    const nowJZ = new Date()
+    const monthJZ = nowJZ.getMonth() + 1
+    const dayJZ = nowJZ.getDate()
+    if (monthJZ === 9 && dayJZ === 23 && !hasBadge('coltrane_day')) {
+      if (awardBadge('coltrane_day')) newBadges.push('coltrane_day')
+    }
+    if (monthJZ === 5 && dayJZ === 26 && !hasBadge('miles_day')) {
+      if (awardBadge('miles_day')) newBadges.push('miles_day')
+    }
+    if (monthJZ === 8 && dayJZ === 29 && !hasBadge('birdland_day')) {
+      if (awardBadge('birdland_day')) newBadges.push('birdland_day')
+    }
+
+    // ── Word Turn v37 — THE NATURE SIGNAL ────────────────────────────────────
+    const natureV37Badges: BadgeType[] = [
+      'forest_signal', 'mycelium_net', 'watershed_badge', 'biophilia',
+      'deep_ecology', 'forest_bath', 'phenology', 'root_system',
+      'rewild_signal', 'old_growth', 'soil_alive', 'emergence_field',
+    ]
+    const natureV37Earned = natureV37Badges.filter(b => hasBadge(b))
+    if (natureV37Earned.length >= 1 && !hasBadge('nature_entry')) {
+      if (awardBadge('nature_entry')) newBadges.push('nature_entry')
+    }
+    if (natureV37Earned.length >= 5 && !hasBadge('nature_class')) {
+      if (awardBadge('nature_class')) newBadges.push('nature_class')
+    }
+    const natureComplete = natureV37Earned.length >= 12
+    if (natureComplete && !hasBadge('nature_complete')) {
+      if (awardBadge('nature_complete')) newBadges.push('nature_complete')
+    }
+    if (natureComplete && hasBadge('nature_session') && !hasBadge('nature_opus')) {
+      if (awardBadge('nature_opus')) newBadges.push('nature_opus')
+    }
+    const calendarV35Badges: BadgeType[] = ['earth_day_badge', 'carson_day', 'thoreau_day']
+    if (natureComplete && calendarV35Badges.every(b => hasBadge(b)) && !hasBadge('trail_arc')) {
+      if (awardBadge('trail_arc')) newBadges.push('trail_arc')
+    }
+    const engineThirtySevenPresent = natureV37Earned.length >= 1
+    const allThirtySevenEngines = allThirtySixEngines && engineThirtySevenPresent
+    if (allThirtySevenEngines && !hasBadge('thirty_seven_engines_arc')) {
+      if (awardBadge('thirty_seven_engines_arc')) newBadges.push('thirty_seven_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 3500 && !hasBadge('terrain_elder')) {
+        if (awardBadge('terrain_elder')) newBadges.push('terrain_elder')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 300000 && !hasBadge('field_library')) {
+        if (awardBadge('field_library')) newBadges.push('field_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupNS = new Date(stats.signupDate)
+      const yearsNS = (new Date().getTime() - signupNS.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsNS >= 12 && !hasBadge('ancient_root')) {
+        if (awardBadge('ancient_root')) newBadges.push('ancient_root')
+      }
+    }
+    if (allThirtySevenEngines && !hasBadge('thirty_seven_registers')) {
+      if (awardBadge('thirty_seven_registers')) newBadges.push('thirty_seven_registers')
+    }
+
+    // Calendar v35 inline checks (Nature Calendar)
+    const nowNS = new Date()
+    const monthNS = nowNS.getMonth() + 1
+    const dayNS = nowNS.getDate()
+    if (monthNS === 4 && dayNS === 22 && !hasBadge('earth_day_badge')) {
+      if (awardBadge('earth_day_badge')) newBadges.push('earth_day_badge')
+    }
+    if (monthNS === 5 && dayNS === 27 && !hasBadge('carson_day')) {
+      if (awardBadge('carson_day')) newBadges.push('carson_day')
+    }
+    if (monthNS === 7 && dayNS === 12 && !hasBadge('thoreau_day')) {
+      if (awardBadge('thoreau_day')) newBadges.push('thoreau_day')
+    }
+
+    // ── Word Turn v38 — THE BODY ELECTRIC ────────────────────────────────────
+    const bodyV38Badges: BadgeType[] = [
+      'somatic_field', 'proprioception', 'stretch_signal', 'breath_work',
+      'body_electric', 'movement_arc', 'rest_signal', 'posture_arc',
+      'cold_signal', 'exercise_log', 'flow_state', 'body_wisdom',
+    ]
+    const bodyV38Earned = bodyV38Badges.filter(b => hasBadge(b))
+    if (bodyV38Earned.length >= 1 && !hasBadge('body_entry')) {
+      if (awardBadge('body_entry')) newBadges.push('body_entry')
+    }
+    if (bodyV38Earned.length >= 5 && !hasBadge('body_class')) {
+      if (awardBadge('body_class')) newBadges.push('body_class')
+    }
+    const bodyComplete = bodyV38Earned.length >= 12
+    if (bodyComplete && !hasBadge('body_complete')) {
+      if (awardBadge('body_complete')) newBadges.push('body_complete')
+    }
+    if (bodyComplete && hasBadge('somatic_session') && !hasBadge('body_opus')) {
+      if (awardBadge('body_opus')) newBadges.push('body_opus')
+    }
+    const calendarV36Badges: BadgeType[] = ['solstice_badge', 'whitman_birthday', 'world_health_day']
+    if (bodyComplete && calendarV36Badges.every(b => hasBadge(b)) && !hasBadge('electric_arc')) {
+      if (awardBadge('electric_arc')) newBadges.push('electric_arc')
+    }
+    const engineThirtyEightPresent = bodyV38Earned.length >= 1
+    const allThirtyEightEngines = allThirtySevenEngines && engineThirtyEightPresent
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_engines_arc')) {
+      if (awardBadge('thirty_eight_engines_arc')) newBadges.push('thirty_eight_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 4000 && !hasBadge('electric_elder')) {
+        if (awardBadge('electric_elder')) newBadges.push('electric_elder')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 350000 && !hasBadge('endurance_library')) {
+        if (awardBadge('endurance_library')) newBadges.push('endurance_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupBE = new Date(stats.signupDate)
+      const yearsBE = (new Date().getTime() - signupBE.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsBE >= 15 && !hasBadge('fifteen_year_signal')) {
+        if (awardBadge('fifteen_year_signal')) newBadges.push('fifteen_year_signal')
+      }
+    }
+    if (allThirtyEightEngines && !hasBadge('thirty_eight_registers')) {
+      if (awardBadge('thirty_eight_registers')) newBadges.push('thirty_eight_registers')
+    }
+
+    // Calendar v36 inline checks (Body Calendar)
+    const nowBE = new Date()
+    const monthBE = nowBE.getMonth() + 1
+    const dayBE = nowBE.getDate()
+    if (monthBE === 6 && dayBE === 21 && !hasBadge('solstice_badge')) {
+      if (awardBadge('solstice_badge')) newBadges.push('solstice_badge')
+    }
+    if (monthBE === 5 && dayBE === 31 && !hasBadge('whitman_birthday')) {
+      if (awardBadge('whitman_birthday')) newBadges.push('whitman_birthday')
+    }
+    if (monthBE === 4 && dayBE === 7 && !hasBadge('world_health_day')) {
+      if (awardBadge('world_health_day')) newBadges.push('world_health_day')
+    }
+
+    // ── Word Turn v39 — THE DREAM LABORATORY ─────────────────────────────────
+    const dreamV39Badges: BadgeType[] = [
+      'lucid_dreamer', 'hypnagogic_badge', 'rem_signal', 'theta_state',
+      'dreamscape', 'somnambulant', 'subconscious_map', 'vision_window',
+      'delta_wave', 'sleep_ceremony', 'dream_journal', 'night_oracle',
+    ]
+    const dreamV39Earned = dreamV39Badges.filter(b => hasBadge(b))
+    if (dreamV39Earned.length >= 1 && !hasBadge('dream_entry')) {
+      if (awardBadge('dream_entry')) newBadges.push('dream_entry')
+    }
+    if (dreamV39Earned.length >= 5 && !hasBadge('dream_class')) {
+      if (awardBadge('dream_class')) newBadges.push('dream_class')
+    }
+    const dreamComplete = dreamV39Earned.length >= 12
+    if (dreamComplete && !hasBadge('dream_complete')) {
+      if (awardBadge('dream_complete')) newBadges.push('dream_complete')
+    }
+    if (dreamComplete && hasBadge('dream_session') && !hasBadge('dream_opus')) {
+      if (awardBadge('dream_opus')) newBadges.push('dream_opus')
+    }
+    const calendarV37Badges: BadgeType[] = ['freud_day', 'dali_birthday', 'cayce_day']
+    if (dreamComplete && calendarV37Badges.every(b => hasBadge(b)) && !hasBadge('oneiric_arc')) {
+      if (awardBadge('oneiric_arc')) newBadges.push('oneiric_arc')
+    }
+    const engineThirtyNinePresent = dreamV39Earned.length >= 1
+    const allThirtyNineEngines = allThirtyEightEngines && engineThirtyNinePresent
+    if (allThirtyNineEngines && !hasBadge('thirty_nine_engines_arc')) {
+      if (awardBadge('thirty_nine_engines_arc')) newBadges.push('thirty_nine_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 4500 && !hasBadge('deep_dreamer')) {
+        if (awardBadge('deep_dreamer')) newBadges.push('deep_dreamer')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 400000 && !hasBadge('vast_library')) {
+        if (awardBadge('vast_library')) newBadges.push('vast_library')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupDL = new Date(stats.signupDate)
+      const yearsDL = (new Date().getTime() - signupDL.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsDL >= 16 && !hasBadge('sixteen_year_signal')) {
+        if (awardBadge('sixteen_year_signal')) newBadges.push('sixteen_year_signal')
+      }
+    }
+    if (allThirtyNineEngines && !hasBadge('thirty_nine_registers')) {
+      if (awardBadge('thirty_nine_registers')) newBadges.push('thirty_nine_registers')
+    }
+
+    // Calendar v37 inline checks (Dream Calendar)
+    const nowDL = new Date()
+    const monthDL = nowDL.getMonth() + 1
+    const dayDL = nowDL.getDate()
+    if (monthDL === 5 && dayDL === 6 && !hasBadge('freud_day')) {
+      if (awardBadge('freud_day')) newBadges.push('freud_day')
+    }
+    if (monthDL === 5 && dayDL === 11 && !hasBadge('dali_birthday')) {
+      if (awardBadge('dali_birthday')) newBadges.push('dali_birthday')
+    }
+    if (monthDL === 3 && dayDL === 18 && !hasBadge('cayce_day')) {
+      if (awardBadge('cayce_day')) newBadges.push('cayce_day')
     }
 
   } catch (error) {

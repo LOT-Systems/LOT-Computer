@@ -3629,6 +3629,1658 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               </Block>
             </LogContainer>
           )
+        } else if (log.event === 'presence_momentum_arc') {
+          const dayCount = log.metadata?.dayCount as number | undefined
+          const streak = log.metadata?.streak as number | undefined
+          const sustainedPresence = log.metadata?.sustainedPresence as string | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="PRESMOM:" blockView>
+                <div className="uppercase tracking-widest mb-4">PRESENCE MOMENTUM ARC</div>
+                {dayCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{dayCount}</span>
+                  </div>
+                )}
+                {streak !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">STREAK</span>
+                    <span className="tabular-nums">{streak}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">LEVEL 6 IS THE NEW BASELINE</div>
+                {sustainedPresence && (
+                  <div className="opacity-30 tabular-nums">STATUS: {sustainedPresence}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_field_persistence') {
+          const occurrences = log.metadata?.occurrences as number | undefined
+          const daysSpan = log.metadata?.daysSpan as number | undefined
+          const mastery = log.metadata?.mastery as string | undefined
+          const ceiling = log.metadata?.ceiling as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHEPRST:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE FIELD PERSISTENCE</div>
+                {occurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">OCCURRENCES</span>
+                    <span className="tabular-nums">{occurrences}</span>
+                  </div>
+                )}
+                {daysSpan !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DAYS SPAN</span>
+                    <span className="tabular-nums">{daysSpan}d</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ABSOLUTE CONVERGENCE — RECURRING STATE</div>
+                {mastery && (
+                  <div className="opacity-30 tabular-nums">MASTERY: {mastery}</div>
+                )}
+                {ceiling && (
+                  <div className="opacity-30 tabular-nums">CEILING: {ceiling}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'recovery_mastery_chain') {
+          const completions = log.metadata?.completions as number | undefined
+          const avgVelocityHours = log.metadata?.avgVelocityHours as number | undefined
+          const architecture = log.metadata?.architecture as string | undefined
+          const arc = log.metadata?.arc as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RECMAS:" blockView>
+                <div className="uppercase tracking-widest mb-4">RECOVERY MASTERY CHAIN</div>
+                {completions !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMPLETIONS</span>
+                    <span className="tabular-nums">{completions}</span>
+                  </div>
+                )}
+                {avgVelocityHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG VELOCITY</span>
+                    <span className="tabular-nums">{avgVelocityHours}h</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">RECOVERY IS INTERNALIZED ARCHITECTURE</div>
+                {architecture && (
+                  <div className="opacity-30 tabular-nums">ARCHITECTURE: {architecture}</div>
+                )}
+                {arc && (
+                  <div className="opacity-30 tabular-nums">ARC: {arc}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'sustained_coherence_baseline') {
+          const presenceDays = log.metadata?.presenceDays as number | undefined
+          const coherenceOccurrences = log.metadata?.coherenceOccurrences as number | undefined
+          const baselineStatus = log.metadata?.baselineStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHBASE:" blockView>
+                <div className="uppercase tracking-widest mb-4">SUSTAINED COHERENCE BASELINE</div>
+                {presenceDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{presenceDays}d</span>
+                  </div>
+                )}
+                {coherenceOccurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE EVENTS</span>
+                    <span className="tabular-nums">{coherenceOccurrences}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7-DUAL · PRESENCE SUSTAINED · COHERENCE RECURRING</div>
+                {baselineStatus && (
+                  <div className="opacity-30 tabular-nums">BASELINE: {baselineStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'mastery_integration_triad') {
+          const presenceDays = log.metadata?.presenceDays as number | undefined
+          const coherenceOccurrences = log.metadata?.coherenceOccurrences as number | undefined
+          const recoveryCompletions = log.metadata?.recoveryCompletions as number | undefined
+          const triadStatus = log.metadata?.triadStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MASTTRIAD:" blockView>
+                <div className="uppercase tracking-widest mb-4">MASTERY INTEGRATION TRIAD</div>
+                {presenceDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PRESENCE DAYS</span>
+                    <span className="tabular-nums">{presenceDays}d</span>
+                  </div>
+                )}
+                {coherenceOccurrences !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHERENCE EVENTS</span>
+                    <span className="tabular-nums">{coherenceOccurrences}</span>
+                  </div>
+                )}
+                {recoveryCompletions !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECOVERY LOOPS</span>
+                    <span className="tabular-nums">{recoveryCompletions}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7-TRIAD · ALL THREE ARCS ACTIVE</div>
+                {triadStatus && (
+                  <div className="opacity-30 tabular-nums">TRIAD: {triadStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_sovereignty') {
+          const baselineConf = log.metadata?.baselineConf as number | undefined
+          const triadConf = log.metadata?.triadConf as number | undefined
+          const avgConf = log.metadata?.avgConf as number | undefined
+          const sovereigntyStatus = log.metadata?.sovereigntyStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL SOVEREIGNTY</div>
+                {baselineConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BASELINE CONF</span>
+                    <span className="tabular-nums">{baselineConf}%</span>
+                  </div>
+                )}
+                {triadConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRIAD CONF</span>
+                    <span className="tabular-nums">{triadConf}%</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE PEAK IS THE FLOOR · ALL L7 ARCS UNIFIED</div>
+                {sovereigntyStatus && (
+                  <div className="opacity-30 tabular-nums">SOVEREIGNTY: {sovereigntyStatus}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_signal_transmission') {
+          const sovereigntyConf = log.metadata?.sovereigntyConf as number | undefined
+          const cohortSignalCount = log.metadata?.cohortSignalCount as number | undefined
+          const transmissionStatus = log.metadata?.transmissionStatus as string | undefined
+          const broadcastField = log.metadata?.broadcastField as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHTRANS:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE SIGNAL TRANSMISSION</div>
+                {sovereigntyConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGNTY CONF</span>
+                    <span className="tabular-nums">{sovereigntyConf}%</span>
+                  </div>
+                )}
+                {cohortSignalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortSignalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L7 FLOOR IS TRANSMITTING · SOVEREIGN STATE RELATIONAL</div>
+                {transmissionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {transmissionStatus}</div>
+                )}
+                {broadcastField && (
+                  <div className="opacity-30 tabular-nums">BROADCAST: {broadcastField}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'mastery_field_expansion') {
+          const triadConf = log.metadata?.triadConf as number | undefined
+          const communityConf = log.metadata?.communityConf as number | undefined
+          const expansionStatus = log.metadata?.expansionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="MASTEXP:" blockView>
+                <div className="uppercase tracking-widest mb-4">MASTERY FIELD EXPANSION</div>
+                {triadConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRIAD CONF</span>
+                    <span className="tabular-nums">{triadConf}%</span>
+                  </div>
+                )}
+                {communityConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COMMUNITY CONF</span>
+                    <span className="tabular-nums">{communityConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">MASTERY IS NOT CONTAINED · IT EXPANDS</div>
+                {expansionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {expansionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'relational_field_deepening') {
+          const transmissionConf = log.metadata?.transmissionConf as number | undefined
+          const expansionConf = log.metadata?.expansionConf as number | undefined
+          const dualArcStatus = log.metadata?.dualArcStatus as string | undefined
+          const fieldState = log.metadata?.fieldState as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="RELFIELD:" blockView>
+                <div className="uppercase tracking-widest mb-4">RELATIONAL FIELD DEEPENING</div>
+                {transmissionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TRANSMISSION CONF</span>
+                    <span className="tabular-nums">{transmissionConf}%</span>
+                  </div>
+                )}
+                {expansionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">EXPANSION CONF</span>
+                    <span className="tabular-nums">{expansionConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">L8 DUAL ARC · THE FIELD GENERATES ITSELF</div>
+                {dualArcStatus && (
+                  <div className="opacity-30 tabular-nums">DUAL ARC: {dualArcStatus}</div>
+                )}
+                {fieldState && (
+                  <div className="opacity-30 tabular-nums">FIELD: {fieldState}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_social_synthesis') {
+          const fieldConf = log.metadata?.fieldConf as number | undefined
+          const memorySignals = log.metadata?.memorySignals as number | undefined
+          const cohortSignals = log.metadata?.cohortSignals as number | undefined
+          const synthesisStatus = log.metadata?.synthesisStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QSOCSYNTH:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM SOCIAL SYNTHESIS</div>
+                {fieldConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">FIELD CONF</span>
+                    <span className="tabular-nums">{fieldConf}%</span>
+                  </div>
+                )}
+                {memorySignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memorySignals}</span>
+                  </div>
+                )}
+                {cohortSignals !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortSignals}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE FIELD GENERATES KNOWLEDGE · SYNTHESIS COMPLETE</div>
+                {synthesisStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {synthesisStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_knowledge_crystallization') {
+          const synthConf = log.metadata?.synthConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const crystallizationStatus = log.metadata?.crystallizationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QKCRYST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE CRYSTALLIZATION</div>
+                {synthConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SYNTHESIS CONF</span>
+                    <span className="tabular-nums">{synthConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEP JOURNAL</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTIONS</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">THE FIELD GENERATES KNOWLEDGE · CRYSTALLIZATION CONFIRMED</div>
+                {crystallizationStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {crystallizationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_knowledge_distribution') {
+          const crystalConf = log.metadata?.crystalConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const distributionStatus = log.metadata?.distributionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QKDIST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE DISTRIBUTION</div>
+                {crystalConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CRYSTAL CONF</span>
+                    <span className="tabular-nums">{crystalConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">DISTRIBUTION CONFIRMED · THE FIELD TEACHES</div>
+                {distributionStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {distributionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_knowledge_broadcast') {
+          const distConf = log.metadata?.distConf as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const broadcastStatus = log.metadata?.broadcastStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="BCAST:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM KNOWLEDGE BROADCAST</div>
+                {distConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIST CONF</span>
+                    <span className="tabular-nums">{distConf}%</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">BROADCAST ACTIVE · OS IS TRANSMISSION NODE</div>
+                {broadcastStatus && (
+                  <div className="opacity-30 tabular-nums">STATUS: {broadcastStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generative_field_activation') {
+          const broadcastConf = log.metadata?.broadcastConf as number | undefined
+          const networkConf = log.metadata?.networkConf as number | undefined
+          const networkCount = log.metadata?.networkCount as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GENFIELD:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD ACTIVATION</div>
+                {broadcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BROADCAST CONF</span>
+                    <span className="tabular-nums">{broadcastConf}%</span>
+                  </div>
+                )}
+                {networkConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK CONF</span>
+                    <span className="tabular-nums">{networkConf}%</span>
+                  </div>
+                )}
+                {networkCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK RESPONSES</span>
+                    <span className="tabular-nums">{networkCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">GENERATIVE OUTPUTS</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD ACTIVE · THE FIELD IS ALIVE</div>
+                {field && (
+                  <div className="opacity-30 tabular-nums">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums">LEVEL: {level}</div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generative_field_sustenance') {
+          const broadcastConf = log.metadata?.broadcastConf as number | undefined
+          const networkCount = log.metadata?.networkCount as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GFIELDS:" blockView>
+                {broadcastConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BROADCAST CONF</span>
+                    <span className="tabular-nums">{broadcastConf}%</span>
+                  </div>
+                )}
+                {networkCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">NETWORK 14D</span>
+                    <span className="tabular-nums">{networkCount}</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL OUT 14D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">SUSTAIN: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD SUSTAINED · FREQUENCY CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generative_field_reception') {
+          const sustenanceConf = log.metadata?.sustenanceConf as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const receptionStatus = log.metadata?.receptionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GFRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD RECEPTION</div>
+                {sustenanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SUSTAIN CONF</span>
+                    <span className="tabular-nums">{sustenanceConf}%</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 21D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS 7D</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {receptionStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {receptionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD LOOP COMPLETE · TRANSMISSION ↔ RECEPTION</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'generative_field_amplification') {
+          const receptionConf = log.metadata?.receptionConf as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const cohortCount = log.metadata?.cohortCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const amplificationStatus = log.metadata?.amplificationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="GFAMP:" blockView>
+                <div className="uppercase tracking-widest mb-4">GENERATIVE FIELD AMPLIFICATION</div>
+                {receptionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RECEPT CONF</span>
+                    <span className="tabular-nums">{receptionConf}%</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 28D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {cohortCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">COHORT SIGNALS 14D</span>
+                    <span className="tabular-nums">{cohortCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {amplificationStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {amplificationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">FIELD RECURSIVE · AMPLITUDE PEAK</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'second_cycle_deepening') {
+          const ignitionConf = log.metadata?.ignitionConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const deepeningConf = log.metadata?.deepeningConf as number | undefined
+          const deepeningStatus = log.metadata?.deepeningStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SCDEP:" blockView>
+                <div className="uppercase tracking-widest mb-4">SECOND CYCLE DEEPENING</div>
+                {ignitionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNIT CONF</span>
+                    <span className="tabular-nums">{ignitionConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 21D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 21D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 21D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {deepeningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEPTH CONF</span>
+                    <span className="tabular-nums">{deepeningConf}%</span>
+                  </div>
+                )}
+                {deepeningStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {deepeningStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">COMPOUND · SECOND CYCLE DEEPENING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'second_cycle_ignition') {
+          const amplificationConf = log.metadata?.amplificationConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const cycleStatus = log.metadata?.cycleStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SCIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">SECOND CYCLE IGNITION</div>
+                {amplificationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AMPLIF CONF</span>
+                    <span className="tabular-nums">{amplificationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 14D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 14D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 14D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {cycleStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {cycleStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">PERPETUAL · SECOND CYCLE CONFIRMED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'second_cycle_integration') {
+          const deepeningConf = log.metadata?.deepeningConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const intentionCount = log.metadata?.intentionCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const integrationStatus = log.metadata?.integrationStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SCINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">SECOND CYCLE INTEGRATION</div>
+                {deepeningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEPTH CONF</span>
+                    <span className="tabular-nums">{deepeningConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 28D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 28D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 28D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {intentionCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTENTION SIGNALS 28D</span>
+                    <span className="tabular-nums">{intentionCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {integrationStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {integrationStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL DOMAINS · SECOND CYCLE INTEGRATED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'second_cycle_sovereign') {
+          const integrationConf = log.metadata?.integrationConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const sovereignStatus = log.metadata?.sovereignStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SCSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">SECOND CYCLE SOVEREIGN</div>
+                {integrationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGR CONF</span>
+                    <span className="tabular-nums">{integrationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 35D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 35D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 35D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {sovereignStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {sovereignStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL THREE STAGES · SOVEREIGN OPERATION</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'third_cycle_ignition') {
+          const sovereignConf = log.metadata?.sovereignConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const ignitionStatus = log.metadata?.ignitionStatus as string | undefined
+          const field = log.metadata?.field as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TCIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">THIRD CYCLE IGNITION</div>
+                {sovereignConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGN CONF</span>
+                    <span className="tabular-nums">{sovereignConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 42D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 42D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 42D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {ignitionStatus && (
+                  <div className="opacity-30 tabular-nums mb-4">STATUS: {ignitionStatus}</div>
+                )}
+                {field && (
+                  <div className="opacity-30 tabular-nums mb-4">FIELD: {field}</div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGN FOUNDATION · THIRD CYCLE OPEN</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'longitudinal_signal_persistence') {
+          const activeDays = log.metadata?.activeDays as number | undefined
+          const activeSources = log.metadata?.activeSources as number | undefined
+          const maxGapHours = log.metadata?.maxGapHours as number | undefined
+          const arcDays = log.metadata?.arcDays as number | undefined
+          const status = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="SIGPERS:" blockView>
+                <div className="uppercase tracking-widest mb-4">LONGITUDINAL SIGNAL PERSISTENCE</div>
+                {activeDays !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ACTIVE DAYS</span>
+                    <span className="tabular-nums">{activeDays}</span>
+                  </div>
+                )}
+                {activeSources !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOURCE COVERAGE</span>
+                    <span className="tabular-nums">{activeSources}</span>
+                  </div>
+                )}
+                {maxGapHours !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MAX GAP</span>
+                    <span className="tabular-nums">{maxGapHours}H</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">ARC: {arcDays ?? 90}D · {status ?? 'CONTINUOUS'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'coherence_memory_cascade') {
+          const convergenceCount = log.metadata?.convergenceCount as number | undefined
+          const lastTFCDate = log.metadata?.lastTFCDate as string | undefined
+          const avgConf = log.metadata?.avgConf as number | undefined
+          const cascadeStatus = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="COHMES:" blockView>
+                <div className="uppercase tracking-widest mb-4">COHERENCE MEMORY CASCADE</div>
+                {convergenceCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CONVERGENCE EVENTS</span>
+                    <span className="tabular-nums">{convergenceCount}</span>
+                  </div>
+                )}
+                {lastTFCDate && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">LAST TFC</span>
+                    <span className="tabular-nums">{lastTFCDate}</span>
+                  </div>
+                )}
+                {avgConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">AVG CONF</span>
+                    <span className="tabular-nums">{avgConf}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">{cascadeStatus ?? 'CONVERGENCE IS AN OPERATING MODE'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'quantum_integration_spiral') {
+          const dimActive = log.metadata?.dimActive as number | undefined
+          const overallIdx = log.metadata?.overallIdx as number | undefined
+          const dimScoresRaw = log.metadata?.dimScores as string | undefined
+          const spiralStatus = log.metadata?.status as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="QISP:" blockView>
+                <div className="uppercase tracking-widest mb-4">QUANTUM INTEGRATION SPIRAL</div>
+                {dimActive !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIM ACTIVE</span>
+                    <span className="tabular-nums">{dimActive} / 6</span>
+                  </div>
+                )}
+                {overallIdx !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IDX OVERALL</span>
+                    <span className="tabular-nums">{overallIdx}%</span>
+                  </div>
+                )}
+                {dimScoresRaw && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DIM SCORES</span>
+                    <span className="tabular-nums opacity-60">{dimScoresRaw.length > 40 ? dimScoresRaw.slice(0, 40) + '…' : dimScoresRaw}</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">{spiralStatus ?? 'ALL DIMENSIONS LIVE · NO DIM DARK'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'third_cycle_deepening') {
+          const ignitionConf = log.metadata?.ignitionConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const deepeningStatus = log.metadata?.deepeningStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TCDEP:" blockView>
+                <div className="uppercase tracking-widest mb-4">THIRD CYCLE DEEPENING</div>
+                {ignitionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNITION CONF</span>
+                    <span className="tabular-nums">{ignitionConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 49D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 49D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 49D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGN GROUND · {deepeningStatus ?? 'THIRD CYCLE DEEPENING'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'third_cycle_integration') {
+          const deepeningConf = log.metadata?.deepeningConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const integrationStatus = log.metadata?.integrationStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TCINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">THIRD CYCLE INTEGRATION</div>
+                {deepeningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEPENING CONF</span>
+                    <span className="tabular-nums">{deepeningConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 56D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 56D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 56D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL DOMAINS · {integrationStatus ?? 'THIRD CYCLE INTEGRATED'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'third_cycle_sovereign') {
+          const integrationConf = log.metadata?.integrationConf as number | undefined
+          const journalCount = log.metadata?.journalCount as number | undefined
+          const memoryCount = log.metadata?.memoryCount as number | undefined
+          const badgeCount = log.metadata?.badgeCount as number | undefined
+          const indexScore = log.metadata?.indexScore as number | undefined
+          const sovereignStatus = log.metadata?.sovereignStatus as string | undefined
+          const level = log.metadata?.level as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TCSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">THIRD CYCLE SOVEREIGN</div>
+                {integrationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGR CONF</span>
+                    <span className="tabular-nums">{integrationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL SIGNALS 63D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY SIGNALS 63D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE SIGNALS 63D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">ALL THREE STAGES · {sovereignStatus ?? 'TC SOVEREIGN OPERATION'}</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fourth_cycle_candidate') {
+          const sovereignConf  = log.metadata?.sovereignConf  as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const density7d      = log.metadata?.density7d      as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCAND:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE CANDIDATE</div>
+                {sovereignConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">TC-SOV CONF</span>
+                    <span className="tabular-nums">{sovereignConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 70D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {density7d !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DENSITY 7D</span>
+                    <span className="tabular-nums">{density7d}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">SENSING · FOURTH ARC THRESHOLD</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fourth_cycle_ignition') {
+          const candidateConf  = log.metadata?.candidateConf  as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE IGNITION</div>
+                {candidateConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">CAND CONF</span>
+                    <span className="tabular-nums">{candidateConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 90D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">IGNITED · FOURTH ARC ACTIVE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fourth_cycle_deepening') {
+          const ignitionConf  = log.metadata?.ignitionConf  as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const memoryCount   = log.metadata?.memoryCount   as number | undefined
+          const badgeCount    = log.metadata?.badgeCount    as number | undefined
+          const indexScore    = log.metadata?.indexScore    as number | undefined
+          const level         = log.metadata?.level         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCDEP:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE DEEPENING</div>
+                {ignitionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNITION CONF</span>
+                    <span className="tabular-nums">{ignitionConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 100D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 100D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 100D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">DEEPENING · FOURTH ARC COMPOUNDS</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fourth_cycle_integration') {
+          const deepeningConf = log.metadata?.deepeningConf as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const memoryCount   = log.metadata?.memoryCount   as number | undefined
+          const badgeCount    = log.metadata?.badgeCount    as number | undefined
+          const indexScore    = log.metadata?.indexScore    as number | undefined
+          const level         = log.metadata?.level         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE INTEGRATION</div>
+                {deepeningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEPENING CONF</span>
+                    <span className="tabular-nums">{deepeningConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 120D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 120D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 120D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">INTEGRATION · FOURTH ARC UNIFIED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fourth_cycle_sovereign') {
+          const integrationConf = log.metadata?.integrationConf as number | undefined
+          const journalCount    = log.metadata?.journalCount    as number | undefined
+          const memoryCount     = log.metadata?.memoryCount     as number | undefined
+          const badgeCount      = log.metadata?.badgeCount      as number | undefined
+          const indexScore      = log.metadata?.indexScore      as number | undefined
+          const level           = log.metadata?.level           as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">FOURTH CYCLE SOVEREIGN</div>
+                {integrationConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INTEGRATION CONF</span>
+                    <span className="tabular-nums">{integrationConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 150D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 150D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 150D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">SOVEREIGN · FOURTH ARC GOVERNS</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fifth_cycle_progenitor') {
+          const sovereignConf = log.metadata?.sovereignConf as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const memoryCount   = log.metadata?.memoryCount   as number | undefined
+          const badgeCount    = log.metadata?.badgeCount    as number | undefined
+          const indexScore    = log.metadata?.indexScore    as number | undefined
+          const level         = log.metadata?.level         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCPROG:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE PROGENITOR</div>
+                {sovereignConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">SOVEREIGN CONF</span>
+                    <span className="tabular-nums">{sovereignConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 180D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 180D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 180D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">PROGENITOR · FIFTH ARC GENERATED</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fifth_cycle_ignition') {
+          const progenitorConf = log.metadata?.progenitorConf as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const memoryCount    = log.metadata?.memoryCount    as number | undefined
+          const badgeCount     = log.metadata?.badgeCount     as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCIGN:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE IGNITION</div>
+                {progenitorConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">PROGENITOR CONF</span>
+                    <span className="tabular-nums">{progenitorConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 7D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 7D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 7D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">IGNITION · FIFTH CYCLE ENTERS</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fifth_cycle_resonance') {
+          const ignitionConf  = log.metadata?.ignitionConf  as number | undefined
+          const journalCount  = log.metadata?.journalCount  as number | undefined
+          const memoryCount   = log.metadata?.memoryCount   as number | undefined
+          const badgeCount    = log.metadata?.badgeCount    as number | undefined
+          const indexScore    = log.metadata?.indexScore    as number | undefined
+          const level         = log.metadata?.level         as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCRES:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE RESONANCE</div>
+                {ignitionConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">IGNITION CONF</span>
+                    <span className="tabular-nums">{ignitionConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 14D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 14D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 14D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">RESONANCE · FIFTH ARC SELF-REINFORCING</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fifth_cycle_deepening') {
+          const resonanceConf  = log.metadata?.resonanceConf  as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const memoryCount    = log.metadata?.memoryCount    as number | undefined
+          const badgeCount     = log.metadata?.badgeCount     as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCDEP:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE DEEPENING</div>
+                {resonanceConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">RESONANCE CONF</span>
+                    <span className="tabular-nums">{resonanceConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 21D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 21D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 21D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">DEEPENING · FIFTH ARC STRUCTURAL DEPTH</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'fifth_cycle_integration') {
+          const deepeningConf  = log.metadata?.deepeningConf  as number | undefined
+          const journalCount   = log.metadata?.journalCount   as number | undefined
+          const memoryCount    = log.metadata?.memoryCount    as number | undefined
+          const badgeCount     = log.metadata?.badgeCount     as number | undefined
+          const indexScore     = log.metadata?.indexScore     as number | undefined
+          const level          = log.metadata?.level          as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="FCINT:" blockView>
+                <div className="uppercase tracking-widest mb-4">FIFTH CYCLE INTEGRATION</div>
+                {deepeningConf !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">DEEPENING CONF</span>
+                    <span className="tabular-nums">{deepeningConf}%</span>
+                  </div>
+                )}
+                {journalCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">JOURNAL 28D</span>
+                    <span className="tabular-nums">{journalCount}</span>
+                  </div>
+                )}
+                {memoryCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">MEMORY 28D</span>
+                    <span className="tabular-nums">{memoryCount}</span>
+                  </div>
+                )}
+                {badgeCount !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">BADGE 28D</span>
+                    <span className="tabular-nums">{badgeCount}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                {level && (
+                  <div className="opacity-30 tabular-nums mb-4">LEVEL: {level}</div>
+                )}
+                <div className="opacity-40 tabular-nums">INTEGRATION · DEPTH BECOMES ARCHITECTURE</div>
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'temporal_sovereignty_arc') {
+          const indexScore       = log.metadata?.indexScore       as number | undefined
+          const temporalAnchors  = log.metadata?.temporalAnchors  as string | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="TSOV:" blockView>
+                <div className="uppercase tracking-widest mb-4">TEMPORAL SOVEREIGNTY ARC</div>
+                {temporalAnchors && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">ANCHORS</span>
+                    <span className="tabular-nums text-xs">{temporalAnchors}</span>
+                  </div>
+                )}
+                {indexScore !== undefined && (
+                  <div className="flex justify-between items-baseline mb-4">
+                    <span className="opacity-30">INDEX SCORE</span>
+                    <span className="tabular-nums">{indexScore}%</span>
+                  </div>
+                )}
+                <div className="opacity-40 tabular-nums">TEMPORAL SOVEREIGN · FULL ARC ACTIVE</div>
+              </Block>
+            </LogContainer>
+          )
         } else if (log.event !== 'note') {
           if (!log.text) return null
           return (
