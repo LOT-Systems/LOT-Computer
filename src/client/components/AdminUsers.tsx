@@ -28,6 +28,7 @@ import { User, UserTag, AdminUsersSort } from '#shared/types'
 import { fp } from '#shared/utils'
 import dayjs from '#client/utils/dayjs'
 import { useDebounce, useDocumentTitle } from '#client/utils/hooks'
+import { Qi46ReadoutPanel } from '#client/components/Qi46ReadoutPanel'
 
 const LIMIT = 100
 
@@ -204,6 +205,8 @@ export const AdminUsers = () => {
           </Button>
         </form>
       )}
+
+      {isCurrentUserAdmin && <Qi46ReadoutPanel />}
 
       <div className="flex flex-col gap-y-16">
         <Input

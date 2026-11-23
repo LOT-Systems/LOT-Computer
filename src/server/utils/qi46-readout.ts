@@ -125,3 +125,20 @@ export function summarizeQi46Verdicts(
     byVersion: suppressed ? {} : byVersion,
   }
 }
+
+/**
+ * The three switch-on gates for Node 6, as booleans only. Shown on the admin
+ * read-out card so the pending approvals sit next to the numbers they unlock.
+ * This reports state. It never changes it.
+ */
+export function qi46SwitchGates(state: {
+  migration: boolean
+  copyApproved: boolean
+  surfaceFlag: boolean
+}): { id: 'migration' | 'copy' | 'flag'; label: string; done: boolean }[] {
+  return [
+    { id: 'migration', label: 'Migration 20261117120000 (audit trail)', done: !!state.migration },
+    { id: 'copy', label: 'Node 5 copy approved (QI46_COPY_APPROVED)', done: !!state.copyApproved },
+    { id: 'flag', label: 'Surface flag QI46_SURFACE_MEMORY=on', done: !!state.surfaceFlag },
+  ]
+}

@@ -171,3 +171,29 @@ const checksF12={
 let passF12=0; for (const [k,ok] of Object.entries(checksF12)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passF12++ }
 const totalF12=totalF4+Object.keys(checksF12).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12}/${totalF12}`); if (passF12!==Object.keys(checksF12).length) process.exit(1)
+
+// ─── Admin read-out panel: view model + switch-on gates ───────────────────
+import { qi46SwitchGates } from '../dist/server/server/utils/qi46-readout.js'
+import { qi46ReadoutView } from '../dist/server/shared/utils/qi46-readout-view.js'
+const prow=(userId,status,o={})=>({userId,status,reasons:status==='HELD'?JSON.stringify(o.reasons||['hedging-voice']):'[]',risk_level:o.risk||'none',lead:o.lead||'beingThere',engine_version:'0.10.0-f12',source:o.source||'surface'})
+const many=[prow('a','HELD'),prow('b','CLEARED'),prow('c','CLEARED',{lead:'grace'}),prow('d','HELD',{reasons:['clinical-claim','hedging-voice'],risk:'low'})]
+const gNone=qi46SwitchGates({migration:false,copyApproved:false,surfaceFlag:false})
+const gAll=qi46SwitchGates({migration:true,copyApproved:true,surfaceFlag:true})
+const vFull=qi46ReadoutView({available:true,...summarizeQi46Verdicts(many,{source:'surface',days:14}),gates:gNone})
+const vFew=qi46ReadoutView({available:true,...summarizeQi46Verdicts(many.slice(0,2),{source:'surface',days:14}),gates:gAll})
+const vOff=qi46ReadoutView({available:false,...summarizeQi46Verdicts([],{source:'surface',days:14}),gates:gNone})
+const vBad=qi46ReadoutView({available:true,...summarizeQi46Verdicts(many,{source:'surface',days:14}),byLead:{'I feel worthless and alone':{total:1,held:1,heldRate:1}}})
+const checksP={
+  'Panel gates: 3 gates, all open by default':gNone.length===3&&gNone.every(g=>!g.done),
+  'Panel gates: all done → 0 open':qi46ReadoutView({available:true,...summarizeQi46Verdicts([],{source:'surface',days:14}),gates:gAll}).gatesOpen===0,
+  'Panel headline counts total/held/rate/people':vFull.headline.startsWith('4 screened · 2 held · 50% · 4 people'),
+  'Panel shows breakdowns at or above the floor':vFull.sections.map(s=>s.title).join('|')==='Held by reason|By lead register|By risk level|By engine version',
+  'Panel top reason is hedging-voice ×2':vFull.sections[0].rows[0].label==='hedging-voice'&&vFull.sections[0].rows[0].value==='2',
+  'Panel below floor: no breakdowns, privacy note':vFew.sections.length===0&&/Fewer than 3/.test(vFew.note||''),
+  'Panel migration missing → no-audit note + gates':/Migration/.test(vOff.note||'')&&vOff.gatesOpen===3,
+  'Panel masks free-text labels':JSON.stringify(vBad).indexOf('worthless')===-1,
+  'Panel holds no user ids':!/"[abcd]"/.test(JSON.stringify(vFull)),
+}
+let passP=0; for (const [k,ok] of Object.entries(checksP)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passP++ }
+const totalP=totalF12+Object.keys(checksP).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12+passP}/${totalP}`); if (passP!==Object.keys(checksP).length) process.exit(1)

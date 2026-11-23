@@ -21,7 +21,9 @@ import { fileURLToPath } from 'url'
 import { escapeHtml } from '../utils/security.js'
 import { assembleQi46, hasQi46Consent, cosmoScreen, toCosmoAuditRow } from '#server/utils/qi46'
 import { recordCosmoVerdict, listCosmoVerdicts, listQi46VerdictsForReadout } from '#server/utils/qi46-audit'
-import { summarizeQi46Verdicts } from '#server/utils/qi46-readout'
+import { summarizeQi46Verdicts, qi46SwitchGates } from '#server/utils/qi46-readout'
+import { qi46SurfaceFlag } from '#server/utils/qi46-surface'
+import { QI46_COPY_APPROVED } from '#shared/constants/qi46'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -484,7 +486,12 @@ export default async (fastify: FastifyInstance) => {
       const days = Math.min(Math.max(parseInt(req.query.days || '14', 10) || 14, 1), 90)
       const source = req.query.source === 'admin-preview' ? 'admin-preview' : 'surface'
       const { available, rows } = await listQi46VerdictsForReadout(source, days)
-      return { available, ...summarizeQi46Verdicts(rows, { source, days }) }
+      const gates = qi46SwitchGates({
+        migration: available,
+        copyApproved: QI46_COPY_APPROVED,
+        surfaceFlag: qi46SurfaceFlag(),
+      })
+      return { available, ...summarizeQi46Verdicts(rows, { source, days }), gates }
     }
   )
 
