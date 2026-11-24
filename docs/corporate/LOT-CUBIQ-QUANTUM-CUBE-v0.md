@@ -321,6 +321,25 @@ entry — never editing or removing a prior one.
   presence without spectacle, felt before it is seen, physical before it
   is digital.
 
+  USE CASE 02 — THE QUIET HOUSE                             2026-11-24
+  ─────────────────────────────────────────────────────────────────
+  Source: LOT-CUBIQ-v0-DEV-REPORT-02.md §09 (full text).
+
+  A parent works late at the kitchen table while an infant sleeps in the
+  next room. LOT® is in night mode; the phone is in a drawer because
+  even on silent it buzzes loudly against wood. When the evening
+  self-care routine is ready, the cube, also in NIGHT mode and with its
+  jump drive locked out, performs THE SETTLE: two seconds of standing
+  pressure felt through the table, under 25 dBA at a meter. If that goes
+  unacknowledged it sends one NUDGE twenty minutes later and then stops.
+  It never escalates to a HOP. QI·46 learns from ack time that this
+  operator responds to the softer second signal and moves the routine
+  earlier.
+
+  Adds to spec: NIGHT mode as a hardware state slaved to the LOT® theme;
+  acoustic gate ≤25 dBA; no escalation at night (signals may get softer
+  as they age, never louder).
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
