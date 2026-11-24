@@ -98,3 +98,6 @@ audit-logs/
 __pycache__/
 *.pyc
 *.pyo
+
+# QI·46 generated training corpus (regenerate: node scripts/qi46/assemble-corpus.mjs)
+corpus/
