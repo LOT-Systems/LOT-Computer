@@ -419,3 +419,26 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* Calendar alert — military-grade event notification */
+.cal-alert-in {
+  animation: cal-alert-in 0.28s steps(4, end) both;
+}
+
+@keyframes cal-alert-in {
+  0% { opacity: 0; clip-path: inset(0 0 100% 0); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+.cal-alert-beacon {
+  animation: cal-alert-beacon 1s steps(1, end) infinite;
+}
+
+@keyframes cal-alert-beacon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal-alert-in, .cal-alert-beacon { animation: none; }
+}

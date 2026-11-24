@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_alert', 'calendar_status', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1585,6 +1585,41 @@ export default async (fastify: FastifyInstance) => {
       return log
     }
   )
+
+  // ============================================================================
+  // CALENDAR — dedicated read path. /logs is capped at 500 rows, which silently
+  // dropped long-range entries; the calendar needs every entry + status ever
+  // written, plus recent alert receipts for cross-device dedupe.
+  // ============================================================================
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const [records, alerts] = await Promise.all([
+      fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: { [Op.in]: ['calendar_entry', 'calendar_status'] },
+        },
+        attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+        order: [['createdAt', 'ASC']],
+        limit: 5000,
+      }),
+      fastify.models.Log.findAll({
+        where: {
+          userId: req.user.id,
+          event: 'calendar_alert',
+          createdAt: { [Op.gte]: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) },
+        },
+        attributes: ['id', 'event', 'metadata', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+        limit: 1000,
+      }),
+    ])
+    return {
+      records,
+      firedKeys: alerts
+        .map((a: any) => a.metadata?.alertKey)
+        .filter((k: unknown): k is string => typeof k === 'string'),
+    }
+  })
 
   fastify.put(
     '/logs/:id',

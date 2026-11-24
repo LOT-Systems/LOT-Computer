@@ -141,6 +141,19 @@ export const useCreateLog = createMutation<{ text: string; event?: string; metad
   '/api/logs'
 )
 
+export type CalendarFeed = {
+  records: Array<Pick<Log, 'id' | 'event' | 'text' | 'metadata' | 'createdAt'>>
+  firedKeys: string[]
+}
+
+export const CALENDAR_QUERY_KEY = '/api/calendar'
+
+export const useCalendar = createQuery<CalendarFeed>(CALENDAR_QUERY_KEY, {
+  staleTime: 60 * 1000,
+  refetchInterval: 5 * 60 * 1000,
+  refetchOnWindowFocus: true,
+})
+
 export const useUpdateLog = createMutation<{ id: string; text: string }, Log>(
   'put',
   (data) => `/api/logs/${data.id}`

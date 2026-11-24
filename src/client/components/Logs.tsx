@@ -2079,11 +2079,44 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | null | undefined
+          const leadMin = log.metadata?.leadMin as number | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
                 <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                {log.metadata?.text && <div className="mt-8">{log.metadata.text as string}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time ? ` · ${time.replace(':', '')}H` : ''}{time && leadMin ? ` · T-${leadMin}` : ''}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const entryType = log.metadata?.entryType as string | undefined
+          const lead = log.metadata?.lead as number | undefined
+          const late = log.metadata?.late as boolean | undefined
+          const time = log.metadata?.time as string | null | undefined
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="ALERT:" blockView>
+                <div className="uppercase tracking-widest tabular-nums">
+                  T-{lead ?? 0}{late ? ' · LATE' : ''} · {entryType || 'ENTRY'}{time ? ` · ${time.replace(':', '')}H` : ''}
+                </div>
+                {log.metadata?.text && <div className="mt-8">{log.metadata.text as string}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_status') {
+          const status = log.metadata?.status as string | undefined
+          const code = status === 'done' ? 'COMPLETE' : status === 'dropped' ? 'SCRUBBED' : 'REINSTATED'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL:" blockView>
+                <div className="uppercase tracking-widest">{code}</div>
+                <div className="opacity-40 mt-8">{(log.text || '').replace(/^\[[A-Z]+\]\s*/, '')}</div>
               </Block>
             </LogContainer>
           )
