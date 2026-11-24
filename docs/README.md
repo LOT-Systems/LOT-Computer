@@ -20,6 +20,7 @@ Core technical documentation about system architecture, engines, and implementat
 - Memory Engine Documentation - Complete Memory Engine system docs
 - Psychological Depth Analysis - User analysis engine documentation
 - Quantum Intent Engine - Intent pattern recognition system
+- Log Command System (LOT-TO-LOG-01) - /system registry, /story compression, Arcade ledger
 
 ### [Deployment Documentation](./deployment/)
 Guides for deploying and managing the application in production.

@@ -19,6 +19,15 @@ import {
 import config from '#server/config'
 import { fp } from '#shared/utils'
 import {
+  compressLogs,
+  compressionToPrompt,
+  storyXp,
+  STORY_HORIZONS,
+  HORIZON_WINDOW_MS,
+  HORIZON_WORDS,
+  type StoryHorizon,
+} from '#shared/utils/story-compression'
+import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
   DATE_TIME_FORMAT,
@@ -5479,9 +5488,12 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed AI Story (LOT AI narrative loop)
+  // /story [day|week|month|year]. Logs for the horizon are compressed
+  // deterministically (shared/utils/story-compression) into counts, mood
+  // distribution, high/low peaks and sampled excerpts. Only that packet is
+  // sent to the AI vendor (Together AI). Result persists as a
+  // `generated_story` log with the compression in metadata.
   // ============================================================================
   fastify.post(
     '/story',
@@ -5490,6 +5502,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          horizon?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5513,31 +5526,33 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         })
       }
 
-      const { logText, quantumState, userIndex } = req.body
+      const { logText, quantumState, userIndex } = req.body || ({} as any)
+      const horizon: StoryHorizon = STORY_HORIZONS.includes(req.body?.horizon as StoryHorizon)
+        ? (req.body.horizon as StoryHorizon)
+        : 'recent'
 
+      const windowMs = HORIZON_WINDOW_MS[horizon]
       const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
+        where: {
+          userId: req.user.id,
+          ...(windowMs ? { createdAt: { [Op.gte]: new Date(Date.now() - windowMs) } } : {}),
+        },
         order: [['createdAt', 'DESC']],
-        limit: 200,
+        // Year horizon is sampled; the compression layer keeps it even.
+        limit: horizon === 'year' ? 3000 : horizon === 'month' ? 1500 : 500,
+        attributes: ['event', 'text', 'createdAt', 'metadata', 'context'],
       })
 
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const compression = compressLogs(
+        logs.map(l => ({
+          event: l.event,
+          text: l.text,
+          createdAt: l.createdAt,
+          metadata: l.metadata as any,
+          context: l.context as any,
+        })),
+        horizon
+      )
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,43 +5562,53 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const [minW, maxW] = HORIZON_WORDS[horizon]
+      const scope = horizon === 'recent' ? 'recent journey' : `last ${horizon}`
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's own data into a short narrative and hands it back to them.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+The operator invoked /story${horizon === 'recent' ? '' : ' ' + horizon}. Write ${horizon === 'year' ? '2-3' : '1-2'} paragraphs (${minW}-${maxW} words) compressing their ${scope}: mood trajectory, self-care rhythm and the high and low peaks. The story should feel personal, grounded and real — not generic motivational writing.
 
 RULES:
 - Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
+- Use only the compressed data below. Never invent events, people or places.
+- Name the HIGH PEAK and LOW PEAK if present — the intimate highs and lows matter most
+- If they've been consistent, acknowledge the discipline; if there are gaps or struggle, acknowledge that with compassion
+- Match their current energy: reflective if low, energized if high
+- End with one forward-looking sentence — not a pep talk, a quiet truth
 - Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Keep it under ${maxW} words.`
 
       const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+OPERATOR LOG ENTRY: "${(logText || '(no text)').substring(0, 500)}"
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock || 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+${compressionToPrompt(compression)}`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
+      const xp = storyXp(compression)
+
+      // Nothing to compress — don't spend a vendor call on an empty horizon.
+      if (compression.entries === 0 && compression.checkins === 0 && compression.selfCare === 0) {
+        return {
+          story: horizon === 'recent'
+            ? 'No entries yet. Write a few lines in the Log and the story will start compressing.'
+            : `No signals in the last ${horizon}. The record starts with the next entry.`,
+          logId: null,
+          horizon,
+          compression,
+          xp: 0,
+        }
+      }
 
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
+        console.log(`📖 Story [${horizon}] for user ${req.user.id}: ${compression.entries} entries, ${compression.checkins} check-ins`)
 
-        const story = await engine.generateCompletion(fullPrompt, 512)
+        const tokens = horizon === 'year' ? 900 : horizon === 'month' ? 700 : 512
+        const story = await engine.generateCompletion(fullPrompt, tokens)
 
         const cleaned = story.trim().replace(/^["']|["']$/g, '')
 
@@ -5595,6 +5620,9 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            horizon,
+            compression: compression as any,
+            xp,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
@@ -5604,12 +5632,18 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
         return {
           story: cleaned,
           logId: storyLog.id,
+          horizon,
+          compression,
+          xp,
         }
       } catch (error: any) {
         console.error('Story generation failed:', error)
         return {
           story: 'The system holds your data quietly. When the engine returns, your story will be here.',
           logId: null,
+          horizon,
+          compression,
+          xp: 0,
         }
       }
     }

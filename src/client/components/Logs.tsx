@@ -29,6 +29,17 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import {
+  renderSystemHelp,
+  renderCommandDossier,
+  parseSystemArg,
+  recordCommandUse,
+} from '#client/utils/logCommands'
+import {
+  parseStoryHorizon,
+  stripStoryCommand,
+  formatCompressionHeader,
+} from '#shared/utils/story-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,7 +3717,13 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyHeader, setStoryHeader] = React.useState<string[] | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // /story waits for the operator to stop typing so "/story week" is read whole
+  const storyPendingRef = React.useRef(false)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const qiPendingRef = React.useRef(false)
+  const qiTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3742,7 +3759,11 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryHeader(data.compression ? formatCompressionHeader(data.compression) : null)
       setStoryLoading(false)
+      if (data.compression && data.logId) {
+        recordCommandUse('story-mode', data.xp || 0)
+      }
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
       const updated = current + separator + '📖 ' + data.story
@@ -3938,6 +3959,8 @@ const NoteEditor = ({
     if (fresh.length === 0) return
 
     for (const trigger of fresh as LogTrigger[]) {
+      // Arcade ledger — /system and /story record their own XP
+      if (trigger !== 'system-help' && trigger !== 'story-mode') recordCommandUse(trigger)
       if (trigger === 'toggle-synth') {
         const next = !stores.isKeyboardSoundOn.get()
         stores.isKeyboardSoundOn.set(next)
@@ -4034,23 +4057,8 @@ const NoteEditor = ({
           setScanResult('SCAN FAILED — Unable to read system state.')
         }
       } else if (trigger === 'qi-rfi') {
-        const qiMatch = value.match(/\/qi\s+(.+)/i)
-        if (qiMatch && qiMatch[1].trim().length >= 2 && !qiLoading) {
-          const query = qiMatch[1].trim()
-          setQiLoading(true)
-          setQiResponse(null)
-          try {
-            const state = getUserState()
-            const index = getUserIndex()
-            submitQi({
-              query,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitQi({ query })
-          }
-        }
+        // Deferred: "/qi" fires before the query is typed — wait for a pause
+        qiPendingRef.current = true
       } else if (trigger === 'breathe') {
         setBreatheEnabled(prev => !prev)
       } else if (trigger === 'silent-mode') {
@@ -4121,52 +4129,87 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        const ledger = recordCommandUse('system-help')
+        const arg = parseSystemArg(value)
+        const dossier = arg ? renderCommandDossier(arg, ledger) : null
+        setSystemHelp((dossier || renderSystemHelp(ledger)).join('\n'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
+        // Deferred: the debounce effect below fires once typing pauses
+        storyPendingRef.current = true
       }
     }
   }, [value])
+
+  // /system <command> — refresh the dossier as the argument is typed
+  React.useEffect(() => {
+    if (!systemHelp || !/(^|\s)\/(system|commands)\b/i.test(value)) return
+    const arg = parseSystemArg(value)
+    const dossier = arg ? renderCommandDossier(arg) : null
+    const next = (dossier || renderSystemHelp()).join('\n')
+    if (next !== systemHelp) setSystemHelp(next)
+  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // /story [day|week|month|year] — fire 1.2s after typing pauses
+  React.useEffect(() => {
+    if (!storyPendingRef.current) return
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    storyTimerRef.current = setTimeout(() => {
+      storyPendingRef.current = false
+      storyTimerRef.current = null
+      if (storyLoading) return
+      const text = valueRef.current
+      const horizon = parseStoryHorizon(text)
+      setStoryLoading(true)
+      setStoryResponse(null)
+      setStoryHeader(null)
+      const logText = stripStoryCommand(text)
+      try {
+        submitStory({
+          logText,
+          horizon,
+          quantumState: getUserState(),
+          userIndex: getUserIndex(),
+        })
+      } catch {
+        submitStory({ logText, horizon })
+      }
+    }, 1200)
+  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // /qi [query] — fire 1.2s after typing pauses so the query is complete
+  React.useEffect(() => {
+    if (!qiPendingRef.current) return
+    if (qiTimerRef.current) clearTimeout(qiTimerRef.current)
+    qiTimerRef.current = setTimeout(() => {
+      qiTimerRef.current = null
+      const qiMatch = valueRef.current.match(/\/qi\s+(.+)/i)
+      // No query yet → stay armed; the next keystroke re-schedules
+      if (qiMatch && qiMatch[1].trim().length >= 2 && !qiLoading) {
+        qiPendingRef.current = false
+        const query = qiMatch[1].trim()
+        setQiLoading(true)
+        setQiResponse(null)
+        try {
+          const state = getUserState()
+          const index = getUserIndex()
+          submitQi({
+            query,
+            quantumState: state,
+            userIndex: index,
+          })
+        } catch {
+          submitQi({ query })
+        }
+      }
+    }, 1200)
+  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    if (qiTimerRef.current) clearTimeout(qiTimerRef.current)
+  }, [])
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
@@ -4393,13 +4436,13 @@ const NoteEditor = ({
               <div className="opacity-80" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {systemHelp.split('\n').map((line, idx) => {
                   if (!line.trim()) return <div key={idx} style={{ height: '0.75rem' }} />
-                  if (line.startsWith('/')) {
-                    const spaceIdx = line.search(/\s{2,}/)
+                  const spaceIdx = line.search(/\s{2,}/)
+                  if (line.startsWith('/') || spaceIdx > 0) {
                     const cmd = spaceIdx > -1 ? line.slice(0, spaceIdx) : line
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
-                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                      <div key={idx} style={{ display: 'flex', flexWrap: 'wrap', columnGap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                        <span style={{ minWidth: '13rem', opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4419,6 +4462,11 @@ const NoteEditor = ({
             <Block label="📖" blockView>
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyResponse && storyHeader && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'pre' , overflowX: 'auto' }}>
+                  {storyHeader.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

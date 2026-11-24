@@ -7,6 +7,7 @@
  */
 
 import axios, { AxiosError } from 'axios'
+import type { StoryHorizon, StoryCompression } from '#shared/utils/story-compression'
 import {
   useQuery,
   useMutation,
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    horizon?: StoryHorizon
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +912,8 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    horizon?: StoryHorizon
+    compression?: StoryCompression | null
+    xp?: number
   }
 >('post', '/api/story')
