@@ -249,6 +249,9 @@ function getAudioContext(): AudioContext | null {
     if (!_audioCtx || _audioCtx.state === 'closed') {
       _audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
     }
+    // Contexts start 'suspended' under autoplay policy (iOS Safari, Chrome) —
+    // without resume() the first planner click is silent.
+    if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {})
     return _audioCtx
   } catch {
     return null

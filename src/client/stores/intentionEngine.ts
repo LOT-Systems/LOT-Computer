@@ -26,7 +26,7 @@ import { atom } from 'nanostores'
 // Intention signals collected from all widgets and background monitors
 export type IntentionSignal = {
   timestamp: number
-  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal' | 'calculator' | 'log' | 'energy' | 'cohort' | 'recipe' | 'goals' | 'qos' | 'medical' | 'resilience' | 'badges' | 'astrology'
+  source: 'mood' | 'memory' | 'planner' | 'intentions' | 'selfcare' | 'journal' | 'calculator' | 'log' | 'energy' | 'cohort' | 'recipe' | 'goals' | 'qos' | 'medical' | 'resilience' | 'badges' | 'astrology' | 'micro_game'
   signal: string
   metadata?: Record<string, any>
 }
@@ -108,11 +108,29 @@ export const intentionEngine = atom<IntentionEngineState>({
   lastSyncedTimestamp: 0
 })
 
+// Persisted sync watermark — without it every page load reset
+// lastSyncedTimestamp to 0 and the first sync re-uploaded up to 7 days of
+// already-synced signals as duplicate quantum_intent_signal Log rows.
+const LAST_SYNC_KEY = 'intention-last-sync'
+
+function safeGetItem(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null // Safari private mode / blocked storage — run in-memory only
+  }
+}
+
 // Load signals and user index from localStorage on init
 if (typeof window !== 'undefined') {
-  const stored = localStorage.getItem('intention-signals')
-  const storedIndex = localStorage.getItem('user-index')
+  const stored = safeGetItem('intention-signals')
+  const storedIndex = safeGetItem('user-index')
+  const storedLastSync = Number(safeGetItem(LAST_SYNC_KEY)) || 0
   let loadedIndex = DEFAULT_USER_INDEX
+
+  if (storedLastSync > 0) {
+    intentionEngine.set({ ...intentionEngine.get(), lastSyncedTimestamp: storedLastSync })
+  }
 
   if (storedIndex) {
     try {
@@ -3329,7 +3347,7 @@ export function analyzeIntentions(): IntentionPattern[] {
   // active OS dimension contributing signal at the same time. The field is not building — it is saturated.
   const hasPresenceP142 = patterns.some(p => p.pattern === 'adaptive-signal-web')
   const hasPresenceP137 = patterns.some(p => p.pattern === 'quantum-coherence-peak')
-  const daySignals147 = signals.filter(s => now - s.timestamp < dayMs)
+  const daySignals147 = signals.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000)
   const uniqueSources147 = new Set(daySignals147.map(s => s.source)).size
   if (hasPresenceP142 && hasPresenceP137 && uniqueSources147 >= 7) {
     const presenceBonus = Math.min((uniqueSources147 - 7) * 0.02, 0.14)
@@ -3752,11 +3770,15 @@ export async function syncToServer(): Promise<boolean> {
 
     const result = await response.json()
 
-    // Update last synced timestamp
+    // Update last synced timestamp. Read the store fresh: `state` was captured
+    // before the await, and spreading it would drop any signals recorded while
+    // the request was in flight. Watermark = newest signal actually sent.
+    const syncedUpTo = Math.max(...unsyncedSignals.map(s => s.timestamp))
     intentionEngine.set({
-      ...state,
-      lastSyncedTimestamp: now
+      ...intentionEngine.get(),
+      lastSyncedTimestamp: syncedUpTo
     })
+    try { localStorage.setItem(LAST_SYNC_KEY, String(syncedUpTo)) } catch { /* non-critical */ }
 
     console.log(`Synced ${result.savedSignals}/${result.totalSignals} signals successfully`)
     return true

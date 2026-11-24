@@ -215,7 +215,7 @@ export const useCreateMemory = createMutation<
     question?: string
     options?: string[]
   },
-  { response: string }
+  { response: string; insight?: string }
 >('post', '/api/memory/answer')
 
 // Admin API
