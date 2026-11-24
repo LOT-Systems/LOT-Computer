@@ -17,6 +17,7 @@ import { aiEngineManager } from '#server/utils/ai-engines'
 import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
 import { toCelsius } from '#shared/utils'
+import { basicsPublicPayload } from '#shared/basics'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -504,6 +505,13 @@ export default async (fastify: FastifyInstance) => {
 
   // Public status endpoint - no authentication required
   // Cached for 2 minutes to be cost-effective with Digital Ocean
+  // LOT-FM-001 OPEN TAB — the ledger is the marketing. Public, read-only.
+  // Nomenclature + cadence only; cost basis never leaves the server.
+  fastify.get('/basics/manifest', async (req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return basicsPublicPayload()
+  })
+
   fastify.get('/status', async (req, reply) => {
     const now = Date.now()
 

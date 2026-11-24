@@ -50,6 +50,10 @@ const fastify = Fastify({
 
 const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
 
+// LOT-FM-001 OPEN TAB: members get the in-app Basics tab, strangers get the
+// public read-only ledger. No login wall between public and manifest.
+const OPEN_TAB_ROUTE = '/basics'
+
 // ==============================================================================
 // SECURITY PLUGINS
 // ==============================================================================
@@ -359,6 +363,13 @@ fastify.register(async (fastify: FastifyInstance) => {
             scriptNonce: reply.cspNonce.script,
             styleNonce: reply.cspNonce.style,
           })
+        })
+      })
+      fastify.get(OPEN_TAB_ROUTE, async function (req, reply) {
+        return reply.view('generic-spa', {
+          scriptName: req.user ? 'app' : 'basics',
+          scriptNonce: reply.cspNonce.script,
+          styleNonce: reply.cspNonce.style,
         })
       })
     })

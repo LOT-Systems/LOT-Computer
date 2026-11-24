@@ -419,3 +419,81 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ==========================================================================
+   LOT-FM-001 · BASIC (RATION) · OPEN TAB
+   House style: white ground / black ink, inversion-only hierarchy, 2px rules,
+   square corners, fixed character grid, IBM 3270 register. Scoped — immune
+   to member themes. No color. No radius. No icons.
+   ========================================================================== */
+.lot-basics {
+  --lb-ground: #fff;
+  --lb-ink: #000;
+  --lb-rule: 2px;
+  --lb-cell: 1ch;
+  background: var(--lb-ground);
+  color: var(--lb-ink);
+  font-family: 'Liberation Mono', 'Cousine', 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  border: var(--lb-rule) solid var(--lb-ink);
+  border-radius: 0;
+  max-width: 88ch;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.lot-basics *, .lot-basics *::before, .lot-basics *::after { border-radius: 0 !important; box-shadow: none !important; }
+.lot-basics ::selection { background: var(--lb-ink); color: var(--lb-ground); }
+.lot-basics h1, .lot-basics h2, .lot-basics p, .lot-basics ol { margin: 0; padding: 0; font-size: inherit; font-weight: inherit; }
+.lot-basics .lb-inv {
+  display: flex; justify-content: space-between; gap: 2ch;
+  background: var(--lb-ink); color: var(--lb-ground);
+  padding: 0 1ch;
+}
+.lot-basics .lb-masthead { border-bottom: var(--lb-rule) solid var(--lb-ink); }
+.lot-basics .lb-title { padding: 20px 1ch 0; }
+.lot-basics .lb-price { padding: 0 1ch 20px; }
+.lot-basics .lb-section { border-bottom: var(--lb-rule) solid var(--lb-ink); }
+.lot-basics .lb-section-head {
+  display: flex; gap: 2ch;
+  padding: 0 1ch;
+  border-bottom: var(--lb-rule) solid var(--lb-ink);
+}
+.lot-basics .lb-section-head > span:first-child {
+  background: var(--lb-ink); color: var(--lb-ground);
+  padding: 0 1ch; margin-left: -1ch;
+}
+.lot-basics .lb-section-body { padding: 20px 1ch; }
+.lot-basics .lb-list { list-style: none; }
+.lot-basics .lb-list li { display: grid; grid-template-columns: 5ch 1fr; }
+.lot-basics .lb-ledger-wrap { overflow-x: auto; }
+.lot-basics .lb-ledger { width: 100%; border-collapse: collapse; white-space: nowrap; }
+.lot-basics .lb-ledger th, .lot-basics .lb-ledger td {
+  text-align: left; font-weight: 700; padding: 0 1ch; vertical-align: top;
+}
+.lot-basics .lb-ledger th:first-child, .lot-basics .lb-ledger td:first-child { padding-left: 0; }
+.lot-basics .lb-ledger thead th { border-bottom: var(--lb-rule) solid var(--lb-ink); }
+.lot-basics .lb-ledger tbody tr:hover { background: var(--lb-ink); color: var(--lb-ground); }
+.lot-basics .lb-ledger .lb-r { text-align: right; }
+.lot-basics .lb-nom { white-space: normal; min-width: 24ch; }
+.lot-basics .lb-note { margin-top: 20px; }
+.lot-basics .lb-status {
+  display: flex; flex-wrap: wrap;
+  background: var(--lb-ink); color: var(--lb-ground);
+}
+.lot-basics .lb-status-field { padding: 0 1ch; border-right: var(--lb-rule) solid var(--lb-ground); }
+.lot-basics .lb-status-field:last-child { border-right: 0; }
+.lot-basics .lb-narrow { display: none; }
+.lot-basics-page {
+  min-height: 100dvh; background: #fff; color: #000;
+  display: flex; justify-content: center; padding: 32px 16px;
+}
+@media (max-width: 480px) {
+  .lot-basics { font-size: 12px; line-height: 18px; }
+  .lot-basics .lb-wide { display: none; }
+  .lot-basics .lb-narrow { display: inline; }
+  .lot-basics-page { padding: 16px; }
+}
