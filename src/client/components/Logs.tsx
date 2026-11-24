@@ -22,7 +22,7 @@ import {
   USER_SETTING_NAMES,
   USER_SETTING_NAME_BY_ID,
 } from '#shared/constants'
-import { toCelsius } from '#shared/utils'
+import { toCelsius, computeAstroResonance } from '#shared/utils'
 import {
   playKeyClick,
   playSynthActivationChime,
@@ -55,6 +55,10 @@ export const Logs: React.FC = React.memo(function LogsInner() {
   const pendingPushRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const { data: loadedLogs = [], refetch: refetchLogs } = useLogs()
+  // Astro Resonance — personal peak zodiac hour folded from every astro-
+  // stamped log; check-ins logged in that hour get a ◆ marker, synchronized
+  // with the System › Astrology widget's "You:" line.
+  const astroResonance = React.useMemo(() => computeAstroResonance(loadedLogs), [loadedLogs])
 
   const { mutate: updateLog } = useUpdateLog({
     onSuccess: (log: any) => {
@@ -276,6 +280,12 @@ export const Logs: React.FC = React.memo(function LogsInner() {
               <Block label={`BIO [${sector}]:`} blockView>
                 <div className="mb-8 uppercase tracking-widest">{emotionalState}</div>
                 {note && <div className="mb-8">{note}</div>}
+                {log.context?.astroRokuyo && (
+                  <div className="mb-8">
+                    ASTRO: {log.context.astroHourlyZodiac} hr · {log.context.astroMoonPhase} · {log.context.astroRokuyo}
+                    {astroResonance.peakHour && log.context.astroHourlyZodiac === astroResonance.peakHour && ' ◆'}
+                  </div>
+                )}
                 {insights && insights.length > 0 && (
                   <div>
                     {insights.map((insight, idx) => (
@@ -363,7 +373,7 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}{log.context.astroHourlyZodiac ? ` · ${log.context.astroHourlyZodiac} hr` : ''}</div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>

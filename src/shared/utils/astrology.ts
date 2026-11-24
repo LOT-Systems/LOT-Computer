@@ -177,3 +177,137 @@ export function getMoonEmoji(phaseName: string): string {
   }
   return emojiMap[phaseName] || '🌑'
 }
+
+// ─── Astro Resonance (personalization from Logs) ────────────────────────────
+//
+// Every log written through getLogContext() carries an ambient astrology
+// stamp (astroRokuyo / astroMoonPhase / astroHourlyZodiac …) in its context.
+// Astro Resonance folds those stamps back into a personal reading: which
+// zodiac hour, moon phase and rokuyo day the user is *actually* most active
+// in, and — from emotional check-ins — under which moon phase their mood
+// tends to lean positive. Still ambient conditions × the user's own
+// behaviour; never a natal chart.
+
+// Emotional states counted as positive for the mood-lean tally. Mirrors the
+// replenishing side of ENERGY_COSTS in server/utils/energy.ts.
+const POSITIVE_STATES = new Set([
+  'energized', 'calm', 'peaceful', 'grateful', 'hopeful', 'fulfilled', 'content', 'excited', 'happy', 'joyful',
+])
+
+// Minimum stamped logs before a resonance is shown — below this the "peak"
+// is noise from a handful of entries.
+export const ASTRO_RESONANCE_MIN_SAMPLES = 5
+
+export type AstroResonanceLog = {
+  event: string
+  context?: Record<string, any> | null
+  metadata?: Record<string, any> | null
+}
+
+export type AstroResonance = {
+  samples: number
+  peakHour: string | null
+  peakHourShare: number // 0-100, share of stamped logs in the peak hour
+  peakMoonPhase: string | null
+  peakRokuyo: string | null
+  // Moon phase under which check-ins lean most positive (≥2 check-ins)
+  brightMoonPhase: string | null
+  brightMoonShare: number // 0-100 positive share under brightMoonPhase
+  checkIns: number
+}
+
+export type AstroAlignment = {
+  inPeakHour: boolean
+  inPeakMoon: boolean
+  inBrightMoon: boolean
+  onPeakRokuyo: boolean
+  score: number // 0-4 count of matches
+}
+
+function topKey(counts: Map<string, number>): [string | null, number] {
+  let best: string | null = null
+  let bestCount = 0
+  counts.forEach((count, key) => {
+    if (count > bestCount) { best = key; bestCount = count }
+  })
+  return [best, bestCount]
+}
+
+function bump(counts: Map<string, number>, key: unknown) {
+  if (typeof key !== 'string' || !key) return
+  counts.set(key, (counts.get(key) || 0) + 1)
+}
+
+/**
+ * Fold astro-stamped log entries into a personal resonance reading.
+ * Pure — safe on client (System widget, Logs) and server alike.
+ */
+export function computeAstroResonance(logs: AstroResonanceLog[]): AstroResonance {
+  const hours = new Map<string, number>()
+  const moons = new Map<string, number>()
+  const rokuyos = new Map<string, number>()
+  const moodByMoon = new Map<string, { total: number; positive: number }>()
+  let samples = 0
+  let checkIns = 0
+
+  for (const log of logs) {
+    const ctx = log.context
+    if (!ctx || !ctx.astroRokuyo) continue
+    samples++
+    bump(hours, ctx.astroHourlyZodiac)
+    bump(moons, ctx.astroMoonPhase)
+    bump(rokuyos, ctx.astroRokuyo)
+
+    if (log.event === 'emotional_checkin' && typeof ctx.astroMoonPhase === 'string') {
+      checkIns++
+      const state = String(log.metadata?.emotionalState || '').toLowerCase()
+      const entry = moodByMoon.get(ctx.astroMoonPhase) || { total: 0, positive: 0 }
+      entry.total++
+      if (POSITIVE_STATES.has(state)) entry.positive++
+      moodByMoon.set(ctx.astroMoonPhase, entry)
+    }
+  }
+
+  const [peakHour, peakHourCount] = topKey(hours)
+  const [peakMoonPhase] = topKey(moons)
+  const [peakRokuyo] = topKey(rokuyos)
+
+  let brightMoonPhase: string | null = null
+  let brightMoonShare = 0
+  moodByMoon.forEach((entry, phase) => {
+    if (entry.total < 2) return
+    const share = Math.round((entry.positive / entry.total) * 100)
+    if (share > brightMoonShare) { brightMoonShare = share; brightMoonPhase = phase }
+  })
+
+  return {
+    samples,
+    peakHour,
+    peakHourShare: samples > 0 ? Math.round((peakHourCount / samples) * 100) : 0,
+    peakMoonPhase,
+    peakRokuyo,
+    brightMoonPhase,
+    brightMoonShare,
+    checkIns,
+  }
+}
+
+/**
+ * Compare the current ambient reading against a resonance profile.
+ */
+export function getAstroAlignment(
+  resonance: AstroResonance,
+  now: { hourlyZodiac: string; moonPhase: string; rokuyo: string }
+): AstroAlignment {
+  const inPeakHour = !!resonance.peakHour && resonance.peakHour === now.hourlyZodiac
+  const inPeakMoon = !!resonance.peakMoonPhase && resonance.peakMoonPhase === now.moonPhase
+  const inBrightMoon = !!resonance.brightMoonPhase && resonance.brightMoonPhase === now.moonPhase
+  const onPeakRokuyo = !!resonance.peakRokuyo && resonance.peakRokuyo === now.rokuyo
+  return {
+    inPeakHour,
+    inPeakMoon,
+    inBrightMoon,
+    onPeakRokuyo,
+    score: [inPeakHour, inPeakMoon, inBrightMoon, onPeakRokuyo].filter(Boolean).length,
+  }
+}

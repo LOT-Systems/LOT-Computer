@@ -4880,7 +4880,18 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  // Personal Astro Resonance folded from Logs astro stamps (optional — only
+  // present once the user has enough stamped logs). Lets cosmic/system
+  // widgets react when the user enters their own resonant hour.
+  resonance?: {
+    peakHour: string | null
+    peakMoonPhase: string | null
+    brightMoonPhase: string | null
+    samples: number
+    alignmentScore: number
+    inPeakHour: boolean
+  }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4900,16 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    ...(resonance
+      ? {
+          personalPeakHour: resonance.peakHour,
+          personalPeakMoon: resonance.peakMoonPhase,
+          personalBrightMoon: resonance.brightMoonPhase,
+          resonanceSamples: resonance.samples,
+          alignmentScore: resonance.alignmentScore,
+          inPeakHour: resonance.inPeakHour,
+        }
+      : {}),
   })
 }
 

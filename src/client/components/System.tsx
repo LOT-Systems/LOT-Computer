@@ -22,7 +22,7 @@ import { cn, formatNumberWithCommas } from '#client/utils'
 import dayjs from '#client/utils/dayjs'
 import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
-import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
+import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo, computeAstroResonance, getAstroAlignment, ASTRO_RESONANCE_MIN_SAMPLES } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
@@ -221,22 +221,46 @@ export const System = React.memo(function SystemInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [astrologyTick])
 
-  // Synchronize the ambient astrology reading into the QIE signal bus once
-  // per calendar day, so other widgets (cosmic, system) can react to it.
+  // Astro Resonance — personalize the ambient reading from the user's own
+  // Logs. Every log carries an astro stamp (server getLogContext), so the
+  // widget can say which zodiac hour / moon phase this user actually lives
+  // in, and whether right now lines up with it.
+  const astroResonance = React.useMemo(() => computeAstroResonance(logs), [logs])
+  const astroAlignment = React.useMemo(
+    () => getAstroAlignment(astroResonance, astrology),
+    [astroResonance, astrology]
+  )
+  const hasAstroResonance = astroResonance.samples >= ASTRO_RESONANCE_MIN_SAMPLES && !!astroResonance.peakHour
+
+  // Synchronize the ambient astrology reading (plus the personal alignment)
+  // into the QIE signal bus once per zodiac hour per day, so other widgets
+  // (cosmic, system) can react when the user enters their resonant hour.
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    const today = dayjs().format('YYYY-MM-DD')
-    const lastRecordedKey = 'astrology_signal_date'
-    if (localStorage.getItem(lastRecordedKey) === today) return
+    const slot = `${dayjs().format('YYYY-MM-DD')}:${astrology.hourlyZodiac}`
+    const lastRecordedKey = 'astrology_signal_slot'
+    try {
+      if (localStorage.getItem(lastRecordedKey) === slot) return
+    } catch { /* storage unavailable — record anyway */ }
     recordAstrologySignal(
       astrology.rokuyo,
       astrology.moonPhase,
       astrology.moonIllumination,
       astrology.hourlyZodiac,
-      astrology.westernZodiac
+      astrology.westernZodiac,
+      hasAstroResonance
+        ? {
+            peakHour: astroResonance.peakHour,
+            peakMoonPhase: astroResonance.peakMoonPhase,
+            brightMoonPhase: astroResonance.brightMoonPhase,
+            samples: astroResonance.samples,
+            alignmentScore: astroAlignment.score,
+            inPeakHour: astroAlignment.inPeakHour,
+          }
+        : undefined
     )
-    localStorage.setItem(lastRecordedKey, today)
-  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac])
+    try { localStorage.setItem(lastRecordedKey, slot) } catch { /* noop */ }
+  }, [astrology.rokuyo, astrology.moonPhase, astrology.moonIllumination, astrology.hourlyZodiac, astrology.westernZodiac, hasAstroResonance, astroResonance, astroAlignment])
 
   const answerLogs = React.useMemo(() => {
     return logs.filter(log => log.event === 'answer')
@@ -467,6 +491,13 @@ export const System = React.memo(function SystemInner() {
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {hasAstroResonance && (
+              <div>
+                You: {astroResonance.peakHour} hour • {astroResonance.peakMoonPhase}
+                {astroResonance.brightMoonPhase && ` • Bright in ${astroResonance.brightMoonPhase}`}
+                {astroAlignment.score > 0 && ` • ${'◆'.repeat(astroAlignment.score)}${astroAlignment.inPeakHour ? ' your hour' : ''}`}
+              </div>
+            )}
           </Block>
         </div>
 
@@ -670,9 +701,18 @@ export const System = React.memo(function SystemInner() {
           }}
         >
           {astrologyView === 'astrology' ? (
+            <>
             <div>
               {astrology.westernZodiac} • {astrology.hourlyZodiac} • {astrology.rokuyo} • {astrology.moonPhase} ({astrology.moonIllumination}%)
             </div>
+            {hasAstroResonance && (
+              <div>
+                You: {astroResonance.peakHour} hour • {astroResonance.peakMoonPhase}
+                {astroResonance.brightMoonPhase && ` • Bright in ${astroResonance.brightMoonPhase}`}
+                {astroAlignment.score > 0 && ` • ${'◆'.repeat(astroAlignment.score)}${astroAlignment.inPeakHour ? ' your hour' : ''}`}
+              </div>
+            )}
+            </>
           ) : astrologyView === 'psychology' ? (
             <div>
               {profile?.archetype || 'The Explorer'} • {profile?.coreValues?.slice(0, 2).join(' • ') || 'Growing'}
