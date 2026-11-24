@@ -24,6 +24,8 @@ import {
   useCreateChatMessage,
   useChatMessages,
   useLikeChatMessage,
+  useEmailInbox,
+  EmailInboxRecord,
 } from '#client/queries'
 import { sync } from '../sync'
 import { PublicChatMessage, UserTag } from '#shared/types'
@@ -172,8 +174,11 @@ export const Sync = React.memo(function SyncInner() {
 
   if (!canAccessChat) {
     return (
-      <div className="max-w-[700px] text-acc/40 py-8">
-        Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+      <div className="max-w-[700px]">
+        <EmailInbox />
+        <div className="text-acc/40 py-8">
+          Sync is available for Usership, Onyx, Legacy, R&D, and Admin members.
+        </div>
       </div>
     )
   }
@@ -213,6 +218,8 @@ export const Sync = React.memo(function SyncInner() {
           </div>
         </form>
       </div>
+
+      <EmailInbox />
 
       <div>
         {messages.map((x, i) => {
@@ -280,6 +287,74 @@ export const Sync = React.memo(function SyncInner() {
     </div>
   )
 })
+
+/**
+ * LOT® Email inbox — messages sent to me with "/email to <me>" from Log
+ * (or from a DM thread). Live via the private `direct_message` SSE event.
+ * Click a sender to open the thread and reply.
+ */
+const EmailInbox: React.FC = () => {
+  const me = useStore(stores.me)
+  const isTimeFormat12h = useStore(stores.isTimeFormat12h)
+  const { data } = useEmailInbox()
+  const [live, setLive] = React.useState<EmailInboxRecord[]>([])
+
+  React.useEffect(() => {
+    const { dispose } = sync.listen('direct_message', (d: any) => {
+      if (!me?.id || d.receiverId !== me.id) return
+      setLive((prev) =>
+        prev.some((x) => x.id === d.id)
+          ? prev
+          : [
+              {
+                id: d.id,
+                senderId: d.senderId,
+                senderName: d.senderName || 'Unknown',
+                message: d.message,
+                createdAt: d.createdAt,
+              },
+              ...prev,
+            ]
+      )
+    })
+    return dispose
+  }, [me?.id])
+
+  const items = React.useMemo(() => {
+    const fetched = data?.messages || []
+    const ids = new Set(fetched.map((m) => m.id))
+    return [...live.filter((m) => !ids.has(m.id)), ...fetched].slice(0, 7)
+  }, [data, live])
+
+  if (!items.length) return null
+
+  return (
+    <div className="mb-80">
+      <div className="text-acc/40 mb-8 select-none">
+        EMAIL · {items.length} RECEIVED
+      </div>
+      {items.map((x) => (
+        <div
+          key={x.id}
+          className="group flex items-start gap-x-8 cursor-pointer grid-fill-hover -mx-4 px-4 py-2 rounded"
+          onClick={() => stores.goTo('dm', { userId: x.senderId })}
+          title="Open thread to reply"
+        >
+          <span className="whitespace-nowrap pr-4">✉ {x.senderName}</span>
+          <div
+            className="whitespace-breakspaces flex-1"
+            style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+          >
+            {x.message}
+          </div>
+          <div className="text-acc/40 select-none pointer-events-none whitespace-nowrap">
+            <MessageTimeLabel dateString={x.createdAt} isTimeFormat12h={isTimeFormat12h} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 const MessageTimeLabel: React.FC<{ dateString: string | Date; isTimeFormat12h: boolean }> = ({ dateString, isTimeFormat12h }) => {
   const date = dayjs(dateString)

@@ -120,6 +120,25 @@ export const useSendDirectMessage = createMutation<
   void
 >('post', '/api/direct-messages')
 
+// LOT® Email — composed in Log ("/email to Hitomi"), received in Sync
+export interface EmailInboxRecord {
+  id: string
+  senderId: string
+  senderName: string
+  message: string
+  createdAt: string
+}
+
+export const useEmailInbox = createQuery<{ messages: EmailInboxRecord[] }>(
+  '/api/email/inbox',
+  { refetchOnWindowFocus: true }
+)
+
+export const useSendEmail = createMutation<
+  { to?: string; toUserId?: string; message: string },
+  { id: string; to: { id: string; name: string }; createdAt: string }
+>('post', '/api/email')
+
 export const useWeather = createQuery<WeatherRecord | null>('/api/weather', {
   refetchOnWindowFocus: false,
 })

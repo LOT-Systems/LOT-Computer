@@ -18,6 +18,7 @@ import {
 } from '#shared/types'
 import config from '#server/config'
 import { fp } from '#shared/utils'
+import { MAX_EMAIL_LENGTH } from '#shared/utils/email-command'
 import {
   COUNTRY_BY_ALPHA3,
   DATE_FORMAT,
@@ -378,6 +379,13 @@ export default async (fastify: FastifyInstance) => {
             attributes: ['id'],
           })
           write({ event, data: { ...payload, isLiked: !!myLike } })
+          break
+        }
+        case 'direct_message': {
+          // Private: only the two correspondents receive the event
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({ event, data })
+          }
           break
         }
         case 'settings_updated': {
@@ -4047,7 +4055,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         senderId: req.user.id,
         receiverId,
         message: directMessage.message,
-        senderName: `${req.user.firstName} ${req.user.lastName}`.trim(),
+        senderName: shortName(req.user),
         createdAt: directMessage.createdAt
       })
 
@@ -4082,6 +4090,151 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — compose in Log with "/email to Hitomi", receive in Sync.
+  // Transport is the DirectMessage table: one message system, two surfaces.
+  // ============================================================================
+
+  const shortName = (u: { firstName?: string | null; lastName?: string | null }) =>
+    `${u.firstName || ''}${u.lastName ? ' ' + u.lastName.charAt(0) + '.' : ''}`.trim() || 'Unknown'
+
+  const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => '\\' + c)
+
+  // Send LOT Email by recipient name (or explicit toUserId after disambiguation)
+  fastify.post('/email', async (req: FastifyRequest<{
+    Body: { to?: string; toUserId?: string; message?: string }
+  }>, reply) => {
+    try {
+      const { to, toUserId } = req.body || {}
+      const message = String(req.body?.message || '').trim().slice(0, MAX_EMAIL_LENGTH)
+      if (!message) {
+        return reply.status(400).send({ error: 'EMPTY MESSAGE' })
+      }
+
+      let receiver: any = null
+      if (toUserId) {
+        receiver = await fastify.models.User.findByPk(toUserId)
+      } else {
+        const name = String(to || '').trim().replace(/[.,;!?]+$/, '')
+        if (!name) return reply.status(400).send({ error: 'NO RECIPIENT' })
+        const [first, ...rest] = name.split(/\s+/)
+        const lastPrefix = rest.join(' ').replace(/\.$/, '')
+        const candidates = await fastify.models.User.findAll({
+          where: {
+            id: { [Op.ne]: req.user.id },
+            firstName: { [Op.iLike]: escapeLike(first) },
+            ...(lastPrefix ? { lastName: { [Op.iLike]: escapeLike(lastPrefix) + '%' } } : {}),
+          },
+          attributes: ['id', 'firstName', 'lastName'],
+          limit: 10,
+        })
+        if (candidates.length === 1) {
+          receiver = candidates[0]
+        } else if (candidates.length > 1) {
+          // Prefer people the sender already corresponds with
+          const prior = await fastify.models.DirectMessage.findAll({
+            where: {
+              [Op.or]: [
+                { senderId: req.user.id, receiverId: { [Op.in]: candidates.map((c) => c.id) } },
+                { receiverId: req.user.id, senderId: { [Op.in]: candidates.map((c) => c.id) } },
+              ],
+            },
+            attributes: ['senderId', 'receiverId'],
+            limit: 50,
+          })
+          const known = new Set(prior.map((p) => (p.senderId === req.user.id ? p.receiverId : p.senderId)))
+          const knownCandidates = candidates.filter((c) => known.has(c.id))
+          if (knownCandidates.length === 1) {
+            receiver = knownCandidates[0]
+          } else {
+            return reply.status(409).send({
+              error: 'AMBIGUOUS RECIPIENT',
+              candidates: candidates.map((c) => ({ id: c.id, name: shortName(c) })),
+            })
+          }
+        }
+      }
+
+      if (!receiver || receiver.id === req.user.id) {
+        return reply.status(404).send({ error: 'RECIPIENT NOT FOUND' })
+      }
+
+      const dm = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message,
+      })
+
+      sync.emit('direct_message', {
+        id: dm.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: dm.message,
+        senderName: shortName(req.user),
+        createdAt: dm.createdAt,
+        channel: 'email',
+      })
+
+      process.nextTick(async () => {
+        try {
+          const context = await getLogContext(req.user)
+          await fastify.models.Log.create({
+            userId: req.user.id,
+            event: 'direct_message_sent',
+            text: '',
+            metadata: { directMessageId: dm.id, receiverId: receiver.id, message: dm.message, channel: 'email' },
+            context,
+          })
+        } catch (logError) {
+          console.error('Error logging LOT email:', logError)
+        }
+      })
+
+      return reply.send({
+        id: dm.id,
+        to: { id: receiver.id, name: shortName(receiver) },
+        createdAt: dm.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending LOT email:', error)
+      return reply.status(500).send({ error: 'SEND FAILED' })
+    }
+  })
+
+  // LOT Email inbox — most recent messages received, shown in Sync
+  fastify.get('/email/inbox', async (req, reply) => {
+    try {
+      const rows = await fastify.models.DirectMessage.findAll({
+        where: { receiverId: req.user.id },
+        order: [['createdAt', 'DESC']],
+        limit: 30,
+      })
+      const senderIds = [...new Set(rows.map((r) => r.senderId))]
+      const senders = senderIds.length
+        ? await fastify.models.User.findAll({
+            where: { id: { [Op.in]: senderIds } },
+            attributes: ['id', 'firstName', 'lastName'],
+          })
+        : []
+      const byId = new Map(senders.map((s) => [s.id, s]))
+      return reply.send({
+        messages: rows.map((r) => {
+          const s = byId.get(r.senderId)
+          return {
+            id: r.id,
+            senderId: r.senderId,
+            senderName: s ? shortName(s) : 'Unknown',
+            message: r.message,
+            createdAt: r.createdAt,
+          }
+        }),
+      })
+    } catch (error) {
+      console.error('Error fetching LOT email inbox:', error)
+      return reply.status(500).send({ error: 'INBOX UNAVAILABLE' })
     }
   })
 

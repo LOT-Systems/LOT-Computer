@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import { EmailComposer } from '#client/components/EmailComposer'
 import * as React from 'react'
 import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
@@ -4128,6 +4129,7 @@ const NoteEditor = ({
           '/story        Generate a personal story from recent data',
           '/scan         System status overview',
           '/qi [query]   Ask the Quantum Intelligence engine',
+          '/email to [name]  Send LOT Email — arrives in Sync',
           '/assembly     Self-assembly module status',
           '/phys         Physiological cohort report',
           '/qos          Quantum OS state analysis',
@@ -4387,6 +4389,7 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
+        <EmailComposer text={value} />
         {systemHelp && (
           <div className="mt-8">
             <Block label="SYSTEM:" blockView>

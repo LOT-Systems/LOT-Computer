@@ -123,7 +123,8 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // LOT® Email: open the private thread (replies also land in Sync inbox)
+    stores.goTo('dm', { userId })
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -269,6 +270,9 @@ export const CohortConnectWidget: React.FC = () => {
                       >
                         Send message
                       </Button>
+                    </div>
+                    <div className="mt-4 opacity-40">
+                      or in Log: /email to {match.user.firstName}
                     </div>
                   </div>
                 )}
