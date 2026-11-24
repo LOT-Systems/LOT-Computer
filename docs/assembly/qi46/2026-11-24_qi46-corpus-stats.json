@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-11-24T19:35:12.046Z",
+  "files": 56,
+  "pairs": 1054,
+  "tokensEst": 174203,
+  "bySource": {
+    "institute": 335,
+    "cosmo": 17,
+    "brand": 57,
+    "bioelectric": 645
+  },
+  "byType": {
+    "example": 499,
+    "philosophy": 44,
+    "technical": 381,
+    "voice": 23,
+    "instruction": 107
+  },
+  "byBodyState": {
+    "calibration": 585,
+    "hardware": 114,
+    "pattern": 323,
+    "coherence": 32
+  },
+  "cosmoCleared": 1023,
+  "cosmoFlagged": 31,
+  "registerMean": {
+    "grace": 0.032,
+    "poetry": 0.041,
+    "love": 0.044,
+    "hugs": 0.019,
+    "being_there": 0.042,
+    "being_cool": 0.032,
+    "male": 0.099
+  },
+  "external": {
+    "platform": "PostgreSQL — not read (consent gate)",
+    "consumables": "not in repository"
+  },
+  "malformed": 0,
+  "gate": {
+    "sourcesInventoried": true,
+    "allTagged": true,
+    "allCosmoCleared": false,
+    "over10kPairs": false,
+    "jsonlValid": true,
+    "vadikReview100": false,
+    "result": "HOLD"
+  }
+}
