@@ -307,10 +307,11 @@ export const System = React.memo(function SystemInner() {
     return null
   }, [quantumState])
 
-  // Cycle arc status — derived from recognized patterns (FM v132–v141)
+  // Cycle arc status — derived from recognized patterns (FM v132–v142)
   const fourthCycleStatus = React.useMemo(() => {
     const eng = intentionEngine.get()
     const patterns = eng.recognizedPatterns ?? []
+    const hasSCProg  = patterns.some(p => p.pattern === 'sixth-cycle-progenitor')
     const hasFCSov5 = patterns.some(p => p.pattern === 'fifth-cycle-sovereign')
     const hasFCInt5 = patterns.some(p => p.pattern === 'fifth-cycle-integration')
     const hasFCDep5 = patterns.some(p => p.pattern === 'fifth-cycle-deepening')
@@ -322,6 +323,7 @@ export const System = React.memo(function SystemInner() {
     const hasFCDep  = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
     const hasFCIgn  = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
     const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasSCProg)  return 'L26-SCPROG'
     if (hasFCSov5) return 'L25-FCSOV'
     if (hasFCInt5) return 'L24-FCINT'
     if (hasFCDep5) return 'L23-FCDEP'

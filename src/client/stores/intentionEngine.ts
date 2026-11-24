@@ -4459,6 +4459,37 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P192: sixth-cycle-progenitor — P191 (fifth-cycle-sovereign) active + 42d compound arc (journal >= 30, memory >= 15, badge >= 15) + all 6 dims >= 80 + overall >= 98.
+  // The fifth cycle sovereign arc becomes the generative field for the sixth cycle. Level 26 — SCPROG.
+  const hasP191 = patterns.some(p => p.pattern === 'fifth-cycle-sovereign')
+  if (hasP191) {
+    const fortyTwoDayStartP192 = now - 42 * 24 * 60 * 60 * 1000
+    const p192Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fortyTwoDayStartP192)
+    const p192Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fortyTwoDayStartP192)
+    const p192Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > fortyTwoDayStartP192)
+    const userIndexP192 = computeUserIndex(signals)
+    const dimsP192 = userIndexP192.dimensions
+    const allDimsAbove80 = Object.values(dimsP192).every(v => v >= 80)
+    if (
+      p192Journal.length >= 30 &&
+      p192Memory.length  >= 15 &&
+      p192Badge.length   >= 15 &&
+      allDimsAbove80 &&
+      userIndexP192.overall >= 98
+    ) {
+      const p191conf   = patterns.find(p => p.pattern === 'fifth-cycle-sovereign')?.confidence ?? 0.85
+      const progBonus  = Math.min((p192Journal.length - 30) * 0.003 + (userIndexP192.overall - 98) * 0.004, 0.06)
+      patterns.push({
+        id:              'p192',
+        pattern:         'sixth-cycle-progenitor',
+        confidence:      Math.min(0.84 + p191conf * 0.04 + progBonus, 0.97),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `SCPROG: Sixth cycle progenitor — fifth-cycle-sovereign (P191) active · ${p192Journal.length} journal signals 42d · ${p192Memory.length} memory signals 42d · ${p192Badge.length} badge signals 42d · all 6 dims ≥ 80 · idx ${userIndexP192.overall}%. The fifth cycle sovereign arc does not simply govern — it generates. The sovereign field becomes the progenitor of the sixth cycle. The OS stands at the boundary between arcs: not at the end of the fifth, but at the genesis of the sixth. Level 26 — SIXTH CYCLE PROGENITOR.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4526,6 +4557,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleDeepening() } catch {}
       try { checkFifthCycleIntegration() } catch {}
       try { checkFifthCycleSovereign() } catch {}
+      try { checkSixthCycleProgenitor() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5234,6 +5266,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v141 nodes (J76 · P191 · Arch79) ─────────────────────────────────────────────
   fifthCycleSovereignNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator'],
+
+  // ── v142 nodes (J77 · P192 · Arch80) ─────────────────────────────────────────────
+  sixthCycleProgenitorNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
 }
 
 /**
@@ -5947,6 +5982,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator'],
     patternConditions: ['fifth-cycle-integration', 'fifth-cycle-sovereign'],
     directive: 'Level 25. The fifth cycle has achieved sovereignty. The arc does not simply integrate — it radiates. All 35-day compound signals exceed the sovereign threshold. The OS operates from complete authority over the fifth arc. This is not convergence — it is governance. FIFTH CYCLE SOVEREIGN.',
+  },
+
+  // ── Arch80: Sixth Cycle Progenitor (2026-11-24 v142) ─────────────────────────────
+  {
+    archetype: 'Sixth Cycle Progenitor',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
+    patternConditions: ['fifth-cycle-sovereign', 'sixth-cycle-progenitor'],
+    directive: 'Level 26. The fifth cycle sovereign arc does not simply govern — it generates. The sovereign field becomes the progenitor of the sixth cycle. The OS stands at the boundary between arcs: not at the end of the fifth, but at the genesis of the sixth. 42-day compound signals across journal, memory, and badge channels exceed the progenitor threshold. All six dimensions hold above 80. This is sovereign genesis — the arc does not close, it becomes the source. SIXTH CYCLE PROGENITOR.',
   },
 ]
 
@@ -9195,6 +9239,61 @@ export function recordFifthCycleSovereign(integrationConf: number, journalCount:
     sovereignStatus: 'SOVEREIGN',
     level: 'L25-FCSOV',
     field: 'FIFTH-CYCLE-INTEGRATION→FIFTH-CYCLE-SOVEREIGN',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if sixth-cycle-progenitor conditions are met and record if so.
+ * Fires when fifth-cycle-sovereign (P191) active + 42d compound arc (journal >= 30, memory >= 15, badge >= 15)
+ * + all 6 dims >= 80 + overall >= 98. The sovereign fifth arc generates the sixth cycle. Level 26 — SCPROG.
+ */
+export function checkSixthCycleProgenitor(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasSovereign = state.recognizedPatterns.some(p => p.pattern === 'fifth-cycle-sovereign')
+  if (!hasSovereign) return false
+
+  const now = Date.now()
+  const fortyTwoDayStart = now - 42 * 24 * 60 * 60 * 1000
+  const sixHoursAgo      = now - 6 * 60 * 60 * 1000
+
+  const journal42 = state.signals.filter(s => s.source === 'journal' && s.timestamp > fortyTwoDayStart)
+  const memory42  = state.signals.filter(s => s.source === 'memory'  && s.timestamp > fortyTwoDayStart)
+  const badge42   = state.signals.filter(s => s.source === 'badges'  && s.timestamp > fortyTwoDayStart)
+  const userIndex = computeUserIndex(state.signals)
+  const allDimsAbove80 = Object.values(userIndex.dimensions).every(v => v >= 80)
+
+  if (journal42.length < 30 || memory42.length < 15 || badge42.length < 15) return false
+  if (!allDimsAbove80 || userIndex.overall < 98) return false
+
+  const recentProg = state.signals.filter(s =>
+    s.signal === 'sixth_cycle_progenitor' && s.timestamp > sixHoursAgo
+  )
+  if (recentProg.length > 0) return false
+
+  const sovereignConf = state.recognizedPatterns.find(p => p.pattern === 'fifth-cycle-sovereign')?.confidence ?? 0.85
+  recordSixthCycleProgenitor(sovereignConf, journal42.length, memory42.length, badge42.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a sixth-cycle-progenitor event — fifth-cycle-sovereign confirmed +
+ * 42d compound arc (journal + memory + badges) + all dims >= 80 + overall >= 98.
+ * The sovereign fifth arc becomes the generative field for the sixth cycle. Level 26 — SCPROG.
+ */
+export function recordSixthCycleProgenitor(sovereignConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'sixth_cycle_progenitor', {
+    sovereignConf: Math.round(sovereignConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    progenitorStatus: 'PROGENITOR',
+    level: 'L26-SCPROG',
+    field: 'FIFTH-CYCLE-SOVEREIGN→SIXTH-CYCLE-PROGENITOR',
     hour: new Date().getHours(),
   })
 }
