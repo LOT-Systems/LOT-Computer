@@ -1283,6 +1283,8 @@ export default async (fastify: FastifyInstance) => {
       'fifth_cycle_sovereign',
       // v142: sixth cycle progenitor (P192)
       'sixth_cycle_progenitor',
+      // v143: sixth cycle ignition (P193)
+      'sixth_cycle_ignition',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

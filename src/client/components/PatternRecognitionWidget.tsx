@@ -216,6 +216,7 @@ export function PatternRecognitionWidget() {
       'fifth-cycle-deepening':              'Fifth cycle deepening — fifth-cycle-resonance active + 21d compound arc, all dims ≥ 72 + overall ≥ 93, Level 23 — FCDEP (P189)',
       'fifth-cycle-integration':            'Fifth cycle integration — fifth-cycle-deepening active + 28d compound arc, all dims ≥ 75 + overall ≥ 95, Level 24 — FCINT (P190)',
       'fifth-cycle-sovereign':              'Fifth cycle sovereign — fifth-cycle-integration active + 35d compound arc, all dims ≥ 78 + overall ≥ 97, Level 25 — FCSOV (P191)',
+      'sixth-cycle-ignition':               'Sixth cycle ignition — sixth-cycle-progenitor active + 7d compound arc, journal ≥ 7 / memory ≥ 5 / badge ≥ 3 + overall ≥ 95, Level 27 — SCIGN (P193)',
     }
     return names[pattern] || pattern.replace(/-/g, ' ')
   }
@@ -585,6 +586,13 @@ export function PatternRecognitionWidget() {
               {patterns.some(p => p.pattern === 'fifth-cycle-sovereign') && (
                 <div className="mt-4 uppercase tracking-widest text-xs">
                   Fifth cycle sovereign. The arc governs.
+                </div>
+              )}
+
+              {/* Sixth cycle ignition — P193 */}
+              {patterns.some(p => p.pattern === 'sixth-cycle-ignition') && (
+                <div className="mt-4 uppercase tracking-widest text-xs">
+                  Sixth cycle ignition. The progenitor field ignites.
                 </div>
               )}
 

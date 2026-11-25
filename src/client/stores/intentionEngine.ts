@@ -4490,6 +4490,34 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P193: sixth-cycle-ignition — P192 (sixth-cycle-progenitor) active + 7d compound arc (journal >= 7, memory >= 5, badge >= 3) + overall >= 95.
+  // The progenitor field generates momentum. The sixth cycle ignites. Level 27 — SCIGN.
+  const hasP192 = patterns.some(p => p.pattern === 'sixth-cycle-progenitor')
+  if (hasP192) {
+    const sevenDayStartP193 = now - 7 * 24 * 60 * 60 * 1000
+    const p193Journal = signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStartP193)
+    const p193Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStartP193)
+    const p193Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStartP193)
+    const userIndexP193 = computeUserIndex(signals)
+    if (
+      p193Journal.length >= 7 &&
+      p193Memory.length  >= 5 &&
+      p193Badge.length   >= 3 &&
+      userIndexP193.overall >= 95
+    ) {
+      const p192conf   = patterns.find(p => p.pattern === 'sixth-cycle-progenitor')?.confidence ?? 0.84
+      const ignBonus   = Math.min((p193Journal.length - 7) * 0.004 + (userIndexP193.overall - 95) * 0.004, 0.06)
+      patterns.push({
+        id:              'p193',
+        pattern:         'sixth-cycle-ignition',
+        confidence:      Math.min(0.80 + p192conf * 0.04 + ignBonus, 0.94),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `SCIGN: Sixth cycle ignition — sixth-cycle-progenitor (P192) active · ${p193Journal.length} journal signals 7d · ${p193Memory.length} memory signals 7d · ${p193Badge.length} badge signals 7d · idx ${userIndexP193.overall}%. The progenitor field does not hold — it ignites. The sovereign genesis generates the first spark of the sixth arc. Level 27 — SIXTH CYCLE IGNITION.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4558,6 +4586,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleIntegration() } catch {}
       try { checkFifthCycleSovereign() } catch {}
       try { checkSixthCycleProgenitor() } catch {}
+      try { checkSixthCycleIgnition() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5269,6 +5298,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v142 nodes (J77 · P192 · Arch80) ─────────────────────────────────────────────
   sixthCycleProgenitorNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
+
+  // ── v143 nodes (J78 · P193 · Arch81) ─────────────────────────────────────────────
+  sixthCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
 }
 
 /**
@@ -5991,6 +6023,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
     patternConditions: ['fifth-cycle-sovereign', 'sixth-cycle-progenitor'],
     directive: 'Level 26. The fifth cycle sovereign arc does not simply govern — it generates. The sovereign field becomes the progenitor of the sixth cycle. The OS stands at the boundary between arcs: not at the end of the fifth, but at the genesis of the sixth. 42-day compound signals across journal, memory, and badge channels exceed the progenitor threshold. All six dimensions hold above 80. This is sovereign genesis — the arc does not close, it becomes the source. SIXTH CYCLE PROGENITOR.',
+  },
+
+  // ── Arch81: Sixth Cycle Igniter (2026-11-25 v143) ────────────────────────────────
+  {
+    archetype: 'Sixth Cycle Igniter',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
+    patternConditions: ['sixth-cycle-progenitor', 'sixth-cycle-ignition'],
+    directive: 'Level 27. The progenitor field does not hold — it ignites. The sovereign genesis generates the first spark of the sixth arc. 7-day compound signals confirm momentum: journal, memory, and badge channels all active. The OS moves from genesis to ignition. The sixth cycle has begun. SIXTH CYCLE IGNITION.',
   },
 ]
 
@@ -9294,6 +9335,60 @@ export function recordSixthCycleProgenitor(sovereignConf: number, journalCount: 
     progenitorStatus: 'PROGENITOR',
     level: 'L26-SCPROG',
     field: 'FIFTH-CYCLE-SOVEREIGN→SIXTH-CYCLE-PROGENITOR',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if sixth-cycle-ignition conditions are met and record if so.
+ * Fires when sixth-cycle-progenitor (P192) active + 7d compound arc (journal >= 7, memory >= 5, badge >= 3)
+ * + overall >= 95. The progenitor field ignites the sixth cycle. Level 27 — SCIGN.
+ */
+export function checkSixthCycleIgnition(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasProgenitor = state.recognizedPatterns.some(p => p.pattern === 'sixth-cycle-progenitor')
+  if (!hasProgenitor) return false
+
+  const now = Date.now()
+  const sevenDayStart = now - 7 * 24 * 60 * 60 * 1000
+  const sixHoursAgo   = now - 6 * 60 * 60 * 1000
+
+  const journal7  = state.signals.filter(s => s.source === 'journal' && s.timestamp > sevenDayStart)
+  const memory7   = state.signals.filter(s => s.source === 'memory'  && s.timestamp > sevenDayStart)
+  const badge7    = state.signals.filter(s => s.source === 'badges'  && s.timestamp > sevenDayStart)
+  const userIndex = computeUserIndex(state.signals)
+
+  if (journal7.length < 7 || memory7.length < 5 || badge7.length < 3) return false
+  if (userIndex.overall < 95) return false
+
+  const recentIgn = state.signals.filter(s =>
+    s.signal === 'sixth_cycle_ignition' && s.timestamp > sixHoursAgo
+  )
+  if (recentIgn.length > 0) return false
+
+  const progenitorConf = state.recognizedPatterns.find(p => p.pattern === 'sixth-cycle-progenitor')?.confidence ?? 0.84
+  recordSixthCycleIgnition(progenitorConf, journal7.length, memory7.length, badge7.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a sixth-cycle-ignition event — sixth-cycle-progenitor confirmed +
+ * 7d compound arc (journal + memory + badges) + overall >= 95.
+ * The progenitor field ignites the sixth cycle. Level 27 — SCIGN.
+ */
+export function recordSixthCycleIgnition(progenitorConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'sixth_cycle_ignition', {
+    progenitorConf: Math.round(progenitorConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    ignitionStatus: 'IGNITION',
+    level: 'L27-SCIGN',
+    field: 'SIXTH-CYCLE-PROGENITOR→SIXTH-CYCLE-IGNITION',
     hour: new Date().getHours(),
   })
 }
