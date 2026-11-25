@@ -3,7 +3,7 @@ import {
   applyEvent, emptyRecord, transition, validateRoster, withinEnvelope,
   marginOf, monthlyTotalCents, addMonth, BASIC_PRICE_CENTS, type Roster,
 } from '../../src/shared/basics/engine.ts'
-import { manifestCard, CARD_COLS } from '../../src/shared/basics/card.ts'
+import { manifestCard, nextIssueCard, CARD_COLS } from '../../src/shared/basics/card.ts'
 import { RATION_MANIFEST, issueLoad, isIssued } from '../../src/shared/basics/manifest.ts'
 
 const now = new Date('2026-10-03T00:00:00Z')
@@ -41,7 +41,9 @@ assert.equal(issueLoad(1).length, 11); assert(issueLoad(6).some((i) => i.line ==
 assert.equal(RATION_MANIFEST.length, 23)
 // every line ships at least once in 12 issues
 for (const i of RATION_MANIFEST) assert(Array.from({ length: 12 }, (_, k) => k + 1).some((n) => isIssued(i, n)), i.line)
-step('STAND_DOWN'); assert.equal(r.state, 'USERSHIP'); assert.equal(r.billing.amountCents, 0)
+// NEXT ISSUE on the card is the issue after this one, never the same date
+const nc = nextIssueCard(r)!; assert(nc.includes('ISSUE 03') && nc.includes('2027-01-01') && nc.includes('NEXT ISSUE 2027-02-01'), nc)
+step('STAND_DOWN'); assert.equal(nextIssueCard(r), null); assert.equal(r.state, 'USERSHIP'); assert.equal(r.billing.amountCents, 0)
 assert.equal(r.roster, null); assert.equal(r.issueLog.length, 5)
 
 // guards

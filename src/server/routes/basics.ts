@@ -16,7 +16,7 @@ import {
   applyEvent, baselineState, normalizeRecord, validateRoster,
   type BasicRecord, type RationEvent,
 } from '#shared/basics/engine'
-import { manifestCard } from '#shared/basics/card'
+import { nextIssueCard } from '#shared/basics/card'
 import { envelope } from '#server/basics/cogs'
 
 const hasUsership = (req: FastifyRequest) =>
@@ -32,16 +32,7 @@ const save = async (user: FastifyRequest['user'], record: BasicRecord) => {
   await user.set({ metadata: { ...(user.metadata || {}), basics: record } }).save()
 }
 
-/** Card for the issue that will ship next, or null when nothing is scheduled. */
-const nextCard = (r: BasicRecord): string | null =>
-  r.roster && r.nextIssue
-    ? manifestCard({
-        issue: r.issuesDispatched + 1,
-        due: r.nextIssue,
-        roster: r.roster,
-        next: r.nextIssue,
-      })
-    : null
+const nextCard = nextIssueCard
 
 const view = (r: BasicRecord) => ({ basic: r, card: nextCard(r) })
 
@@ -95,13 +86,17 @@ export default async (fastify: FastifyInstance) => {
       const { userId, tracking } = req.body ?? {}
       const user = userId ? await fastify.models.User.findByPk(userId) : null
       if (!user) return reply.status(404).send({ ok: false, error: 'OPERATOR NOT FOUND' })
+      // Never breach the ceiling: no box leaves while any scheduled issue breaks
+      // the USD 40 landed ceiling or the 60% margin floor.
+      const env = envelope()
+      if (!env.ok) return reply.status(409).send({ ok: false, error: `ENVELOPE BREACH: ${env.breach}` })
       const rec = load(user as any)
       const r = applyEvent(rec, 'ISSUE_DISPATCHED', {
         now: new Date(), hasUsership: true, tracking,
       })
       if (!r.ok) return reply.status(409).send({ ok: false, error: r.error })
       await save(user as any, r.record)
-      return { ok: true, basic: r.record }
+      return { ok: true, basic: r.record, cogs: env.status }
     }
   )
 

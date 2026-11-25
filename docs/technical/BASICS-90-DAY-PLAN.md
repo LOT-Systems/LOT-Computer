@@ -2,11 +2,11 @@
 
 Envelope: USD 100/MO · margin ≥ 60% · landed ≤ USD 40 · 23-line load.
 
-| MONTH | BUILD | EXIT | STATE (2026-10-03) |
+| MONTH | BUILD | EXIT | STATE (2026-11-25) |
 |-------|-------|------|--------------------|
 | 1 | OPEN TAB: 23-line ledger, doctrine, price, status line, public JSON `GET /api/public/basics` | stranger reads what LOT issues, on what terms | DONE in-app + public page `/open-tab` (2026-10-06) |
 | 2 | UPGRADE state machine, roster intake, additive billing record, STAND DOWN, issue log | Usership member goes ON STRENGTH and back OFF | DONE (billing LEDGERED only — no processor) |
-| 3 | load engine (monthly + quarterly), supplier quotes vs ceiling, printed manifest card, first dispatch, NEXT ISSUE advance | first real ration ships; margin verified ≥ 60% | ENGINE BUILT 2026-10-05 (card, load, dispatch, envelope gate); no real shipment — blockers below |
+| 3 | load engine (monthly + quarterly), supplier quotes vs ceiling, printed manifest card, first dispatch, NEXT ISSUE advance | first real ration ships; margin verified ≥ 60% | ENGINE BUILT (card, load, dispatch queue, quote intake). Dispatch envelope-gated 2026-11-25. No real shipment — blockers below |
 
 ## Modules
 - `src/shared/basics/manifest.ts` — 23 lines, doctrine, price (no COGS).

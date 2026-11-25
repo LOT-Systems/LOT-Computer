@@ -4,7 +4,7 @@
  * Rendered in-app (<pre>) and printed as-is on the card stock. White ground, black ink.
  */
 import { issueLoad, MANUAL_REF, RATION_COUNT } from './manifest'
-import type { Roster } from './engine'
+import { addMonth, type BasicRecord, type Roster } from './engine'
 
 export const CARD_COLS = 48
 const RULE = '='.repeat(CARD_COLS)
@@ -45,3 +45,9 @@ export const manifestCard = ({ issue, due, roster, next }: CardInput): string =>
     RULE,
   ].join('\n')
 }
+
+/** Card for the issue that ships next, or null when nothing is scheduled. NEXT ISSUE = due + 1 month. */
+export const nextIssueCard = (r: BasicRecord): string | null =>
+  r.roster && r.nextIssue
+    ? manifestCard({ issue: r.issuesDispatched + 1, due: r.nextIssue, roster: r.roster, next: addMonth(r.nextIssue) })
+    : null
