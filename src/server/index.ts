@@ -231,6 +231,15 @@ fastify.get('/status', async (req, reply) => {
   })
 })
 
+// LOT-FM-001 OPEN TAB — public, read-only ration ledger (no authentication required)
+fastify.get('/open-tab', async (req, reply) => {
+  return reply.view('generic-spa', {
+    scriptName: 'open-tab',
+    scriptNonce: reply.cspNonce.script,
+    styleNonce: reply.cspNonce.style,
+  })
+})
+
 // Database
 fastify.addHook('onClose', () => sequelize.close())
 
