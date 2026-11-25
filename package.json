@@ -45,6 +45,7 @@
     "production:run": "npx run-p build migrations:up start",
     "fix": "prettier --write ./src",
     "start": "node ./dist/server/server/index.js",
+    "test:log-commands": "esbuild scripts/tests/test-log-commands.ts --bundle --platform=node --format=esm --log-level=warning --outfile=dist/tests/test-log-commands.mjs && node dist/tests/test-log-commands.mjs",
     "test:cold-start": "npx esr ./scripts/tests/test-cold-start.ts",
     "test:cold-start:prod": "APP_HOST=https://lot-systems.com npx esr ./scripts/tests/test-cold-start.ts"
   },

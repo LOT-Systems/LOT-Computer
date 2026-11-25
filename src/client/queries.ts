@@ -6,6 +6,7 @@
  * Made in the USA | brand.lot-systems.com
  */
 
+import type { StoryPeriod, StoryDigest } from '#shared/utils/story-compression'
 import axios, { AxiosError } from 'axios'
 import {
   useQuery,
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    period?: StoryPeriod | 'auto'
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +912,8 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    period?: StoryPeriod
+    source?: 'ai' | 'fallback'
+    digest?: StoryDigest | null
   }
 >('post', '/api/story')

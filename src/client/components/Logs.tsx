@@ -28,7 +28,9 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, formatSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryPeriod, formatDigestGrid } from '#shared/utils/story-compression'
+import { computeArcadeProgress, formatArcadeStatus } from '#shared/utils/arcade'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3706,7 +3708,19 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyDigest, setStoryDigest] = React.useState<string[] | null>(null)
+  // /story is armed on detection, then fired after the operator pauses
+  // typing so "/story week" can be read in full (detection fires at "/story").
+  const [storyArmed, setStoryArmed] = React.useState(false)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  const [arcadeResult, setArcadeResult] = React.useState<string | null>(null)
+  const { data: arcadeLogs } = useLogs()
+  const arcadeLogsRef = React.useRef(arcadeLogs)
+  arcadeLogsRef.current = arcadeLogs
+  const getArcade = React.useCallback(
+    () => computeArcadeProgress((arcadeLogsRef.current || []) as any[]),
+    []
+  )
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3742,10 +3756,12 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryDigest(data.digest ? formatDigestGrid(data.digest) : null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
-      const updated = current + separator + '📖 ' + data.story
+      const tag = data.period ? `[${data.period.toUpperCase()}] ` : ''
+      const updated = current + separator + '📖 ' + tag + data.story
       setValue(updated)
       valueRef.current = updated
       onChangeRef.current(updated)
@@ -4121,52 +4137,47 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Registry-driven: every command in LOG_COMMANDS appears here.
+        let header: string[] = ['LOT® LOG — COMMAND INDEX']
+        try {
+          const a = getArcade()
+          header = [`LOT® LOG — COMMAND INDEX · ${a.rank.glyph} ${a.rank.title} L${a.level} · ${a.totalXp} XP`]
+        } catch {}
+        setSystemHelp(formatSystemHelp(header).join('\n'))
+      } else if (trigger === 'arcade-status') {
+        try {
+          setArcadeResult(formatArcadeStatus(getArcade()).join('\n'))
+        } catch {
+          setArcadeResult('ARCADE STATE UNAVAILABLE')
+        }
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
+        if (!storyLoading) setStoryArmed(true)
       }
     }
   }, [value])
+
+  // Fire an armed /story once typing pauses (1.2s). Re-runs on every
+  // keystroke, so the timer resets while "/story month" is being typed.
+  React.useEffect(() => {
+    if (!storyArmed || storyLoading) return
+    const t = setTimeout(() => {
+      setStoryArmed(false)
+      setStoryLoading(true)
+      setStoryResponse(null)
+      setStoryDigest(null)
+      const text = valueRef.current
+      const period = parseStoryPeriod(text) || 'auto'
+      const logText = text.replace(/(^|\s)\/story(\s+\w+)?/i, ' ').replace(/📖/g, '').trim()
+      try {
+        submitStory({ logText, period, quantumState: getUserState(), userIndex: getUserIndex() })
+      } catch {
+        submitStory({ logText, period })
+      }
+    }, 1200)
+    return () => clearTimeout(t)
+  }, [storyArmed, storyLoading, value])
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
@@ -4414,11 +4425,26 @@ const NoteEditor = ({
             </Block>
           </div>
         )}
-        {(storyLoading || storyResponse) && (
+        {arcadeResult && (
+          <div className="mt-8">
+            <Block label="ARCADE:" blockView>
+              <div className="opacity-60" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{arcadeResult}</div>
+            </Block>
+          </div>
+        )}
+        {(storyArmed || storyLoading || storyResponse) && (
           <div className="mt-8">
             <Block label="📖" blockView>
+              {storyArmed && !storyLoading && (
+                <div className="opacity-40 tracking-widest">COMPRESSING {(parseStoryPeriod(value) || 'auto').toUpperCase()}…</div>
+              )}
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
+              )}
+              {storyDigest && (
+                <div className="opacity-40 mb-4" style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  {storyDigest.join('\n')}
+                </div>
               )}
               {storyResponse && (
                 <div className="opacity-60">

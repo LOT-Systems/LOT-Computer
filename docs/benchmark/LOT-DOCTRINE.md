@@ -1,4 +1,4 @@
-# LOT-DOCTRINE  rev N
+# LOT-DOCTRINE  rev O
 
 ## Render Isolation
 
@@ -226,3 +226,15 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## EVENT-NAME INTEGRITY  (rev O)
+
+Any filter on `log.event` must name a value that is actually written. A filter
+on a nonexistent event returns an empty array, the AI prompt receives "(none)",
+and nothing errors — silent erasure, second instance of the formatLog class.
+Journal entries are `note`. Rule: new readers of the log stream filter through
+a shared, tested module (e.g. `xpForLog`, `compressStory`) rather than inline
+string literals in a route; the module's tests pin the event names.
+
+(SR-20261125-01: /story filtered `log_entry`/`journal`; journal never reached the
+story. Fixed via shared compressStory(). Cites SR-20260630-01.)
