@@ -363,7 +363,11 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                   <div>HUM: {log.context.humidity}%</div>
                 )}
                 {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
+                  <div>
+                    ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}
+                    {log.context.astroMoonIllumination != null && ` (${log.context.astroMoonIllumination}%)`}
+                    {log.context.astroHourlyZodiac && ` · ${log.context.astroHourlyZodiac} hour`}
+                  </div>
                 )}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
@@ -4168,22 +4172,7 @@ const NoteEditor = ({
     }
   }, [value])
 
-  const contextText = React.useMemo(() => {
-    if (!log?.context) return ''
-    const weatherParts: string[] = []
-    if (log.context?.temperature) {
-      const celsius = toCelsius(log.context.temperature)
-      weatherParts.push(`${Math.round(celsius)}°C`)
-    }
-    if (log.context?.humidity) {
-      weatherParts.push(`${Math.round(log.context.humidity)}%`)
-    }
-    const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
-  }, [log?.context])
+  const contextText = React.useMemo(() => formatLogContextText(log?.context), [log?.context])
 
   return (
     <div className="relative group">
@@ -4435,26 +4424,33 @@ const NoteEditor = ({
   )
 }
 
+// Hover context line shown on every log entry: weather – city · moon · rokuyo.
+// (Astrology v2, 2026-11-25) Each entry's ambient astro snapshot
+// (context.astro*, written by getLogContext) now surfaces on every entry,
+// not only on SYS: snapshots — the journal and the dashboard Astrology
+// block read from the same per-user timeZone clock.
+function formatLogContextText(context?: Record<string, any> | null): string {
+  if (!context) return ''
+  const weatherParts: string[] = []
+  if (context.temperature) {
+    weatherParts.push(`${Math.round(toCelsius(context.temperature))}°C`)
+  }
+  if (context.humidity) {
+    weatherParts.push(`${Math.round(context.humidity)}%`)
+  }
+  let text = weatherParts.join(', ')
+  if (context.city) text = text ? `${text} – ${context.city}` : context.city
+  const astroParts = [context.astroMoonPhase, context.astroRokuyo].filter(Boolean)
+  if (astroParts.length) text = text ? `${text} · ${astroParts.join(' · ')}` : astroParts.join(' · ')
+  return text
+}
+
 const LogContainer: React.FC<{
   children: React.ReactNode
   log: Log
   dateFormat: string
 }> = ({ log, dateFormat, children }) => {
-  const contextText = React.useMemo(() => {
-    const weatherParts: string[] = []
-    if (log.context?.temperature) {
-      const celsius = toCelsius(log.context.temperature)
-      weatherParts.push(`${Math.round(celsius)}°C`)
-    }
-    if (log.context?.humidity) {
-      weatherParts.push(`${Math.round(log.context.humidity)}%`)
-    }
-    const weatherText = weatherParts.join(', ')
-    if (log.context?.city) {
-      return `${weatherText} – ${log.context.city}`
-    }
-    return weatherText
-  }, [log.context])
+  const contextText = React.useMemo(() => formatLogContextText(log.context), [log.context])
 
   return (
     <div className="relative group">

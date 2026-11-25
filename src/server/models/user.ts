@@ -56,6 +56,7 @@ export class User
       'tags',
       'hideActivityLogs',
       'timeChime',
+      'timeZone', // (Astrology v2) dashboard reads in the user's saved timeZone
     ])(this.toJSON())
 
     // Add memory engine status based on tags

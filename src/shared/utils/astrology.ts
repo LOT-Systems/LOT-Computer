@@ -81,14 +81,21 @@ export function getHourlyZodiac(date: Date): string {
  */
 export function getRokuyo(date: Date): string {
   // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
   const knownRokuyoIndex = 0
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
+  // Count whole CALENDAR days using the date's local wall-clock fields.
+  // (2026-11-25 fix) The previous version diffed raw epoch ms against
+  // `new Date('2000-01-01')` (UTC midnight), so the day boundary landed at
+  // UTC midnight instead of local midnight — in Tokyo (UTC+9) the rokuyo
+  // flipped at 09:00, in Los Angeles at 16:00/17:00. Diffing two UTC-encoded
+  // calendar dates makes the cycle roll over at the viewer's own midnight,
+  // consistently on client and server (the server feeds wall-clock Dates).
+  const dayMs = 1000 * 60 * 60 * 24
+  const localDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((localDay - Date.UTC(2000, 0, 1)) / dayMs)
 
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  // Calculate Rokuyo index (6-day cycle), safe for pre-2000 dates
+  const rokuyoIndex = (((knownRokuyoIndex + daysDiff) % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +183,172 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Astrology v2 (2026-11-25) — timeZone-aware reading + Logs resonance
+// Ambient conditions only: no birth data, no natal chart.
+// ─────────────────────────────────────────────────────────────────────────
+
+export type AstrologyReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  auspicious: boolean
+}
+
+/**
+ * Build a Date whose LOCAL wall-clock fields (getHours/getDate/...) equal the
+ * wall clock of `timeZone` at `instant`. Uses Intl only (isomorphic, no
+ * dayjs plugin needed). Falls back to `instant` for a missing/invalid zone.
+ */
+export function toWallClockInTimeZone(instant: Date, timeZone?: string | null): Date {
+  if (!timeZone) return instant
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(instant)
+    const get = (type: string) => Number(parts.find(p => p.type === type)?.value ?? 0)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return instant
+  }
+}
+
+/**
+ * One full ambient reading. Calendar-bound values (zodiac hour, sign,
+ * rokuyo) follow the wall clock of `timeZone`; the moon phase follows the
+ * real instant (the Moon is the same everywhere at a given moment).
+ */
+export function getAstrologyReading(instant: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const wall = toWallClockInTimeZone(instant, timeZone)
+  const moon = getMoonPhase(instant)
+  const rokuyo = getRokuyo(wall)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    rokuyo,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    auspicious: rokuyo === 'Taian',
+  }
+}
+
+const POSITIVE_STATES = new Set([
+  'energized', 'calm', 'hopeful', 'fulfilled', 'grateful', 'content', 'peaceful', 'excited',
+])
+const NEGATIVE_STATES = new Set([
+  'tired', 'anxious', 'exhausted', 'restless', 'overwhelmed', 'uncertain',
+])
+
+type LogLike = {
+  event: string
+  context?: Record<string, any> | null
+  metadata?: Record<string, any> | null
+}
+
+export type AstrologyResonance = {
+  /** Log entries that carry an ambient astro snapshot */
+  sampleSize: number
+  /** Moon phase under which the user writes / logs most */
+  dominantMoonPhase: string | null
+  dominantMoonPhaseCount: number
+  /** Moon phase with the highest positive check-in ratio (min 3 check-ins) */
+  brightestMoonPhase: string | null
+  brightestRatio: number
+  /** Rokuyo day the user logs most */
+  dominantRokuyo: string | null
+  /** Today's reading lines up with the user's own history */
+  alignedToday: boolean
+  /** Short label for the dashboard, or null when there is too little data */
+  label: string | null
+}
+
+/** Minimum astro-tagged entries before a resonance line is shown */
+export const RESONANCE_MIN_SAMPLES = 5
+
+function topKey(counts: Map<string, number>): [string | null, number] {
+  let best: string | null = null
+  let n = 0
+  for (const [k, v] of Array.from(counts.entries())) {
+    if (v > n) { best = k; n = v }
+  }
+  return [best, n]
+}
+
+/**
+ * Personal resonance derived from the user's own Logs: every log entry since
+ * Astrology v1 snapshots the ambient reading into `context.astro*`. This
+ * correlates that history (plus emotional check-in valence) with today's
+ * reading. Pure function — safe on client and server.
+ */
+export function getAstrologyResonance(logs: LogLike[], today: AstrologyReading): AstrologyResonance {
+  const phaseCounts = new Map<string, number>()
+  const rokuyoCounts = new Map<string, number>()
+  const phaseMood = new Map<string, { pos: number; total: number }>()
+  let sampleSize = 0
+
+  for (const log of logs) {
+    const phase = log.context?.astroMoonPhase
+    const rokuyo = log.context?.astroRokuyo
+    if (!phase && !rokuyo) continue
+    sampleSize++
+    if (phase) phaseCounts.set(phase, (phaseCounts.get(phase) ?? 0) + 1)
+    if (rokuyo) rokuyoCounts.set(rokuyo, (rokuyoCounts.get(rokuyo) ?? 0) + 1)
+    if (phase && log.event === 'emotional_checkin') {
+      const state = String(log.metadata?.emotionalState ?? '')
+      if (POSITIVE_STATES.has(state) || NEGATIVE_STATES.has(state)) {
+        const m = phaseMood.get(phase) ?? { pos: 0, total: 0 }
+        m.total++
+        if (POSITIVE_STATES.has(state)) m.pos++
+        phaseMood.set(phase, m)
+      }
+    }
+  }
+
+  const [dominantMoonPhase, dominantMoonPhaseCount] = topKey(phaseCounts)
+  const [dominantRokuyo] = topKey(rokuyoCounts)
+
+  let brightestMoonPhase: string | null = null
+  let brightestRatio = 0
+  for (const [phase, m] of Array.from(phaseMood.entries())) {
+    if (m.total < 3) continue
+    const ratio = m.pos / m.total
+    if (ratio > brightestRatio) { brightestRatio = ratio; brightestMoonPhase = phase }
+  }
+
+  const alignedToday =
+    sampleSize >= RESONANCE_MIN_SAMPLES &&
+    (today.moonPhase === brightestMoonPhase ||
+      today.moonPhase === dominantMoonPhase ||
+      today.rokuyo === dominantRokuyo)
+
+  let label: string | null = null
+  if (sampleSize >= RESONANCE_MIN_SAMPLES) {
+    if (brightestMoonPhase && today.moonPhase === brightestMoonPhase) {
+      label = `Your brightest phase • ${Math.round(brightestRatio * 100)}% uplifted`
+    } else if (dominantMoonPhase && today.moonPhase === dominantMoonPhase) {
+      label = `Your most active phase • ${dominantMoonPhaseCount} logs`
+    } else if (dominantRokuyo && today.rokuyo === dominantRokuyo) {
+      label = `Your most active day • ${dominantRokuyo}`
+    } else if (dominantMoonPhase) {
+      label = `Your phase: ${dominantMoonPhase} • ${sampleSize} logs`
+    }
+  }
+
+  return {
+    sampleSize,
+    dominantMoonPhase,
+    dominantMoonPhaseCount,
+    brightestMoonPhase,
+    brightestRatio,
+    dominantRokuyo,
+    alignedToday,
+    label,
+  }
 }

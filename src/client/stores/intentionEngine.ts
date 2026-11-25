@@ -4880,7 +4880,14 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  resonance?: {
+    sampleSize: number
+    alignedToday: boolean
+    dominantMoonPhase: string | null
+    brightestMoonPhase: string | null
+    dominantRokuyo: string | null
+  }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4896,13 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // (v2 2026-11-25) personal resonance derived from the user's Logs —
+    // lets cosmic/system widgets key off "today matches your history"
+    resonanceSamples: resonance?.sampleSize ?? 0,
+    resonanceAligned: resonance?.alignedToday ?? false,
+    resonanceDominantPhase: resonance?.dominantMoonPhase ?? null,
+    resonanceBrightestPhase: resonance?.brightestMoonPhase ?? null,
+    resonanceDominantRokuyo: resonance?.dominantRokuyo ?? null,
   })
 }
 
