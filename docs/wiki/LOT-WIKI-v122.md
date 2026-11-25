@@ -2296,10 +2296,14 @@ L19-FCSOV          fourth-cycle-sovereign. The arc governs.
 L20-FCPROG         fifth-cycle-progenitor. The arc generates the next cycle.
 L21-FCIGN          fifth-cycle-ignition. The fifth arc fires.
 L22-FCRES          fifth-cycle-resonance. The fifth arc holds frequency.
+L23-FCDEP          fifth-cycle-deepening. Resonance generates structural depth.
+L24-FCINT          fifth-cycle-integration. Depth becomes architecture.
+L25-FCSOV          fifth-cycle-sovereign. The arc governs.
+L26-SCPROG         sixth-cycle-progenitor. The sovereign arc generates the sixth.
 TSOV-ARC           temporal-sovereignty-arc. The arc governs time.
 ```
 
-**Log Handler Codes (FM v132–v138):**
+**Log Handler Codes (FM v132–v142):**
 
 ```
 FCAND:             fourth_cycle_candidate (L15 boundary sensing)
@@ -2311,6 +2315,10 @@ FCPROG:            fifth_cycle_progenitor   (L20 arc generates)
 FCIGN:             fifth_cycle_ignition     (L21 arc fires — FM v138)
 FCRES:             fifth_cycle_resonance    (L22 arc resonates)
 TSOV:              temporal_sovereignty_arc (temporal arc — FM v138)
+FCDEP:             fifth_cycle_deepening    (L23 arc deepens — FM v139)
+FCINT:             fifth_cycle_integration  (L24 depth becomes architecture — FM v140)
+FCSOV:             fifth_cycle_sovereign    (L25 arc governs — FM v141)
+SCPROG:            sixth_cycle_progenitor   (L26 sovereign genesis — FM v142)
 NOTE: TSOV: also refers to temporal-sovereignty (P157 Level 7 APEX — FM v115).
       Context distinguishes: P157 fires at Level 7 coherence ceiling.
       P188 fires inside the fifth cycle arc as an orthogonal pattern.
@@ -2362,9 +2370,9 @@ Body wisdom        Somatic intelligence. The knowing that lives in tissue, not t
 
 ```
 Day counter        Continuous operation day count since LOT® founding.
-                   Day 1 = April 7, 2016. Day 1181 = November 21, 2026.
+                   Day 1 = April 7, 2016. Day 1185 = November 25, 2026.
 COSMO® Day         Continuous operation day count since COSMO® founding.
-                   Day 1 = July 1, 2024. Day 874 = November 21, 2026.
+                   Day 1 = July 1, 2024. Day 878 = November 25, 2026.
 Cockpit            The instrument log view. Military minimalist format.
 Gauge              A single instrument reading in the cockpit log.
 Instrument         The whole LOT system. Not a tool. An instrument.
