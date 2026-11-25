@@ -32,6 +32,7 @@ import * as fp from '#shared/utils/fp'
 import dayjs from '#client/utils/dayjs'
 import { cn } from '#client/utils'
 import { useDocumentTitle } from '#client/utils/hooks'
+import { Qi46PersonLine } from '#client/components/Qi46PersonLine'
 
 export const AdminUser = () => {
   const [tagsEditorIsOn, setTagsEditorIsOn] = React.useState(false)
@@ -218,6 +219,12 @@ export const AdminUser = () => {
           {!!user.lastSeenAt && (
             <div className="mt-32">
               Last seen {dayjs(user.lastSeenAt).fromNow()}
+            </div>
+          )}
+
+          {isCurrentUserAdmin && (
+            <div className="mt-32">
+              <Qi46PersonLine userId={user.id} />
             </div>
           )}
 

@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.11 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21 · F12 language coverage prep 2026-11-22 · Admin read-out panel 2026-11-23
+### Engine Specification v0.12 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21 · F12 language coverage prep 2026-11-22 · Admin read-out panel 2026-11-23 · Per-person signal line + Phase 0 corpus fold-in 2026-11-25
 
 ---
 
@@ -20,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           7 of N  — Beta read-out prepped · F4 ideation hardening · F12 language coverage (safety path) · admin read-out panel
+NODE           7 of N  — Beta read-out prepped · F4 ideation hardening · F12 language coverage (safety path) · admin read-out panel · per-person signal line
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.10.0-f12) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts · shared/utils/qi46-readout-view.ts · client Qi46ReadoutPanel.tsx
+CODE           src/server/utils/qi46.ts   (v0.10.0-f12) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts · shared/utils/qi46-readout-view.ts · shared/utils/qi46-person-view.ts · client Qi46ReadoutPanel.tsx · Qi46PersonLine.tsx · scripts/qi46/assemble-corpus.mjs
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 81/81
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 88/88
 REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
@@ -406,6 +406,35 @@ A read-only card on the admin Users page (`/us`), shown to admins only. It calls
 - Every label shown must match `^[a-z0-9.\-:]{1,32}$`. Anything else is shown as `other`, so a bad row cannot put free text on the screen.
 - No user ids are shown. No new table, write, migration or flag.
 
+## 3i. PER-PERSON SIGNAL LINE (assembled 2026-11-25)
+
+> *Show what the engine heard. Never show what the person said.*
+
+A read-only block, `QI·46:`, on the admin user page (`/us/:id`), shown to admins only. It calls the existing preview `GET /admin-api/users/:id/qi46`. There is no new route.
+
+```
+QI·46:
+Consent · 18 signals · 30% confidence · risk moderate · lead beingThere
+Signals: detector:low · breadth:6/7
+```
+
+| State | Line |
+|---|---|
+| No opt-in | `No consent · nothing read` plus a one-line note |
+| Opt-in, nothing logged | `Consent · 0 signals` plus a note |
+| Opt-in with logs | count · confidence · risk level · lead register, then risk signal labels |
+
+### Guarantees
+
+- The view model `qi46PersonView` (`src/shared/utils/qi46-person-view.ts`) is pure, with no imports. The smoke test runs the code the block renders.
+- It never reads `systemPrompt`, `dominantNeeds`, `values` or any log text.
+- Every label must match `^[a-z0-9.\-:/]{1,32}$`, and risk must be one of the four levels. Anything else shows as `other` / `unknown`.
+- At most 8 signal labels, de-duplicated. No table, write, migration or flag.
+
+### Phase 0 corpus (folded in)
+
+The 2026-11-24 run branched from master and missed this chain. Its work (`scripts/qi46/assemble-corpus.mjs`, `docs/assembly/qi46/`) is now cherry-picked here. Checkpoint 0 is still **HOLD**: 1,054 of 10,000 pairs, and 31 Medical/PTSD pairs flagged for Vadik.
+
 ---
 
 ## 4. NEXT NODES (self-assembly queue)
@@ -424,11 +453,13 @@ A read-only card on the admin Users page (`/us`), shown to admins only. It calls
 | ~~F12 prep~~ | ~~Non-English text → standard path~~ | **ASSEMBLED 2026-11-22** as label + surface gate 5. Level unchanged |
 | **F12** | Native-speaker ideation list (Russian first) | Vadik & Kuzya write and review the phrases. No machine translation |
 | ~~Panel~~ | ~~Admin read-out card + switch-on gates~~ | **ASSEMBLED 2026-11-23** on `/us`, admin only, read-only |
+| ~~Signal line~~ | ~~Per-person signal labels on `/us/:id`~~ | **ASSEMBLED 2026-11-25**, admin only, read-only, labels only |
+| **0.2** | Corpus lexicon v1 (drop `build`, add emotion words) | No gate, repo docs only |
 | **8** | Optional skip-code baseline (calibrated vs. standard) | Vadik decides (adds one write per Memory request) |
 
 ---
 
-*QI·46 Engine Specification — v0.11 · Admin read-out panel*
+*QI·46 Engine Specification — v0.12 · Per-person signal line*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026 · F12 prep assembled: November 22, 2026 · Read-out panel assembled: November 23, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026 · F12 prep assembled: November 22, 2026 · Read-out panel assembled: November 23, 2026 · Signal line assembled: November 25, 2026*

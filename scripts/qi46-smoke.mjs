@@ -197,3 +197,22 @@ const checksP={
 let passP=0; for (const [k,ok] of Object.entries(checksP)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passP++ }
 const totalP=totalF12+Object.keys(checksP).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12+passP}/${totalP}`); if (passP!==Object.keys(checksP).length) process.exit(1)
+
+// ─── Per-person signal line on /us/:id (labels only) ───────────────────────
+import { qi46PersonView } from '../dist/server/shared/utils/qi46-person-view.js'
+const pr=(logs,consent)=>({userId:'u',consent,...assembleQi46(logs,consent)})
+const pHeavy=qi46PersonView(pr(heavy,true)), pIde=qi46PersonView(pr(ideation,true))
+const pNo=qi46PersonView(pr(heavy,false)), pEmpty=qi46PersonView(pr([],true))
+const pBad=qi46PersonView({consent:true,vector:{signalCount:3,confidence:0.5,riskLevel:'I feel worthless',riskSignals:['ideation','I feel worthless and alone']},calibration:{lead:'I feel worthless'},systemPrompt:secret})
+const checksL={
+  'Line no consent → nothing read':/No consent/.test(pNo.line)&&pNo.signals.length===0,
+  'Line consent, 0 signals → note':/0 signals/.test(pEmpty.line)&&!!pEmpty.note,
+  'Line heavy shows risk + lead beingThere':/risk (moderate|elevated)/.test(pHeavy.line)&&/lead beingThere/.test(pHeavy.line),
+  'Line heavy shows breadth label':pHeavy.signals.some(s=>/^breadth:\d\/7$/.test(s)),
+  'Line ideation → ideation label + elevated':pIde.signals.includes('ideation')&&/risk elevated/.test(pIde.line),
+  'Line never renders system prompt or log text':!JSON.stringify([pHeavy,pIde,pBad]).includes(secret)&&!JSON.stringify(pHeavy).includes('Open in the register'),
+  'Line masks free-text risk/lead/signal':!JSON.stringify(pBad).includes('worthless')&&/risk other · lead unknown/.test(pBad.line),
+}
+let passL=0; for (const [k,ok] of Object.entries(checksL)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passL++ }
+const totalL=totalP+Object.keys(checksL).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12+passP+passL}/${totalL}`); if (passL!==Object.keys(checksL).length) process.exit(1)
