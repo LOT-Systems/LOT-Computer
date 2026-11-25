@@ -73,6 +73,9 @@ export type UserProfile = {
   timeChime?: boolean;
   memoryEngine?: 'ai' | 'standard';
   isAdmin?: boolean;
+  // Present on /api/me responses only
+  joinedAt?: string | Date | null;
+  metadata?: Record<string, any>;
 };
 
 export type User = {

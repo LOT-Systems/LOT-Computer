@@ -45,7 +45,6 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -77,11 +76,20 @@ import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
 import { BenchmarkWidget } from './BenchmarkWidget'
-import { ArchitectWidget } from './ArchitectWidget'
 import { IntegrityWidget } from './IntegrityWidget'
 import { recomputeAssembly } from '#client/stores/selfAssembly'
 import { $layoutDensity } from '#client/stores/evolution'
 import { useInViewport } from '#client/hooks/useInViewport'
+
+// Code-split: SystemProgressWidget carries ~177 KB of assembly changelog text and
+// ArchitectWidget imports from it. Both sit below the fold inside LazyMount, so
+// they load as a separate chunk only when scrolled near — off the initial app.js.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then((m) => ({ default: m.SystemProgressWidget }))
+)
+const ArchitectWidget = React.lazy(() =>
+  import('./ArchitectWidget').then((m) => ({ default: m.ArchitectWidget }))
+)
 
 // Defers mount of children until element first enters the viewport.
 // Once mounted, stays mounted — no unmount on scroll away.
@@ -393,14 +401,6 @@ export const System = React.memo(function SystemInner() {
     return { next: entries[0] ?? null, count: entries.length }
   }, [logs])
 
-  // Check for recipe and planner suggestions when component mounts
-  React.useEffect(() => {
-    checkRecipeWidget()
-    checkPlannerWidget()
-  }, [])
-
-  // Sound is now managed globally in app.tsx via useSound hook
-
   // Paid account check — R&D and Usership get the full condensed pro layout
   const isPaidAccount = React.useMemo(() => {
     if (!me?.tags) return false
@@ -409,6 +409,53 @@ export const System = React.memo(function SystemInner() {
       tag.toLowerCase() === UserTag.RND.toLowerCase()
     )
   }, [me])
+
+  // Intentions visibility — the last-shown stamp happens in an effect, never during render.
+  const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
+  // Base visibility (existing intention OR 2–3 day cooldown passed) is rolled
+  // once per mount via lazy useState, so the last-shown stamp below cannot hide
+  // the widget on the next re-render.
+  const [intentionsDue] = React.useState(() => {
+    try {
+      const hasIntention = !!localStorage.getItem('current-intention')
+      const lastShown = localStorage.getItem('intentions-last-shown')
+      const twoDaysMs = 2 * 24 * 60 * 60 * 1000
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+      // Random cooldown between 2-3 days
+      const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
+      const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
+      return hasIntention || cooldownPassed
+    } catch {
+      return false
+    }
+  })
+  const showIntentions = intentionsDue || intentionSuggestsIntentions
+  // Reason is written before the widget renders (it reads it inline).
+  // Idempotent — unlike the last-shown stamp, rewriting it is harmless.
+  React.useMemo(() => {
+    try {
+      if (intentionSuggestsIntentions && optimalWidget?.reason) {
+        localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
+      } else {
+        localStorage.removeItem('intentions-quantum-reason')
+      }
+    } catch { /* storage unavailable */ }
+  }, [intentionSuggestsIntentions, optimalWidget?.reason])
+  React.useEffect(() => {
+    if (!showIntentions || !isPaidAccount) return
+    try {
+      localStorage.setItem('intentions-last-shown', Date.now().toString())
+    } catch { /* storage unavailable */ }
+  }, [showIntentions, isPaidAccount])
+
+  // Check for recipe and planner suggestions when component mounts
+  React.useEffect(() => {
+    checkRecipeWidget()
+    checkPlannerWidget()
+  }, [])
+
+  // Sound is now managed globally in app.tsx via useSound hook
+
 
   // Simple, clean layout for non-paid accounts — no AI, just essentials
   if (!isPaidAccount) {
@@ -621,7 +668,7 @@ export const System = React.memo(function SystemInner() {
             <Block label="Humidity:">
               <span
                 className={cn(
-                  !isMirrorOn && !isCustomThemeEnabled && weather?.humidity >= 50 && 'text-blue-500'
+                  !isMirrorOn && !isCustomThemeEnabled && (weather?.humidity ?? 0) >= 50 && 'text-blue-500'
                 )}
               >
                 {weather?.humidity}%
@@ -877,44 +924,12 @@ export const System = React.memo(function SystemInner() {
         })()}
       </WidgetErrorBoundary>
 
-      {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern */}
+      {/* Intentions - Show if user has intention OR when intention engine detects seeking-direction pattern.
+          Visibility is decided once per mount/engine-suggestion (see showIntentions) — not
+          re-rolled on every render, which previously hid the widget on the next unrelated
+          re-render (users online tick, weather) right after it stamped intentions-last-shown. */}
       <WidgetErrorBoundary name="Intentions">
-        {(() => {
-          const hasIntention = !!localStorage.getItem('current-intention')
-
-          // Check cooldown (2-3 days since last shown)
-          const lastShown = localStorage.getItem('intentions-last-shown')
-          const twoDaysMs = 2 * 24 * 60 * 60 * 1000
-          const threeDaysMs = 3 * 24 * 60 * 60 * 1000
-
-          // Random cooldown between 2-3 days
-          const cooldownPeriod = twoDaysMs + Math.random() * (threeDaysMs - twoDaysMs)
-          const cooldownPassed = !lastShown || (Date.now() - parseInt(lastShown)) >= cooldownPeriod
-
-          const intentionSuggestsIntentions = optimalWidget?.widget === 'intentions'
-
-          // Show if:
-          // 1. User has an existing intention to display, OR
-          // 2. Intention engine detects seeking-direction or morning-clarity patterns, OR
-          // 3. Cooldown passed (fallback for periodic prompting)
-          if (hasIntention || intentionSuggestsIntentions || cooldownPassed) {
-            // Update last shown time
-            if (!lastShown || cooldownPassed || intentionSuggestsIntentions) {
-              localStorage.setItem('intentions-last-shown', Date.now().toString())
-            }
-
-            // Store quantum reasoning for widget to display
-            if (intentionSuggestsIntentions && optimalWidget?.reason) {
-              localStorage.setItem('intentions-quantum-reason', optimalWidget.reason)
-            } else {
-              localStorage.removeItem('intentions-quantum-reason')
-            }
-
-            return <div><IntentionsWidget /></div>
-          }
-
-          return null
-        })()}
+        {showIntentions && <div><IntentionsWidget /></div>}
       </WidgetErrorBoundary>
 
       {/* Subscribe - Show occasionally to engaged users without subscription */}
@@ -992,12 +1007,14 @@ export const System = React.memo(function SystemInner() {
 
       {/* Investor stack — Visible when Investment switch is On in Settings */}
       <WidgetErrorBoundary name="Investor">
-        <div className={cn('flex flex-col', density.stackGap)}>
-          <AngelInvestorWidget />
-          <CorporatePlanWidget />
-          <DemoDayWidget />
-          <FourDimensionalUI />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.stackGap)}>
+            <AngelInvestorWidget />
+            <CorporatePlanWidget />
+            <DemoDayWidget />
+            <FourDimensionalUI />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Quantum Engine Connect Widgets — lazy-mounted: subscriptions only start when widget enters viewport */}
@@ -1009,56 +1026,72 @@ export const System = React.memo(function SystemInner() {
 
       {/* CQGS Biofield Engine Widgets */}
       <WidgetErrorBoundary name="Biofield Engine">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <QuantumStateWidget />
-          <PatternRecognitionWidget />
-          <AIFeedbackWidget />
-          <SignalStreamWidget />
-          <IntegrityWidget />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <QuantumStateWidget />
+            <PatternRecognitionWidget />
+            <AIFeedbackWidget />
+            <SignalStreamWidget />
+            <IntegrityWidget />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* CQGS Dashboard stack */}
       <WidgetErrorBoundary name="Dashboard">
-        <div className={cn('flex flex-col', density.stackGap)}>
-          {/* CQGS Dashboard - Bioethics health, performance, version */}
-          <UserMetricsWidget />
+        <LazyMount>
+          <div className={cn('flex flex-col', density.stackGap)}>
+            {/* CQGS Dashboard - Bioethics health, performance, version */}
+            <UserMetricsWidget />
 
-          {/* Correlated Indexes - Four-dimensional weekly tracking */}
-          <CorrelatedIndexesWidget />
+            {/* Correlated Indexes - Four-dimensional weekly tracking */}
+            <CorrelatedIndexesWidget />
 
-          {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+            {/* System Progress - Deployment info with feedback */}
+            <React.Suspense fallback={null}>
+              <SystemProgressWidget />
+            </React.Suspense>
 
-          {/* System Pulse - Real-time system metrics */}
-          <SystemPulseWidget />
-        </div>
+            {/* System Pulse - Real-time system metrics */}
+            <SystemPulseWidget />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Architect — executive self-assembly telemetry, paid users only */}
       <WidgetErrorBoundary name="Architect">
-        <ArchitectWidget />
+        <LazyMount>
+          <React.Suspense fallback={null}>
+            <ArchitectWidget />
+          </React.Suspense>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Stats stack */}
       <WidgetErrorBoundary name="Stats">
-        <div className={cn('flex flex-col', density.sectionGap)}>
-          <IntentionPatterns />
-          <CollectiveConsciousness />
-          <WellnessPulse />
-          <MemoryEngineStats />
-          <GrowthMilestones />
-          <BadgeUnlockFeed />
-        </div>
+        <LazyMount>
+          <div className={cn('flex flex-col', density.sectionGap)}>
+            <IntentionPatterns />
+            <CollectiveConsciousness />
+            <WellnessPulse />
+            <MemoryEngineStats />
+            <GrowthMilestones />
+            <BadgeUnlockFeed />
+          </div>
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* Calendar — Personal date planner */}
       <WidgetErrorBoundary name="Calendar">
-        <CalendarWidget />
+        <LazyMount>
+          <CalendarWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       <WidgetErrorBoundary name="Benchmark">
-        <BenchmarkWidget />
+        <LazyMount>
+          <BenchmarkWidget />
+        </LazyMount>
       </WidgetErrorBoundary>
 
       {/* The original. Imitation is the sincerest form of flattery, but the quantum field knows. */}

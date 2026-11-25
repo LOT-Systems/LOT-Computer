@@ -418,7 +418,10 @@ export default async (fastify: FastifyInstance) => {
       fastify.models.User.countOnline().catch(() => 0),
     ])
     req.user.deferredPing()
-    return { ...profile, isAdmin, metadata, usersTotal, usersOnline }
+    // joinedAt feeds the month-to-month reveal (MonthlyPulseWidget); without it
+    // the client month counter is always 0 and the pulse never shows.
+    const joinedAt = req.user.joinedAt || null
+    return { ...profile, isAdmin, metadata, joinedAt, usersTotal, usersOnline }
   })
 
   // Memory prompt status - debugging endpoint

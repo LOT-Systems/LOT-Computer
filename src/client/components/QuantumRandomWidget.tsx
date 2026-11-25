@@ -9,6 +9,15 @@
 import React from 'react'
 import { Block } from '#client/components/ui'
 import { recordSignal } from '#client/stores/intentionEngine'
+import { isRouteActive } from '#client/stores/router'
+
+// The number re-rolls on its own every 1–72 s (×2 hooks). Recording a QIE
+// signal on every automatic roll emitted ~300 'calculator' signals/hour and
+// flushed the 1000-signal buffer (moods, memories, journal) within ~3 h of an
+// open tab. Ambient ticks are not user intent: record at most one presence
+// signal per 30 min, and only while the System tab is actually being viewed.
+const QR_SIGNAL_COOLDOWN_MS = 30 * 60 * 1000
+let lastQuantumRandomSignal = 0
 
 /**
  * QuantumRandomWidget - Real-time quantum-random number generator.
@@ -37,13 +46,19 @@ function useQuantumNumber() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      // Pause off-tab: no re-renders while hidden or on another in-app tab.
+      if (document.hidden || !isRouteActive('system')) return
       setRemaining((prev) => {
         if (prev <= 1) {
           const next = quantumRandom(0, 99)
           const nextCountdown = pickCountdown()
           setNumber(next)
           setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          const now = Date.now()
+          if (now - lastQuantumRandomSignal >= QR_SIGNAL_COOLDOWN_MS) {
+            lastQuantumRandomSignal = now
+            recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+          }
           return nextCountdown
         }
         return prev - 1
@@ -63,6 +78,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (document.hidden || !isRouteActive('system')) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)
