@@ -2079,11 +2079,64 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const lead = log.metadata?.lead as number | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{entryType || 'ENTRY'}</span>
+                  {time && <span className="tabular-nums">{time}</span>}
+                </div>
+                {text && <div className="mt-8">{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time && lead !== undefined ? ` · ALERT ${lead ? `T-${lead}m` : 'T-0'}` : ''}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_status') {
+          const status = log.metadata?.status as string | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const label = status === 'done' ? 'DONE' : status === 'cancelled' ? 'CANCELLED' : 'RESTORED'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-STS:" blockView>
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{label}</span>
+                  <span className="opacity-40">{entryType || 'ENTRY'}</span>
+                </div>
+                {text && <div className={cn('mt-8', status !== 'active' && 'line-through opacity-60')}>{text}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time}` : ''}</div>}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert') {
+          const phase = log.metadata?.phase as string | undefined
+          const offset = log.metadata?.offset as number | undefined
+          const entryType = log.metadata?.entryType as string | undefined
+          const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
+          const phaseText = phase === 'lead' ? 'STANDBY' : phase === 'zero' ? 'EXECUTE' : 'BRIEF'
+          const offsetText = phase === 'day' ? 'DAY-OF'
+            : offset === undefined || offset === 0 ? 'T-0'
+            : offset < 0 ? `T${offset}m` : `T+${offset}m`
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label="CAL-ALERT:" blockView>
+                <div className="flex justify-between items-baseline uppercase tracking-widest">
+                  <span>{phaseText}</span>
+                  <span className="tabular-nums">{offsetText}</span>
+                </div>
+                {text && <div className="mt-8">{entryType ? `${entryType.toUpperCase()} · ` : ''}{text}</div>}
+                {date && <div className="opacity-40 mt-8 tabular-nums">{date}{time ? ` ${time} LCL` : ''}</div>}
               </Block>
             </LogContainer>
           )

@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1586,6 +1586,30 @@ export default async (fastify: FastifyInstance) => {
     }
   )
 
+  // ============================================================================
+  // CALENDAR — dedicated feed, independent of the 500-row /logs window so that
+  // entries scheduled long ago for a future date never fall out of the widget.
+  // Entries: calendar_entry · status changes: calendar_status · fired alerts: calendar_alert
+  // ============================================================================
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    const logs = await fastify.models.Log.findAll({
+      where: {
+        userId: req.user.id,
+        event: { [Op.in]: ['calendar_entry', 'calendar_status', 'calendar_alert'] },
+      },
+      attributes: ['id', 'event', 'text', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+    return logs.map((l: any) => ({
+      id: l.id,
+      event: l.event,
+      text: l.text,
+      metadata: l.metadata || {},
+      createdAt: l.createdAt,
+    }))
+  })
+
   fastify.put(
     '/logs/:id',
     async (
@@ -1597,7 +1621,7 @@ export default async (fastify: FastifyInstance) => {
     ) => {
       const text = (req.body.text || '').trim().slice(0, MAX_LOG_TEXT_LENGTH)
       const log = await fastify.models.Log.findByPk(req.params.id)
-      if (!log) return reply.throw.notFound()
+      if (!log || log.userId !== req.user.id) return reply.throw.notFound()
       if (log.event !== 'note') return log
 
       // If user backspaced all content, delete the log instead of saving empty text

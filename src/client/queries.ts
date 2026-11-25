@@ -912,3 +912,17 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+export type CalendarLogRecord = {
+  id: string
+  event: 'calendar_entry' | 'calendar_status' | 'calendar_alert'
+  text: string | null
+  metadata: Record<string, any>
+  createdAt: string
+}
+
+export const useCalendarLogs = createQuery<CalendarLogRecord[]>('/api/calendar', {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000, // pick up entries/alerts from other devices
+  staleTime: 30 * 1000,
+})
