@@ -3,6 +3,8 @@
  *
  * Spec:  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R09.md §02-§03
  *        docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R10.md §02 (contract v0.6-DRAFT, decideV06Draft)
+ *        docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R11.md §02 (v0.6-draft calendar rule, F85)
+ * Firmware twin: firmware/cubiq/cubiq_contract.c (C99, R11 F84)
  * Ports: scripts/cubiq-r07-contract-check.py  decide()  (contract v0.3)
  *        scripts/cubiq-r08-fsm-sim.py          decide()  (contract v0.4: home-pad credit)
  *
@@ -100,12 +102,52 @@ function parseTs(s: string): number {
   return ISO_UTC.test(s) ? Date.parse(s) : NaN
 }
 
+// Contract v0.6-draft calendar rule (R11 F85). The v0.5 profile fixes the SYNTAX only; the
+// calendar was left to each library, and they disagree INSIDE the profile:
+//   Date.parse (V8) accepts 2026-02-29, 2026-04-31 and T24:00 (it rolls them over), and keeps
+//   milliseconds only; Python's fromisoformat accepts an offset of +05:60 or +05:99.
+// v0.6-draft therefore writes the calendar into the contract and compares in integer
+// MICROSECONDS (Number is exact to 2^53 us, i.e. past the year 2255).
+const ISO_PARTS = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,6}))?)?(?:Z|([+-])(\d{2}):(\d{2}))$/
+
+function daysFromCivil(y: number, m: number, d: number): number {
+  y -= m <= 2 ? 1 : 0
+  const era = Math.floor(y / 400)
+  const yoe = y - era * 400
+  const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + d - 1
+  const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy
+  return era * 146097 + doe - 719468
+}
+
+/** Strict v0.6-draft timestamp → integer microseconds since the epoch, or NaN (R11 F85). */
+export function parseTsMicros(s: unknown): number {
+  if (typeof s !== 'string') return NaN
+  const m = ISO_PARTS.exec(s)
+  if (!m) return NaN
+  const [Y, Mo, D, h, mi] = [m[1], m[2], m[3], m[4], m[5]].map(Number)
+  const sec = m[6] ? Number(m[6]) : 0
+  const us = m[7] ? Number(m[7].padEnd(6, '0')) : 0
+  const leap = (Y % 4 === 0 && Y % 100 !== 0) || Y % 400 === 0
+  const dim = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  if (Y < 1 || Mo < 1 || Mo > 12 || D < 1 || D > dim[Mo - 1]) return NaN
+  if (h > 23 || mi > 59 || sec > 59) return NaN
+  let off = 0
+  if (m[8]) {
+    const oh = Number(m[9])
+    const om = Number(m[10])
+    if (oh > 23 || om > 59) return NaN
+    off = (m[8] === '-' ? -1 : 1) * (oh * 60 + om)
+  }
+  const t = daysFromCivil(Y, Mo, D) * 86400 + h * 3600 + mi * 60 + sec - off * 60
+  return t * 1e6 + us
+}
+
 function isInt(x: unknown): x is number {
   return typeof x === 'number' && Number.isInteger(x)
 }
 
 /** Returns a rejection reason, or null when the message is well formed. */
-export function validate(sig: Record<string, unknown>): string | null {
+export function validate(sig: Record<string, unknown>, strictCalendar = false): string | null {
   const required: [string, 'int' | 'str'][] = [
     ['v', 'int'],
     ['id', 'str'],
@@ -128,7 +170,7 @@ export function validate(sig: Record<string, unknown>): string | null {
   const hint = sig.ceiling_hint
   if (!(hint === undefined || hint === null || hint === 'call_live')) return 'bad_ceiling_hint'
   if (s.v === 1 && Object.prototype.hasOwnProperty.call(sig, 'ceiling_hint')) return 'hint_requires_v2'
-  if (Number.isNaN(parseTs(s.not_before))) return 'bad_not_before'
+  if (Number.isNaN(strictCalendar ? parseTsMicros(s.not_before) : parseTs(s.not_before))) return 'bad_not_before'
   return null
 }
 
@@ -149,12 +191,18 @@ function decideCore(
   freeAhead: Record<string, number>,
   v06 = false,
 ): Decision {
-  const err = validate(sig)
+  const err = validate(sig, v06)
   if (err) return ['rejected', 'none', err]
   const s = sig as unknown as CubiqSignal
-  const now = parseTs(st.now)
-  const nb = parseTs(s.not_before)
-  if (now > nb + s.ttl_s * 1000) return ['expired', 'none', null]
+  // v0.5: Date.parse milliseconds. v0.6-draft: strict calendar, integer microseconds (R11 F85)
+  const unit = v06 ? 1e6 : 1000
+  const now = v06 ? parseTsMicros(st.now) : parseTs(st.now)
+  const nb = v06 ? parseTsMicros(s.not_before) : parseTs(s.not_before)
+  // R11 F86: an unparseable clock is NaN, every comparison with NaN is false, and v0.5 then
+  // falls through to 'performed' whatever the time. The clock is the caller's own data, so
+  // v0.6-draft fails loudly (Python raises; the C port returns a state fault).
+  if (v06 && Number.isNaN(now)) throw new RangeError(`cubiq: bad device clock ${String(st.now)}`)
+  if (now > nb + s.ttl_s * unit) return ['expired', 'none', null]
   if (now < nb) return ['held', 'none', null]
   if (st.fall_recent) return ['safe_hold', 'none', 'G8_fall_recent']
   if (st.machine_vibration) return ['deferred', 'none', 'G9_machine_vibration']
@@ -210,8 +258,9 @@ export function decide(sig: Record<string, unknown>, st: CubiqDeviceState): Deci
 }
 
 /**
- * Contract v0.6-DRAFT (R10 §02). NOT ADOPTED: edge_seen thresholds wait for bench item B31.
+ * Contract v0.6-DRAFT (R10 §02, R11 §02). NOT ADOPTED: edge_seen thresholds wait for bench item B31.
  *   · pad credit needs model_ok, home_spot AND edge_seen, each the literal `true`
+ *   · timestamps: the R11 calendar rule and microsecond comparison (parseTsMicros)
  *   · surface_motion: 'gentle' caps jump at leap; anything but still/gentle defers (G11)
  * decide() above stays the v0.5 behaviour until S-2 adopts v0.6.
  */

@@ -5,7 +5,7 @@ TITLE:    LOT® Quantum Cube (CUBIQ™) — v.0 Actuated Haptic Notification Dev
 CLASS:    RESTRICTED // S-2 EYES
 S-2:      VADIK MARMELADOV
 DATE:     2026-07-28
-VERSION:  0.1 — DEVELOPMENT START (see R02-R10 reports for amendments to §03/§06)
+VERSION:  0.1 — DEVELOPMENT START (see R02-R11 reports for amendments to §03/§06)
 STATUS:   v.0 — NOTIFICATION-GRADE ACTUATION (PRE-HARDWARE, DESIGN LOCK PENDING)
 ================================================================================
 
@@ -467,6 +467,24 @@ entry — never editing or removing a prior one.
   plus per-class TTLs need no network to stay correct, and that a pad's
   claim must be checked against what the cube can see. Full narrative:
   LOT-CUBIQ-QUANTUM-CUBE-v0-R10.md, Section 10.
+
+  USE CASE 11 — THE GARDEN STUDIO                           2026-11-25
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Usership tier, 51, an illustrator working from an
+  unheated-overnight garden studio that is 3 °C at a January dawn. The
+  cube charges on its pad at reduced current in the cold (R11 F90) and
+  HOPs the morning Memory question by the brush jar. An epic achievement
+  LEAPs 40 mm with a 6.9× tip-over margin. Carried into a 23 °C kitchen
+  at dusk, the cold cube fogs its ToF window for about half an hour. That
+  is G7, so a cohort ping arrives as a SETTLE, and the uplink says
+  "window fogged" to the operator only. After a nine-day trip the cell
+  is flat and the clock is lost. The firmware decides nothing until the
+  phone sets the time (R11 F86). Then the TTLs expire the badges and
+  pings, and one NUDGE remains. Proves that temperature is an ordinary
+  operating condition, that fog is covered by an existing guard, that a
+  device without a readable clock must not act, and that coming home
+  should be quiet. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R11.md,
+  Section 09.
 
 --------------------------------------------------------------------------------
 08 // BRAND

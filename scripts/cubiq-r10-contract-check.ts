@@ -23,7 +23,15 @@ type Fn = (s: Record<string, unknown>, st: CubiqDeviceState) => Decision
 if (args[0] === '--cases') {
   const cases = JSON.parse(readFileSync(args[1], 'utf8')) as { signal: Record<string, unknown>; state: CubiqDeviceState }[]
   const fn: Fn = args[2] === 'v05' ? decide : decideV06Draft
-  process.stdout.write(JSON.stringify(cases.map((c) => fn(c.signal, c.state))))
+  // R11: a throw (v0.6-draft bad device clock, F86) is reported as ["crash"], like the Python harness
+  const run = (c: { signal: Record<string, unknown>; state: CubiqDeviceState }) => {
+    try {
+      return fn(c.signal, c.state)
+    } catch {
+      return ['crash']
+    }
+  }
+  process.stdout.write(JSON.stringify(cases.map(run)))
 } else {
   process.exitCode = runChecks()
 }
