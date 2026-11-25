@@ -196,6 +196,10 @@ export type DirectMessage = {
   senderId: string;
   receiverId: string;
   message: string;
+  // LOT® Email — 'dm' (thread reply) | 'email' (composed in Log via /email)
+  kind: 'dm' | 'email';
+  subject: string | null;
+  readAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };

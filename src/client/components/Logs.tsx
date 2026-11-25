@@ -29,6 +29,8 @@ import {
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
 import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { parseEmailCommand, sentStamp } from '#client/utils/lotEmail'
+import { EmailCompose } from '#client/components/EmailCompose'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
@@ -3764,6 +3766,21 @@ const NoteEditor = ({
       setIsSaved(true)
     },
   })
+  // LOT® Email — `/email to Hitomi` in the primary Log opens a compose block
+  const emailDraft = React.useMemo(
+    () => (primary ? parseEmailCommand(value) : null),
+    [value, primary]
+  )
+  const onEmailSent = React.useCallback((recipientName: string) => {
+    const current = valueRef.current
+    const draft = parseEmailCommand(current)
+    if (!draft) return
+    const updated = current.replace(draft.commandLine, sentStamp(recipientName))
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+    setIsSaved(true)
+  }, [])
   const debounceTime = 7000  // 7s for all logs
   const debouncedValue = useDebounce(value, debounceTime)
 
@@ -3793,6 +3810,11 @@ const NoteEditor = ({
   // Timeline: finish typing > wait 7s > save > opacity fades to 20% > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
+    // Stale debounce guard: if the live value has moved past the debounced
+    // snapshot (an immediate save — Ctrl+Enter, /prayer, /story, /email —
+    // landed while the 7s timer was pending), don't write the old snapshot
+    // back over it. The debounce re-fires with the live value.
+    if (debouncedValue !== valueRef.current) return
 
     // Save the log
     onChange(debouncedValue)
@@ -4139,6 +4161,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to [name]   Compose LOT® Email — delivered to Sync',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4274,6 +4297,7 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {emailDraft && <EmailCompose draft={emailDraft} onSent={onEmailSent} />}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>

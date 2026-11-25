@@ -123,7 +123,8 @@ export const CohortConnectWidget: React.FC = () => {
       connectionReadiness,
       hour: new Date().getHours()
     })
-    stores.goTo('sync')
+    // LOT® Email — cohort introductions go private: open the mail thread
+    stores.goTo('dm', { userId })
   }
 
   const handleToggleExpand = (userId: string) => {
@@ -267,7 +268,7 @@ export const CohortConnectWidget: React.FC = () => {
                           handleSendMessage(match.user.id, match.similarity)
                         }}
                       >
-                        Send message
+                        Email
                       </Button>
                     </div>
                   </div>
@@ -288,6 +289,10 @@ export const CohortConnectWidget: React.FC = () => {
             </button>
           </div>
         )}
+
+        <div className="mt-16 opacity-30">
+          Or write /email to [name] in Log.
+        </div>
 
         {/* Log-context-grounded cohort insight */}
         <div className="mt-16 opacity-30">

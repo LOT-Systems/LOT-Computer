@@ -380,6 +380,13 @@ export default async (fastify: FastifyInstance) => {
           write({ event, data: { ...payload, isLiked: !!myLike } })
           break
         }
+        case 'direct_message': {
+          // LOT® Email / DM — private: only the two parties receive it
+          if (data.receiverId === req.user.id || data.senderId === req.user.id) {
+            write({ event, data })
+          }
+          break
+        }
         case 'settings_updated': {
           if (data.userId === req.user.id) {
             write({ event, data: {} })
@@ -3995,6 +4002,12 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         limit: 100
       })
 
+      // Opening the thread reads the mail
+      fastify.models.DirectMessage.update(
+        { readAt: new Date() },
+        { where: { senderId: otherUserId, receiverId: req.user.id, readAt: null } }
+      ).catch(() => {})
+
       return reply.send({
         messages: messages.map(m => ({
           id: m.id,
@@ -4082,6 +4095,161 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
     } catch (error) {
       console.error('Error sending direct message:', error)
       return reply.status(500).send({ error: 'Failed to send message' })
+    }
+  })
+
+  // ============================================================================
+  // LOT® EMAIL — compose in Log (/email to Hitomi), receive in Sync
+  // ============================================================================
+  const EMAIL_MAX_BODY = 2000
+  const EMAIL_HOURLY_LIMIT = 30
+  const isSuspendedUser = (u: { tags?: string[] | null }) =>
+    (u.tags || []).some((t) => t.toLowerCase() === 'suspended')
+  const toMailUser = (u: any) => ({
+    id: u.id,
+    firstName: u.firstName || null,
+    lastInitial: u.lastName ? String(u.lastName).charAt(0).toUpperCase() : null,
+    city: u.city || null,
+  })
+
+  // Resolve "Hitomi" / "Hitomi K" / "Hitomi Kato" to joined, non-suspended operators
+  const findMailRecipients = async (query: string, selfId: string) => {
+    const parts = query.replace(/[%_\\]/g, '').trim().replace(/[.,;:!?]+$/, '').split(/\s+/).filter(Boolean)
+    if (!parts.length || parts[0].length < 2) return []
+    const [first, ...rest] = parts
+    const last = rest.join(' ')
+    const where: any = {
+      id: { [Op.ne]: selfId },
+      joinedAt: { [Op.ne]: null },
+      firstName: { [Op.iLike]: first },
+    }
+    if (last) where.lastName = { [Op.iLike]: `${last}%` }
+    const users = await fastify.models.User.findAll({
+      where,
+      attributes: ['id', 'firstName', 'lastName', 'city', 'tags'],
+      order: [['lastSeenAt', 'DESC NULLS LAST']],
+      limit: 6,
+    })
+    return users.filter((u: any) => !isSuspendedUser(u))
+  }
+
+  fastify.get('/email/recipients', async (req: FastifyRequest<{
+    Querystring: { q?: string }
+  }>, reply) => {
+    try {
+      const users = await findMailRecipients(String(req.query.q || ''), req.user.id)
+      return reply.send({ recipients: users.map(toMailUser) })
+    } catch (error) {
+      console.error('Error resolving email recipients:', error)
+      return reply.status(500).send({ error: 'Failed to resolve recipient' })
+    }
+  })
+
+  fastify.post('/email', async (req: FastifyRequest<{
+    Body: { to?: string; receiverId?: string; subject?: string; body: string }
+  }>, reply) => {
+    try {
+      if (isSuspendedUser(req.user)) {
+        return reply.status(403).send({ error: 'Mail disabled for this account' })
+      }
+      const body = String(req.body?.body || '').trim().slice(0, EMAIL_MAX_BODY)
+      if (!body) return reply.status(400).send({ error: 'Empty message' })
+
+      let receiver: any = null
+      if (req.body.receiverId) {
+        receiver = await fastify.models.User.findByPk(req.body.receiverId)
+        if (receiver && (isSuspendedUser(receiver) || !receiver.joinedAt || receiver.id === req.user.id)) receiver = null
+      } else {
+        const candidates = await findMailRecipients(String(req.body.to || ''), req.user.id)
+        if (candidates.length > 1) {
+          return reply.status(409).send({ error: 'Ambiguous recipient', recipients: candidates.map(toMailUser) })
+        }
+        receiver = candidates[0] || null
+      }
+      if (!receiver) return reply.status(404).send({ error: 'No operator found' })
+
+      const sentLastHour = await fastify.models.DirectMessage.count({
+        where: { senderId: req.user.id, createdAt: { [Op.gte]: new Date(Date.now() - 3600e3) } },
+      })
+      if (sentLastHour >= EMAIL_HOURLY_LIMIT) {
+        return reply.status(429).send({ error: 'Hourly mail limit reached' })
+      }
+
+      const subject = String(req.body.subject || '').trim().slice(0, 200) || null
+      const mail = await fastify.models.DirectMessage.create({
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: body,
+        kind: 'email',
+        subject,
+      })
+
+      const senderName = `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim()
+      sync.emit('direct_message', {
+        id: mail.id,
+        senderId: req.user.id,
+        receiverId: receiver.id,
+        message: mail.message,
+        subject: mail.subject,
+        kind: 'email',
+        senderName,
+        createdAt: mail.createdAt,
+      })
+
+      // No separate Log row: the sender's Log entry already carries the
+      // ✉ SENT stamp. A server-side Log row here would sort above the open
+      // primary note and make GET /logs spawn a new empty note mid-compose.
+
+      return reply.send({
+        id: mail.id,
+        to: toMailUser(receiver),
+        subject: mail.subject,
+        createdAt: mail.createdAt,
+      })
+    } catch (error) {
+      console.error('Error sending email:', error)
+      return reply.status(500).send({ error: 'Failed to send' })
+    }
+  })
+
+  // Inbox for Sync — latest mail in and out, with unread count
+  fastify.get('/email/inbox', async (req, reply) => {
+    try {
+      const mail = await fastify.models.DirectMessage.findAll({
+        where: { [Op.or]: [{ receiverId: req.user.id }, { senderId: req.user.id }] },
+        order: [['createdAt', 'DESC']],
+        limit: 20,
+      })
+      const peerIds = Array.from(new Set(mail.map((m) => (m.senderId === req.user.id ? m.receiverId : m.senderId))))
+      const peers = peerIds.length
+        ? await fastify.models.User.findAll({ where: { id: peerIds }, attributes: ['id', 'firstName', 'lastName', 'city', 'tags'] })
+        : []
+      const peerMap = new Map(peers.map((u: any) => [u.id, u]))
+      const unread = await fastify.models.DirectMessage.count({
+        where: { receiverId: req.user.id, readAt: null },
+      })
+      return reply.send({
+        unread,
+        mail: mail
+          .filter((m) => peerMap.has(m.senderId === req.user.id ? m.receiverId : m.senderId))
+          .map((m) => {
+            const outgoing = m.senderId === req.user.id
+            const peer = peerMap.get(outgoing ? m.receiverId : m.senderId)
+            return {
+              id: m.id,
+              kind: m.kind || 'dm',
+              subject: m.subject || null,
+              message: m.message,
+              outgoing,
+              isNew: !outgoing && !m.readAt,
+              peer: toMailUser(peer),
+              createdAt: m.createdAt,
+            }
+          }),
+      })
+    } catch (error) {
+      console.error('Error fetching inbox:', error)
+      return reply.status(500).send({ error: 'Failed to fetch inbox' })
     }
   })
 
