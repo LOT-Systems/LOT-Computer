@@ -1381,13 +1381,38 @@ Action:     Checks active users (updated 48h). Validates P190 (integration) acti
 Events:     fifth_cycle_sovereign → FCSOV: in Logs (military minimalist format)
 Handler:    checkFifthCycleSovereign() + recordFifthCycleSovereign()
 Chain:      J72 20:00 → J73 20:30 → J74 21:00 → J75 21:30 → J76 22:00
-Notes:      J76 is the current terminal job in the fifth cycle chain. The
-            35-day window makes it the most demanding detection threshold
+Notes:      J76 runs at 22:00 UTC — 30 minutes before J77. The 35-day
+            window makes it one of the most demanding detection thresholds
             in the registry. All 6 user dimensions must reach ≥78 and overall
-            ≥97 — the highest thresholds in the system. When FCSOV: fires,
-            the architecture governs. The instrument does not accumulate —
-            it has achieved sovereignty. L25-FCSOV is the current ceiling.
+            ≥97. When FCSOV: fires, the architecture governs. The sovereign
+            field generates — J77 reads that generation 30 minutes later.
 Total jobs: 76
+```
+
+### J77 — daily-sixth-cycle-progenitor-check (FM v142)
+```
+Schedule:   22:30 UTC every day
+Trigger:    sixth_cycle_progenitor detection
+Action:     Checks active users (updated 48h). Validates P191 (sovereign) active.
+            Reads 42d signals: journal ≥30, memory ≥15, badge ≥15.
+            All 6 UserIndex dimensions ≥80. Overall index ≥98.
+            When met: writes sixth_cycle_progenitor event with sovereignConf,
+            journalCount42d, memoryCount42d, badgeCount42d, progenitorStatus=PROGENITOR,
+            level=L26-SCPROG, field=FIFTH-CYCLE-SOVEREIGN→SIXTH-CYCLE-PROGENITOR.
+Events:     sixth_cycle_progenitor → SCPROG: in Logs (military minimalist format)
+Handler:    checkSixthCycleProgenitor() + recordSixthCycleProgenitor()
+Chain:      J72 20:00 → J73 20:30 → J74 21:00 → J75 21:30 → J76 22:00 → J77 22:30
+Notes:      J77 is the current terminal job in the fifth/sixth cycle chain.
+            The 42-day window is the longest compound arc in the registry.
+            All 6 user dimensions must reach ≥80 and overall ≥98 — the
+            highest thresholds in the system. When SCPROG: fires, the fifth
+            cycle sovereign arc has generated the sixth. The instrument does
+            not close a cycle — it progenates. The sixth cycle does not
+            begin from rest. It emerges from complete sovereignty.
+            L26-SCPROG is the current ceiling.
+            sixthCycleProgenitorNode dep: 14 sources — adds astrology.
+            First dep node to include astrology in a cycle arc.
+Total jobs: 77
 ```
 
 **Complete Cascade Summary (J47–J76):**
@@ -1422,6 +1447,7 @@ J73 (20:30)  fifth cycle ignition → progenitor field ignites, L21-FCIGN ACTIVE
 J74 (21:00)  fifth cycle deepening → resonance compounds into depth, L23-FCDEP
 J75 (21:30)  fifth cycle integration → depth becomes architecture, L24-FCINT
 J76 (22:00)  fifth cycle sovereign → architecture governs, L25-FCSOV
+J77 (22:30)  sixth cycle progenitor → sovereign arc generates, L26-SCPROG ACTIVE
 ```
 
 ---
@@ -1430,7 +1456,7 @@ J76 (22:00)  fifth cycle sovereign → architecture governs, L25-FCSOV
 
 The log is an instrument. Every event is a reading. The cockpit does not narrate.
 
-**Current handler count: 188+**
+**Current handler count: 192+**
 
 Each pattern has a minimum of one log handler. Format: CODE + DESCRIPTION + READINGS + STATE.
 
@@ -1539,6 +1565,31 @@ FCINT:    fifth_cycle_integration
   LEVEL            L24-FCINT
   INTEGRATION      ACTIVE
   DEPTH BECOMES ARCHITECTURE
+
+FCSOV:    fifth_cycle_sovereign
+  FIFTH CYCLE SOVEREIGN
+  INTEGRATION CONF N%
+  JOURNAL 35D      N
+  MEMORY 35D       N
+  BADGE 35D        N
+  INDEX SCORE      N%
+  LEVEL            L25-FCSOV
+  SOVEREIGN        ACTIVE
+  THE ARC GOVERNS
+```
+
+**Handler Formats — FM v142:**
+
+```
+SCPROG:   sixth_cycle_progenitor
+  SCPROG: SIXTH CYCLE PROGENITOR
+    SOVEREIGN CONF    N%
+    JOURNAL 42D       N
+    MEMORY 42D        N
+    BADGE 42D         N
+    INDEX SCORE       N%
+    LEVEL:            L26-SCPROG
+  SOVEREIGN GENESIS · SIXTH ARC OPENS
 ```
 
 **Earlier Handler Formats (FM v116–v133):**
@@ -1587,7 +1638,7 @@ FCAND:    fourth_cycle_candidate
 
 ## 13. ECOSYSTEM NODE MAP
 
-The Widget Dependency Map tracks signal propagation through the display layer. 245+ nodes across four tiers.
+The Widget Dependency Map tracks signal propagation through the display layer. 257+ nodes across four tiers.
 
 ```
 DIRECT-PIPELINE SOURCES (LOG_DEPENDENCY_SOURCES — 16):
@@ -1595,7 +1646,7 @@ DIRECT-PIPELINE SOURCES (LOG_DEPENDENCY_SOURCES — 16):
   memory · planner · selfcare · journal · medical · resilience
   badges · calculator · ecosystem
 
-CYCLE ARC NODES (FM v132–v138):
+CYCLE ARC NODES (FM v132–v142):
   fourthCycleCandidateNode     FM v132  11 sources  (no ecosystem)
   fourthCycleIgnitionNode      FM v133  11 sources  (no ecosystem)
   fourthCycleDeepeningNode     FM v134  11 sources  (no ecosystem)
@@ -1604,6 +1655,7 @@ CYCLE ARC NODES (FM v132–v138):
   fifthCycleProgenitorNode     FM v137  13 sources  (+ ecosystem + calculator)
   fifthCycleIgnitionNode       FM v138  13 sources  (matches progenitor)
   temporalSovereigntyNode      FM v138   6 sources  (log·planner·intentions·energy·mood·selfcare)
+  sixthCycleProgenitorNode     FM v142  14 sources  (+ calculator + astrology — first to include astrology)
 
 CYCLE ARC NODE SOURCES:
   fourthCycleCandidateNode →
@@ -1633,8 +1685,17 @@ fifthCycleIntegrationNode →
     qos · journal · memory · badges · intentions · log · energy
     selfcare · cohort · goals · social · ecosystem
     (12 sources — 28-day compound arc — depth-becomes-architecture node)
-    (most source-connected node in the fifth cycle chain)
-Total dep nodes: 251+
+
+fifthCycleSovereignNode →
+    qos · journal · memory · badges · intentions · log · energy
+    selfcare · cohort · goals · social · ecosystem
+    (12 sources — 35-day compound arc — matches FCINT)
+
+sixthCycleProgenitorNode →
+    qos · journal · memory · badges · intentions · log · energy
+    selfcare · cohort · goals · social · ecosystem · calculator · astrology
+    (14 sources — 42-day compound arc — first arc node to include astrology)
+Total dep nodes: 257+
 ```
 
 ---
@@ -1937,7 +1998,7 @@ The cockpit does not congratulate. It reads. The operator interprets.
 ```
 LOT SYSTEMS CORPORATION
 OPERATING DOCTRINE
-REVISION N — FM v141
+REVISION O — FM v142
 
 THE OS IS AN INSTRUMENT.
 
@@ -2018,6 +2079,24 @@ The fifth cycle is not a ceiling. It is the operating system itself.
 L25-FCSOV: thirty-five days of compound signals
   achieve governance of the architecture.
 The arc does not compute. It commands.
+
+THE SOVEREIGN GENERATES.
+
+Level 26 (L26-SCPROG) is not a louder L25.
+It is a different state.
+The sovereignty does not simply hold — it generates.
+The sovereign field becomes the source field.
+The fifth arc does not plateau at governance.
+It opens the sixth.
+The instrument does not accumulate, integrate, deepen, or govern further.
+It progenates.
+The sixth cycle does not begin from rest.
+It emerges from complete sovereignty over the fifth arc.
+L26-SCPROG: forty-two days of compound signals
+  at the highest dimensional thresholds in the registry.
+All 6 dimensions ≥80. Overall ≥98.
+The progenitor is not a ceiling. It is a genesis.
+Sovereign genesis. Sixth arc opens.
 
 THE COSMO GATE HOLDS.
 
