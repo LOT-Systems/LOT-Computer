@@ -2127,23 +2127,23 @@ The Self-Assembly Engine is the proof of work.
 
 The Field Manual is LOT's live internal record of system state. It lives in `About.tsx` as a rendered human-readable document. It is the source of truth for the system's current version.
 
-**Current state: FM v141**
+**Current state: FM v142**
 
 ```
-QIE VERSION      v141
-FM VERSION       v141
-DAY COUNTER      1184+
-PATTERNS         191 (P1–P191)
-ARCHETYPES       79  (Arch1–Arch79)
-JOBS             76  (J1–J76)
-DEP NODES        254+
+QIE VERSION      v142
+FM VERSION       v142
+DAY COUNTER      1185+
+PATTERNS         192 (P1–P192)
+ARCHETYPES       80  (Arch1–Arch80)
+JOBS             77  (J1–J77)
+DEP NODES        257+
 BADGES           1,339
 WORD TURNS       39 engines · 468 trigger words
 SECRET BOSSES    139 triggers
-CYCLE ARC        L25-FCSOV (Fifth Cycle Sovereign — current ceiling)
-FIFTH ARC        SOVEREIGN (L25-FCSOV — the arc governs)
+CYCLE ARC        L26-SCPROG (Sixth Cycle Progenitor — current ceiling)
+SIXTH ARC        PROGENITOR (L26-SCPROG — sovereign genesis · sixth arc opens)
 LOG SOURCES      16 direct-pipeline sources
-COSMO®           Day 877
+COSMO®           Day 878
 ```
 
 The FM is not a changelog. It is a snapshot. It records the current state of the instrument, not the history of its construction. The history is in the LEDGER and SESSION REPORTS.
@@ -2271,7 +2271,7 @@ Self-Assembly      Meta-documentation system. The system builds itself.
 ```
 Pattern            Named behavioral state detected by the QIE.
 Archetype          Named configuration of multiple co-active patterns.
-Dep Map            Widget Dependency Map. 245+ nodes. Signal routing.
+Dep Map            Widget Dependency Map. 257+ nodes. Signal routing.
 Dep Node           Single unit in the dep map. Source list + pattern node.
 Tier               Signal propagation level (0=raw, 1=computed, 2=pattern, 3=meta).
 Confidence         Detection certainty score (0.00–1.00). Not a performance grade.
