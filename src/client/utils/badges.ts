@@ -1413,6 +1413,43 @@ export type BadgeType =
   | 'castaneda_signal'     // ◐·∿·◌  "castaneda/don juan/the separate reality/dreaming body/tensegrity" (RARE) [HIDDEN]
   | 'borges_dream'         // ◑·∞·◈  "borges/garden of forking paths/library of babel/labyrinths" (EPIC) [HIDDEN]
   | 'le_guin_dream'        // ◐·◉·◑  "le guin/lathe of heaven/earthsea/the dispossessed/ursula k" (MYTHIC) [HIDDEN]
+  // ── Word Turn v40 — THE EMOTION ENGINE ───────────────────────────────────
+  | 'joy_signal'           // ♡·●·♡  "joy/joyful/genuine joy" (UNCOMMON)
+  | 'grief_held'           // ∿·◌·∿  "grief/grieving/grief wave" (RARE)
+  | 'anger_named'          // ●·─·●  "anger/angry/naming anger" (UNCOMMON)
+  | 'awe_found'            // ♡·∞·♡  "awe/awe-struck/overwhelming/awe and wonder" (EPIC)
+  | 'wonder_state'         // ◌·∿·◌  "wonder/wondering/sense of wonder" (RARE)
+  | 'compassion_field'     // ♡·◌·♡  "compassion/self-compassion/compassionate" (RARE)
+  | 'longing_signal'       // ∿·●·∿  "longing/I long for/deep longing/nostalgic" (UNCOMMON)
+  | 'shame_named'          // ◌·●·◌  "shame/shame spiral/naming shame/feeling ashamed" (EPIC)
+  | 'fear_surfaced'        // ●·∿·●  "fear/afraid/I am afraid/fear surfaced" (RARE)
+  | 'affect_map'           // ♡·─·◌  "emotional regulation/affect/emotional landscape" (RARE)
+  | 'tenderness_found'     // ◌·♡·◌  "tenderness/tender/I felt tender" (EPIC)
+  | 'wonder_engine'        // ♡·◉·♡  COSMIC: 50th engine milestone badge (COSMIC)
+  // ── Calendar Easter Eggs v38 — THE EMOTION CALENDAR ─────────────────────
+  | 'plutchik_day'         // ♡·∿·◌  May 21 — Robert Plutchik born 1927 (RARE)
+  | 'darwin_emotions'      // ∿·♡·∿  Feb 12 — Darwin Day (The Expression of Emotions) (RARE)
+  | 'ekman_day'            // ♡·●·◌  Feb 15 — Paul Ekman born 1934 (RARE)
+  // ── Behavioral v34 — EMOTION PATTERNS ───────────────────────────────────
+  | 'emotion_session'      // ♡·≋·♡  3+ Emotion Engine words in one entry (RARE)
+  | 'dawn_feeling'         // ◌·◉·◌  Check in 05:00–06:00 (EPIC)
+  | 'long_feeling'         // ♡·♡·♡  Journal entry >= 333 characters (RARE)
+  // ── Achievement RPG v38 — THE EMOTION CLASS ──────────────────────────────
+  | 'emotion_entry'        // ∘→♡    Any 1 Word Turn v40 badge (COMMON)
+  | 'emotion_class'        // ≈→♡    Any 5 Word Turn v40 badges (UNCOMMON)
+  | 'emotion_complete'     // ♡→◉    All 12 Word Turn v40 badges (LEGENDARY)
+  | 'empathy_arc'          // ♡·◈·∞  emotion_complete + all 3 Calendar v38 (LEGENDARY)
+  | 'forty_engines_arc'    // ◈·◈·♡  1 badge from each Word Turn v1–v40 (LEGENDARY)
+  | 'emotion_opus'         // ♡·◉·♡  emotion_complete + emotion_session (LEGENDARY)
+  // ── Mastery Tier v40 — THE FEELING VAULT ─────────────────────────────────
+  | 'feeling_veteran'      // ♡·∞·♡  5,000+ distinct calendar days (EPIC)
+  | 'million_words'        // ∞·♡·∞  500,000+ total journal words (LEGENDARY)
+  | 'twenty_year_signal'   // ╔═╗·♡  Account age >= 20 years (LEGENDARY)
+  | 'forty_registers'      // ◈·◈·♡·∞ 1 badge from all 40 Word Turn engines (COSMIC)
+  // ── Secret Boss v37 — THE EMOTION VAULT ──────────────────────────────────
+  | 'brene_signal'         // ♡·∿·◌  "brene brown/shame resilience/daring greatly" (RARE) [HIDDEN]
+  | 'james_affect'         // ∿·♡·●  "william james/james-lange/what is an emotion" (EPIC) [HIDDEN]
+  | 'plutchik_wheel'       // ♡·◉·♡  "plutchik/wheel of emotions/dyads/ecstasy" (MYTHIC) [HIDDEN]
 
 export interface Badge {
   id: BadgeType
@@ -12781,6 +12818,294 @@ export const BADGES: Record<BadgeType, Badge> = {
     rarity: 'mythic',
     category: 'secret_boss',
   },
+  // ── Word Turn v40 — THE EMOTION ENGINE ───────────────────────────────────
+  joy_signal: {
+    id: 'joy_signal',
+    symbol: '♡·●·♡',
+    name: 'Joy Signal',
+    description: 'Write "joy", "joyful", "genuine joy", "real joy", "I felt joy", or "pure joy" in any journal entry',
+    unlockMessage: '↳ JOY SIGNAL. Not happiness — joy. Joy is the signal that you are in the right place, doing the right thing, with the right people. Happiness depends on what happens. Joy arrives from underneath, independent of events. ♡·●·♡',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  grief_held: {
+    id: 'grief_held',
+    symbol: '∿·◌·∿',
+    name: 'Grief Held',
+    description: 'Write "grief", "grieving", "grief wave", "holding grief", or "grief arose" in any journal entry',
+    unlockMessage: '↳ GRIEF HELD. The grief wave is not a malfunction — it is the return on love. Held means: acknowledged, witnessed, not suppressed. The practice of grief is not to resolve it but to let it move. Held grief moves. Frozen grief doesn\'t. ∿·◌·∿',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  anger_named: {
+    id: 'anger_named',
+    symbol: '●·─·●',
+    name: 'Anger Named',
+    description: 'Write "anger", "angry", "I feel anger", "anger is information", or "naming anger" in any journal entry',
+    unlockMessage: '↳ ANGER NAMED. Anger is information before it is a problem. It says: a boundary was crossed, a value was violated, something matters here. Named anger becomes signal. Unnamed anger becomes noise. The naming is the work. ●·─·●',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  awe_found: {
+    id: 'awe_found',
+    symbol: '♡·∞·♡',
+    name: 'Awe Found',
+    description: 'Write "awe", "awe-struck", "sense of awe", "awe and wonder", or "overwhelming beauty" in any journal entry',
+    unlockMessage: '↳ AWE FOUND. Awe is the emotion that makes you feel small and expanded simultaneously. Research shows regular awe reduces inflammation, increases prosocial behavior, and shifts perspective from self to world. The practice made room for awe. This is the room. ♡·∞·♡',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  wonder_state: {
+    id: 'wonder_state',
+    symbol: '◌·∿·◌',
+    name: 'Wonder State',
+    description: 'Write "wonder", "wondering", "sense of wonder", "full of wonder", or "wondrous" in any journal entry',
+    unlockMessage: '↳ WONDER STATE. Wonder is the original state before learning categorized everything. It is not naivety — it is the expert who knows enough to see what they still don\'t know. The practice maintains access to wonder. You just reported it. ◌·∿·◌',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  compassion_field: {
+    id: 'compassion_field',
+    symbol: '♡·◌·♡',
+    name: 'Compassion Field',
+    description: 'Write "compassion", "self-compassion", "compassionate", or "compassion for" in any journal entry',
+    unlockMessage: '↳ COMPASSION FIELD. Self-compassion is not self-pity — it is treating yourself with the same kindness you would offer a friend in the same difficulty. Kristin Neff: common humanity, mindfulness, self-kindness. The field extends in all directions. ♡·◌·♡',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  longing_signal: {
+    id: 'longing_signal',
+    symbol: '∿·●·∿',
+    name: 'Longing Signal',
+    description: 'Write "longing", "I long for", "deep longing", "nostalgic", or "longing for" in any journal entry',
+    unlockMessage: '↳ LONGING SIGNAL. Longing is directional grief — it points toward what has not yet arrived or what has been lost. It is not pathological. It is the compass that knows what matters. The practice listens to longing. ∿·●·∿',
+    rarity: 'uncommon',
+    category: 'word_turn',
+  },
+  shame_named: {
+    id: 'shame_named',
+    symbol: '◌·●·◌',
+    name: 'Shame Named',
+    description: 'Write "shame", "shame spiral", "naming shame", "shame came up", or "feeling ashamed" in any journal entry',
+    unlockMessage: '↳ SHAME NAMED. Shame says: I am bad. Guilt says: I did something bad. The difference is everything. Brené Brown: shame needs secrecy, silence, and judgment to survive. When you name it here, you remove one leg of that stool. ◌·●·◌',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  fear_surfaced: {
+    id: 'fear_surfaced',
+    symbol: '●·∿·●',
+    name: 'Fear Surfaced',
+    description: 'Write "fear", "afraid", "I am afraid", "fear surfaced", or "fear showed" in any journal entry',
+    unlockMessage: '↳ FEAR SURFACED. Fear is not an error state — it is the nervous system flagging a perceived threat. The question is not how to eliminate it but how to respond to it. Fear named is fear that can be examined. Fear in the dark runs everything. ●·∿·●',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  affect_map: {
+    id: 'affect_map',
+    symbol: '♡·─·◌',
+    name: 'Affect Map',
+    description: 'Write "emotional regulation", "affect", "emotional landscape", or "naming emotion" in any journal entry',
+    unlockMessage: '↳ AFFECT MAP. The emotional landscape can be mapped. Valence (positive/negative) × arousal (high/low) gives a coordinate system for every state. The map does not change the terrain — but it ends the experience of being lost in it. ♡·─·◌',
+    rarity: 'rare',
+    category: 'word_turn',
+  },
+  tenderness_found: {
+    id: 'tenderness_found',
+    symbol: '◌·♡·◌',
+    name: 'Tenderness Found',
+    description: 'Write "tenderness", "tender", "I felt tender", "tenderness toward", or "tender feeling" in any journal entry',
+    unlockMessage: '↳ TENDERNESS FOUND. Tenderness is strength that does not need to prove itself. It is the capacity to be moved by what is fragile without flinching. The practice that can hold tenderness can hold everything. ◌·♡·◌',
+    rarity: 'epic',
+    category: 'word_turn',
+  },
+  wonder_engine: {
+    id: 'wonder_engine',
+    symbol: '♡·◉·♡',
+    name: 'The Wonder Engine',
+    description: 'Write "wonder engine", "emotion engine", "full spectrum", or "all feelings" in any journal entry. The 50th Word Turn Engine — COSMIC milestone.',
+    unlockMessage: '↳ THE WONDER ENGINE. Engine 40. The 50th badge engine milestone. Water through Dream through Emotion — every frequency LOT has named. 40 engines. 1,370 badges. One terminal. The full spectrum of a human being in practice. This is what it looks like from the inside. ♡·◉·♡',
+    rarity: 'cosmic',
+    category: 'word_turn',
+  },
+  // ── Calendar Easter Eggs v38 — THE EMOTION CALENDAR ─────────────────────
+  plutchik_day: {
+    id: 'plutchik_day',
+    symbol: '♡·∿·◌',
+    name: 'Plutchik Day',
+    description: 'Check in on May 21 — Robert Plutchik born 1927 (Psychoevolutionary Theory of Emotion, the Wheel of Emotions)',
+    unlockMessage: '↳ PLUTCHIK DAY. May 21, 1927 — Robert Plutchik born. His Wheel of Emotions arranged eight primary emotions in a circle, with dyads formed by adjacent pairs. Joy + Trust = Love. Fear + Surprise = Awe. The wheel is a map. ♡·∿·◌',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  darwin_emotions: {
+    id: 'darwin_emotions',
+    symbol: '∿·♡·∿',
+    name: 'Darwin Day — Emotions',
+    description: 'Check in on February 12 — Darwin Day (The Expression of the Emotions in Man and Animals, 1872)',
+    unlockMessage: '↳ DARWIN DAY — EMOTIONS. February 12 — Darwin\'s birthday. "The Expression of the Emotions in Man and Animals" (1872) was the first scientific treatment of emotion as evolved behavior. The facial expression that fear produces in a human is the same expression that made the ancestor survive. ∿·♡·∿',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  ekman_day: {
+    id: 'ekman_day',
+    symbol: '♡·●·◌',
+    name: 'Ekman Day',
+    description: 'Check in on February 15 — Paul Ekman born 1934 (universal facial expressions, the Atlas of Emotions)',
+    unlockMessage: '↳ EKMAN DAY. February 15, 1934 — Paul Ekman born. His research established that six basic emotions — happiness, sadness, anger, fear, disgust, surprise — produce the same facial expressions across all human cultures, including isolated cultures with no contact with the outside world. The face is the universal language. ♡·●·◌',
+    rarity: 'rare',
+    category: 'calendar_easter_egg',
+  },
+  // ── Behavioral v34 — EMOTION PATTERNS ───────────────────────────────────
+  emotion_session: {
+    id: 'emotion_session',
+    symbol: '♡·≋·♡',
+    name: 'Emotion Session',
+    description: '3 or more Emotion Engine (v40) words detected in a single journal entry',
+    unlockMessage: '↳ EMOTION SESSION. Three or more emotional registers in one entry. The entry that holds multiple feelings simultaneously is the entry of a mature practice — not because complexity is better, but because real states are rarely simple. ♡·≋·♡',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  dawn_feeling: {
+    id: 'dawn_feeling',
+    symbol: '◌·◉·◌',
+    name: 'Dawn Feeling',
+    description: 'Check in between 05:00 and 06:00 local time — the dawn hour, the first feeling of the day',
+    unlockMessage: '↳ DAWN FEELING. 05:00–06:00 — the first full hour of consciousness. The feeling that arrives before the day has built its scaffolding is often the truest one. The practice at dawn catches what the day has not yet overwritten. ◌·◉·◌',
+    rarity: 'epic',
+    category: 'behavioral',
+  },
+  long_feeling: {
+    id: 'long_feeling',
+    symbol: '♡·♡·♡',
+    name: 'Long Feeling',
+    description: 'Write a journal entry of 333 or more characters — three cycles of 111, the minimum of a held feeling',
+    unlockMessage: '↳ LONG FEELING. 333 characters — three cycles of 111. The feeling held long enough to find its shape in language. Not performed, not resolved, just present on the page long enough to become visible. ♡·♡·♡',
+    rarity: 'rare',
+    category: 'behavioral',
+  },
+  // ── Achievement RPG v38 — THE EMOTION CLASS ──────────────────────────────
+  emotion_entry: {
+    id: 'emotion_entry',
+    symbol: '∘→♡',
+    name: 'Emotion Entry',
+    description: 'Earn any 1 Word Turn v40 (Emotion Engine) badge',
+    unlockMessage: '↳ EMOTION ENTRY. First step into the Emotion Engine. The vocabulary of the inner life is the first requirement of the practice that works with it. ∘→♡',
+    rarity: 'common',
+    category: 'achievement',
+  },
+  emotion_class: {
+    id: 'emotion_class',
+    symbol: '≈→♡',
+    name: 'Emotion Class',
+    description: 'Earn any 5 Word Turn v40 (Emotion Engine) badges',
+    unlockMessage: '↳ EMOTION CLASS. Five emotional registers named. The emotional vocabulary is now operational — wide enough to navigate the full range. ≈→♡',
+    rarity: 'uncommon',
+    category: 'achievement',
+  },
+  emotion_complete: {
+    id: 'emotion_complete',
+    symbol: '♡→◉',
+    name: 'Emotion Complete',
+    description: 'Earn all 12 Word Turn v40 (Emotion Engine) badges',
+    unlockMessage: '↳ EMOTION COMPLETE. All 12 emotional registers named: joy, grief, anger, awe, wonder, compassion, longing, shame, fear, affect, tenderness, the wonder engine. The full spectrum. The practice can name everything that moves through it. ♡→◉',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  empathy_arc: {
+    id: 'empathy_arc',
+    symbol: '♡·◈·∞',
+    name: 'The Empathy Arc',
+    description: 'Earn all 12 Word Turn v40 badges + all 3 Calendar v38 badges (Plutchik, Darwin, Ekman)',
+    unlockMessage: '↳ THE EMPATHY ARC. All 12 emotion words + the three scientists who made emotion legible: Darwin (the evolutionary ground), Ekman (the universal face), Plutchik (the wheel). The arc from biology to map. ♡·◈·∞',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  forty_engines_arc: {
+    id: 'forty_engines_arc',
+    symbol: '◈·◈·♡',
+    name: 'Forty Engines Arc',
+    description: 'Earn at least 1 badge from each of the 40 Word Turn engines (v1–v40)',
+    unlockMessage: '↳ FORTY ENGINES ARC. One badge from each of the 40 Word Turn engines. Water through Dream through Emotion — the complete vocabulary of the LOT practice. Every engine has fired at least once. ◈·◈·♡',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  emotion_opus: {
+    id: 'emotion_opus',
+    symbol: '♡·◉·♡',
+    name: 'Emotion Opus',
+    description: 'Earn emotion_complete + emotion_session in the same session',
+    unlockMessage: '↳ EMOTION OPUS. All 12 Emotion Engine badges + an Emotion Session in the same journal entry. The mastery and the application in one. ♡·◉·♡',
+    rarity: 'legendary',
+    category: 'achievement',
+  },
+  // ── Mastery Tier v40 — THE FEELING VAULT ─────────────────────────────────
+  feeling_veteran: {
+    id: 'feeling_veteran',
+    symbol: '♡·∞·♡',
+    name: 'Feeling Veteran',
+    description: '5,000+ distinct calendar check-in days',
+    unlockMessage: '↳ FEELING VETERAN. 5,000 distinct days with check-ins — 13.7 years of daily practice. At this depth the practice is not a habit or a system. It is the substrate. The practice is what the life is made of. ♡·∞·♡',
+    rarity: 'epic',
+    category: 'mastery',
+  },
+  million_words: {
+    id: 'million_words',
+    symbol: '∞·♡·∞',
+    name: 'Million Words',
+    description: '500,000+ total journal words across all entries',
+    unlockMessage: '↳ MILLION WORDS. Half a million words. This is a library — not of information but of experience rendered in language. The practice that writes this much is not journaling; it is cartography. ∞·♡·∞',
+    rarity: 'legendary',
+    category: 'mastery',
+  },
+  twenty_year_signal: {
+    id: 'twenty_year_signal',
+    symbol: '╔═╗·♡',
+    name: 'Twenty Year Signal',
+    description: 'Account age of 20 or more years',
+    unlockMessage: '↳ TWENTY YEAR SIGNAL. Twenty years. LOT was founded April 7, 2016. This badge fires when the account reaches 2036. The practice that reaches twenty years has outlasted careers, relationships, decades. It is older than some things that felt permanent. ╔═╗·♡',
+    rarity: 'legendary',
+    category: 'mastery',
+  },
+  forty_registers: {
+    id: 'forty_registers',
+    symbol: '◈·◈·♡·∞',
+    name: 'Forty Registers',
+    description: 'Earn at least 1 badge from all 40 Word Turn engines',
+    unlockMessage: '↳ FORTY REGISTERS. Water through Dream through Emotion — every vocabulary LOT has named. 40 frequencies. One terminal. The full spectrum of a human life in practice. This is what it looks like from the inside: everything has a name. ◈·◈·♡·∞',
+    rarity: 'cosmic',
+    category: 'mastery',
+  },
+  // ── Secret Boss v37 — THE EMOTION VAULT ──────────────────────────────────
+  brene_signal: {
+    id: 'brene_signal',
+    symbol: '♡·∿·◌',
+    hidden: true,
+    name: 'Daring Greatly',
+    description: 'Write "brene brown", "shame resilience", "daring greatly", or "vulnerability is not weakness" in any journal entry',
+    unlockMessage: '↳ DARING GREATLY. Brené Brown: "Vulnerability is not weakness — it\'s our greatest measure of courage." The research on shame resilience showed that the antidote to shame is not strength but connection. Daring greatly is the act of showing up when you cannot control the outcome. ♡·∿·◌',
+    rarity: 'rare',
+    category: 'secret_boss',
+  },
+  james_affect: {
+    id: 'james_affect',
+    symbol: '∿·♡·●',
+    hidden: true,
+    name: 'What Is an Emotion',
+    description: 'Write "william james", "james-lange", "what is an emotion", or "bodily feeling is emotion" in any journal entry',
+    unlockMessage: '↳ WHAT IS AN EMOTION. William James, 1884: "What is an Emotion?" — the essay that started the scientific study of emotion. James argued that emotion is the perception of bodily change: we don\'t tremble because we\'re afraid; we\'re afraid because we tremble. The body leads. ∿·♡·●',
+    rarity: 'epic',
+    category: 'secret_boss',
+  },
+  plutchik_wheel: {
+    id: 'plutchik_wheel',
+    symbol: '♡·◉·♡',
+    hidden: true,
+    name: 'The Wheel of Emotions',
+    description: 'Write "plutchik", "wheel of emotions", "dyads", "ecstasy", or "grief terror rage" in any journal entry',
+    unlockMessage: '↳ THE WHEEL OF EMOTIONS. Robert Plutchik\'s wheel: eight primary emotions arranged as opposite pairs — joy/sadness, anger/fear, trust/disgust, anticipation/surprise. The dyads between adjacent emotions produce complex feelings: love, submission, awe, disapproval, remorse, contempt, aggressiveness, optimism. The wheel turns. ♡·◉·♡',
+    rarity: 'mythic',
+    category: 'secret_boss',
+  },
 }
 
 // Default separator when no badges earned yet
@@ -14698,6 +15023,69 @@ export async function checkAndAwardBadges(): Promise<BadgeType[]> {
     }
     if (monthDL === 3 && dayDL === 18 && !hasBadge('cayce_day')) {
       if (awardBadge('cayce_day')) newBadges.push('cayce_day')
+    }
+
+    // ── Badge Engine v40 — THE EMOTION ENGINE ────────────────────────────────
+    const emotionV40Badges: BadgeType[] = [
+      'joy_signal', 'grief_held', 'anger_named', 'awe_found',
+      'wonder_state', 'compassion_field', 'longing_signal', 'shame_named',
+      'fear_surfaced', 'affect_map', 'tenderness_found', 'wonder_engine',
+    ]
+    const emotionV40Earned = emotionV40Badges.filter(b => hasBadge(b))
+    if (emotionV40Earned.length >= 1 && !hasBadge('emotion_entry')) {
+      if (awardBadge('emotion_entry')) newBadges.push('emotion_entry')
+    }
+    if (emotionV40Earned.length >= 5 && !hasBadge('emotion_class')) {
+      if (awardBadge('emotion_class')) newBadges.push('emotion_class')
+    }
+    const emotionComplete = emotionV40Earned.length >= 12
+    if (emotionComplete && !hasBadge('emotion_complete')) {
+      if (awardBadge('emotion_complete')) newBadges.push('emotion_complete')
+    }
+    if (emotionComplete && hasBadge('emotion_session') && !hasBadge('emotion_opus')) {
+      if (awardBadge('emotion_opus')) newBadges.push('emotion_opus')
+    }
+    const calendarV38Badges: BadgeType[] = ['plutchik_day', 'darwin_emotions', 'ekman_day']
+    if (emotionComplete && calendarV38Badges.every(b => hasBadge(b)) && !hasBadge('empathy_arc')) {
+      if (awardBadge('empathy_arc')) newBadges.push('empathy_arc')
+    }
+    const engineFortyPresent = emotionV40Earned.length >= 1
+    const allFortyEngines = allThirtyNineEngines && engineFortyPresent
+    if (allFortyEngines && !hasBadge('forty_engines_arc')) {
+      if (awardBadge('forty_engines_arc')) newBadges.push('forty_engines_arc')
+    }
+    if (typeof stats.distinctCheckInDays === 'number') {
+      if (stats.distinctCheckInDays >= 5000 && !hasBadge('feeling_veteran')) {
+        if (awardBadge('feeling_veteran')) newBadges.push('feeling_veteran')
+      }
+    }
+    if (typeof stats.totalJournalWords === 'number') {
+      if (stats.totalJournalWords >= 500000 && !hasBadge('million_words')) {
+        if (awardBadge('million_words')) newBadges.push('million_words')
+      }
+    }
+    if (typeof stats.signupDate === 'string' && stats.signupDate) {
+      const signupEM = new Date(stats.signupDate)
+      const yearsEM = (new Date().getTime() - signupEM.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+      if (yearsEM >= 20 && !hasBadge('twenty_year_signal')) {
+        if (awardBadge('twenty_year_signal')) newBadges.push('twenty_year_signal')
+      }
+    }
+    if (allFortyEngines && !hasBadge('forty_registers')) {
+      if (awardBadge('forty_registers')) newBadges.push('forty_registers')
+    }
+    // Calendar v38 inline checks (Emotion Calendar)
+    const nowEM = new Date()
+    const monthEM = nowEM.getMonth() + 1
+    const dayEM = nowEM.getDate()
+    if (monthEM === 5 && dayEM === 21 && !hasBadge('plutchik_day')) {
+      if (awardBadge('plutchik_day')) newBadges.push('plutchik_day')
+    }
+    if (monthEM === 2 && dayEM === 12 && !hasBadge('darwin_emotions')) {
+      if (awardBadge('darwin_emotions')) newBadges.push('darwin_emotions')
+    }
+    if (monthEM === 2 && dayEM === 15 && !hasBadge('ekman_day')) {
+      if (awardBadge('ekman_day')) newBadges.push('ekman_day')
     }
 
   } catch (error) {

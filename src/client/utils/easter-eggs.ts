@@ -4761,3 +4761,72 @@ export function checkLongDream(journalText: string): BadgeType | null {
   }
   return null
 }
+
+// ── Emotion Engine v40 — word turn patterns ──────────────────────────────────
+
+export const EMOTION_WORD_MAP: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\b(joy|joyful|genuine joy|real joy|i felt joy|pure joy)\b/i,          badge: 'joy_signal' },
+  { regex: /\b(grief|grieving|grief wave|holding grief|grief arose)\b/i,           badge: 'grief_held' },
+  { regex: /\b(anger|angry|i feel anger|anger is information|naming anger)\b/i,    badge: 'anger_named' },
+  { regex: /\b(awe[\s\-]struck|sense of awe|awe and wonder|overwhelming beauty|(?<!\w)awe(?!\w))/i, badge: 'awe_found' },
+  { regex: /\b(wonder|wondering|sense of wonder|full of wonder|wondrous)\b/i,      badge: 'wonder_state' },
+  { regex: /\b(compassion|self[\s\-]compassion|compassionate|compassion for)\b/i,  badge: 'compassion_field' },
+  { regex: /\b(longing|i long for|deep longing|nostalgic|longing for)\b/i,         badge: 'longing_signal' },
+  { regex: /\b(shame|shame spiral|naming shame|shame came up|feeling ashamed)\b/i, badge: 'shame_named' },
+  { regex: /\b(fear|afraid|i am afraid|fear surfaced|fear showed)\b/i,             badge: 'fear_surfaced' },
+  { regex: /\b(emotional regulation|affect|emotional landscape|naming emotion)\b/i,badge: 'affect_map' },
+  { regex: /\b(tenderness|tender|i felt tender|tenderness toward|tender feeling)\b/i, badge: 'tenderness_found' },
+  { regex: /\b(wonder engine|emotion engine|full spectrum|all feelings)\b/i,       badge: 'wonder_engine' },
+]
+
+export const EMOTION_SECRET_WORDS: { regex: RegExp; badge: BadgeType }[] = [
+  { regex: /\b(bren[eé] brown|shame resilience|daring greatly|vulnerability is not weakness)\b/i, badge: 'brene_signal' },
+  { regex: /\b(william james|james[\s\-]lange|what is an emotion|bodily feeling is emotion)\b/i,  badge: 'james_affect' },
+  { regex: /\b(plutchik|wheel of emotions|dyads|ecstasy|grief terror rage)\b/i,                    badge: 'plutchik_wheel' },
+]
+
+const EMOTION_WORDS_V40 = EMOTION_WORD_MAP.map(e => e.regex)
+
+/** Check all Emotion Engine (v40) word turns and secret boss words. */
+export function checkEmotionEngine(journalText: string): BadgeType[] {
+  const found: BadgeType[] = []
+  for (const { regex, badge } of EMOTION_WORD_MAP) {
+    if (regex.test(journalText)) found.push(badge)
+  }
+  for (const { regex, badge } of EMOTION_SECRET_WORDS) {
+    if (regex.test(journalText)) found.push(badge)
+  }
+  return found
+}
+
+/** Award emotion_session badge if 3+ Emotion Engine words appear in one entry. */
+export function checkEmotionSession(journalText: string): BadgeType | null {
+  if (hasBadge('emotion_session')) return null
+  const hits = EMOTION_WORDS_V40.filter(rx => rx.test(journalText)).length
+  if (hits >= 3) {
+    awardBadge('emotion_session')
+    return 'emotion_session'
+  }
+  return null
+}
+
+/** Award long_feeling badge if journal entry has 333+ characters. */
+export function checkLongFeeling(journalText: string): BadgeType | null {
+  if (hasBadge('long_feeling')) return null
+  if (journalText.length >= 333) {
+    awardBadge('long_feeling')
+    return 'long_feeling'
+  }
+  return null
+}
+
+/** Award dawn_feeling badge if check-in is between 05:00 and 06:00 local. */
+export function checkDawnFeeling(): BadgeType | null {
+  if (hasBadge('dawn_feeling')) return null
+  const h = new Date().getHours()
+  if (h === 5) {
+    awardBadge('dawn_feeling')
+    return 'dawn_feeling'
+  }
+  return null
+}
