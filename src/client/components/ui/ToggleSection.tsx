@@ -31,6 +31,7 @@ export function ToggleSection({
   onToggle,
 }: ToggleSectionProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  const contentRef = React.useRef<HTMLDivElement>(null)
 
   const handleToggle = () => {
     const newState = !isOpen
@@ -40,35 +41,34 @@ export function ToggleSection({
 
   return (
     <div className={cn('w-full', className)}>
-      {/* Header */}
       <button
         onClick={handleToggle}
-        className={cn(
-          'w-full text-left flex items-center gap-8 py-8 transition-opacity hover:opacity-30',
-          indent > 0 && 'pl-' + (indent * 16)
-        )}
+        aria-expanded={isOpen}
+        className="w-full text-left flex items-center gap-8 py-8 transition-opacity hover:opacity-30"
         style={{ paddingLeft: indent > 0 ? `${indent * 16}px` : undefined }}
       >
-        <span className="transition-transform duration-200" style={{
-          transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-          display: 'inline-block',
-          width: '8px'
-        }}>
+        <span
+          className="transition-transform duration-200"
+          style={{
+            transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+            display: 'inline-block',
+            width: '8px',
+          }}
+        >
           ›
         </span>
         <span>{label}</span>
       </button>
 
-      {/* Content */}
       <div
-        className={cn(
-          'overflow-hidden transition-all duration-300',
-          isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-        )}
+        ref={contentRef}
+        className="overflow-hidden transition-[max-height,opacity] duration-300"
+        style={{
+          maxHeight: isOpen ? (contentRef.current?.scrollHeight ?? 9999) : 0,
+          opacity: isOpen ? 1 : 0,
+        }}
       >
-        <div className="py-4">
-          {children}
-        </div>
+        <div className="py-4">{children}</div>
       </div>
     </div>
   )
