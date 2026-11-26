@@ -2079,11 +2079,44 @@ export const Logs: React.FC = React.memo(function LogsInner() {
         } else if (log.event === 'calendar_entry') {
           const entryType = log.metadata?.entryType as string | undefined
           const date = log.metadata?.date as string | undefined
+          const time = log.metadata?.time as string | undefined
+          const text = log.metadata?.text as string | undefined
           return (
             <LogContainer key={id} log={log} dateFormat={dateFormat}>
               <Block label="CAL:" blockView>
-                <div className="uppercase tracking-widest">{entryType || 'ENTRY'}</div>
-                {date && <div className="opacity-40 mt-8">{date}</div>}
+                <div className="flex justify-between gap-16">
+                  <span className="uppercase tracking-widest">{entryType || 'ENTRY'}</span>
+                  <span className="opacity-40 tabular-nums">#{log.id.replace(/-/g, '').slice(-4).toUpperCase()}</span>
+                </div>
+                {text && <div className="mt-8">{text}</div>}
+                {date && (
+                  <div className="opacity-40 mt-8 tabular-nums">
+                    {date}{time ? ` · ${time.replace(':', '')}H` : ' · DAY'}
+                  </div>
+                )}
+              </Block>
+            </LogContainer>
+          )
+        } else if (log.event === 'calendar_alert' || log.event === 'calendar_status') {
+          const md = (log.metadata || {}) as Record<string, any>
+          const isAlert = log.event === 'calendar_alert'
+          const ref = typeof md.entryId === 'string' ? md.entryId.replace(/-/g, '').slice(-4).toUpperCase() : '----'
+          const head = isAlert
+            ? `ALERT ${md.phase || ''}`.trim()
+            : md.status === 'done' ? 'DONE' : md.status === 'cancelled' ? 'CANCELLED' : 'REOPENED'
+          return (
+            <LogContainer key={id} log={log} dateFormat={dateFormat}>
+              <Block label={isAlert ? 'CAL/ALRT:' : 'CAL/STAT:'} blockView>
+                <div className="flex justify-between gap-16">
+                  <span className="uppercase tracking-widest">{head}</span>
+                  <span className="opacity-40 tabular-nums">#{ref}</span>
+                </div>
+                {md.text && <div className="mt-8">{md.text}</div>}
+                <div className="opacity-40 mt-8 tabular-nums uppercase tracking-widest">
+                  {md.entryType || 'entry'}
+                  {md.date ? ` · ${md.date}` : ''}
+                  {md.time ? ` · ${String(md.time).replace(':', '')}H` : ''}
+                </div>
               </Block>
             </LogContainer>
           )

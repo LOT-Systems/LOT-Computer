@@ -1084,7 +1084,7 @@ export default async (fastify: FastifyInstance) => {
     const displayableEvents = [
       'note', 'answer', 'chat_message', 'chat_message_like',
       'emotional_checkin', 'settings_change', 'system_snapshot',
-      'weekly_summary_response', 'calendar_entry', 'qi_rfi',
+      'weekly_summary_response', 'calendar_entry', 'calendar_status', 'calendar_alert', 'qi_rfi',
       'assembly_directive', 'prayer_scripture',
       // Physiological + archetype events (background job outputs)
       'physiological_cohort', 'archetype_shift', 'scheduled_job',
@@ -1583,6 +1583,119 @@ export default async (fastify: FastifyInstance) => {
       })
 
       return log
+    }
+  )
+
+  // ─── Calendar ─────────────────────────────────────────────────────────────
+  // Dedicated stream so calendar entries never fall off the 500-row /logs
+  // window. Append-only: entries, status changes, and fired alerts.
+  const CALENDAR_EVENTS = ['calendar_entry', 'calendar_status', 'calendar_alert']
+  const CAL_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+  const CAL_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/
+  const CAL_PHASES = ['T-15', 'T-0', 'DAY']
+  const CAL_STATUSES = ['open', 'done', 'cancelled']
+  const CAL_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+  fastify.get('/calendar', async (req: FastifyRequest) => {
+    return fastify.models.Log.findAll({
+      where: { userId: req.user.id, event: { [Op.in]: CALENDAR_EVENTS } },
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+  })
+
+  fastify.post(
+    '/calendar/entries',
+    async (
+      req: FastifyRequest<{
+        Body: { date: string; time?: string | null; text: string; entryType?: string }
+      }>,
+      reply
+    ) => {
+      const { date, time, entryType } = req.body || ({} as any)
+      const text = String(req.body?.text || '').trim().slice(0, 280)
+      if (!text) return reply.throw.badParams('Entry text is required')
+      if (typeof date !== 'string' || !CAL_DATE_RE.test(date) || !dayjs(date).isValid()) {
+        return reply.throw.badParams('Invalid date')
+      }
+      if (time != null && time !== '' && (typeof time !== 'string' || !CAL_TIME_RE.test(time))) {
+        return reply.throw.badParams('Invalid time')
+      }
+      const type = ['note', 'task', 'call'].includes(entryType as string) ? entryType : 'note'
+      const when = dayjs(date).format('dddd, MMMM D, YYYY') + (time ? ` ${time.replace(':', '')}H` : '')
+      const context = await getLogContext(req.user)
+      return fastify.models.Log.create({
+        userId: req.user.id,
+        text: `[SCHEDULE] ${type}: ${text} (${when})`.slice(0, MAX_LOG_TEXT_LENGTH),
+        event: 'calendar_entry',
+        metadata: { date, time: time || null, text, entryType: type },
+        context,
+      })
+    }
+  )
+
+  fastify.post(
+    '/calendar/status',
+    async (
+      req: FastifyRequest<{ Body: { entryId: string; status: string } }>,
+      reply
+    ) => {
+      const { entryId, status } = req.body || ({} as any)
+      if (!CAL_STATUSES.includes(status)) return reply.throw.badParams('Invalid status')
+      if (typeof entryId !== 'string' || !CAL_UUID_RE.test(entryId)) return reply.throw.badParams('Invalid entry')
+      const entry = await fastify.models.Log.findOne({
+        where: { id: entryId, userId: req.user.id, event: 'calendar_entry' },
+      })
+      if (!entry) return reply.throw.notFound()
+      const md = (entry.metadata || {}) as Record<string, any>
+      const label = status === 'done' ? 'DONE' : status === 'cancelled' ? 'CANCELLED' : 'REOPENED'
+      return fastify.models.Log.create({
+        userId: req.user.id,
+        text: `[${label}] ${md.entryType || 'note'}: ${md.text || ''}`.slice(0, MAX_LOG_TEXT_LENGTH),
+        event: 'calendar_status',
+        metadata: { entryId, status, date: md.date, time: md.time || null, entryType: md.entryType, text: md.text },
+        context: {},
+      })
+    }
+  )
+
+  // Idempotent: one calendar_alert per (entry, phase), even across devices/tabs.
+  fastify.post(
+    '/calendar/alert',
+    async (
+      req: FastifyRequest<{ Body: { entryId: string; phase: string; text?: string } }>,
+      reply
+    ) => {
+      const { entryId, phase } = req.body || ({} as any)
+      if (!CAL_PHASES.includes(phase)) return reply.throw.badParams('Invalid phase')
+      if (typeof entryId !== 'string' || !CAL_UUID_RE.test(entryId)) return reply.throw.badParams('Invalid entry')
+      const entry = await fastify.models.Log.findOne({
+        where: { id: entryId, userId: req.user.id, event: 'calendar_entry' },
+      })
+      if (!entry) return reply.throw.notFound()
+      const alertKey = `${entryId}:${phase}`
+      const recent = await fastify.models.Log.findAll({
+        where: { userId: req.user.id, event: 'calendar_alert' },
+        order: [['createdAt', 'DESC']],
+        limit: 300,
+      })
+      const existing = recent.find((l) => (l.metadata as any)?.alertKey === alertKey)
+      if (existing) return { ...existing.toJSON(), duplicate: true }
+      const md = (entry.metadata || {}) as Record<string, any>
+      const text = String(req.body?.text || `[ALERT ${phase}] ${md.entryType || 'note'}: ${md.text || ''}`)
+        .trim()
+        .slice(0, MAX_LOG_TEXT_LENGTH)
+      return fastify.models.Log.create({
+        userId: req.user.id,
+        text,
+        event: 'calendar_alert',
+        metadata: {
+          entryId, phase, alertKey,
+          date: md.date, time: md.time || null, entryType: md.entryType, text: md.text,
+          firedAt: new Date().toISOString(),
+        },
+        context: {},
+      })
     }
   )
 

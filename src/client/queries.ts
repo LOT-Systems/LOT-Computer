@@ -912,3 +912,33 @@ export const useStoryGeneration = createMutation<
     logId: string | null
   }
 >('post', '/api/story')
+
+// ─── Calendar ────────────────────────────────────────────────────────────────
+// Dedicated calendar stream (entries + status + fired alerts). Independent of
+// /api/logs so entries never fall off its 500-row window.
+export const CALENDAR_QUERY_KEY = '/api/calendar'
+
+export const useCalendar = createQuery<Log[]>(CALENDAR_QUERY_KEY, {
+  refetchOnWindowFocus: true,
+  refetchInterval: 5 * 60 * 1000,
+  staleTime: 60 * 1000,
+})
+
+export const useCreateCalendarEntry = createMutation<
+  { date: string; time?: string | null; text: string; entryType: string },
+  Log
+>('post', '/api/calendar/entries')
+
+export const useSetCalendarStatus = createMutation<
+  { entryId: string; status: 'open' | 'done' | 'cancelled' },
+  Log
+>('post', '/api/calendar/status')
+
+export async function postCalendarAlert(data: {
+  entryId: string
+  phase: string
+  text: string
+}): Promise<Log & { duplicate?: boolean }> {
+  const res = await api.post('/api/calendar/alert', data)
+  return res.data
+}

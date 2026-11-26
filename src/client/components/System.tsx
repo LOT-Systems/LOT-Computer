@@ -24,7 +24,7 @@ import { getUserTagByIdCaseInsensitive } from '#shared/constants'
 import { toCelsius, toFahrenheit } from '#shared/utils'
 import { getHourlyZodiac, getWesternZodiac, getMoonPhase, getRokuyo } from '#shared/utils/astrology'
 import { useBreathe } from '#client/utils/breathe'
-import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
+import { useProfile, useLogs, useCommunityEmotion, useCalendar } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
 import { UserTag } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
@@ -76,6 +76,7 @@ import { CosmicUpdateWidget } from './CosmicUpdateWidget'
 import { QuantumEngineWidgets } from './QuantumEngineWidgets'
 import { ChakraErgonomicsWidget } from './ChakraErgonomicsWidget'
 import { CalendarWidget } from './CalendarWidget'
+import { foldCalendarLogs, militaryTime } from '#client/utils/calendar'
 import { BenchmarkWidget } from './BenchmarkWidget'
 import { ArchitectWidget } from './ArchitectWidget'
 import { IntegrityWidget } from './IntegrityWidget'
@@ -380,18 +381,15 @@ export const System = React.memo(function SystemInner() {
   const convergence = React.useMemo(() => getConvergenceSignal(), [])
   const ambientIntensity = React.useMemo(() => getAmbientIntensity(), [])
 
-  // Temporal Planner — next scheduled calendar entry, from QIE signal pipeline
+  // Temporal Planner — next open calendar entry (dedicated calendar stream,
+  // folds done/cancelled status so closed items never surface here).
+  const { data: calendarLogs } = useCalendar()
   const upcomingCalendar = React.useMemo(() => {
+    const { entries } = foldCalendarLogs((calendarLogs as any[]) || [])
     const today = dayjs().format('YYYY-MM-DD')
-    const entries = logs
-      .filter(log => log.event === 'calendar_entry' && log.metadata?.date && (log.metadata.date as string) >= today)
-      .map(log => ({
-        date: log.metadata!.date as string,
-        text: (log.metadata!.text as string) || log.text || '',
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date))
-    return { next: entries[0] ?? null, count: entries.length }
-  }, [logs])
+    const open = entries.filter(e => e.status === 'open' && e.date >= today)
+    return { next: open[0] ?? null, count: open.length }
+  }, [calendarLogs])
 
   // Check for recipe and planner suggestions when component mounts
   React.useEffect(() => {
@@ -725,6 +723,7 @@ export const System = React.memo(function SystemInner() {
         <div>
           <Block label="Next:">
             {dayjs(upcomingCalendar.next.date).format('ddd, MMMM D')}
+            {upcomingCalendar.next.time ? ` ${militaryTime(upcomingCalendar.next.time)}` : ''}
             {' — '}
             {upcomingCalendar.next.text}
             {upcomingCalendar.count > 1 && ` (+${upcomingCalendar.count - 1} more)`}
