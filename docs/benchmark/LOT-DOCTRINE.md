@@ -226,3 +226,16 @@ automatically. No code change needed to switch keys.
 
 (SR-20260630-01: plannerContext minted; plan_set + emotional_checkin added
 to formatLog(); Together AI restored as primary.)
+
+## Packet Before Prose
+
+LOT computes the numbers; the AI vendor writes prose. Story-type endpoints
+hand the model a deterministic packet (counts, peaks, shift, spikes, context)
+built by a pure shared module, store that packet next to the output, and
+compose a deterministic fallback from the same packet when the vendor fails.
+Read the journal by its real event name (`note`); strip machine-written blocks
+before re-ingesting, or the engine compresses itself. Command help renders from
+the detector's own registry, never a parallel list.
+
+(SR-20260622-01: /story + /system bug pass; SR-20261126-01: LCE-1, note-event
+fix, registry /system.)

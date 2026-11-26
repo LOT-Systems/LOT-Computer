@@ -5479,10 +5479,59 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
   )
 
   // ============================================================================
-  // STORY — Contextual AI Story
-  // Generates a 1-2 paragraph story based on recent logs, self-care events,
-  // and widget data. The story reflects the operator's recent journey.
+  // STORY — Compressed Log Story (LCE-1)
+  //
+  //   LOT user data → Log Compression Engine packet → Quantum Intent state
+  //   → Together AI (prose only) → stored as `generated_story`
+  //
+  // `/story [day|week|month|year]` in the Log. Default horizon: week.
+  // The AI receives a deterministic packet (counts, peaks, spikes, shift,
+  // environment context) — never the raw journal dump. If the vendor is
+  // down, a deterministic fallback story is composed from the same packet.
+  // See docs/technical/LOT-LOG-COMMAND-SYSTEM.md
   // ============================================================================
+  const loadStoryLogs = async (userId: string, days: number) => {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+    return fastify.models.Log.findAll({
+      where: {
+        userId,
+        event: { [Op.in]: ['note', 'emotional_checkin'] },
+        createdAt: { [Op.gte]: since },
+      },
+      attributes: ['id', 'event', 'text', 'context', 'metadata', 'createdAt'],
+      order: [['createdAt', 'DESC']],
+      limit: 3000,
+    })
+  }
+
+  // Packet + Record Rank only — no AI call. Powers /rank and /story previews.
+  fastify.get(
+    '/story/packet',
+    { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } },
+    async (req: FastifyRequest<{ Querystring: { horizon?: string } }>) => {
+      const { compressLogs, computeRecordRank, normalizeHorizon } = await import(
+        '#shared/utils/log-compression'
+      )
+      const horizon = normalizeHorizon(req.query.horizon)
+      const logs = await loadStoryLogs(req.user.id, 365)
+      const plain = logs.map(l => l.get({ plain: true }) as any)
+      const packet = compressLogs(plain, horizon)
+      const rank = computeRecordRank(plain)
+      let overallLevel: number | null = null
+      try {
+        const all = await fastify.models.Log.findAll({
+          where: { userId: req.user.id },
+          order: [['createdAt', 'DESC']],
+          limit: 500,
+        })
+        overallLevel = all.length ? generateUserNarrative(req.user, all).currentLevel : null
+      } catch {
+        overallLevel = null
+      }
+      return { packet, rank, overallLevel }
+    }
+  )
+
   fastify.post(
     '/story',
     { config: { rateLimit: { max: 5, timeWindow: '1 minute' } } },
@@ -5490,6 +5539,7 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
       req: FastifyRequest<{
         Body: {
           logText: string
+          horizon?: string
           quantumState?: {
             energy?: string
             clarity?: string
@@ -5510,34 +5560,24 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         return reply.code(403).send({
           story: 'Story generation is available for Usership members.',
           logId: null,
+          packet: null,
         })
       }
 
+      const {
+        compressLogs,
+        normalizeHorizon,
+        packetToPrompt,
+        composeFallbackStory,
+        HORIZON_DAYS,
+        HORIZON_WORD_BUDGET,
+      } = await import('#shared/utils/log-compression')
+
       const { logText, quantumState, userIndex } = req.body
+      const horizon = normalizeHorizon(req.body.horizon)
 
-      const logs = await fastify.models.Log.findAll({
-        where: { userId: req.user.id },
-        order: [['createdAt', 'DESC']],
-        limit: 200,
-      })
-
-      const recentEntries = logs
-        .filter(l => l.event === 'log_entry' || l.event === 'journal')
-        .slice(0, 10)
-        .map(l => (l.text || '').substring(0, 200))
-        .filter(Boolean)
-
-      const moodLogs = logs.filter(l => l.event === 'emotional_checkin').slice(0, 10)
-      const recentMoods = moodLogs.map(l => (l.metadata?.emotionalState as string || '').toUpperCase()).filter(Boolean)
-
-      const selfCareLogs = logs.filter(l =>
-        l.event === 'memory_answer' || l.event === 'self_care_checkin' || l.event === 'energy_checkin'
-      ).slice(0, 10)
-      const selfCareNotes = selfCareLogs.map(l => {
-        const q = (l.metadata?.question as string || '')
-        const a = (l.metadata?.option as string || l.metadata?.answer as string || '')
-        return q && a ? `${q}: ${a}` : ''
-      }).filter(Boolean)
+      const logs = await loadStoryLogs(req.user.id, HORIZON_DAYS[horizon])
+      const packet = compressLogs(logs.map(l => l.get({ plain: true }) as any), horizon)
 
       let stateBlock = ''
       if (quantumState && quantumState.energy) {
@@ -5547,47 +5587,48 @@ ${recentPrayers.length > 0 ? `RECENT SCRIPTURES (DO NOT REPEAT):\n${recentPrayer
         stateBlock += `\nUSER INDEX: ${userIndex.overall}/100 (trend: ${userIndex.trend || '—'})`
       }
 
-      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that weaves the operator's recent data into a short narrative.
+      const [minWords, maxWords] = HORIZON_WORD_BUDGET[horizon]
+      const systemPrompt = `You are the Story module of LOT Systems — a personal operating system that compresses the operator's journal into a short narrative of their ${horizon}.
 
-The operator typed a log entry and invoked /story. Your task: write 1-2 paragraphs (100-200 words) that reflect their recent journey, mood trajectory, and self-care patterns. The story should feel personal, grounded, and real — not generic motivational writing.
+You receive a COMPRESSION PACKET computed deterministically from their Log entries, mood check-ins and environment context (weather, city, moon). Write ${minWords}-${maxWords} words that compress this ${horizon} into a story.
 
 RULES:
-- Write in second person ("You...")
-- Draw from their actual log entries, moods, and self-care answers below
-- Reference specific details from their data — make it feel like THEIR story
-- If they've been consistent with check-ins, acknowledge the discipline
-- If there are gaps or struggle, acknowledge that with compassion
-- The tone should match their current energy: reflective if low, energized if high
-- End with a single forward-looking sentence — not a pep talk, just a quiet truth
-- Return ONLY the story paragraphs. No title. No commentary. No preamble.
-- Keep it under 200 words.`
+- Second person ("You...").
+- Use only facts present in the packet. Never invent events, people or numbers.
+- Name the high peak and the low peak if present — quote or paraphrase their excerpts. These are the moments that matter.
+- If the tone shifted, say which way, gently.
+- If coverage is sparse, acknowledge the quiet without judgement.
+- Weave in the environment (place, weather, moon) only where it adds texture.
+- Match tone to the packet: reflective if heavier, brighter if lighter.
+- If a FOLLOW-UP SIGNAL is present, end with ONE short, open question about it. Otherwise end with one quiet, forward-looking sentence. Never a pep talk.
+- Return ONLY the story. No title, no preamble, no bullet points, no markdown.`
 
-      const dataBlock = `
-OPERATOR LOG ENTRY: "${logText || '(no text)'}"
+      const dataBlock = `COMPRESSION PACKET
+${packetToPrompt(packet)}
 
-${stateBlock ? stateBlock : 'STATE: unknown'}
+${stateBlock || 'STATE: unknown'}
 
-RECENT MOODS: ${recentMoods.slice(0, 5).join(', ') || 'NO DATA'}
-
-RECENT LOG ENTRIES:
-${recentEntries.slice(0, 5).map(e => `- ${e}`).join('\n') || '- (none)'}
-
-SELF-CARE DATA:
-${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
+OPERATOR NOTE WITH THE COMMAND: "${(logText || '').substring(0, 300) || '(none)'}"`
 
       const fullPrompt = `${systemPrompt}\n\n${dataBlock}`
+      const context = await getLogContext(req.user)
 
+      let cleaned: string
+      let engineUsed: 'together' | 'fallback' = 'together'
       try {
         const { aiEngineManager } = await import('#server/utils/ai-engines.js')
         const engine = aiEngineManager.getEngine('together')
+        console.log(`📖 Story [${horizon}] for user ${req.user.id}: ${packet.entries} entries, ${packet.checkins} check-ins`)
+        const story = await engine.generateCompletion(fullPrompt, 640)
+        cleaned = story.trim().replace(/^["']|["']$/g, '')
+        if (!cleaned) throw new Error('empty completion')
+      } catch (error: any) {
+        console.error('Story generation failed, composing deterministic fallback:', error?.message || error)
+        cleaned = composeFallbackStory(packet)
+        engineUsed = 'fallback'
+      }
 
-        console.log(`📖 Story generation for ${req.user.email}: "${(logText || '').substring(0, 80)}"`)
-
-        const story = await engine.generateCompletion(fullPrompt, 512)
-
-        const cleaned = story.trim().replace(/^["']|["']$/g, '')
-
-        const context = await getLogContext(req.user)
+      try {
         const storyLog = await fastify.models.Log.create({
           userId: req.user.id,
           text: cleaned,
@@ -5595,22 +5636,18 @@ ${selfCareNotes.slice(0, 5).map(n => `- ${n}`).join('\n') || '- (none)'}`
           context,
           metadata: {
             story: cleaned,
+            horizon,
+            engine: engineUsed,
+            packet,
             logText: (logText || '').substring(0, 500),
             quantumState: quantumState || null,
             timestamp: new Date().toISOString(),
           },
         })
-
-        return {
-          story: cleaned,
-          logId: storyLog.id,
-        }
+        return { story: cleaned, logId: storyLog.id, horizon, packet, engine: engineUsed }
       } catch (error: any) {
-        console.error('Story generation failed:', error)
-        return {
-          story: 'The system holds your data quietly. When the engine returns, your story will be here.',
-          logId: null,
-        }
+        console.error('Story persistence failed:', error)
+        return { story: cleaned, logId: null, horizon, packet, engine: engineUsed }
       }
     }
   )

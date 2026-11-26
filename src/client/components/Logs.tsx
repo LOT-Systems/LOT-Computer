@@ -28,12 +28,13 @@ import {
   playSynthActivationChime,
   playSynthDeactivationChime,
 } from '#client/utils/sovietKeyboard'
-import { detectNewTriggers, type LogTrigger } from '#client/utils/logTriggers'
+import { detectNewTriggers, buildSystemHelp, type LogTrigger } from '#client/utils/logTriggers'
+import { parseStoryCommand, packetToGrid, rankToGrid } from '#shared/utils/log-compression'
 import { runJournalEasterEggs } from '#client/utils/easter-eggs'
 import { recordLogSignal, recordJournalSignal, recordBadgeSignal, analyzeIntentions, getUserState, getUserIndex, intentionEngine } from '#client/stores/intentionEngine'
 import { getAssemblyState } from '#client/stores/selfAssembly'
 import { getEarnedBadges, BADGES } from '#client/utils/badges'
-import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
+import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration, getStoryPacket } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
 
@@ -3706,7 +3707,13 @@ const NoteEditor = ({
   const [prayerLoading, setPrayerLoading] = React.useState(false)
   const [storyResponse, setStoryResponse] = React.useState<string | null>(null)
   const [storyLoading, setStoryLoading] = React.useState(false)
+  const [storyGrid, setStoryGrid] = React.useState<string | null>(null)
+  const [rankResult, setRankResult] = React.useState<string | null>(null)
   const [systemHelp, setSystemHelp] = React.useState<string | null>(null)
+  // /story fires on keystroke; wait for the text to settle so the
+  // horizon argument ("/story month") can be typed before we submit.
+  const storyPendingRef = React.useRef(false)
+  const storyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const [breatheEnabled, setBreatheEnabled] = React.useState(false)
   const breatheState = useBreathe(breatheEnabled)
   const [silentResult, setSilentResult] = React.useState<string | null>(null)
@@ -3742,6 +3749,7 @@ const NoteEditor = ({
   const { mutate: submitStory } = useStoryGeneration({
     onSuccess: (data) => {
       setStoryResponse(data.story)
+      setStoryGrid(data.packet ? packetToGrid(data.packet) : null)
       setStoryLoading(false)
       const current = valueRef.current
       const separator = current.trim() ? '\n\n' : ''
@@ -4121,52 +4129,47 @@ const NoteEditor = ({
           setPhysResult('PHYS STATE UNAVAILABLE')
         }
       } else if (trigger === 'system-help') {
-        const lines = [
-          'AVAILABLE COMMANDS',
-          '',
-          '/prayer       Generate contextual scripture',
-          '/story        Generate a personal story from recent data',
-          '/scan         System status overview',
-          '/qi [query]   Ask the Quantum Intelligence engine',
-          '/assembly     Self-assembly module status',
-          '/phys         Physiological cohort report',
-          '/qos          Quantum OS state analysis',
-          '/fast         Orthodox fasting calendar',
-          '/breathe      4-2-6 breathing exercise',
-          '/freeze       Pause and reflect protocol',
-          '/silent       Signal silence check',
-          '/synth        Toggle keyboard sound',
-          '/radio        Toggle radio',
-          '/night        Dark mode',
-          '/how          Open LOT AI check-in (System tab)',
-          '/system       This help screen',
-          '',
-          'SHORTCUTS',
-          'Ctrl+Enter    Save log immediately',
-        ]
-        setSystemHelp(lines.join('\n'))
+        // Rendered from the command registry in logTriggers.ts — never drifts.
+        setSystemHelp(buildSystemHelp())
+      } else if (trigger === 'rank-report') {
+        setRankResult('RECORD RANK     COMPUTING...')
+        getStoryPacket('week')
+          .then(({ packet, rank, overallLevel }) => {
+            const lines = [rankToGrid(rank, overallLevel)]
+            if (packet.followUp) lines.push('', `FOLLOW-UP       ${packet.followUp}`)
+            setRankResult(lines.join('\n'))
+          })
+          .catch(() => setRankResult('RECORD RANK     UNAVAILABLE'))
       } else if (trigger === 'how-checkin') {
         stores.goTo('system')
       } else if (trigger === 'story-mode') {
-        if (!storyLoading) {
-          setStoryLoading(true)
-          setStoryResponse(null)
-          try {
-            const logText = value.replace(/\/story/i, '').replace(/📖/g, '').trim()
-            const state = getUserState()
-            const index = getUserIndex()
-            submitStory({
-              logText,
-              quantumState: state,
-              userIndex: index,
-            })
-          } catch {
-            submitStory({ logText: value })
-          }
-        }
+        if (!storyLoading) storyPendingRef.current = true
       }
     }
   }, [value])
+
+  // Settle timer for /story — (re)armed on every keystroke while pending.
+  React.useEffect(() => {
+    if (!storyPendingRef.current) return
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+    storyTimerRef.current = setTimeout(() => {
+      storyPendingRef.current = false
+      storyTimerRef.current = null
+      const { horizon, note } = parseStoryCommand(valueRef.current)
+      setStoryLoading(true)
+      setStoryResponse(null)
+      setStoryGrid(null)
+      try {
+        submitStory({ logText: note, horizon, quantumState: getUserState(), userIndex: getUserIndex() })
+      } catch {
+        submitStory({ logText: note, horizon })
+      }
+    }, 1500)
+  }, [value])
+
+  React.useEffect(() => () => {
+    if (storyTimerRef.current) clearTimeout(storyTimerRef.current)
+  }, [])
 
   const contextText = React.useMemo(() => {
     if (!log?.context) return ''
@@ -4399,7 +4402,7 @@ const NoteEditor = ({
                     const desc = spaceIdx > -1 ? line.slice(spaceIdx).trim() : ''
                     return (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', padding: '3px 0', fontSize: '14px', lineHeight: '1.5' }}>
-                        <span style={{ minWidth: '100px', opacity: 1 }}>{cmd}</span>
+                        <span style={{ minWidth: '200px', flexShrink: 0, opacity: 1 }}>{cmd}</span>
                         <span style={{ opacity: 0.6 }}>{desc}</span>
                       </div>
                     )
@@ -4420,6 +4423,11 @@ const NoteEditor = ({
               {storyLoading && !storyResponse && (
                 <div className="opacity-40 tracking-widest">...</div>
               )}
+              {storyGrid && (
+                <div className="opacity-40 mb-4" style={{ fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  {storyGrid}
+                </div>
+              )}
               {storyResponse && (
                 <div className="opacity-60">
                   {storyResponse.split('\n').map((line, idx) => (
@@ -4427,6 +4435,13 @@ const NoteEditor = ({
                   ))}
                 </div>
               )}
+            </Block>
+          </div>
+        )}
+        {rankResult && (
+          <div className="mt-8">
+            <Block label="RANK:" blockView>
+              <div className="opacity-60" style={{ fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{rankResult}</div>
             </Block>
           </div>
         )}

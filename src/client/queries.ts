@@ -27,6 +27,7 @@ import {
 } from '#shared/types'
 import dayjs from '#client/utils/dayjs'
 import { DATE_TIME_FORMAT } from '#shared/constants'
+import type { StoryHorizon, CompressionPacket, RecordRank } from '#shared/utils/log-compression'
 
 const api = axios.create({
   baseURL: '/',
@@ -895,6 +896,7 @@ export const usePrayerScripture = createMutation<
 export const useStoryGeneration = createMutation<
   {
     logText: string
+    horizon?: StoryHorizon
     quantumState?: {
       energy?: string
       clarity?: string
@@ -910,5 +912,18 @@ export const useStoryGeneration = createMutation<
   {
     story: string
     logId: string | null
+    horizon?: StoryHorizon
+    packet?: CompressionPacket | null
+    engine?: 'together' | 'fallback'
   }
 >('post', '/api/story')
+
+/** Deterministic packet + Record Rank (no AI call). Powers /rank. */
+export async function getStoryPacket(horizon: StoryHorizon = 'week'): Promise<{
+  packet: CompressionPacket
+  rank: RecordRank
+  overallLevel: number | null
+}> {
+  const { data } = await api.get('/api/story/packet', { params: { horizon } })
+  return data
+}
