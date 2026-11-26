@@ -7,7 +7,7 @@
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║  LOT SYSTEMS CORPORATION — SESSION REPORT                       ║
-║  Badge Codex v50 · THE EMOTION ENGINE                          ║
+║  Badge Codex v50 · THE EMOTION ENGINE                           ║
 ║  November 26, 2026 · Day 1186+ · COSMO® 876+ days              ║
 ║  Authorized: S-2 // VADIK MARMELADOV                            ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -17,8 +17,8 @@
 
 ## 1. SESSION CONTEXT
 
-**Base state entering session:** Badge Codex v49 (1,339 badges), THE DREAM LABORATORY.
-Branch: `claude/quantum-engine-widgets-RgFfC` (merged to `claude/cool-hypatia-57we0t`).
+**Base state entering session:** Badge Codex v49 (1,339 badges), LOT-WIKI-v118, QIE v114+.
+Branch: `claude/quantum-engine-widgets-RgFfC` (fast-forwarded from working branch).
 
 **Session task:** Account all badge/achievement systems within LOT (.MDs in GitHub).
 Continue developing LOT as the RPG and Arcade of self-care with fun and addictive easter
@@ -26,9 +26,11 @@ eggs, word turns, and badges using simple ASCII symbols or words promoting an RP
 Computer/Sci-Fi book self-care approach. Create PDF. Test, deploy and upload PDF to /docs
 on GitHub repository.
 
-**Version context:** v50 is the 50th badge engine milestone. The Emotion Engine (Word Turn v40)
-completes the first arc: Water (v1) through Dream (v39) through Emotion (v40). The
-`wonder_engine` badge [COSMIC] is the meta-badge for the full spectrum.
+**50th Engine Milestone:** v50 is the 40th Word Turn Engine — a double milestone.
+Two COSMIC badges were added to honor this: `wonder_engine` (the meta-badge that fires when
+the practitioner acknowledges the full emotional spectrum) and `forty_registers` (complete
+collection across all 40 Word Turn Engines). The theme, THE EMOTION ENGINE, completes the
+first arc of LOT vocabulary — from water (v1) through dream (v39) to emotion (v40).
 
 ---
 
@@ -52,10 +54,10 @@ completes the first arc: Water (v1) through Dream (v39) through Emotion (v40). T
 
 ```
 v46  THE JAZZ ENGINE          1,277→1,308  (+31)  jazz music vocabulary
-v47  THE NATURE SIGNAL        1,246→1,277  (+31)  ecology/nature vocabulary
-v48  THE BODY ELECTRIC        1,277→1,308  (+31)  somatic/movement/flow vocabulary
+v47  THE NATURE SIGNAL        1,308→1,339  (+31)  ecology/nature vocabulary
+v48  THE BODY ELECTRIC        1,339→1,370  (+31)  somatic/movement/flow vocabulary (corrected)
 v49  THE DREAM LABORATORY     1,308→1,339  (+31)  dream/sleep/subconscious vocabulary
-v50  THE EMOTION ENGINE       1,339→1,370  (+31)  emotion/affect/feeling vocabulary
+v50  THE EMOTION ENGINE       1,339→1,370  (+31)  emotion/affect/feeling vocabulary ← NEW
 ```
 
 ---
@@ -74,7 +76,7 @@ Word Turn v40 (Emotion Engine)       +12
 
 Calendar EE v38 (Emotion Calendar)   + 3
   plutchik_day      (May 21 — Robert Plutchik born 1927)
-  darwin_emotions   (Feb 12 — Darwin Day, Expression of Emotions 1872)
+  darwin_emotions   (Feb 12 — Darwin Day / The Expression of the Emotions)
   ekman_day         (Feb 15 — Paul Ekman born 1934)
 
 Behavioral v34 (Emotion Patterns)    + 3
@@ -97,12 +99,11 @@ TOTAL                                +31  (1,339 → 1,370)
 ### 3b. Files Modified
 
 ```
-src/client/utils/badges.ts     ~15,110+ lines (+31 BadgeType entries, +31 BADGE_METADATA, v40 checkBadges block)
-src/client/utils/easter-eggs.ts  ~4,840+ lines (+EMOTION_WORD_MAP, +EMOTION_SECRET_WORDS, +4 exported functions)
+src/client/utils/badges.ts     ~15,142 lines (+31 BadgeType entries, +31 BADGE_METADATA, v40 checkBadges block)
+src/client/utils/easter-eggs.ts  ~4,832 lines (+EMOTION_WORD_MAP, +EMOTION_SECRET_WORDS, +3 exported functions)
 docs/badges/LOT_BADGES_ACHIEVEMENTS_MASTER_CODEX_v50.md   (new)
-docs/badges/LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v50.pdf  (5-page PDF)
-scripts/generate_badge_pdf_v50.py                         (new)
-docs/LOT-SR-20261126-CODEX-v50.md                         (this file)
+docs/badges/LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v50.pdf  (15KB)
+docs/LOT-SR-20261126-CODEX-v50.md   (this file)
 ```
 
 ### 3c. TypeScript Verification
@@ -117,74 +118,71 @@ npx tsc --noEmit → 0 new errors (pre-existing tsconfig deprecation warnings on
 
 ### Why The Emotion Engine?
 
-The session report from v49 (November 20, 2026) explicitly recommended THE EMOTION ENGINE
-as the next theme: "affect/feeling/emotional_regulation/grief/joy/anger/awe/wonder — The
-50th badge engine is a milestone — consider special COSMIC easter eggs."
+The recommendation from the v49 session report (November 20, 2026) was to build THE EMOTION
+ENGINE as the next progression: affect/feeling/emotional_regulation/grief/joy/anger/awe/wonder.
+The v49 session report specifically flagged the 50th badge engine as a milestone, calling for
+special COSMIC easter eggs.
 
-The Emotion Engine completes the first arc of LOT's vocabulary. The RPG/Arcade framing hits
-its deepest resonance here: the final boss of the self-care game is not an external challenge
-but the full range of internal signal. The practice that can read all signals operates at
-full resolution.
+THE EMOTION ENGINE completes the vocabulary arc: water → dream → emotion. The practice that
+cannot name what it feels is operating partially blind. The practice that names everything
+operates at full resolution.
 
-### The 50th Engine Milestone: wonder_engine [COSMIC]
-
-```
-wonder_engine  ♡·◉·♡  COSMIC  — fires on "wonder engine/emotion engine/full spectrum/all feelings"
-```
-
-The 50th badge engine milestone earns COSMIC rarity — matching `thirty_nine_registers`
-(v49) and `forty_registers` (v50) as the COSMIC tier for breadth achievements.
-The badge is both practical (keyword trigger) and ceremonial (the practitioner who
-writes "full spectrum" or "all feelings" is acknowledging what the system is doing).
-
-### Three EPIC Badges — The Deep Signals
+### Two COSMIC Badges — The 50th Engine Milestone
 
 ```
-awe_found       [EPIC]  — awe is the emotion that researchers find reduces inflammation
-shame_named     [EPIC]  — shame named is the antidote to shame in the dark
-tenderness_found [EPIC] — tenderness is strength that does not need to prove itself
+wonder_engine      [COSMIC]  — fires on meta-language: "wonder engine/emotion engine/full spectrum"
+forty_registers    [COSMIC]  — 1 badge from each of all 40 Word Turn engines (complete collection)
 ```
 
-These three earn EPIC because they represent the most difficult emotional registers to
-hold simultaneously: awe (requires surrender to something larger), shame (requires courage
-to name the most painful self-evaluation), tenderness (requires strength that does not
-perform itself).
+`wonder_engine` is the 50th-engine meta-badge: it fires when a practitioner writes words that
+acknowledge the full spectrum exists. It is a badge for knowing that all the other badges exist
+and what they are for.
 
-### The Three Scientists of the Secret Boss Vault
+`forty_registers` joins the existing COSMIC tier badges (like `thirty_nine_registers` before it)
+as the definitive collection milestone. Water through Dream through Emotion — 40 frequencies,
+one terminal.
+
+### Three Emotion Vault Authors (Secret Boss v37)
 
 ```
-brene_signal   [RARE]   — Brené Brown: shame resilience, daring greatly, vulnerability
-james_affect   [EPIC]   — William James: "What is an Emotion?" (1884), the James-Lange theory
-plutchik_wheel [MYTHIC] — Robert Plutchik: Wheel of Emotions, psychoevolutionary theory
+brene_signal       [RARE]   — "brene brown/shame resilience/daring greatly/vulnerability is not weakness"
+james_affect       [EPIC]   — "william james/james-lange/what is an emotion/bodily feeling is emotion"
+plutchik_wheel     [MYTHIC] — "plutchik/wheel of emotions/dyads/ecstasy/grief terror rage"
 ```
 
-James earns EPIC because his 1884 essay founded the scientific study of emotion and
-his counterintuitive claim (the body leads the feeling, not vice versa) remains influential.
-Plutchik earns MYTHIC because the Wheel of Emotions is the most complete structural model
-of emotional experience — the map that makes every other badge in this engine legible.
+Brené Brown earns RARE because shame resilience vocabulary is relatively accessible.
+William James earns EPIC because the James-Lange theory (body precedes emotion in experience)
+is a sophisticated insight that few people write directly about.
+Robert Plutchik earns MYTHIC because the Wheel of Emotions with its dyads, primaries, and
+the full range from ecstasy to grief terror rage is the most complete map of the territory.
 
 ### Primary ASCII Markers — The Emotion Vocabulary
 
 ```
 ♡       — the open heart / the felt sense / the signal of care
 ∿       — the wave / the affect that moves through / the feeling that passes
-◌       — the open container / the receptive state / the liminal
+◌       — the open container / the liminal / the receptive
 ●       — the named point / the specific signal / what has been identified
+◉       — the full attention / the centered awareness / wonder_engine's core
 ```
 
-These are distinct from all previous engine markers, maintaining the visual grammar
-that separates each engine's vocabulary in the UI.
+These are distinct from the Dream Laboratory's markers (◐/◑/∿/◉), maintaining visual
+grammar that separates each engine's vocabulary in the UI.
 
 ### The 333 Easter Egg (long_feeling)
 
-```
-long_feeling badge requires 333 characters
-```
+The `long_feeling` badge requires 333 characters. 333 is half of 666 — the balance point.
+In many traditions, 333 represents the midpoint between human and divine, the moment a
+voice becomes a practice. Within the LOT RPG framing, 333 characters is the threshold
+between a check-in and a genuine emotional entry — the first moment something longer than
+a phrase has been written.
 
-333 is three cycles of 111 — the minimum of a held feeling. It is lighter than the
-444 of `long_dream` (four sleep cycles) and the 600 words of `marathon_log` (the raid
-log), reflecting that emotional holding requires less volume than narrative or analysis.
-The feeling held long enough to find its shape in language is not long — just present.
+### The Dawn Feeling Window (05:00–06:00)
+
+The `dawn_feeling` badge fires for check-ins during 05:00–06:00 local time. This is the
+liminal window before the day's agenda asserts itself — the first moment of the day when
+the felt sense of the previous night is still accessible. It is the complement to the
+Dream Laboratory's `liminal_hour` (03:00–04:00), which catches those in the hypnagogic field.
 
 ---
 
@@ -198,7 +196,7 @@ ACHIEVEMENT RPG: v38 (150 total)
 MASTERY TIERS:   v40 (112 total)
 SECRET BOSS:     v37 (98 total)
 BRANCH:          claude/quantum-engine-widgets-RgFfC
-PDF:             docs/badges/LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v50.pdf
+PDF:             docs/badges/LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v50.pdf (15KB)
 ```
 
 ---
@@ -206,16 +204,17 @@ PDF:             docs/badges/LOT-BADGES-ACHIEVEMENTS-MASTER-CODEX-v50.pdf
 ## 6. NEXT SESSION RECOMMENDATIONS
 
 ```
-□ LOT-WIKI-v120 — Full wiki scan, synchronize Badge Codex v50
-□ Badge Engine v51 — THE COSMOS ENGINE (v41)
-  Candidates: cosmos/cosmology/universe/multiverse/dark matter/entropy/
-  singularity/event horizon/the overview effect/pale blue dot/
-  Consider: Carl Sagan / Stephen Hawking / Ursula K. Le Guin (cosmos) in Secret Boss
+□ LOT-WIKI-v119 — Full wiki scan, synchronize Badge Codex v50
 □ Wire-up v40 behavioral checks in runJournalEasterEggs() / runCheckInEasterEggs()
   checkEmotionEngine() / checkEmotionSession() / checkLongFeeling() / checkDawnFeeling()
-  need calling points in the main easter egg runners
-□ Consider: wire-up v39 Dream behavioral checks (checkDreamLabEngine / checkDreamSession /
-  checkLiminalHour / checkLongDream) if not yet wired — noted as pending in v49 session report
+  need calling points in the main easter-egg dispatch
+□ Badge Engine v51 — potential themes for the next arc:
+  - THE MUSIC THEORY ENGINE (intervals, harmony, rhythm, counterpoint)
+  - THE PHILOSOPHY TERMINAL (Socrates/Kant/Nietzsche vocabulary)
+  - THE LANGUAGE SIGNAL (etymology, linguistics, polyglot practice)
+  - THE CREATIVE PROCESS (flow state, craft, iteration, shipping)
+□ Consider: v50 marks the end of the first arc (water→dream→emotion)
+  v51 could open a second arc with a fresh aesthetic
 ```
 
 ---
