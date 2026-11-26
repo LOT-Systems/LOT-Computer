@@ -3920,7 +3920,10 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         },
         order: [['createdAt', 'DESC']],
         limit: 100, // Sample last 100 check-ins for performance
-        attributes: ['emotionalState', 'createdAt']
+        // emotionalState lives in metadata (see POST /emotional-checkins);
+        // selecting it as a column threw "column does not exist" → 500 on
+        // every call, so the System tab "Shared emotion:" never resolved.
+        attributes: ['metadata', 'createdAt']
       })
 
       if (recentEmotions.length === 0) {
@@ -3935,7 +3938,7 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
       // Count emotional states
       const emotionCounts: Record<string, number> = {}
       recentEmotions.forEach((log: any) => {
-        const emotion = log.emotionalState
+        const emotion = log.metadata?.emotionalState
         if (emotion) {
           emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1
         }
@@ -4390,15 +4393,14 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
         const twentyFourHoursAgo = dayjs().subtract(24, 'hours').toDate()
 
         const [recentUnlocks, badgesUnlockedToday] = await Promise.all([
+          // Log has no User association defined (models/index.ts), so an
+          // `include: User` threw SequelizeEagerLoadingError → permanent 500.
+          // Fetch the logs, then resolve first names in one batched query.
           fastify.models.Log.findAll({
             where: {
               event: 'badge_unlock',
               createdAt: { [Op.gte]: twentyFourHoursAgo }
             },
-            include: [{
-              model: fastify.models.User,
-              attributes: ['firstName']
-            }],
             order: [['createdAt', 'DESC']],
             limit: 10
           }),
@@ -4410,9 +4412,15 @@ Create a short, vivid description (1-2 sentences) for a ${elementType} that woul
           })
         ])
 
+        const unlockUserIds = [...new Set(recentUnlocks.map((log: any) => log.userId).filter(Boolean))]
+        const unlockUsers = unlockUserIds.length
+          ? await fastify.models.User.findAll({ where: { id: unlockUserIds }, attributes: ['id', 'firstName'] })
+          : []
+        const firstNameById = new Map(unlockUsers.map((u: any) => [u.id, u.firstName]))
+
         const unlocks = recentUnlocks.map((log: any) => ({
           badge: log.metadata?.badge || '∘',
-          userName: log.User?.firstName || 'Someone',
+          userName: firstNameById.get(log.userId) || 'Someone',
           timeAgo: dayjs().diff(dayjs(log.createdAt), 'minutes')
         }))
 

@@ -28,12 +28,16 @@ import {
  * callForHelp flag, etc.).
  */
 export function usePunctuationContext(): PunctuationContextState {
-  const { data: logs = [] } = useLogs()
+  // No `= []` default here: a fresh array literal on every render (while logs
+  // are loading, errored or rate-limited) re-fired the effect below, which
+  // always writes the store → re-render → new [] → "Maximum update depth
+  // exceeded". That loop crashed CohortConnectWidget (Community group) and
+  // MicroImageWidget. Only recompute when react-query hands us real data.
+  const { data: logs } = useLogs()
   const snapshot = useStore(punctuationContext)
 
-  // Recompute whenever logs change. The store short-circuits on no-op
-  // updates so this does not spam re-renders.
   React.useEffect(() => {
+    if (!logs) return
     updatePunctuationFromLogs(logs)
   }, [logs])
 

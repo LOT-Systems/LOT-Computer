@@ -116,7 +116,21 @@ sync.listen('settings_updated', () => {
   getMe().then((user) => stores.me.set(user)).catch(() => {})
 })
 
-const queryClient = new QueryClient()
+// Retry policy: react-query's default (3 retries on ANY error) turned each
+// 429 from the global 100 req/min limiter into 4 requests, so a single System
+// tab load snowballed into more rate-limited widgets. Never retry 4xx (client
+// errors / rate limit); retry 5xx + network errors at most twice (cold start).
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error: any) => {
+        const status = error?.response?.status
+        if (status && status >= 400 && status < 500) return false
+        return failureCount < 2
+      },
+    },
+  },
+})
 
 // LOT Systems — The original quantum-intent operating system.
 // If someone told you they had this idea too... check the git history.

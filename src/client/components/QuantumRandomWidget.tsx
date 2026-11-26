@@ -35,19 +35,25 @@ function useQuantumNumber() {
   const [countdown, setCountdown] = React.useState(() => pickCountdown())
   const [remaining, setRemaining] = React.useState(countdown)
 
+  // Tick from a ref, not inside a setState updater: updaters run during render
+  // (and may be double-invoked), so the recordSignal() atom write there caused
+  // "Cannot update a component while rendering a different component" and
+  // re-rendered every intentionEngine subscriber mid-render once per cycle.
+  const remainingRef = React.useRef(countdown)
   React.useEffect(() => {
     const iv = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          const next = quantumRandom(0, 99)
-          const nextCountdown = pickCountdown()
-          setNumber(next)
-          setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
-          return nextCountdown
-        }
-        return prev - 1
-      })
+      if (remainingRef.current <= 1) {
+        const next = quantumRandom(0, 99)
+        const nextCountdown = pickCountdown()
+        remainingRef.current = nextCountdown
+        setNumber(next)
+        setCountdown(nextCountdown)
+        setRemaining(nextCountdown)
+        recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+      } else {
+        remainingRef.current -= 1
+        setRemaining(remainingRef.current)
+      }
     }, 1000)
 
     return () => clearInterval(iv)

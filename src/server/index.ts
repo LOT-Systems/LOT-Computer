@@ -57,9 +57,17 @@ const KNOWN_CLIENT_ROUTES = ['/', '/settings', '/sync', '/log']
 fastify.register(fastifyCookie)
 
 // Global rate limiting: 100 requests per minute per IP
+// Static client bundles (/js/, /css/) are exempt: one System tab load pulls
+// ~40–60 chunk/asset requests, which alone ate half the budget and left the
+// widget API fan-out (~45 calls) rate-limited (429) on first paint. API and
+// page routes keep the same 100/min ceiling.
 fastify.register(fastifyRateLimit, {
   max: 100,
   timeWindow: '1 minute',
+  allowList: (req: FastifyRequest) => {
+    const url = req.url || ''
+    return url.startsWith('/js/') || url.startsWith('/css/')
+  },
   errorResponseBuilder: (_req: FastifyRequest, context: { after: string; statusCode: number }) => {
     return {
       statusCode: context.statusCode,

@@ -12,7 +12,7 @@ import { useOSStatus, useOSVersion, useOSPerformance } from '#client/queries'
 import { ProgressBars } from '#client/utils/progressBars'
 import { useLogContext } from '#client/hooks/useLogContext'
 import { useStore } from '@nanostores/react'
-import { intentionEngine, getUserIndex, classifyPhysiologicalCohort, recordOSSignal } from '#client/stores/intentionEngine'
+import { intentionEngine, getUserIndex, getUserState, classifyPhysiologicalCohort, recordOSSignal } from '#client/stores/intentionEngine'
 
 type MetricsView = 'status' | 'performance' | 'version' | 'physiology' | 'qos'
 
@@ -95,7 +95,10 @@ export function UserMetricsWidget() {
   // they only recompute when signals actually change — not on every re-render
   // this mounted widget receives from unrelated intentionEngine writes.
   const userIndex = React.useMemo(() => getUserIndex(), [engineState.signals])
-  const qieCohort = React.useMemo(() => classifyPhysiologicalCohort(), [engineState.signals])
+  const qieCohort = React.useMemo(
+    () => classifyPhysiologicalCohort(engineState.signals, getUserState(), engineState.recognizedPatterns ?? []),
+    [engineState.signals]
+  )
 
   // Don't render while loading all data
   if (statusLoading && perfLoading && versionLoading) return null

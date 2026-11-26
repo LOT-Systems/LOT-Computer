@@ -27,6 +27,7 @@ import { useBreathe } from '#client/utils/breathe'
 import { useProfile, useLogs, useCommunityEmotion } from '#client/queries'
 import { useEvolutionSync } from '#client/hooks/useEvolutionSync'
 import { UserTag } from '#shared/types'
+import type { Log } from '#shared/types'
 import { TimeWidget } from './TimeWidget'
 import { QuantumRandomWidget } from './QuantumRandomWidget'
 import { MemoryWidget } from './MemoryWidget'
@@ -92,6 +93,10 @@ function LazyMount({ children }: { children: React.ReactNode }) {
   return <div ref={ref}>{inViewport ? children : null}</div>
 }
 
+// Stable fallback: a fresh `[]` each render would re-fire every [logs] effect
+// (analyzeIntentions + setQuantumState) while logs are loading or errored.
+const EMPTY_LOGS: Log[] = []
+
 function LoadingDots() {
   const [dots, setDots] = React.useState(1)
   React.useEffect(() => {
@@ -113,7 +118,7 @@ export const System = React.memo(function SystemInner() {
   const myProfileVisits: number = (me as any)?.metadata?.profileVisits ?? 0
 
   const { data: profile } = useProfile()
-  const { data: logs = [] } = useLogs()
+  const { data: logs = EMPTY_LOGS } = useLogs()
   const { data: communityEmotion } = useCommunityEmotion()
 
 
@@ -265,7 +270,7 @@ export const System = React.memo(function SystemInner() {
   // before the browser can paint, causing visible UI lag on every logs change.
   const [quantumState, setQuantumState] = React.useState(() => getUserState())
   React.useEffect(() => {
-    analyzeIntentions()
+    try { analyzeIntentions() } catch (e) { console.warn('[QIE] analyzeIntentions failed:', e) }
     recomputeAssembly()
     setQuantumState(getUserState())
   }, [logs])
@@ -374,7 +379,10 @@ export const System = React.memo(function SystemInner() {
     return options[index]
   }, [weather])
 
-  const optimalWidget = React.useMemo(() => getOptimalWidget(), [logs])
+  // Guarded: a single faulty QIE pattern must never take down the System tab.
+  const optimalWidget = React.useMemo(() => {
+    try { return getOptimalWidget() } catch (e) { console.warn('[QIE] getOptimalWidget failed:', e); return null }
+  }, [logs])
 
   // Community pulse — atmosphere layer
   const convergence = React.useMemo(() => getConvergenceSignal(), [])

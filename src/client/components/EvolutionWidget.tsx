@@ -29,6 +29,10 @@ export const EvolutionWidget: React.FC = () => {
   const { data: logs } = useLogs()
   const logCtx = useLogContext()
   const [view, setView] = React.useState<'metrics' | 'activity'>('metrics')
+  // Must run before the early return below (Rules of Hooks). Previously this
+  // useMemo sat after `return null`, so the hook count changed once narrative +
+  // logs loaded → React #310 → the whole Bioethics widget group crashed.
+  const stoicAnchor = React.useMemo(() => getDailyStoicAnchor(), [])
 
   const cycleView = () => {
     setView(prev => prev === 'metrics' ? 'activity' : 'metrics')
@@ -95,7 +99,6 @@ export const EvolutionWidget: React.FC = () => {
   }
 
   const stage = getEvolutionStage(currentLevel)
-  const stoicAnchor = React.useMemo(() => getDailyStoicAnchor(), [])
 
   // Activity breakdown labels (CQGS module mapping)
   const activityLabels: Record<string, string> = {
