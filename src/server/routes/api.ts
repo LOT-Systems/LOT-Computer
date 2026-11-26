@@ -1287,6 +1287,8 @@ export default async (fastify: FastifyInstance) => {
       'sixth_cycle_ignition',
       // v144: sixth cycle resonance (P194)
       'sixth_cycle_resonance',
+      // v145: sixth cycle deepening (P195)
+      'sixth_cycle_deepening',
     ]
     const logs = await fastify.models.Log.findAll({
       where: {

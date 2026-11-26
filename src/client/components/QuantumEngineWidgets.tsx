@@ -150,6 +150,7 @@ const PATTERN_DISPLAY: Record<string, string> = {
   'sixth-cycle-progenitor':               'SCPROG',
   'sixth-cycle-ignition':                 'SCIGN',
   'sixth-cycle-resonance':                'SCRES',
+  'sixth-cycle-deepening':                'SCDEP',
   'temporal-sovereignty-arc':             'TSOV',
 }
 
@@ -584,6 +585,7 @@ export const QuantumEngineWidgets: React.FC = () => {
               </div>
               {(() => {
                 const cyclePatterns = [
+                  { pattern: 'sixth-cycle-deepening',    label: 'L29 · SIXTH CYCLE DEEPENING',       urgent: true },
                   { pattern: 'sixth-cycle-resonance',    label: 'L28 · SIXTH CYCLE RESONANCE',      urgent: true },
                   { pattern: 'sixth-cycle-ignition',     label: 'L27 · SIXTH CYCLE IGNITION',      urgent: true },
                   { pattern: 'sixth-cycle-progenitor',   label: 'L26 · SIXTH CYCLE PROGENITOR',    urgent: true },

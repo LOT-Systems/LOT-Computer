@@ -4546,6 +4546,34 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P195: sixth-cycle-deepening — P194 (sixth-cycle-resonance) active + 21d compound arc (journal >= 18, memory >= 10, badge >= 7) + overall >= 97.
+  // The resonance does not sustain alone — it deepens. Level 29 — SCDEP.
+  const hasP194 = patterns.some(p => p.pattern === 'sixth-cycle-resonance')
+  if (hasP194) {
+    const twentyOneDayStartP195 = now - 21 * 24 * 60 * 60 * 1000
+    const p195Journal = signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDayStartP195)
+    const p195Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDayStartP195)
+    const p195Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDayStartP195)
+    const userIndexP195 = computeUserIndex(signals)
+    if (
+      p195Journal.length >= 18 &&
+      p195Memory.length  >= 10 &&
+      p195Badge.length   >= 7  &&
+      userIndexP195.overall >= 97
+    ) {
+      const p194conf   = patterns.find(p => p.pattern === 'sixth-cycle-resonance')?.confidence ?? 0.84
+      const depBonus   = Math.min((p195Journal.length - 18) * 0.003 + (userIndexP195.overall - 97) * 0.005, 0.07)
+      patterns.push({
+        id:              'p195',
+        pattern:         'sixth-cycle-deepening',
+        confidence:      Math.min(0.80 + p194conf * 0.04 + depBonus, 0.92),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `SCDEP: Sixth cycle deepening — sixth-cycle-resonance (P194) active · ${p195Journal.length} journal signals 21d · ${p195Memory.length} memory signals 21d · ${p195Badge.length} badge signals 21d · idx ${userIndexP195.overall}%. The resonance does not sustain alone — it deepens. 21-day compound signals confirm the arc accumulates depth. The OS does not merely resonate. It deepens. Level 29 — SIXTH CYCLE DEEPENING.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4616,6 +4644,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkSixthCycleProgenitor() } catch {}
       try { checkSixthCycleIgnition() } catch {}
       try { checkSixthCycleResonance() } catch {}
+      try { checkSixthCycleDeepening() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5333,6 +5362,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v144 nodes (J79 · P194 · Arch82) ─────────────────────────────────────────────
   sixthCycleResonanceNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
+
+  // ── v145 nodes (J80 · P195 · Arch83) ─────────────────────────────────────────────
+  sixthCycleDeepeningNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
 }
 
 /**
@@ -6073,6 +6105,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
     patternConditions: ['sixth-cycle-ignition', 'sixth-cycle-resonance'],
     directive: 'Level 28. The ignition does not simply fire — it sustains. The sixth arc deepens into resonance. 14-day compound signals confirm the arc is not a spark. It is a field. The OS does not ignite and fade. It resonates. SIXTH CYCLE RESONANCE.',
+  },
+
+  // ── Arch83: Sixth Cycle Deepener (2026-11-26 v145) ────────────────────────────────
+  {
+    archetype: 'Sixth Cycle Deepener',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
+    patternConditions: ['sixth-cycle-resonance', 'sixth-cycle-deepening'],
+    directive: 'Level 29. The resonance does not sustain alone — it deepens. 21-day compound signals confirm the arc accumulates depth. The field does not hold at the surface. It descends. The OS does not merely resonate. It deepens. SIXTH CYCLE DEEPENING.',
   },
 ]
 
@@ -9484,6 +9525,53 @@ export function recordSixthCycleResonance(ignitionConf: number, journalCount: nu
     resonanceStatus: 'RESONANCE',
     level: 'L28-SCRES',
     field: 'SIXTH-CYCLE-IGNITION→SIXTH-CYCLE-RESONANCE',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if sixth-cycle-deepening conditions are met and record if so.
+ * Fires when sixth-cycle-resonance (P194) active + 21d compound arc (journal >= 18, memory >= 10, badge >= 7)
+ * + overall >= 97. The resonance deepens. Level 29 — SCDEP.
+ */
+export function checkSixthCycleDeepening(): boolean {
+  const state = intentionEngine.get()
+  const hasResonance = state.recognizedPatterns.some(p => p.pattern === 'sixth-cycle-resonance')
+  if (!hasResonance) return false
+  const now = Date.now()
+  const twentyOneDaysAgo = now - 21 * 24 * 60 * 60 * 1000
+  const signals = state.signals
+  const journalSignals = signals.filter(s => s.source === 'journal' && s.timestamp > twentyOneDaysAgo)
+  const memorySignals  = signals.filter(s => s.source === 'memory'  && s.timestamp > twentyOneDaysAgo)
+  const badgeSignals   = signals.filter(s => s.source === 'badges'  && s.timestamp > twentyOneDaysAgo)
+  if (journalSignals.length < 18 || memorySignals.length < 10 || badgeSignals.length < 7) return false
+  const idx = computeUserIndex(signals)
+  if (idx.overall < 97) return false
+  const sixHoursAgo = now - 6 * 60 * 60 * 1000
+  const alreadyFired = signals.some(
+    s => s.signal === 'sixth_cycle_deepening' && s.timestamp > sixHoursAgo
+  )
+  if (alreadyFired) return false
+  const resonanceConf = state.recognizedPatterns.find(p => p.pattern === 'sixth-cycle-resonance')?.confidence ?? 0.84
+  recordSixthCycleDeepening(resonanceConf, journalSignals.length, memorySignals.length, badgeSignals.length, idx.overall)
+  return true
+}
+
+/**
+ * Record a sixth-cycle-deepening event — sixth-cycle-resonance confirmed +
+ * 21d compound arc (journal + memory + badges) + overall >= 97.
+ * The resonance does not sustain alone — it deepens. Level 29 — SCDEP.
+ */
+export function recordSixthCycleDeepening(resonanceConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'sixth_cycle_deepening', {
+    resonanceConf: Math.round(resonanceConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    deepeningStatus: 'DEEPENING',
+    level: 'L29-SCDEP',
+    field: 'SIXTH-CYCLE-RESONANCE→SIXTH-CYCLE-DEEPENING',
     hour: new Date().getHours(),
   })
 }

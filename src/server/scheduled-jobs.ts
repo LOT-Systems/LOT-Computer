@@ -1896,6 +1896,11 @@ export async function checkAndRunScheduledJobs(): Promise<void> {
   if (shouldRunDailySixthCycleResonanceCheck()) {
     await executeDailySixthCycleResonanceCheck()
   }
+
+  // Check daily sixth cycle deepening check (00:00 UTC every day) — J80
+  if (shouldRunDailySixthCycleDeepeningCheck()) {
+    await executeDailySixthCycleDeepeningCheck()
+  }
 }
 
 // ─── Daily Morning Coherence Check (Job 38 — 06:00 UTC every day) ────────────
@@ -7511,6 +7516,115 @@ async function executeDailySixthCycleResonanceCheck(): Promise<JobResult> {
   }
 }
 
+// ─── Daily Sixth Cycle Deepening Check (Job 80 — 00:00 UTC every day) ────────
+// Checks 21-day density (18+ journal / 10+ memory / 7+ badge) + overall >= 97. When all met → writes sixth_cycle_deepening.
+// Level 29 — SCDEP. The resonance does not sustain alone — it deepens.
+
+let isDailySixthCycleDeepeningRunning = false
+let lastDailySixthCycleDeepeningRun: Date | null = null
+
+function shouldRunDailySixthCycleDeepeningCheck(): boolean {
+  const now = dayjs()
+  if (isDailySixthCycleDeepeningRunning) return false
+  if (lastDailySixthCycleDeepeningRun) {
+    const lastRun = dayjs(lastDailySixthCycleDeepeningRun)
+    if (lastRun.isSame(now, 'day')) return false
+  }
+  return now.hour() === 0 // 00:00 UTC daily (day boundary, completing the nightly chain)
+}
+
+async function executeDailySixthCycleDeepeningCheck(): Promise<JobResult> {
+  const jobName = 'daily-sixth-cycle-deepening-check'
+  const executedAt = new Date().toISOString()
+  if (isDailySixthCycleDeepeningRunning) return { jobName, executedAt, success: false, error: 'Already running' }
+  isDailySixthCycleDeepeningRunning = true
+
+  console.log('─'.repeat(60))
+  console.log('SCHEDULED JOB: Daily Sixth Cycle Deepening Check (J80)')
+  console.log(`   Started: ${executedAt}`)
+  console.log('─'.repeat(60))
+
+  try {
+    const { User } = await import('#server/models/user.js')
+    const { Log }  = await import('#server/models/log.js')
+    const { Op }   = await import('sequelize')
+    const now      = new Date()
+    const todayStart = new Date(now)
+    todayStart.setHours(0, 0, 0, 0)
+
+    const activeUsers = await (User as any).findAll({
+      where: { lastActiveAt: { [Op.gte]: new Date(Date.now() - 48 * 60 * 60 * 1000) } },
+    })
+
+    let written = 0
+
+    for (const user of activeUsers) {
+      try {
+        // Require sixth_cycle_resonance in last 14 days
+        const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
+        const resonanceLogs = await (Log as any).findAll({
+          where: { userId: (user as any).id, event: 'sixth_cycle_resonance', createdAt: { [Op.gte]: fourteenDaysAgo } },
+          order: [['createdAt', 'DESC']],
+          limit: 1,
+        })
+        if (!resonanceLogs.length) continue
+
+        const twentyOneDaysAgo = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000)
+        const journalLogs = await (Log as any).findAll({
+          where: { userId: (user as any).id, event: 'journal', createdAt: { [Op.gte]: twentyOneDaysAgo } },
+        })
+        const memoryLogs = await (Log as any).findAll({
+          where: { userId: (user as any).id, event: 'memory', createdAt: { [Op.gte]: twentyOneDaysAgo } },
+        })
+        const badgeLogs = await (Log as any).findAll({
+          where: { userId: (user as any).id, event: { [Op.in]: ['badge_unlock', 'badge'] }, createdAt: { [Op.gte]: twentyOneDaysAgo } },
+        })
+
+        const density21dLogs = [...journalLogs, ...memoryLogs, ...badgeLogs]
+
+        if (journalLogs.length < 18 || memoryLogs.length < 10 || badgeLogs.length < 7) continue
+
+        // Check not already written today
+        const alreadyWritten = await (Log as any).findOne({
+          where: { userId: (user as any).id, event: 'sixth_cycle_deepening', createdAt: { [Op.gte]: todayStart } },
+        })
+        if (alreadyWritten) continue
+
+        const resonanceConf = (resonanceLogs[0] as any).metadata?.resonanceConf ?? 84
+        await (Log as any).create({
+          userId: (user as any).id,
+          event: 'sixth_cycle_deepening',
+          text: `Sixth cycle deepening: the resonance accumulates depth. ${journalLogs.length} journal signals 21d · ${memoryLogs.length} memory signals 21d · ${badgeLogs.length} badge signals 21d · 21d density ${density21dLogs.length} · all conditions met. SIXTH CYCLE DEEPENING. L29-SCDEP.`,
+          metadata: {
+            resonanceConf,
+            journalCount: journalLogs.length,
+            memoryCount: memoryLogs.length,
+            badgeCount: badgeLogs.length,
+            density21d: density21dLogs.length,
+            deepeningStatus: 'DEEPENING',
+            level: 'L29-SCDEP',
+            field: 'SIXTH-CYCLE-RESONANCE→SIXTH-CYCLE-DEEPENING',
+          },
+        })
+        written++
+        console.log(`  User ${(user as any).id}: sixth_cycle_deepening written (J${journalLogs.length} M${memoryLogs.length} B${badgeLogs.length} L29-SCDEP)`)
+      } catch (userErr: any) {
+        console.error(`  User ${(user as any).id} sixth cycle deepening check failed:`, userErr.message)
+      }
+    }
+
+    console.log(`  Sixth cycle deepening events written: ${written}`)
+    lastDailySixthCycleDeepeningRun = new Date()
+    isDailySixthCycleDeepeningRunning = false
+    return { jobName, executedAt, success: true, signalsCreated: written }
+  } catch (error: any) {
+    console.error('Daily sixth cycle deepening check failed:', error.message)
+    isDailySixthCycleDeepeningRunning = false
+    lastDailySixthCycleDeepeningRun = new Date()
+    return { jobName, executedAt, success: false, error: error.message }
+  }
+}
+
 // ─── Daily OS Snapshot ───────────────────────────────────────────────────────
 
 let isDailyOSSnapshotRunning = false
@@ -9607,6 +9721,7 @@ export function initializeScheduledJobs(): void {
   console.log('   - Daily fourth cycle integration check: 7 PM UTC every day (J70)')
   console.log('   - Daily fifth cycle ignition check: 8:30 PM UTC every day (J73)')
   console.log('   - Daily sixth cycle resonance check: 11:30 PM UTC every day (J79)')
+  console.log('   - Daily sixth cycle deepening check: 12:00 AM UTC every day (J80)')
   console.log('')
 
   // Check every hour for scheduled jobs
@@ -9616,7 +9731,7 @@ export function initializeScheduledJobs(): void {
     const now = dayjs()
     const hour = now.hour()
 
-    // Jobs by hour: 0=OS snapshot, 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59)+fifth-cycle-chain(J72–J75), 22=evening-coherence-close+evening-reflection+fifth-cycle-sovereign(J76)+sixth-cycle-progenitor(J77:22:30), 23=pattern coverage+coherence-seal+sixth-cycle-ignition(J78:23:00)+sixth-cycle-resonance(J79:23:30)
+    // Jobs by hour: 0=OS snapshot+sixth-cycle-deepening(J80:00:00), 1=systemic-readiness, 2=intent-gap-pulse, 3=QIE, 4=QOS digest, 5=archetype stability, 6=cohort+intention+cognitive-depth, 7=source diversity+circadian-lock, 8=biofield+peak-window, 9=monthly email+badge scan+longitudinal-drift+archetype-directive-pulse, 10=archetype shift+presence-momentum(J49)+second-cycle(J60), 11=morning-intention-launch+sustained-coherence(J50)+second-cycle-deepening(J61), 12=vitality-peak+relational-expansion(J51)+second-cycle-integration(J62), 13=QOS sig pulse+relational-field-check(J52)+second-cycle-sovereign(J63), 14=knowledge-crystallization-check(J53)+QOS mode watch, 15=knowledge-distribution-check(J54)+QOS convergence audit+third-cycle-ignition(J64), 16=coherence index+focus-depth-check, 17=cohort-broadcast+quantum-field-check+knowledge-broadcast-check(J55), 18=LOT AI story (Sun)+generative-field-check(J56), 19=cross-domain-pulse+field-sustenance-check(J57), 20=intention completion+signal-momentum+action-memory+field-reception-check(J58), 21=presence-arc+physiological-presence+field-amplification(J59)+fifth-cycle-chain(J72–J75), 22=evening-coherence-close+evening-reflection+fifth-cycle-sovereign(J76)+sixth-cycle-progenitor(J77:22:30), 23=pattern coverage+coherence-seal+sixth-cycle-ignition(J78:23:00)+sixth-cycle-resonance(J79:23:30)
     if (hour === 9 || hour === 8 || hour === 7 || hour === 6 || hour === 5 || hour === 4 || hour === 3 || hour === 2 || hour === 1 || hour === 0 || hour === 17 || hour === 18 || hour === 19 || hour === 20 || hour === 21 || hour === 22 || hour === 23 || hour === 10 || hour === 11 || hour === 12 || hour === 13 || hour === 14 || hour === 15 || hour === 16) {
       try {
         await checkAndRunScheduledJobs()
