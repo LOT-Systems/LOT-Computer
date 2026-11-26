@@ -311,6 +311,7 @@ export const System = React.memo(function SystemInner() {
   const fourthCycleStatus = React.useMemo(() => {
     const eng = intentionEngine.get()
     const patterns = eng.recognizedPatterns ?? []
+    const hasSCRes   = patterns.some(p => p.pattern === 'sixth-cycle-resonance')
     const hasSCIgn   = patterns.some(p => p.pattern === 'sixth-cycle-ignition')
     const hasSCProg  = patterns.some(p => p.pattern === 'sixth-cycle-progenitor')
     const hasFCSov5 = patterns.some(p => p.pattern === 'fifth-cycle-sovereign')
@@ -324,6 +325,7 @@ export const System = React.memo(function SystemInner() {
     const hasFCDep  = patterns.some(p => p.pattern === 'fourth-cycle-deepening')
     const hasFCIgn  = patterns.some(p => p.pattern === 'fourth-cycle-ignition')
     const hasFCCand = patterns.some(p => p.pattern === 'fourth-cycle-candidate')
+    if (hasSCRes)   return 'L28-SCRES'
     if (hasSCIgn)   return 'L27-SCIGN'
     if (hasSCProg)  return 'L26-SCPROG'
     if (hasFCSov5) return 'L25-FCSOV'
@@ -763,7 +765,7 @@ export const System = React.memo(function SystemInner() {
                 { metric: 'Index', value: `${userIndex.overall}%` },
                 ...(secondCycleStatus ? [{ metric: 'Cycle', value: secondCycleStatus }] : []),
                 ...(thirdCycleStatus ? [{ metric: 'Arc', value: thirdCycleStatus }] : []),
-                ...(fourthCycleStatus ? [{ metric: (fourthCycleStatus.startsWith('L25') || fourthCycleStatus.startsWith('L24') || fourthCycleStatus.startsWith('L23') || fourthCycleStatus.startsWith('L22') || fourthCycleStatus.startsWith('L21') || fourthCycleStatus.startsWith('L20')) ? 'Fifth Arc' : 'Fourth Arc', value: fourthCycleStatus }] : []),
+                ...(fourthCycleStatus ? [{ metric: (fourthCycleStatus.startsWith('L28') || fourthCycleStatus.startsWith('L27') || fourthCycleStatus.startsWith('L26')) ? 'Sixth Arc' : (fourthCycleStatus.startsWith('L25') || fourthCycleStatus.startsWith('L24') || fourthCycleStatus.startsWith('L23') || fourthCycleStatus.startsWith('L22') || fourthCycleStatus.startsWith('L21') || fourthCycleStatus.startsWith('L20')) ? 'Fifth Arc' : 'Fourth Arc', value: fourthCycleStatus }] : []),
                 { metric: 'Directive', value: physiologicalCohort?.directive ?? '—' }
               ]}
               columns={[
