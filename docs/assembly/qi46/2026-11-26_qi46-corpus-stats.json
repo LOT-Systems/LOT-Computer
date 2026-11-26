@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-11-26T19:38:16.651Z",
+  "lexicon": "v1",
+  "files": 57,
+  "pairs": 1089,
+  "tokensEst": 179745,
+  "bySource": {
+    "institute": 370,
+    "cosmo": 17,
+    "brand": 57,
+    "bioelectric": 645
+  },
+  "byType": {
+    "example": 513,
+    "philosophy": 47,
+    "technical": 392,
+    "voice": 29,
+    "instruction": 108
+  },
+  "byBodyState": {
+    "calibration": 619,
+    "hardware": 114,
+    "pattern": 324,
+    "coherence": 32
+  },
+  "cosmoCleared": 1058,
+  "cosmoFlagged": 31,
+  "registerMean": {
+    "grace": 0.021,
+    "poetry": 0.005,
+    "love": 0.018,
+    "hugs": 0.007,
+    "being_there": 0.013,
+    "being_cool": 0.003,
+    "male": 0.014
+  },
+  "registerMeanV0": {
+    "grace": 0.033,
+    "poetry": 0.041,
+    "love": 0.043,
+    "hugs": 0.02,
+    "being_there": 0.042,
+    "being_cool": 0.032,
+    "male": 0.104
+  },
+  "registerNonZero": {
+    "grace": 79,
+    "poetry": 20,
+    "love": 78,
+    "hugs": 36,
+    "being_there": 54,
+    "being_cool": 19,
+    "male": 55
+  },
+  "external": {
+    "platform": "PostgreSQL — not read (consent gate)",
+    "consumables": "not in repository"
+  },
+  "malformed": 0,
+  "gate": {
+    "sourcesInventoried": true,
+    "allTagged": true,
+    "allCosmoCleared": false,
+    "over10kPairs": false,
+    "jsonlValid": true,
+    "vadikReview100": false,
+    "result": "HOLD"
+  }
+}

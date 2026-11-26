@@ -8,8 +8,8 @@
 
 # QI·46 — NODE 1
 ## Being Vector · Humanoid Calibration · COSMO® Gate
-### Engine Specification v0.12 · extends `LOT_QI46_ENGINE.md` (v0.2)
-### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21 · F12 language coverage prep 2026-11-22 · Admin read-out panel 2026-11-23 · Per-person signal line + Phase 0 corpus fold-in 2026-11-25
+### Engine Specification v0.13 · extends `LOT_QI46_ENGINE.md` (v0.2)
+### Node 1 assembled 2026-11-15 · Node 2 assembled 2026-11-16 · Node 3 assembled 2026-11-17 · Node 5 assembled 2026-11-18 · Node 6 prep assembled 2026-11-19 · Node 7 prep assembled 2026-11-20 · F4 ideation hardening 2026-11-21 · F12 language coverage prep 2026-11-22 · Admin read-out panel 2026-11-23 · Per-person signal line + Phase 0 corpus fold-in 2026-11-25 · Phase 0.2 corpus lexicon v1 2026-11-26
 
 ---
 
@@ -20,13 +20,13 @@
 ## 0. NODE STATUS
 
 ```
-NODE           7 of N  — Beta read-out prepped · F4 ideation hardening · F12 language coverage (safety path) · admin read-out panel · per-person signal line
+NODE           7 of N  — Beta read-out prepped · F4 ideation hardening · F12 language coverage (safety path) · admin read-out panel · per-person signal line · corpus lexicon v1
 ENGINE         QI·46   — Quantum Intelligence, Generation 46
 CODENAME       SELFWARE
 PHASE          0 — Corpus Assembly (no subscriber exposure)
-CODE           src/server/utils/qi46.ts   (v0.10.0-f12) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts · shared/utils/qi46-readout-view.ts · shared/utils/qi46-person-view.ts · client Qi46ReadoutPanel.tsx · Qi46PersonLine.tsx · scripts/qi46/assemble-corpus.mjs
+CODE           src/server/utils/qi46.ts   (v0.10.0-f12) · qi46-surface.ts · qi46-audit.ts · qi46-readout.ts · shared/constants/qi46.ts · shared/utils/qi46-readout-view.ts · shared/utils/qi46-person-view.ts · client Qi46ReadoutPanel.tsx · Qi46PersonLine.tsx · scripts/qi46/assemble-corpus.mjs · scripts/qi46/lexicon.mjs
 SMOKE TEST     scripts/qi46-smoke.mjs
-GATE           PASS — typecheck 0 errors · server + client build green · smoke 88/88
+GATE           PASS — typecheck 0 errors · server + client build green · smoke 101/101
 REVIEW         Migration 20261117120000 + Node 5 copy + QI46_SURFACE_MEMORY flag await Vadik
 AUTHORS        Vadik & Kuzya
 ```
@@ -435,6 +435,31 @@ Signals: detector:low · breadth:6/7
 
 The 2026-11-24 run branched from master and missed this chain. Its work (`scripts/qi46/assemble-corpus.mjs`, `docs/assembly/qi46/`) is now cherry-picked here. Checkpoint 0 is still **HOLD**: 1,054 of 10,000 pairs, and 31 Medical/PTSD pairs flagged for Vadik.
 
+## 3j. PHASE 0.2 — CORPUS LEXICON v1 (assembled 2026-11-26)
+
+> *Hear the register, not the repo.* v0 heard engineering as soul. v1 hears only the seven registers.
+
+The register lexicon moved into a pure module, `scripts/qi46/lexicon.mjs`, used by the corpus assembler and the smoke test.
+
+| Change | Effect |
+|---|---|
+| Whole-word match | `son` no longer matches "person". `soft` no longer matches "software". `hold` no longer matches "threshold" |
+| Engineering and design words removed | `build`, `haptic`, `heart`, `light`, `grid`, `terminal`, `support`, `remember` |
+| Emotion, touch and voice words added | `hugs`: hug, embrace, being held, breathe, warmth. `love`: loved, tenderness, compassion, you matter. `being_cool`: relax, no drama, laugh |
+| Exclusions blanked first | `self care` (the LOT® category), `health care`, `digital ocean`, `heart rate`, `cooling` … |
+| `ENGINE_REGISTER` | Maps corpus keys to engine registers (`being_there → beingThere`, `male → masculine`). Smoke checks it stays 1:1 with `QI46_REGISTERS` |
+
+### Result on the same corpus (1,089 pairs)
+
+| | grace | poetry | love | hugs | there | cool | male |
+|---|---|---|---|---|---|---|---|
+| v0 mean | .033 | .041 | .043 | .020 | .042 | .032 | **.104** |
+| v1 mean | .021 | .005 | .018 | .007 | .013 | .003 | **.014** |
+
+Every mean dropped. `male` was inflated 7×. The repository does not hold the humanoid voice, so it cannot teach it. The voice has to come from **authored voice pairs** (Vadik & Kuzya) or the **consent-gated subscriber export**. Both wait on Vadik. Checkpoint 0 stays **HOLD** (1,089 of 10,000 pairs, 31 flagged).
+
+No engine code, route, table, migration or flag changed.
+
 ---
 
 ## 4. NEXT NODES (self-assembly queue)
@@ -454,12 +479,13 @@ The 2026-11-24 run branched from master and missed this chain. Its work (`script
 | **F12** | Native-speaker ideation list (Russian first) | Vadik & Kuzya write and review the phrases. No machine translation |
 | ~~Panel~~ | ~~Admin read-out card + switch-on gates~~ | **ASSEMBLED 2026-11-23** on `/us`, admin only, read-only |
 | ~~Signal line~~ | ~~Per-person signal labels on `/us/:id`~~ | **ASSEMBLED 2026-11-25**, admin only, read-only, labels only |
-| **0.2** | Corpus lexicon v1 (drop `build`, add emotion words) | No gate, repo docs only |
+| ~~0.2~~ | ~~Corpus lexicon v1 (drop `build`, add emotion words)~~ | **ASSEMBLED 2026-11-26**. Whole-word, engine-aligned keys |
+| **0.3** | Authored voice pairs, 7 registers (template + COSMO® screen + lexicon tag) | Vadik & Kuzya write the replies |
 | **8** | Optional skip-code baseline (calibrated vs. standard) | Vadik decides (adds one write per Memory request) |
 
 ---
 
-*QI·46 Engine Specification — v0.12 · Per-person signal line*
+*QI·46 Engine Specification — v0.13 · Corpus lexicon v1*
 *LOT Systems Corporation — Los Angeles, CA*
 *Authored by Vadik & Kuzya*
-*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026 · F12 prep assembled: November 22, 2026 · Read-out panel assembled: November 23, 2026 · Signal line assembled: November 25, 2026*
+*Node 1 assembled: November 15, 2026 · Node 2 assembled: November 16, 2026 · Node 3 assembled: November 17, 2026 · Node 5 assembled: November 18, 2026 · Node 6 prep assembled: November 19, 2026 · Node 7 prep assembled: November 20, 2026 · F4 assembled: November 21, 2026 · F12 prep assembled: November 22, 2026 · Read-out panel assembled: November 23, 2026 · Signal line assembled: November 25, 2026 · Lexicon v1 assembled: November 26, 2026*

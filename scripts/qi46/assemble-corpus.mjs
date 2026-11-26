@@ -11,6 +11,8 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+// Calibration registers — the humanoid output axes (lexicon v1, whole-word)
+import { LEXICON_V1 as REGISTERS, LEXICON_VERSION, scoreRegisters, registerHitsV0 } from './lexicon.mjs'
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..')
 const OUT = path.resolve(process.argv[2] || path.join(ROOT, 'corpus/qi46'))
@@ -32,17 +34,6 @@ const SOURCES = {
 
 // Documents never auto-cleared: personal health / trauma material
 const COSMO_HOLD = [/Medical_Records/i, /PTSD/i, /\.pdf$/i]
-
-// Calibration registers — the humanoid output axes
-const REGISTERS = {
-  grace:      ['grace', 'gentle', 'calm', 'quiet', 'still', 'soft', 'patience', 'ease'],
-  poetry:     ['poem', 'poetry', 'story', 'shore', 'water', 'light', 'myth', 'verse'],
-  love:       ['love', 'care', 'tender', 'heart', 'devotion', 'compassion', 'kind'],
-  hugs:       ['hug', 'hold', 'embrace', 'warm', 'comfort', 'touch', 'haptic'],
-  being_there:['present', 'presence', 'listen', 'listening', 'with you', 'support', 'remember'],
-  being_cool: ['cool', 'clean', 'minimal', 'terminal', 'grid', 'precise', 'sharp'],
-  male:       ['father', 'son', 'protect', 'strength', 'steady', 'discipline', 'build'],
-}
 
 function walk(rel) {
   const abs = path.join(ROOT, rel)
@@ -86,22 +77,16 @@ function bodyState(text) {
   return 'calibration'
 }
 
-function registers(text) {
-  const t = text.toLowerCase()
-  const r = {}
-  for (const [k, words] of Object.entries(REGISTERS)) {
-    const hits = words.reduce((n, w) => n + (t.split(w).length - 1), 0)
-    r[k] = Math.min(1, +(hits / 6).toFixed(2))
-  }
-  return r
-}
+const registers = (text) => scoreRegisters(text)
+const registersV0 = (text) => scoreRegisters(text, registerHitsV0)
 
 const files = latestWiki(Object.values(SOURCES).flat().flatMap(walk)).filter((f) => f.endsWith('.md'))
 const lines = []
-const stats = { generatedAt: new Date().toISOString(), files: 0, pairs: 0, tokensEst: 0,
-  bySource: {}, byType: {}, byBodyState: {}, cosmoCleared: 0, cosmoFlagged: 0, registerMean: {},
+const stats = { generatedAt: new Date().toISOString(), lexicon: LEXICON_VERSION, files: 0, pairs: 0, tokensEst: 0,
+  bySource: {}, byType: {}, byBodyState: {}, cosmoCleared: 0, cosmoFlagged: 0, registerMean: {}, registerMeanV0: {}, registerNonZero: {},
   external: { platform: 'PostgreSQL — not read (consent gate)', consumables: 'not in repository' } }
-const regSum = Object.fromEntries(Object.keys(REGISTERS).map((k) => [k, 0]))
+const zero = () => Object.fromEntries(Object.keys(REGISTERS).map((k) => [k, 0]))
+const regSum = zero(), regSumV0 = zero(), regNonZero = zero()
 
 for (const f of files) {
   const src = /COSMO/i.test(f) ? 'cosmo'
@@ -113,7 +98,7 @@ for (const f of files) {
     if (body.length < 120) continue
     const completion = body.slice(0, 4000)
     const tags = { source: src, type: classify(completion), arc_position: '12mo+',
-      body_state: bodyState(completion), cosmo_cleared: cleared, file: f, registers: registers(completion) }
+      body_state: bodyState(completion), cosmo_cleared: cleared, file: f, lexicon: LEXICON_VERSION, registers: registers(completion) }
     lines.push(JSON.stringify({ prompt: `[LOT® SYSTEM] ${SYSTEM_PROMPT}\n\n${head}`, completion, tags }))
     stats.pairs++
     stats.tokensEst += Math.round(completion.length / 4)
@@ -121,10 +106,15 @@ for (const f of files) {
     stats.byType[tags.type] = (stats.byType[tags.type] || 0) + 1
     stats.byBodyState[tags.body_state] = (stats.byBodyState[tags.body_state] || 0) + 1
     cleared ? stats.cosmoCleared++ : stats.cosmoFlagged++
-    for (const k in regSum) regSum[k] += tags.registers[k]
+    const v0 = registersV0(completion)
+    for (const k in regSum) { regSum[k] += tags.registers[k]; regSumV0[k] += v0[k]; if (tags.registers[k] > 0) regNonZero[k]++ }
   }
 }
-for (const k in regSum) stats.registerMean[k] = +(regSum[k] / Math.max(1, stats.pairs)).toFixed(3)
+for (const k in regSum) {
+  stats.registerMean[k] = +(regSum[k] / Math.max(1, stats.pairs)).toFixed(3)
+  stats.registerMeanV0[k] = +(regSumV0[k] / Math.max(1, stats.pairs)).toFixed(3)
+  stats.registerNonZero[k] = regNonZero[k]
+}
 
 // Validate JSONL
 let malformed = 0

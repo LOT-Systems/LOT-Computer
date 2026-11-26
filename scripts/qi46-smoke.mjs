@@ -216,3 +216,27 @@ const checksL={
 let passL=0; for (const [k,ok] of Object.entries(checksL)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passL++ }
 const totalL=totalP+Object.keys(checksL).length
 console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12+passP+passL}/${totalL}`); if (passL!==Object.keys(checksL).length) process.exit(1)
+
+// ─── Phase 0.2: corpus lexicon v1 (whole-word, no engineering words) ───────
+import { registerHits, registerHitsV0, scoreRegisters, LEXICON_V1, LEXICON_VERSION, ENGINE_REGISTER } from './qi46/lexicon.mjs'
+import { QI46_REGISTERS } from '../dist/server/server/utils/qi46.js'
+const lx=(t)=>registerHits(t)
+const eng='We build the server, then build the client. The person gave a reason this season. Software threshold, heart rate 72, haptic grid on the terminal.'
+const checksX={
+  'Lexicon version is v1':LEXICON_VERSION==='v1',
+  'Lexicon keys map 1:1 to engine registers':Object.keys(LEXICON_V1).map(k=>ENGINE_REGISTER[k]).sort().join()===[...QI46_REGISTERS].sort().join(),
+  'Lexicon: engineering text scores 0 on every register':Object.values(lx(eng)).every(n=>n===0),
+  'Lexicon: v0 scored that same text (proves the fix)':registerHitsV0(eng).male>0&&registerHitsV0(eng).hugs>0,
+  'Lexicon: build no longer counts as masculine':lx('build build build').male===0,
+  'Lexicon: whole word — careful/scared/glove are not love':lx('be careful, I was scared, a glove').love===0,
+  'Lexicon: self-care is the category, not love':lx('the LOT self-care platform').love===0&&lx('I care about you').love===1,
+  'Lexicon: hugs hears touch words':lx('A hug. Breathe. You are being held, warmth on your shoulders.').hugs>=4,
+  'Lexicon: love hears emotion words':lx('You are loved. Tenderness and compassion. You matter.').love>=4,
+  'Lexicon: being_cool scores ease, not design':lx('minimal clean terminal grid').being_cool===0&&lx('relax, no drama, just laugh').being_cool===3,
+  'Lexicon: being_there hears presence phrases':lx("I'm here. I am with you. You are not alone.").being_there===3,
+  'Lexicon: curly apostrophe folds (I’m here)':lx('I’m here').being_there===1,
+  'Lexicon: score capped at 1':scoreRegisters('love love love love love love love love').love===1,
+}
+let passX=0; for (const [k,ok] of Object.entries(checksX)) { console.log((ok?'■ PASS  ':'□ FAIL  ')+k); if(ok) passX++ }
+const totalX=totalL+Object.keys(checksX).length
+console.log(`SMOKE ${pass+pass3+pass5+pass6+pass7+passF4+passF12+passP+passL+passX}/${totalX}`); if (passX!==Object.keys(checksX).length) process.exit(1)
