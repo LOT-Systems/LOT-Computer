@@ -4880,7 +4880,8 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  rhythm?: { dominantMoonPhase: string | null; inRhythm: boolean; sampled: number }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,6 +4890,11 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // Logs-derived personal rhythm (Astrology v2): does today's moon phase
+    // match the phase this user historically writes under?
+    dominantMoonPhase: rhythm?.dominantMoonPhase ?? null,
+    inRhythm: rhythm?.inRhythm ?? false,
+    rhythmSamples: rhythm?.sampled ?? 0,
   })
 }
 

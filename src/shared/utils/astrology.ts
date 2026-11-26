@@ -80,16 +80,16 @@ export function getHourlyZodiac(date: Date): string {
  * Simplified calculation based on Gregorian calendar
  */
 export function getRokuyo(date: Date): string {
-  // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
-  const knownRokuyoIndex = 0
-
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
-
-  // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
-
+  // Known starting point: January 1, 2000 was Sensho (index 0).
+  // Count whole *calendar* days using the date's own wall-clock fields on
+  // both sides (Date.UTC), so the result can't flip a day early/late near
+  // local midnight. The previous version subtracted a UTC-midnight anchor
+  // from a local timestamp, which shifted the cycle for users west of UTC
+  // in the evening and east of UTC after midnight (2026-11-26 fix).
+  const anchor = Date.UTC(2000, 0, 1)
+  const day = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.round((day - anchor) / 86400000)
+  const rokuyoIndex = ((daysDiff % 6) + 6) % 6
   return ROKUYO[rokuyoIndex]
 }
 
@@ -176,4 +176,127 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ---------------------------------------------------------------------------
+// Ambient reading — single source of truth (2026-11-26, Astrology v2)
+// Shared by the dashboard (client) and getLogContext (server) so the block
+// on screen and the ASTRO: line written into every Log entry can never drift.
+// ---------------------------------------------------------------------------
+
+export type AmbientReading = {
+  hourlyZodiac: string
+  westernZodiac: string
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  auspicious: boolean
+}
+
+/**
+ * Wall-clock Date for a given IANA timeZone. The returned Date's local
+ * getters (getHours/getDate/...) report the time *in that zone*, which is
+ * what the hour/day-based readers above expect. Falls back to `now` on an
+ * unknown/empty zone. Uses Intl only — no tz plugin needed on the client.
+ */
+export function getWallClockDate(timeZone?: string | null, now: Date = new Date()): Date {
+  if (!timeZone) return now
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(now)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    return new Date(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  } catch {
+    return now
+  }
+}
+
+/**
+ * Full ambient reading. Moon phase is an absolute astronomical quantity, so
+ * it is computed from the real instant; the hour/day-based readings use the
+ * wall clock of the user's timeZone.
+ */
+export function getAmbientReading(timeZone?: string | null, now: Date = new Date()): AmbientReading {
+  const wall = getWallClockDate(timeZone, now)
+  const moon = getMoonPhase(now)
+  const rokuyo = getRokuyo(wall)
+  return {
+    hourlyZodiac: getHourlyZodiac(wall),
+    westernZodiac: getWesternZodiac(wall),
+    rokuyo,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    auspicious: rokuyo === 'Taian',
+  }
+}
+
+export type AstroRhythm = {
+  /** log entries that carried an ambient snapshot */
+  sampled: number
+  /** moon phase under which this user writes most (null below threshold) */
+  dominantMoonPhase: string | null
+  /** rokuyo under which this user writes most (null below threshold) */
+  dominantRokuyo: string | null
+  /** zodiac hour under which this user writes most (null below threshold) */
+  dominantHourlyZodiac: string | null
+  /** share (0-100) of entries written under the dominant moon phase */
+  moonPhaseShare: number
+  /** true when the current reading matches the user's dominant moon phase */
+  inRhythm: boolean
+}
+
+/** Minimum snapshots before a rhythm is claimed — avoids noise-as-pattern. */
+export const ASTRO_RHYTHM_MIN_SAMPLES = 8
+
+function topOf(counts: Record<string, number>): [string | null, number] {
+  let best: string | null = null
+  let n = 0
+  for (const [k, v] of Object.entries(counts)) {
+    if (v > n) { best = k; n = v }
+  }
+  return [best, n]
+}
+
+/**
+ * Personal rhythm derived from the user's own Logs — reads the ambient
+ * snapshot that getLogContext stamps on every entry (log.context.astro*).
+ * Personalization without birth data: "when do *you* tend to write".
+ * Only user-authored events count (answers, notes, journal), not system noise.
+ */
+export function summarizeAstroRhythm(
+  logs: Array<{ event?: string; context?: Record<string, any> | null }>,
+  current?: Pick<AmbientReading, 'moonPhase'>
+): AstroRhythm {
+  const AUTHORED = new Set([
+    'answer', 'note', 'emotional_checkin', 'intention',
+    'goal_set', 'goal_complete', 'plan_set', 'self_care_complete',
+  ])
+  const moon: Record<string, number> = {}
+  const roku: Record<string, number> = {}
+  const hour: Record<string, number> = {}
+  let sampled = 0
+  for (const log of logs) {
+    const c = log?.context
+    if (!c?.astroMoonPhase || (log.event && !AUTHORED.has(log.event))) continue
+    sampled++
+    moon[c.astroMoonPhase] = (moon[c.astroMoonPhase] || 0) + 1
+    if (c.astroRokuyo) roku[c.astroRokuyo] = (roku[c.astroRokuyo] || 0) + 1
+    if (c.astroHourlyZodiac) hour[c.astroHourlyZodiac] = (hour[c.astroHourlyZodiac] || 0) + 1
+  }
+  const enough = sampled >= ASTRO_RHYTHM_MIN_SAMPLES
+  const [dominantMoonPhase, moonN] = topOf(moon)
+  const [dominantRokuyo] = topOf(roku)
+  const [dominantHourlyZodiac] = topOf(hour)
+  return {
+    sampled,
+    dominantMoonPhase: enough ? dominantMoonPhase : null,
+    dominantRokuyo: enough ? dominantRokuyo : null,
+    dominantHourlyZodiac: enough ? dominantHourlyZodiac : null,
+    moonPhaseShare: enough && sampled ? Math.round((moonN / sampled) * 100) : 0,
+    inRhythm: !!(enough && current && dominantMoonPhase === current.moonPhase),
+  }
 }

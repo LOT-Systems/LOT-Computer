@@ -170,6 +170,7 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  astroAuspicious?: boolean | null;
   [key: string]: any;
 };
 
