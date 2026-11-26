@@ -20,7 +20,18 @@ import { Button } from './Button'
 import { Page } from './Page'
 import { cn } from '#client/utils'
 
-type RouteName = 'sync' | 'logs' | 'system' | 'api' | 'settings'
+type RouteName = 'sync' | 'logs' | 'system' | 'basics' | 'api' | 'settings'
+
+// Logged-out pages (login, public Basics) are separate entries: a client-side
+// route change would not swap the page, so hard-navigate instead.
+const ROUTE_PATH: Record<RouteName, string> = {
+  sync: '/sync',
+  logs: '/log',
+  system: '/',
+  basics: '/basics',
+  api: '/api',
+  settings: '/settings',
+}
 
 type NavItem = { label: string | null; spacer?: boolean; route?: RouteName }
 
@@ -28,10 +39,12 @@ const NavButton = React.memo(function NavButton({
   link,
   isActive,
   isMirrorOn,
+  isLoggedIn,
 }: {
   link: NavItem
   isActive: boolean
   isMirrorOn: boolean
+  isLoggedIn: boolean
 }) {
   return (
     <Button
@@ -46,7 +59,14 @@ const NavButton = React.memo(function NavButton({
           ? 'bg-white/20 hover:bg-white/20 before:!hidden'
           : 'bg-acc text-bac before:!hidden')
       )}
-      onClick={link.route ? () => goTo(link.route!) : undefined}
+      onClick={
+        link.route
+          ? () =>
+              isLoggedIn
+                ? goTo(link.route!)
+                : window.location.assign(ROUTE_PATH[link.route!])
+          : undefined
+      }
       disabled={!link.route}
     >
       {link.label}
@@ -71,7 +91,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync', route: 'sync' },
           { label: 'Log', route: 'logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', route: 'basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },
@@ -83,7 +103,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
           { label: 'Sync' },
           { label: 'Logs' },
           { label: 'System', route: 'system' },
-          { label: 'Basics' },
+          { label: 'Basics', route: 'basics' },
           { label: 'Self-care' },
           { label: 'Kids' },
           { label: 'Home' },
@@ -122,6 +142,7 @@ export const Layout: React.FC<Props> = ({ children, hideNav = false }) => {
                     link={link}
                     isActive={link.route === currentRoute}
                     isMirrorOn={isMirrorOn}
+                    isLoggedIn={isLoggedIn}
                   />
                 )
               )}

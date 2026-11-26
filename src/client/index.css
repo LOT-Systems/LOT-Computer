@@ -419,3 +419,73 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ============================================================
+ * LOT-FM-001 / BASIC (RATION) — terminal register.
+ * White ground, black ink. Hierarchy by inversion only.
+ * 2px rules. Square corners. Fixed character grid. No color.
+ * Scoped to .lr-root so it never leaks into the rest of the app.
+ * ============================================================ */
+.lr-root {
+  --lr-ink: #000;
+  --lr-ground: #fff;
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Cousine', ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--lr-ink);
+  background: var(--lr-ground);
+  border: 2px solid var(--lr-ink);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  min-width: 0;
+  contain: inline-size;
+  font-variant-numeric: tabular-nums;
+}
+.lr-root * { border-radius: 0 !important; }
+.lr-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 2ch;
+  padding: 0 1ch;
+  background: var(--lr-ink);
+  color: var(--lr-ground);
+  white-space: nowrap;
+}
+.lr-sect { padding: 24px 1ch; border-top: 2px solid var(--lr-ink); }
+.lr-status + .lr-sect { border-top: 0; }
+.lr-head {
+  display: inline-block;
+  padding: 0 1ch;
+  margin: 0 -1ch 24px;
+  background: var(--lr-ink);
+  color: var(--lr-ground);
+}
+.lr-rule { border-top: 2px solid var(--lr-ink); margin: 24px 0; }
+.lr-doctrine, .lr-load { list-style: none; margin: 0; padding: 0; }
+.lr-scroll { overflow-x: auto; margin: 0 -1ch; padding: 0 1ch; }
+.lr-table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+.lr-table th, .lr-table td {
+  text-align: left;
+  padding: 0 2ch 0 0;
+  font-weight: 700;
+  vertical-align: top;
+}
+.lr-table thead th { border-bottom: 2px solid var(--lr-ink); }
+.lr-table .lr-mo { padding: 0; width: 3ch; text-align: center; }
+.lr-table tr.lr-on td { background: var(--lr-ink); color: var(--lr-ground); }
+.lr-inv { background: var(--lr-ink) !important; color: var(--lr-ground) !important; }
+.lr-months { display: flex; flex-wrap: wrap; gap: 1ch; margin-bottom: 24px; }
+.lr-btn {
+  font: inherit;
+  color: var(--lr-ink);
+  background: var(--lr-ground);
+  border: 2px solid var(--lr-ink);
+  padding: 0 1ch;
+  cursor: pointer;
+}
+.lr-btn:hover, .lr-btn:focus-visible { background: var(--lr-ink); color: var(--lr-ground); outline: none; }

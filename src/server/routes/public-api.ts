@@ -17,6 +17,8 @@ import { aiEngineManager } from '#server/utils/ai-engines'
 import { AI_ENGINE_PREFERENCE } from '#server/utils/memory/constants'
 import config from '#server/config'
 import { toCelsius } from '#shared/utils'
+import { publicEnvelopeStatus } from '#server/utils/basics-ledger'
+import { BASICS_FM, BASICS_MODULE, BASICS_PRICE_USD, RATION_MANIFEST } from '#shared/constants/basics'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -526,6 +528,21 @@ export default async (fastify: FastifyInstance) => {
     return {
       ...status,
       cached: false,
+    }
+  })
+
+  // LOT-FM-001 / BASIC — OPEN TAB. Public ledger: nomenclature + cadence.
+  // COGS withheld; only the envelope state leaves the server.
+  fastify.get('/basics/manifest', async (req, reply) => {
+    reply.header('Cache-Control', 'public, max-age=300')
+    return {
+      fm: BASICS_FM,
+      module: BASICS_MODULE,
+      priceUsd: BASICS_PRICE_USD,
+      envelope: publicEnvelopeStatus(),
+      lines: RATION_MANIFEST.map(({ line, nomenclature, qty, cls, cadence, offset }) => ({
+        line, nomenclature, qty, cls, cadence, offset,
+      })),
     }
   })
 

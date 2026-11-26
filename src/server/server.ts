@@ -253,6 +253,16 @@ fastify.register(async (fastify: FastifyInstance) => {
       fastify.register(adminApiRoutes, { prefix: '/admin-api' })
     })
 
+    // LOT-FM-001 / BASIC — OPEN TAB. Public: strangers read the ledger,
+    // members get it as a tab inside the app.
+    fastify.get('/basics', async function (req, reply) {
+      return reply.view('generic-spa', {
+        scriptName: req.user ? 'app' : 'basics',
+        scriptNonce: reply.cspNonce.script,
+        styleNonce: reply.cspNonce.style,
+      })
+    })
+
     // Client app / index page
     fastify.register(async (fastify) => {
       // Note: /u/ routes are registered at top level (lines 131-191)
