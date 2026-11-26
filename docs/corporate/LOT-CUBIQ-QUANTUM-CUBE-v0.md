@@ -18,6 +18,11 @@ Cube. It is not a new invention — it is the next layer poured on top of
 work already on record. Before writing a line of spec, the following were
 read in full:
 
+  docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md
+    Cycle 02 development report (2026-11-26): hop physics, actuator
+    correction (impact-hop), power, BOM, firmware, six-gate test plan,
+    levitation track narrowed. Read it after this document.
+
   docs/corporate/LOT-CUBIQ-VISION.md
     The cubic as a multi-sensory, spatial experience. Section 05 —
     "Physical Products: The Inevitable Step" — names the arc this
@@ -320,6 +325,22 @@ entry — never editing or removing a prior one.
   This is the use case v.0's single-hop primitive was built to serve:
   presence without spectacle, felt before it is seen, physical before it
   is digital.
+
+  USE CASE 02 — THE BEDSIDE CIRCADIAN CLOSE                 2026-11-26
+  ─────────────────────────────────────────────────────────────────
+  Full text: docs/corporate/LOT-CUBIQ-QUANTUM-CUBE-v0-R02.md, §11.
+
+  Operator profile: Usership tier, eight months in, parent of two, sleep
+  the weakest line in their Bioethics Index. The pad lives on the
+  nightstand where the phone used to. When QIE's circadian lock (P143)
+  says the day is closing, the cube performs THE SETTLE — silent, dark,
+  two seconds of pressure — meaning "you can stop." A LEGENDARY badge
+  that unlocks overnight is held by firmware quiet hours instead of
+  triggering a LEAP at 01:00, and is released at 06:55 as one coalesced
+  NUDGE with the morning's first signal. Proves: quiet hours, gesture
+  coalescing, and the ≤30 dBA acoustic gate are v.0 requirements, and
+  the evening SETTLE → last-phone-session gap is a new sleep-hygiene
+  signal for the QI·46 Calibration Loop.
 
 --------------------------------------------------------------------------------
 08 // BRAND
