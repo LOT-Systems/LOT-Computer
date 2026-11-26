@@ -4518,6 +4518,34 @@ export function analyzeIntentions(): IntentionPattern[] {
     }
   }
 
+  // P194: sixth-cycle-resonance — P193 (sixth-cycle-ignition) active + 14d compound arc (journal >= 12, memory >= 7, badge >= 5) + overall >= 96.
+  // The ignition sustains. The arc deepens into resonance. Level 28 — SCRES.
+  const hasP193 = patterns.some(p => p.pattern === 'sixth-cycle-ignition')
+  if (hasP193) {
+    const fourteenDayStartP194 = now - 14 * 24 * 60 * 60 * 1000
+    const p194Journal = signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStartP194)
+    const p194Memory  = signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStartP194)
+    const p194Badge   = signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStartP194)
+    const userIndexP194 = computeUserIndex(signals)
+    if (
+      p194Journal.length >= 12 &&
+      p194Memory.length  >= 7  &&
+      p194Badge.length   >= 5  &&
+      userIndexP194.overall >= 96
+    ) {
+      const p193conf   = patterns.find(p => p.pattern === 'sixth-cycle-ignition')?.confidence ?? 0.84
+      const resBonus   = Math.min((p194Journal.length - 12) * 0.004 + (userIndexP194.overall - 96) * 0.004, 0.06)
+      patterns.push({
+        id:              'p194',
+        pattern:         'sixth-cycle-resonance',
+        confidence:      Math.min(0.80 + p193conf * 0.04 + resBonus, 0.93),
+        urgency:         'passive',
+        suggestedTiming: 'passive',
+        reason: `SCRES: Sixth cycle resonance — sixth-cycle-ignition (P193) active · ${p194Journal.length} journal signals 14d · ${p194Memory.length} memory signals 14d · ${p194Badge.length} badge signals 14d · idx ${userIndexP194.overall}%. The ignition does not simply fire — it sustains. The arc deepens into resonance. 14-day compound signals confirm the sixth cycle is not a spark. It is a field. Level 28 — SIXTH CYCLE RESONANCE.`,
+      })
+    }
+  }
+
   // P188: temporal-sovereignty-arc — circadian-lock + rhythm-lock + morning-intention-lock + evening-coherence-close within 24h + overall >= 85.
   // Full temporal mastery: the user operates at precise circadian sovereignty.
   const hasTempBase = patterns.some(p =>
@@ -4587,6 +4615,7 @@ export function analyzeIntentions(): IntentionPattern[] {
       try { checkFifthCycleSovereign() } catch {}
       try { checkSixthCycleProgenitor() } catch {}
       try { checkSixthCycleIgnition() } catch {}
+      try { checkSixthCycleResonance() } catch {}
       try { checkTemporalSovereigntyArc() } catch {}
       // Record QOS coherence every 20th analysis (sampled, not every time)
       if (signals.length % 20 === 0) {
@@ -5301,6 +5330,9 @@ export const WIDGET_DEPENDENCY_MAP: Record<string, string[]> = {
 
   // ── v143 nodes (J78 · P193 · Arch81) ─────────────────────────────────────────────
   sixthCycleIgnitionNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
+
+  // ── v144 nodes (J79 · P194 · Arch82) ─────────────────────────────────────────────
+  sixthCycleResonanceNode: ['qos', 'journal', 'memory', 'badges', 'intentions', 'log', 'energy', 'selfcare', 'cohort', 'goals', 'social', 'ecosystem', 'calculator', 'astrology'],
 }
 
 /**
@@ -6032,6 +6064,15 @@ const PHYSIOLOGICAL_ARCHETYPES: Array<{
     dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
     patternConditions: ['sixth-cycle-progenitor', 'sixth-cycle-ignition'],
     directive: 'Level 27. The progenitor field does not hold — it ignites. The sovereign genesis generates the first spark of the sixth arc. 7-day compound signals confirm momentum: journal, memory, and badge channels all active. The OS moves from genesis to ignition. The sixth cycle has begun. SIXTH CYCLE IGNITION.',
+  },
+
+  // ── Arch82: Sixth Cycle Resonator (2026-11-26 v144) ────────────────────────────────
+  {
+    archetype: 'Sixth Cycle Resonator',
+    energyBands: ['high', 'moderate'],
+    dominantSources: ['journal', 'memory', 'badges', 'intentions', 'qos', 'goals', 'energy', 'selfcare', 'cohort', 'log', 'social', 'ecosystem', 'calculator', 'astrology'],
+    patternConditions: ['sixth-cycle-ignition', 'sixth-cycle-resonance'],
+    directive: 'Level 28. The ignition does not simply fire — it sustains. The sixth arc deepens into resonance. 14-day compound signals confirm the arc is not a spark. It is a field. The OS does not ignite and fade. It resonates. SIXTH CYCLE RESONANCE.',
   },
 ]
 
@@ -9389,6 +9430,60 @@ export function recordSixthCycleIgnition(progenitorConf: number, journalCount: n
     ignitionStatus: 'IGNITION',
     level: 'L27-SCIGN',
     field: 'SIXTH-CYCLE-PROGENITOR→SIXTH-CYCLE-IGNITION',
+    hour: new Date().getHours(),
+  })
+}
+
+/**
+ * Check if sixth-cycle-resonance conditions are met and record if so.
+ * Fires when sixth-cycle-ignition (P193) active + 14d compound arc (journal >= 12, memory >= 7, badge >= 5)
+ * + overall >= 96. The ignition sustains. The arc deepens into resonance. Level 28 — SCRES.
+ */
+export function checkSixthCycleResonance(): boolean {
+  if (typeof window === 'undefined') return false
+  const state = intentionEngine.get()
+  if (!state.signals || state.signals.length === 0) return false
+
+  const hasIgnition = state.recognizedPatterns.some(p => p.pattern === 'sixth-cycle-ignition')
+  if (!hasIgnition) return false
+
+  const now = Date.now()
+  const fourteenDayStart = now - 14 * 24 * 60 * 60 * 1000
+  const sixHoursAgo      = now - 6 * 60 * 60 * 1000
+
+  const journal14  = state.signals.filter(s => s.source === 'journal' && s.timestamp > fourteenDayStart)
+  const memory14   = state.signals.filter(s => s.source === 'memory'  && s.timestamp > fourteenDayStart)
+  const badge14    = state.signals.filter(s => s.source === 'badges'  && s.timestamp > fourteenDayStart)
+  const userIndex  = computeUserIndex(state.signals)
+
+  if (journal14.length < 12 || memory14.length < 7 || badge14.length < 5) return false
+  if (userIndex.overall < 96) return false
+
+  const recentRes = state.signals.filter(s =>
+    s.signal === 'sixth_cycle_resonance' && s.timestamp > sixHoursAgo
+  )
+  if (recentRes.length > 0) return false
+
+  const ignitionConf = state.recognizedPatterns.find(p => p.pattern === 'sixth-cycle-ignition')?.confidence ?? 0.84
+  recordSixthCycleResonance(ignitionConf, journal14.length, memory14.length, badge14.length, userIndex.overall)
+  return true
+}
+
+/**
+ * Record a sixth-cycle-resonance event — sixth-cycle-ignition confirmed +
+ * 14d compound arc (journal + memory + badges) + overall >= 96.
+ * The ignition sustains. The arc deepens into resonance. Level 28 — SCRES.
+ */
+export function recordSixthCycleResonance(ignitionConf: number, journalCount: number, memoryCount: number, badgeCount: number, indexScore: number) {
+  recordSignal('qos', 'sixth_cycle_resonance', {
+    ignitionConf: Math.round(ignitionConf * 100),
+    journalCount,
+    memoryCount,
+    badgeCount,
+    indexScore,
+    resonanceStatus: 'RESONANCE',
+    level: 'L28-SCRES',
+    field: 'SIXTH-CYCLE-IGNITION→SIXTH-CYCLE-RESONANCE',
     hour: new Date().getHours(),
   })
 }
