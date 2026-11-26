@@ -36,6 +36,8 @@ import { getEarnedBadges, BADGES } from '#client/utils/badges'
 import { useQiQuery, useAssemblyDirective, usePrayerScripture, useStoryGeneration } from '#client/queries'
 import { useBreathe } from '#client/utils/breathe'
 import { getFastingState } from '#client/utils/fasting'
+import { LogEmailComposer } from '#client/components/LogEmailComposer'
+import { lotEmailDraft, type LotEmailSource } from '#client/stores/lotEmail'
 
 const localStore = {
   logById: map<Record<string, Log>>({}),
@@ -3713,6 +3715,42 @@ const NoteEditor = ({
   const [freezeResult, setFreezeResult] = React.useState<string | null>(null)
   const [fastResult, setFastResult] = React.useState<string | null>(null)
   const [physResult, setPhysResult] = React.useState<string | null>(null)
+  // LOT® Email — source of the current draft (log | sync | cohort)
+  const [emailSource, setEmailSource] = React.useState<LotEmailSource>('log')
+  const replaceValue = React.useCallback((updated: string) => {
+    setValue(updated)
+    valueRef.current = updated
+    onChangeRef.current(updated)
+    setIsSaved(true)
+  }, [])
+  const onEmailSent = React.useCallback((updated: string) => {
+    replaceValue(updated)
+    setEmailSource('log')
+  }, [replaceValue])
+  // Cohort Dating / Sync hand-off: append `/email to <name>` to the primary log
+  React.useEffect(() => {
+    if (!primary) return
+    const consume = (draft: { to: string; source: LotEmailSource } | null) => {
+      if (!draft) return
+      lotEmailDraft.set(null)
+      const current = valueRef.current
+      const separator = current.trim() ? '\n\n' : ''
+      const updated = `${current}${separator}/email to ${draft.to}\n`
+      setValue(updated)
+      valueRef.current = updated
+      setIsSaved(false)
+      setEmailSource(draft.source)
+      setTimeout(() => {
+        const ta = containerRef.current?.querySelector('textarea')
+        if (ta) { ta.focus(); ta.selectionStart = ta.selectionEnd = 9e6 }
+      }, 50)
+    }
+    // Defer past the mount-time server-sync effect, which would otherwise
+    // reset the editor to log.text and drop the draft.
+    const t = setTimeout(() => consume(lotEmailDraft.get()), 0)
+    const unlisten = lotEmailDraft.listen((d) => setTimeout(() => consume(d), 0))
+    return () => { clearTimeout(t); unlisten() }
+  }, [primary])
   const { mutate: submitPrayer } = usePrayerScripture({
     onSuccess: (data) => {
       setPrayerResponse(data.scripture)
@@ -3793,6 +3831,10 @@ const NoteEditor = ({
   // Timeline: finish typing > wait 7s > save > opacity fades to 20% > push
   React.useEffect(() => {
     if (log.text === debouncedValue) return
+    // Stale debounce: the text changed since (typing, or an immediate save
+    // such as a /email receipt). A newer debounce will save the current text —
+    // saving this old value would overwrite (or delete) the log.
+    if (debouncedValue !== valueRef.current) return
 
     // Save the log
     onChange(debouncedValue)
@@ -4139,6 +4181,7 @@ const NoteEditor = ({
           '/radio        Toggle radio',
           '/night        Dark mode',
           '/how          Open LOT AI check-in (System tab)',
+          '/email to [name]  LOT Email — write the message below, press Send',
           '/system       This help screen',
           '',
           'SHORTCUTS',
@@ -4274,6 +4317,9 @@ const NoteEditor = ({
           )}
           rows={primary ? 10 : 1}
         />
+        {primary && (
+          <LogEmailComposer value={value} source={emailSource} onSent={onEmailSent} />
+        )}
         {(qiLoading || qiResponse) && (
           <div className="mt-8">
             <Block label="QI [INTSUM]:" blockView>
