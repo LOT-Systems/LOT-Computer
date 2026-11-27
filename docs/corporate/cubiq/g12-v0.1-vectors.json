@@ -1,0 +1,535 @@
+{
+ "contract": "CUBIQ G12 pitch self-check v0.1 (R12 \u00a702, D61)",
+ "protocol": "commands as in firmware/cubiq/cubiq_r12_test.c g12 mode; each step is [command, expected answer]",
+ "note": "Expectations written from the rule text before either implementation was run. Vector 18 corrected once after the first run: its expectation assumed the JUMP-150 and JUMP-200 flight windows were disjoint; they overlap (R12 \u00a702).",
+ "vectors": [
+  {
+   "name": "01 empty record",
+   "steps": [
+    [
+     "q",
+     "q 0 -1 G12_pitch_unverified"
+    ]
+   ]
+  },
+  {
+   "name": "02 four LEAPs are not enough",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 0 -1 G12_pitch_unverified"
+    ]
+   ]
+  },
+  {
+   "name": "03 five good LEAPs -> 200 mm",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 18000 -"
+    ]
+   ]
+  },
+  {
+   "name": "04 200 mm limit is inclusive",
+   "steps": [
+    [
+     "r 0 25355 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25355 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25355 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25355 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25355 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 25355 -"
+    ]
+   ]
+  },
+  {
+   "name": "05 1 mdps over the 200 limit -> 150",
+   "steps": [
+    [
+     "r 0 25356 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25356 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25356 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25356 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 25356 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 150 25356 -"
+    ]
+   ]
+  },
+  {
+   "name": "06 150 mm limit is inclusive",
+   "steps": [
+    [
+     "r 0 34964 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34964 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34964 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34964 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34964 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 150 34964 -"
+    ]
+   ]
+  },
+  {
+   "name": "07 1 mdps over the 150 limit -> LEAP only",
+   "steps": [
+    [
+     "r 0 34965 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34965 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34965 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34965 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 34965 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 0 34965 G12_pitch_over_limit"
+    ]
+   ]
+  },
+  {
+   "name": "08 one bad flight of five blocks JUMP (max, not median: F93)",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 40000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 0 40000 G12_pitch_over_limit"
+    ]
+   ]
+  },
+  {
+   "name": "09 the bad flight rolls out after five more",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 40000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 18000 -"
+    ]
+   ]
+  },
+  {
+   "name": "10 the sign of the spin does not matter",
+   "steps": [
+    [
+     "r 0 -18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 -18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 -18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 -18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 -18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 18000 -"
+    ]
+   ]
+  },
+  {
+   "name": "11 flight 0.85x nominal accepted, 1 us shorter refused",
+   "steps": [
+    [
+     "r 0 18000 101021 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 101020 0 0",
+     "rec 1"
+    ]
+   ]
+  },
+  {
+   "name": "12 flight 1.15x nominal accepted, 1 us longer refused",
+   "steps": [
+    [
+     "r 0 18000 136675 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 136676 0 0",
+     "rec 1"
+    ]
+   ]
+  },
+  {
+   "name": "13 a weak spring (0.9x flight) reads 0.9x rate: normalised back (F92)",
+   "steps": [
+    [
+     "r 0 18000 106963 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 106963 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 106963 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 106963 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 106963 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 20000 -"
+    ]
+   ]
+  },
+  {
+   "name": "14 saturated gyro is the worst sample, never refused (F94)",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 1 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 0 2147483647 G12_pitch_over_limit"
+    ]
+   ]
+  },
+  {
+   "name": "15 contact in flight refused, record unchanged",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 90000 118848 0 1",
+     "rec 2"
+    ],
+    [
+     "q",
+     "q 200 18000 -"
+    ]
+   ]
+  },
+  {
+   "name": "16 a drop clears the record",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "d",
+     "reset"
+    ],
+    [
+     "q",
+     "q 0 -1 G12_pitch_unverified"
+    ]
+   ]
+  },
+  {
+   "name": "17 a 150 mm JUMP flight counts, normalised to LEAP",
+   "steps": [
+    [
+     "r 1 34000 230148 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 10000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 10000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 10000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 10000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 200 17557 -"
+    ]
+   ]
+  },
+  {
+   "name": "18 a JUMP flight judged against its own window (150 and 200 windows overlap: R12 \u00a702)",
+   "steps": [
+    [
+     "r 1 34000 118848 0 0",
+     "rec 1"
+    ],
+    [
+     "r 2 34000 200000 0 0",
+     "rec 1"
+    ],
+    [
+     "r 2 34000 230148 0 0",
+     "rec 0"
+    ]
+   ]
+  },
+  {
+   "name": "19 impossible inputs refused",
+   "steps": [
+    [
+     "r 3 18000 118848 0 0",
+     "rec 3"
+    ],
+    [
+     "r 0 18000 0 0 0",
+     "rec 3"
+    ],
+    [
+     "r -1 18000 118848 0 0",
+     "rec 3"
+    ]
+   ]
+  },
+  {
+   "name": "20 INT32_MIN rate clamps, does not wrap",
+   "steps": [
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 18000 118848 0 0",
+     "rec 0"
+    ],
+    [
+     "r 0 -2147483648 101021 0 0",
+     "rec 0"
+    ],
+    [
+     "q",
+     "q 0 2147483647 G12_pitch_over_limit"
+    ]
+   ]
+  }
+ ]
+}

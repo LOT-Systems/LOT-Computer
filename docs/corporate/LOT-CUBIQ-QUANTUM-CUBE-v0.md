@@ -486,6 +486,25 @@ entry — never editing or removing a prior one.
   should be quiet. Full narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R11.md,
   Section 09.
 
+  USE CASE 12 — THE JIGSAW TABLE                            2026-11-27
+  ─────────────────────────────────────────────────────────────────
+  Operator profile: Legacy tier, 68, a retired land surveyor living
+  alone with a 2.2 m oak table and a 2,000-piece jigsaw on it for six
+  weeks at a time. The cube is a v.1 on its home pad at the far end.
+  Five ordinary LEAPs in the first week measure its own thrust line in
+  flight (G12, R12 §02) and clear it for 200 mm. A COSMIC codex badge
+  (assuming D64) JUMPs it 200 mm across the oak in 266 ms. That flight
+  is longer than the 150 ms fall confirmation, and the FSM knows the
+  flight is part of the plan (R12 F97). A grandchild's knock bends the
+  plunger guide without a fall. The next LEAP reads 0.95°, and the
+  max-of-five rule (R12 F93) pauses the long jump at once, where R11's
+  median would have allowed a 200 mm JUMP that topples. On the last
+  piece, a hand at the re-check turns the armed JUMP into a LEAP by
+  partial decock, 2 s sooner than starting over. Proves that a JUMP is
+  safe per unit and the unit can show it, that unseen damage is caught
+  on the next flight, and that backing down should be cheap. Full
+  narrative: LOT-CUBIQ-QUANTUM-CUBE-v0-R12.md, Section 08.
+
 --------------------------------------------------------------------------------
 08 // BRAND
 --------------------------------------------------------------------------------
