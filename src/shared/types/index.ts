@@ -170,6 +170,8 @@ export type LogContext = {
   astroMoonIllumination?: number | null;
   astroHourlyZodiac?: string | null;
   astroWesternZodiac?: string | null;
+  // v2: whether the log was written inside the rokuyo's favored window
+  astroFavoredNow?: boolean | null;
   [key: string]: any;
 };
 

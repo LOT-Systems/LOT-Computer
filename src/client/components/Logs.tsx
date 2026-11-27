@@ -11,6 +11,7 @@ import { useStore } from '@nanostores/react'
 import * as stores from '#client/stores'
 import { Block, Button, ResizibleGhostInput, Unknown } from '#client/components/ui'
 import { useLogs, useUpdateLog } from '#client/queries'
+import { getLogAstroStamp } from '#shared/utils/astrology'
 import { useDebounce, useMouseInactivity } from '#client/utils/hooks'
 import dayjs from '#client/utils/dayjs'
 import * as fp from '#shared/utils/fp'
@@ -362,9 +363,17 @@ export const Logs: React.FC = React.memo(function LogsInner() {
                 {log.context?.humidity && (
                   <div>HUM: {log.context.humidity}%</div>
                 )}
-                {log.context?.astroRokuyo && (
-                  <div>ASTRO: {log.context.astroRokuyo} · {log.context.astroMoonPhase}</div>
-                )}
+                {(() => {
+                  // v2: show for every snapshot — legacy entries without a
+                  // server astro stamp are back-derived from createdAt.
+                  const astro = getLogAstroStamp(log)
+                  return astro ? (
+                    <div>
+                      ASTRO: {astro.rokuyo} · {astro.moonPhase} {astro.moonIllumination}% · {astro.hourlyZodiac}
+                      {log.context?.astroFavoredNow ? ' · favored' : ''}
+                    </div>
+                  ) : null
+                })()}
                 {log.metadata?.sound && (
                   <div>SND: {log.metadata.sound}</div>
                 )}

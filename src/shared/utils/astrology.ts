@@ -81,14 +81,19 @@ export function getHourlyZodiac(date: Date): string {
  */
 export function getRokuyo(date: Date): string {
   // Known starting point: January 1, 2000 was Sensho (index 0)
-  const knownDate = new Date('2000-01-01')
   const knownRokuyoIndex = 0
 
-  // Calculate days since known date
-  const daysDiff = Math.floor((date.getTime() - knownDate.getTime()) / (1000 * 60 * 60 * 24))
+  // Count whole *calendar* days between the anchor and the date's local
+  // (wall-clock) Y/M/D. The previous version subtracted a UTC-midnight
+  // anchor from a local instant, so for zones east of UTC (e.g. Asia/Tokyo)
+  // the rokuyo rolled over at 09:00 local instead of at midnight. Comparing
+  // UTC-normalized calendar dates makes the boundary local midnight in every
+  // zone; zones west of UTC are unchanged.
+  const localDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  const daysDiff = Math.floor((localDay - Date.UTC(2000, 0, 1)) / 86400000)
 
   // Calculate Rokuyo index (6-day cycle)
-  const rokuyoIndex = (knownRokuyoIndex + daysDiff) % 6
+  const rokuyoIndex = (((knownRokuyoIndex + daysDiff) % 6) + 6) % 6
 
   return ROKUYO[rokuyoIndex]
 }
@@ -176,4 +181,180 @@ export function getMoonEmoji(phaseName: string): string {
     'Waning Crescent': '🌘',
   }
   return emojiMap[phaseName] || '🌑'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v2 (2026-11-27) — personalization + widget/Logs synchronization helpers
+// Ambient conditions only — never a personal natal chart.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AstrologyReading = {
+  westernZodiac: string
+  hourlyZodiac: string
+  rokuyo: string
+  moonPhase: string
+  moonIllumination: number
+  /** Short ambient guidance for the rokuyo, adjusted to the current hour */
+  guidance: string
+  /** True when the current hour falls in the rokuyo's favored window */
+  favoredNow: boolean
+  /** IANA zone the reading was computed in (null = device-local) */
+  timeZone: string | null
+}
+
+/**
+ * Build a Date whose local getters (getHours/getDate/…) return the wall-clock
+ * time in `timeZone`. Isomorphic (Intl only, no dayjs) so client and server
+ * produce identical readings for the same saved profile timeZone.
+ * Falls back to the input date when the zone is missing or invalid.
+ */
+export function toZonedWallClock(date: Date, timeZone?: string | null): Date {
+  if (!timeZone) return date
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(date)
+    const get = (t: string) => Number(parts.find(p => p.type === t)?.value)
+    const y = get('year'), mo = get('month'), d = get('day')
+    const h = get('hour') % 24, mi = get('minute'), se = get('second')
+    if ([y, mo, d, h, mi, se].some(n => Number.isNaN(n))) return date
+    return new Date(y, mo - 1, d, h, mi, se)
+  } catch {
+    return date
+  }
+}
+
+// Traditional rokuyo windows. Sensho favors the morning, Senpu the afternoon,
+// Shakku only the midday hour (11–13); Taian and Tomobiki are good all day
+// (Tomobiki's midday is traditionally neutral); Butsumetsu is quiet all day.
+export function getRokuyoGuidance(rokuyo: string, hour: number): { guidance: string; favoredNow: boolean } {
+  switch (rokuyo) {
+    case 'Sensho':
+      return { guidance: hour < 12 ? 'Morning favored · act early' : 'Morning has passed · steady pace', favoredNow: hour < 12 }
+    case 'Senpu':
+      return { guidance: hour < 12 ? 'Calm morning · afternoon favored' : 'Afternoon favored · move now', favoredNow: hour >= 12 }
+    case 'Shakku':
+      return { guidance: hour >= 11 && hour < 13 ? 'Midday window open' : 'Caution · favor midday', favoredNow: hour >= 11 && hour < 13 }
+    case 'Taian':
+      return { guidance: 'Auspicious all day · begin things', favoredNow: true }
+    case 'Tomobiki':
+      return { guidance: hour >= 11 && hour < 13 ? 'Neutral midday · share with others' : 'Good for shared plans', favoredNow: !(hour >= 11 && hour < 13) }
+    case 'Butsumetsu':
+      return { guidance: 'Quiet day · reflect, rest, close loops', favoredNow: false }
+    default:
+      return { guidance: '', favoredNow: false }
+  }
+}
+
+/**
+ * One-call ambient reading. If `timeZone` is given (the user's saved
+ * profile zone), the reading reflects that zone's wall clock, so the
+ * dashboard and the Logs snapshot agree even on a travelling device.
+ */
+export function getAstrologyReading(date: Date = new Date(), timeZone?: string | null): AstrologyReading {
+  const local = toZonedWallClock(date, timeZone)
+  const moon = getMoonPhase(date) // moon phase is an absolute instant — no zone shift
+  const rokuyo = getRokuyo(local)
+  const { guidance, favoredNow } = getRokuyoGuidance(rokuyo, local.getHours())
+  return {
+    westernZodiac: getWesternZodiac(local),
+    hourlyZodiac: getHourlyZodiac(local),
+    rokuyo,
+    moonPhase: moon.phase,
+    moonIllumination: moon.illumination,
+    guidance,
+    favoredNow,
+    timeZone: timeZone || null,
+  }
+}
+
+type AstroLogLike = {
+  createdAt: Date | string
+  event?: string
+  context?: Record<string, any> | null
+}
+
+export type AstroLogRhythm = {
+  /** Log entries considered (with a readable astro stamp) */
+  total: number
+  /** Entries written under the same moon phase as `current` */
+  samePhase: number
+  /** Entries written under the same rokuyo as `current` */
+  sameRokuyo: number
+  /** Moon phase the user logs under most (null when < 3 entries) */
+  topPhase: string | null
+  /** Rokuyo the user logs under most (null when < 3 entries) */
+  topRokuyo: string | null
+  /** Entries in the current lunar cycle (last 29.5 days) */
+  thisCycle: number
+}
+
+/**
+ * Read the astro stamp for a log. Prefers the server snapshot written at
+ * creation (LogContext.astro*, added 2026-07-27); for older entries it
+ * back-derives the reading from createdAt in the entry's own saved zone.
+ */
+export function getLogAstroStamp(log: AstroLogLike): { rokuyo: string; moonPhase: string; moonIllumination: number; hourlyZodiac: string } | null {
+  const ctx = log.context || {}
+  if (ctx.astroRokuyo && ctx.astroMoonPhase) {
+    return {
+      rokuyo: ctx.astroRokuyo,
+      moonPhase: ctx.astroMoonPhase,
+      moonIllumination: typeof ctx.astroMoonIllumination === 'number' ? ctx.astroMoonIllumination : getMoonPhase(new Date(log.createdAt)).illumination,
+      hourlyZodiac: ctx.astroHourlyZodiac || getHourlyZodiac(toZonedWallClock(new Date(log.createdAt), ctx.timeZone)),
+    }
+  }
+  const created = new Date(log.createdAt)
+  if (Number.isNaN(created.getTime())) return null
+  const local = toZonedWallClock(created, ctx.timeZone)
+  const moon = getMoonPhase(created)
+  return { rokuyo: getRokuyo(local), moonPhase: moon.phase, moonIllumination: moon.illumination, hourlyZodiac: getHourlyZodiac(local) }
+}
+
+function topKey(counts: Record<string, number>): string | null {
+  let best: string | null = null
+  let bestN = 0
+  for (const [k, n] of Object.entries(counts)) {
+    if (n > bestN) { best = k; bestN = n }
+  }
+  return best
+}
+
+/**
+ * Summarize which ambient conditions a user's Logs were written under.
+ * Only user-authored entries count (event 'note' / 'answer' or text logs),
+ * so automatic system snapshots don't drown the rhythm.
+ */
+export function summarizeAstroLogs(
+  logs: (AstroLogLike & { text?: string | null })[],
+  current: Pick<AstrologyReading, 'moonPhase' | 'rokuyo'>,
+  now: Date = new Date()
+): AstroLogRhythm {
+  const phaseCounts: Record<string, number> = {}
+  const rokuyoCounts: Record<string, number> = {}
+  let total = 0, samePhase = 0, sameRokuyo = 0, thisCycle = 0
+  const cycleStart = now.getTime() - 29.53058770576 * 86400000
+  for (const log of logs) {
+    const authored = log.event === 'note' || log.event === 'answer' || (!!log.text && log.text.trim().length > 0)
+    if (!authored) continue
+    const stamp = getLogAstroStamp(log)
+    if (!stamp) continue
+    total++
+    phaseCounts[stamp.moonPhase] = (phaseCounts[stamp.moonPhase] || 0) + 1
+    rokuyoCounts[stamp.rokuyo] = (rokuyoCounts[stamp.rokuyo] || 0) + 1
+    if (stamp.moonPhase === current.moonPhase) samePhase++
+    if (stamp.rokuyo === current.rokuyo) sameRokuyo++
+    if (new Date(log.createdAt).getTime() >= cycleStart) thisCycle++
+  }
+  return {
+    total,
+    samePhase,
+    sameRokuyo,
+    topPhase: total >= 3 ? topKey(phaseCounts) : null,
+    topRokuyo: total >= 3 ? topKey(rokuyoCounts) : null,
+    thisCycle,
+  }
 }

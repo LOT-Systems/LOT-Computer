@@ -4880,7 +4880,17 @@ export function recordAstrologySignal(
   moonPhase: string,
   moonIllumination: number,
   hourlyZodiac: string,
-  westernZodiac: string
+  westernZodiac: string,
+  extra?: {
+    favoredNow?: boolean
+    guidance?: string
+    timeZone?: string | null
+    // Logs synchronization (v2): how the user's own entries line up with today
+    logsSamePhase?: number
+    logsThisCycle?: number
+    logsTopPhase?: string | null
+    logsTopRokuyo?: string | null
+  }
 ) {
   recordSignal('astrology', 'ambient_reading', {
     rokuyo,
@@ -4889,7 +4899,23 @@ export function recordAstrologySignal(
     hourlyZodiac,
     westernZodiac,
     auspicious: rokuyo === 'Taian',
+    // v2: a day the user historically writes on — their own rhythm, not a chart
+    resonant: !!extra?.logsTopPhase && extra.logsTopPhase === moonPhase,
+    ...(extra || {}),
   })
+}
+
+/**
+ * Latest ambient astrology reading recorded on the signal bus, for widgets
+ * that want to synchronize without recomputing (cosmic, system, journal).
+ * Returns null when no reading has been recorded yet.
+ */
+export function getLatestAstrologySignal(): Record<string, any> | null {
+  const signals = intentionEngine.get().signals
+  for (let i = signals.length - 1; i >= 0; i--) {
+    if (signals[i].source === 'astrology') return signals[i].metadata || null
+  }
+  return null
 }
 
 /**
