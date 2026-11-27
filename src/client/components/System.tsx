@@ -45,7 +45,11 @@ import { EnergyCapacitor } from './EnergyCapacitor'
 import { NarrativeWidget } from './NarrativeWidget'
 import { InterventionsWidget } from './InterventionsWidget'
 import { ChatCatalystWidget } from './ChatCatalystWidget'
-import { SystemProgressWidget } from './SystemProgressWidget'
+// SystemProgressWidget is ~180 KB minified (session-report history). Split it
+// into its own chunk so it never blocks first paint of the System tab.
+const SystemProgressWidget = React.lazy(() =>
+  import('./SystemProgressWidget').then(m => ({ default: m.SystemProgressWidget }))
+)
 import { SystemPulseWidget } from './SystemPulseWidget'
 import { EvolutionWidget } from './EvolutionWidget'
 import { CohortConnectWidget } from './CohortConnectWidget'
@@ -136,6 +140,10 @@ export const System = React.memo(function SystemInner() {
   const [isSoundToggling, setIsSoundToggling] = React.useState(false)
   const [showSharedEmotion, setShowSharedEmotion] = React.useState(false)
   const [selectedQuantumCell, setSelectedQuantumCell] = React.useState(0)
+  // One 20% roll per mount. Rolling Math.random() inside render made the
+  // Subscribe widget blink in/out on every System re-render (weather, users
+  // online, logs refetch).
+  const [subscribeRoll] = React.useState(() => Math.random() < 0.2)
 
   // Compute whether to show sunset or sunrise based on current time
   // Show sunset during daytime (between sunrise and sunset)
@@ -937,8 +945,7 @@ export const System = React.memo(function SystemInner() {
           }
 
           // Random 20% chance to show when all conditions met
-          const shouldShow = Math.random() < 0.2
-          return shouldShow && <div><SubscribeWidget /></div>
+          return subscribeRoll && <div><SubscribeWidget /></div>
         })()}
       </WidgetErrorBoundary>
 
@@ -1028,7 +1035,11 @@ export const System = React.memo(function SystemInner() {
           <CorrelatedIndexesWidget />
 
           {/* System Progress - Deployment info with feedback */}
-          <SystemProgressWidget />
+          <LazyMount>
+            <React.Suspense fallback={null}>
+              <SystemProgressWidget />
+            </React.Suspense>
+          </LazyMount>
 
           {/* System Pulse - Real-time system metrics */}
           <SystemPulseWidget />

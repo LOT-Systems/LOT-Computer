@@ -98,18 +98,22 @@ export function useBreathe(enabled: boolean) {
       const label = PHASE_LABELS[currentPhase]
       const display = `${ascii} ${label} ${countdown}s`
 
-      setState({
-        phase: currentPhase,
-        count: countdown,
-        display,
-      })
+      // Bail out when nothing visible changed — a fresh object every 100 ms
+      // forced the whole System tree to re-render 10×/s while Breathe was on.
+      setState(prev =>
+        prev.display === display && prev.count === countdown && prev.phase === currentPhase
+          ? prev
+          : { phase: currentPhase, count: countdown, display }
+      )
     }
 
     // Update immediately
     updateState()
 
     // Update every 100ms for smooth countdown, but use precise timing
-    const interval = setInterval(updateState, 100)
+    const interval = setInterval(() => {
+      if (!document.hidden) updateState()
+    }, 100)
 
     return () => {
       clearInterval(interval)

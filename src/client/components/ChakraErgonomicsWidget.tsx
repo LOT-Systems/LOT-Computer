@@ -62,11 +62,13 @@ export function ChakraErgonomicsWidget() {
   if (!hasInitRef.current) {
     const weakest = [...state.chakras].sort((a, b) => a.charge - b.charge)[0]
     if (weakest) {
-      recordSignal('selfcare', `chakra_scan_${weakest.id}`, {
+      // Deferred: writing the intentionEngine atom during render re-renders every
+      // subscriber mid-mount (React 'cannot update while rendering').
+      queueMicrotask(() => recordSignal('selfcare', `chakra_scan_${weakest.id}`, {
         weakestCharge: weakest.charge,
         coherence: state.session.coherence,
         durationMinutes: state.session.durationMinutes,
-      })
+      }))
     }
     hasInitRef.current = true
   }

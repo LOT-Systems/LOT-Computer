@@ -35,19 +35,26 @@ function useQuantumNumber() {
   const [countdown, setCountdown] = React.useState(() => pickCountdown())
   const [remaining, setRemaining] = React.useState(countdown)
 
+  // Countdown lives in a ref so the side effects (new number, QIE signal) run
+  // once per rollover — not inside a setState updater, which StrictMode
+  // double-invokes. Paused while the tab is hidden.
+  const remainingRef = React.useRef(remaining)
   React.useEffect(() => {
     const iv = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          const next = quantumRandom(0, 99)
-          const nextCountdown = pickCountdown()
-          setNumber(next)
-          setCountdown(nextCountdown)
-          recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
-          return nextCountdown
-        }
-        return prev - 1
-      })
+      if (document.hidden) return
+      const prev = remainingRef.current
+      if (prev <= 1) {
+        const next = quantumRandom(0, 99)
+        const nextCountdown = pickCountdown()
+        remainingRef.current = nextCountdown
+        setNumber(next)
+        setCountdown(nextCountdown)
+        setRemaining(nextCountdown)
+        recordSignal('calculator', 'quantum_random', { value: next, interval: nextCountdown })
+      } else {
+        remainingRef.current = prev - 1
+        setRemaining(prev - 1)
+      }
     }, 1000)
 
     return () => clearInterval(iv)
@@ -63,6 +70,7 @@ export function QuantumRandomWidget() {
 
   React.useEffect(() => {
     const iv = setInterval(() => {
+      if (document.hidden) return
       setShowPair(Math.random() < 0.5)
     }, 10000)
     return () => clearInterval(iv)

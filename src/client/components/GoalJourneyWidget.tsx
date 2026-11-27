@@ -45,11 +45,13 @@ export function GoalJourneyWidget() {
   // Record goal signal once per mount
   if (!hasRecordedRef.current) {
     const activeGoals = goals?.filter((g: any) => g.state === 'active' || g.state === 'progressing') || []
-    recordSignal('intentions', 'goals_viewed', {
+    // Deferred: writing the intentionEngine atom during render re-renders every
+    // subscriber mid-mount (React 'cannot update while rendering').
+    queueMicrotask(() => recordSignal('intentions', 'goals_viewed', {
       activeGoalCount: activeGoals.length,
       primaryGoal: overallJourney?.primaryGoal?.title || null,
       hour: new Date().getHours()
-    })
+    }))
     hasRecordedRef.current = true
   }
 

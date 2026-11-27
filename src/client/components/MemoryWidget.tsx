@@ -32,6 +32,7 @@ export const MemoryWidget = React.memo(function MemoryWidget() {
   const [response, setResponse] = React.useState<string | null>(null)
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
   const [clickedButtonIndex, setClickedButtonIndex] = React.useState<number | null>(null)
+  const answeredIdRef = React.useRef<string | null>(null)
 
   // Session-local ref to prevent re-showing the same question during this mount
   const shownQuestionId = React.useRef<string | null>(null)
@@ -117,6 +118,10 @@ export const MemoryWidget = React.memo(function MemoryWidget() {
   const onAnswer = React.useCallback(
     (option: string, buttonIndex: number) => (ev: React.MouseEvent) => {
       if (!question || !question.id) return
+      // Double-tap guard: buttons fade out but stay clickable until onSuccess,
+      // so a second tap used to post a duplicate answer.
+      if (answeredIdRef.current === question.id) return
+      answeredIdRef.current = question.id
 
       setClickedButtonIndex(buttonIndex)
 

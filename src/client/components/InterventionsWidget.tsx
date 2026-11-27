@@ -35,11 +35,13 @@ export function InterventionsWidget() {
 
   // Record intervention signal once per mount
   if (!hasRecordedRef.current) {
-    recordSignal('mood', `intervention_${intervention.severity}`, {
+    // Deferred: writing the intentionEngine atom during render re-renders every
+    // subscriber mid-mount (React 'cannot update while rendering').
+    queueMicrotask(() => recordSignal('mood', `intervention_${intervention.severity}`, {
       type: intervention.type,
       severity: intervention.severity,
       hour: new Date().getHours()
-    })
+    }))
     hasRecordedRef.current = true
   }
 
