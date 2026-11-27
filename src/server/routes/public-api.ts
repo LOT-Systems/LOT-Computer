@@ -20,6 +20,13 @@ import { toCelsius } from '#shared/utils'
 import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
+import {
+  BASICS_MANIFEST,
+  BASICS_DOCTRINE,
+  BASICS_TERMS,
+  BASICS_FORM,
+} from '#shared/constants/basics'
+import { basicsEnvelopeCycle, basicsCogsGaps } from '#server/utils/basics-cogs'
 
 // Read package.json to get version
 const packageJson = JSON.parse(
@@ -499,6 +506,21 @@ export default async (fastify: FastifyInstance) => {
     } catch (error: any) {
       console.error('[PUBLIC-ANALYTICS] Error:', error.message)
       return reply.code(500).send({ error: 'Analytics unavailable' })
+    }
+  })
+
+  // LOT-FM-001 · BASIC · OPEN TAB ledger. Nomenclature + cadence. COGS WITHHELD —
+  // only the envelope verdict (GREEN/BREACH) leaves the server, never a figure.
+  fastify.get('/basics', async (req, reply) => {
+    const breach = basicsCogsGaps().length > 0 || basicsEnvelopeCycle().some((e) => e.breach)
+    reply.header('Cache-Control', 'public, max-age=300')
+    return {
+      form: BASICS_FORM,
+      doctrine: BASICS_DOCTRINE,
+      terms: BASICS_TERMS,
+      manifest: BASICS_MANIFEST,
+      count: BASICS_MANIFEST.length,
+      envelope: breach ? 'BREACH' : 'GREEN',
     }
   })
 

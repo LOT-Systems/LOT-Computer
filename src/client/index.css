@@ -419,3 +419,53 @@ td:last-child {
   content: 'built different since day one';
   display: none;
 }
+
+/* ============================================================================
+   LOT-FM-001 · BASIC (RATION) · TERMINAL SHEET
+   House style: LiberationMono-Bold · white ground / black ink · inversion-only
+   hierarchy · 2px rules · square corners · fixed character grid · 3270 register.
+   Theme-independent by doctrine: the ledger reads the same on every terminal.
+   ============================================================================ */
+.lot-basics {
+  --lb-ink: #000;
+  --lb-ground: #fff;
+  --lb-rule: 2px solid var(--lb-ink);
+  font-family: 'Liberation Mono', 'LiberationMono-Bold', 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--lb-ink);
+  background: var(--lb-ground);
+  border: var(--lb-rule);
+  border-radius: 0;
+  max-width: 80ch;
+  font-variant-numeric: tabular-nums;
+}
+.lot-basics * { border-radius: 0 !important; }
+.lot-basics-row { display: flex; justify-content: space-between; gap: 2ch; padding: 0 1ch; }
+.lot-basics-rule { border-top: var(--lb-rule); }
+.lot-basics-inv { background: var(--lb-ink); color: var(--lb-ground); }
+.lot-basics-sec { padding: 12px 0; }
+.lot-basics-dim { white-space: pre; }
+.lot-basics table { width: 100%; border-collapse: collapse; }
+.lot-basics th, .lot-basics td { text-align: left; padding: 0 1ch; vertical-align: top; font-weight: 700; }
+.lot-basics th { background: var(--lb-ink); color: var(--lb-ground); }
+.lot-basics td.num, .lot-basics th.num { text-align: right; white-space: nowrap; }
+.lot-basics tr.lot-basics-cls td { border-top: var(--lb-rule); }
+.lot-basics-btn {
+  font: inherit; text-transform: inherit; color: var(--lb-ink); background: var(--lb-ground);
+  border: var(--lb-rule); padding: 0 1ch; cursor: pointer;
+}
+.lot-basics-btn:hover:not(:disabled), .lot-basics-btn:focus-visible { background: var(--lb-ink); color: var(--lb-ground); outline: none; }
+.lot-basics-btn:disabled { cursor: not-allowed; border-style: dashed; }
+.lot-basics-status { flex-wrap: wrap; column-gap: 2ch; row-gap: 0; }
+.lot-basics-show-sm { display: none; }
+@media (max-width: 480px) {
+  .lot-basics { font-size: 11px; line-height: 20px; }
+  .lot-basics-row { padding: 0 0.5ch; gap: 1ch; }
+  .lot-basics th, .lot-basics td { padding: 0 0.5ch; }
+  .lot-basics .lot-basics-hide-sm { display: none; }
+  .lot-basics .lot-basics-show-sm { display: inline; }
+}
