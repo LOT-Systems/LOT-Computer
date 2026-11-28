@@ -871,6 +871,23 @@ export function checkCalendarEasterEggs(): BadgeType[] {
     awarded.push('odyssey_day')
   }
 
+  // ── Calendar v21 — THE ARCANE CALENDAR ───────────────────────────────────────
+  // Alchemy Day: September 25 — Paracelsus born 1493
+  if (!hasBadge('alchemy_day') && month === 9 && day === 25) {
+    awardBadge('alchemy_day')
+    awarded.push('alchemy_day')
+  }
+  // Newton Stone: January 4 — Isaac Newton born 1643
+  if (!hasBadge('newton_stone') && month === 1 && day === 4) {
+    awardBadge('newton_stone')
+    awarded.push('newton_stone')
+  }
+  // Dee Day: July 13 — John Dee born 1527
+  if (!hasBadge('dee_day') && month === 7 && day === 13) {
+    awardBadge('dee_day')
+    awarded.push('dee_day')
+  }
+
   return awarded
 }
 
@@ -1483,6 +1500,23 @@ const WORD_TURNS: Array<{ patterns: RegExp; badge: BadgeType }> = [
   { patterns: /one[\s-]?ring[\s-]?(to[\s-]?rule|to[\s-]?find)|my[\s-]?precious|\bring[\s-]?of[\s-]?power/i, badge: 'tolkien_ring' },
   { patterns: /\b(odysseus|ulysses|ithaca|penelope|telemachus|cyclops)\b/i,             badge: 'odysseus_bow' },
   { patterns: /\b(gilgamesh|enkidu|great[\s-]?flood|utnapishtim|cedar[\s-]?forest)\b/i, badge: 'gilgamesh_word' },
+  // ── v23 — THE ARCANE TERMINAL ─────────────────────────────────────────────────
+  { patterns: /\barcane\b|\bthe[\s-]?arcane\b|\barcane[\s-]?arts?\b/i,                                badge: 'arcane_signal' },
+  { patterns: /\bgrimoire\b|\bbook[\s-]?of[\s-]?shadows\b|\bspell[\s-]?book\b/i,                      badge: 'grimoire_open' },
+  { patterns: /\bincantation\b|\bspell[\s-]?cast\b|\bwords[\s-]?of[\s-]?power\b/i,                    badge: 'incantation_cast' },
+  { patterns: /\bwarding?\b|\bprotective[\s-]?ward\b|\bward[\s-]?placed\b/i,                           badge: 'ward_placed' },
+  { patterns: /\btransmut(e|ing|ed|ation)\b|\balchemical[\s-]?change\b/i,                              badge: 'transmute_active' },
+  { patterns: /\bsigil\b|\bsacred[\s-]?symbol\b|\bpower[\s-]?symbol\b/i,                              badge: 'sigil_carved' },
+  { patterns: /\bfamiliar\b|\bspirit[\s-]?animal\b|\bbound[\s-]?spirit\b/i,                           badge: 'familiar_bound' },
+  { patterns: /\bsanctum\b|\bsacred[\s-]?space\b|\binner[\s-]?sanctum\b/i,                            badge: 'sanctum_found' },
+  { patterns: /\balchemy\b|\balchemical\b|\bmagnum[\s-]?opus\b/i,                                      badge: 'alchemy_process' },
+  { patterns: /\bcipher\b|\bcode[\s-]?broken\b|\bsecret[\s-]?revealed\b|\bhidden[\s-]?key\b/i,        badge: 'cipher_broken' },
+  { patterns: /\brune[sd]?\b|\brunic\b|\bfuthark\b|\belder[\s-]?futhark\b/i,                          badge: 'rune_inscribed' },
+  { patterns: /\bnexus\b|\bconvergence[\s-]?point\b|\bthe[\s-]?junction\b/i,                          badge: 'nexus_activated' },
+  // ── v20 Secret Boss — THE HIDDEN CODEX word triggers ─────────────────────────
+  { patterns: /\bparacelsus\b|\bdose[\s-]?makes[\s-]?the[\s-]?poison\b|\biatrochemistry\b/i,          badge: 'paracelsus_key' },
+  { patterns: /\bjohn[\s-]?dee\b|\benochian\b|\bdee'?s[\s-]?mirror\b|\bobsidian[\s-]?mirror\b/i,     badge: 'dee_cipher' },
+  { patterns: /\bemerald[\s-]?tablet\b|\bas[\s-]?above[\s-]?so[\s-]?below\b|\bhermes[\s-]?trismegistus\b/i, badge: 'emerald_tablet' },
 ]
 
 /**
@@ -1954,6 +1988,30 @@ export function runJournalEasterEggs(journalText: string): BadgeType[] {
   // Behavioral v16: body signal (journal entry >= 300 words)
   const bodySignal = checkBodySignal(journalText)
   if (bodySignal) awarded.push(bodySignal)
+
+  // Behavioral v19: hero session (3+ Hero's Journey v22 words in one entry)
+  const heroSession = checkHeroSession(journalText)
+  if (heroSession) awarded.push(heroSession)
+
+  // Behavioral v19: long quest (500+ words)
+  const longQuest = checkLongQuest(journalText)
+  if (longQuest) awarded.push(longQuest)
+
+  // Behavioral v19: threshold moment (00:00–00:30 checkin)
+  const thresholdMoment = checkThresholdMoment()
+  if (thresholdMoment) awarded.push(thresholdMoment)
+
+  // Behavioral v20: arcane session (3+ Arcane Terminal v23 words in one entry)
+  const arcaneSession = checkArcaneSession(journalText)
+  if (arcaneSession) awarded.push(arcaneSession)
+
+  // Behavioral v20: midnight ritual (23:00–23:59 checkin)
+  const midnightRitual = checkMidnightRitual()
+  if (midnightRitual) awarded.push(midnightRitual)
+
+  // Behavioral v20: long spell (666+ characters)
+  const longSpell = checkLongSpell(journalText)
+  if (longSpell) awarded.push(longSpell)
 
   // Word turns from journal text
   const wordTurns = detectWordTurns(journalText)
@@ -2711,6 +2769,61 @@ export function checkThresholdMoment(): BadgeType | null {
   if (hour === 0 && minute <= 30) {
     awardBadge('threshold_moment')
     return 'threshold_moment'
+  }
+  return null
+}
+
+// ── Arcane Terminal v23 behavioral checks ─────────────────────────────────────
+
+const ARCANE_WORDS_V23 = [
+  /\barcane\b|\barcane[\s-]?arts?\b/i,
+  /\bgrimoire\b|\bbook[\s-]?of[\s-]?shadows\b/i,
+  /\bincantation\b|\bspell[\s-]?cast\b/i,
+  /\bwarding?\b|\bprotective[\s-]?ward\b/i,
+  /\btransmut(e|ing|ed|ation)\b/i,
+  /\bsigil\b|\bsacred[\s-]?symbol\b/i,
+  /\bfamiliar\b|\bspirit[\s-]?animal\b/i,
+  /\bsanctum\b|\binner[\s-]?sanctum\b/i,
+  /\balchemy\b|\balchemical\b/i,
+  /\bcipher\b|\bcode[\s-]?broken\b/i,
+  /\brune[sd]?\b|\brunic\b|\bfuthark\b/i,
+  /\bnexus\b|\bconvergence[\s-]?point\b/i,
+]
+
+/**
+ * Award arcane_session badge if 3+ Arcane Terminal (v23) words appear in one journal entry.
+ */
+export function checkArcaneSession(journalText: string): BadgeType | null {
+  if (hasBadge('arcane_session')) return null
+  const matchCount = ARCANE_WORDS_V23.filter(r => r.test(journalText)).length
+  if (matchCount >= 3) {
+    awardBadge('arcane_session')
+    return 'arcane_session'
+  }
+  return null
+}
+
+/**
+ * Award midnight_ritual badge if user checks in between 23:00 and 23:59 local time.
+ */
+export function checkMidnightRitual(): BadgeType | null {
+  if (typeof window === 'undefined') return null
+  if (hasBadge('midnight_ritual')) return null
+  if (new Date().getHours() === 23) {
+    awardBadge('midnight_ritual')
+    return 'midnight_ritual'
+  }
+  return null
+}
+
+/**
+ * Award long_spell badge if journal entry is 666+ characters (magic square of the sun).
+ */
+export function checkLongSpell(journalText: string): BadgeType | null {
+  if (hasBadge('long_spell')) return null
+  if (journalText.length >= 666) {
+    awardBadge('long_spell')
+    return 'long_spell'
   }
   return null
 }

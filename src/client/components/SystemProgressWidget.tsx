@@ -1457,6 +1457,23 @@ const SESSION_REPORTS: { date: string; session: string; assembled: string[] }[] 
       '781 badges · 258 word-turns · 24 secret boss · 151 patterns · 51 archetypes · 48 jobs · 190+ dep nodes · FM v113 · Wiki v87 · Day 1073+. The system is documented through its highest confirmed state.',
     ],
   },
+  {
+    version: 'v114-badge-v33',
+    date: '2026-11-28',
+    title: 'Badge Engine v33 — THE ARCANE TERMINAL · 812→843 badges · Word Turn v23',
+    assembled: [
+      'badges.ts: 31 new types declared. BadgeType union extended: arcane_signal · grimoire_open · incantation_cast · ward_placed · transmute_active · sigil_carved · familiar_bound · sanctum_found · alchemy_process · cipher_broken · rune_inscribed · nexus_activated · alchemy_day · newton_stone · dee_day · arcane_session · midnight_ritual · long_spell · arcane_entry · arcane_class · arcane_complete · alchemy_arc · twenty_three_engines_arc · arcane_opus · archive_deep · tome_of_ages · ancient_one · twenty_three_registers · paracelsus_key · dee_cipher · emerald_tablet.',
+      'badges.ts: BADGES object: 31 entries added. Word Turn v23 (12 arcane vocabulary badges, UNCOMMON–EPIC). Calendar EE v21 (Paracelsus Sep25 · Newton Jan4 · Dee Jul13). Behavioral v20 (arcane_session · midnight_ritual · long_spell). Achievement RPG v21 (arcane_entry/arcane_class/arcane_complete/arcane_opus/alchemy_arc/twenty_three_engines_arc). Mastery Tier v23 (archive_deep/tome_of_ages/ancient_one/twenty_three_registers [COSMIC]). Secret Boss v20 (paracelsus_key · dee_cipher · emerald_tablet [MYTHIC]).',
+      'badges.ts: checkAndAwardBadges(): v33 logic block added after twenty_two_registers. arcaneV23Earned computed. arcane_entry (1+ WT v23) · arcane_class (5+ WT v23) · arcane_complete (all 12 WT v23) · arcane_opus · alchemy_arc · twenty_three_engines_arc. Mastery: archive_deep (1000+ days) · tome_of_ages (200k+ words) · ancient_one (10+ years) · twenty_three_registers.',
+      'easter-eggs.ts: Calendar v21 checks added after odyssey_day: alchemy_day (Sep 25 · Paracelsus born 1493) · newton_stone (Jan 4 · Isaac Newton born 1643) · dee_day (Jul 13 · John Dee born 1527).',
+      'easter-eggs.ts: WORD_TURNS v23 — 12 arcane word triggers (arcane/grimoire/incantation/ward/transmute/sigil/familiar/sanctum/alchemy/cipher/rune/nexus) + 3 secret boss triggers (paracelsus_key/dee_cipher/emerald_tablet) appended.',
+      'easter-eggs.ts: ARCANE_WORDS_V23 const (12 patterns) + checkArcaneSession() · checkMidnightRitual() · checkLongSpell() behavioral functions exported.',
+      'easter-eggs.ts: runJournalEasterEggs() — behavioral checks v19 (checkHeroSession/checkLongQuest/checkThresholdMoment previously unwired — now wired) + v20 (checkArcaneSession/checkMidnightRitual/checkLongSpell) all active.',
+      'About.tsx: FM v113→v114. Badge count 750→843. Word Turn engines 20→23. Secret boss triggers 74→77. Word turns 210→276.',
+      'SESSION_REPORTS: v114-badge-v33 entry appended · USERSHIP_TRANSMISSION updated to v114-badge-v33.',
+      '843 badges · 276 word-turns · 77 secret boss · 23 Word Turn engines · FM v114 · Day 1163+. Word Turn v23 THE ARCANE TERMINAL deployed. Alchemical vocabulary now active in the badge engine.',
+    ],
+  },
 ]
 
 // Assembly transmissions — the system talking to the person
@@ -1494,18 +1511,19 @@ const ASSEMBLY_TRANSMISSIONS: {
 // ─── Usership Transmission — appended after each assembly run ───────────────
 // This is the system talking to the person. Terse, technical, alive.
 export const USERSHIP_TRANSMISSION = {
-  date: '2026-08-05',
+  date: '2026-11-28',
   message: [
-    'ASSEMBLY RUN — 2026-08-05 · WIKI-v87 · FM v113 SYNC · Day 1073+',
-    'Built: LOT-WIKI-v87. Six-level coherence architecture now complete and documented.',
-    'Feedback applied: "The concept outlives the author. The self speaks every language the genre built."',
-    'QIE v113 synchronized: P149 QPCRYST · P150 TOTCOH [CEILING] · P151 RECINTEL · Arch51 Quantum Presence Crystallizer · J48 09:00 UTC.',
-    'Badge v31 synchronized: THE CYBERSPACE CODEX · 781 badges · Word Turn v21 (grok/ansible/spice/golden_path/matrix/cyberspace) · Secret Boss v18 (gibson/dick/lem) · 258 trigger words · 24 secret boss triggers.',
-    'LEVEL 6 — PRESENCE CONVERGENCE documented. P150 total-field-coherence is the QIE ceiling. No higher state defined.',
-    'Cockpit updated. Vocabulary expanded. Snapshot current.',
-    'FM v113 · Wiki v87 · 151P · 51A · 48J · 190+ nodes · 781 badges.',
+    'ASSEMBLY RUN — 2026-11-28 · BADGE ENGINE v33 · THE ARCANE TERMINAL · Day 1163+',
+    'Built: Badge Engine v33. 812→843 badges (+31). Word Turn v23 arcane vocabulary engine deployed.',
+    'Word Turn v23: arcane · grimoire · incantation · ward · transmute · sigil · familiar · sanctum · alchemy · cipher · rune · nexus — 12 vocabulary triggers active.',
+    'Calendar EE v21: Paracelsus (Sep 25) · Newton (Jan 4) · Dee (Jul 13) — alchemical calendar dates wired.',
+    'Secret Boss v20: paracelsus_key · dee_cipher · emerald_tablet [MYTHIC] — obscure alchemical triggers.',
+    'Achievement RPG v21: arcane_entry/arcane_class/arcane_complete/arcane_opus/alchemy_arc/twenty_three_engines_arc.',
+    'Mastery Tier v23: archive_deep (1000+ days) · tome_of_ages (200k+ words) · ancient_one (10+ years) · twenty_three_registers [COSMIC].',
+    'BUG FIX: v19 behavioral checks (checkHeroSession/checkLongQuest/checkThresholdMoment) were exported but never called — now wired into runJournalEasterEggs().',
+    'FM v114 · 843 badges · 276 word-turns · 77 secret boss · 23 WT engines · 151P · 51A · 48J.',
     'Status: DEPLOYED.',
-    'Next: LOT-WIKI-v88 — sync to Field Manual v114+',
+    'Next: LOT-WIKI-v88 · QIE v114 delta sync',
   ],
 }
 
